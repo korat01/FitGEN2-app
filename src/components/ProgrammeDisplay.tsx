@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ClientProfile, ProgrammeHebdomadaire, BlocExercice } from '@/types/programme';
-import { Calendar, Clock, Target, Dumbbell, User, Download, Mail, Zap } from 'lucide-react';
+import { Calendar, Clock, Target, Dumbbell, User, Download, Mail, Zap, TrendingUp } from 'lucide-react';
 
 interface ProgrammeDisplayProps {
   programme: ProgrammeHebdomadaire;
@@ -24,6 +23,21 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
     if (difficulte <= 4) return 'Modéré';
     return 'Difficile';
   };
+
+  const getVitesseLabel = (vitesse: string) => {
+    switch (vitesse) {
+      case 'maintien':
+        return { label: '3 - Maintien', color: 'bg-blue-100 text-blue-800' };
+      case 'progression_legere':
+        return { label: '4 - Progression légère', color: 'bg-orange-100 text-orange-800' };
+      case 'progression_rapide':
+        return { label: '5 - Progression rapide', color: 'bg-red-100 text-red-800' };
+      default:
+        return { label: 'Standard', color: 'bg-gray-100 text-gray-800' };
+    }
+  };
+
+  const vitesseInfo = getVitesseLabel(clientProfile.vitesse_progression);
 
   const joursOrdonnés = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
   const joursAvecSeances = joursOrdonnés.filter(jour => programme[jour]);
@@ -49,6 +63,10 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                 <div className="flex items-center space-x-1">
                   <Calendar className="h-4 w-4" />
                   <span>{joursAvecSeances.length} séance{joursAvecSeances.length > 1 ? 's' : ''}/semaine</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <TrendingUp className="h-4 w-4" />
+                  <Badge className={vitesseInfo.color}>{vitesseInfo.label}</Badge>
                 </div>
                 {hasRM && (
                   <div className="flex items-center space-x-1">

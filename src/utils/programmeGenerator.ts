@@ -1,4 +1,3 @@
-
 import { ClientProfile, BlocExercice, SeanceJour, ProgrammeHebdomadaire, Contraintes } from '@/types/programme';
 import { tousBlocs } from './blocsExercices';
 
@@ -46,19 +45,26 @@ export function creerProgrammeOptimise(
         profilClient.equipement_disponible
       );
       
-      // Optimiser la séquence des blocs
+      // Optimiser la séquence des blocs selon la vitesse de progression
       const blocsOptimisés = optimiserSequenceBlocs(
         blocsCandidats,
         objectif,
         profilClient.age,
-        profilClient.limitations_physiques
+        profilClient.limitations_physiques,
+        profilClient.vitesse_progression
       );
       
-      // Ajouter à la séance
-      séance.blocs = blocsOptimisés.slice(0, 5); // Limiter à 5 exercices par séance
+      // Ajouter à la séance (ajuster le nombre selon la vitesse)
+      const nombreExercices = determinerNombreExercices(profilClient.vitesse_progression);
+      séance.blocs = blocsOptimisés.slice(0, nombreExercices);
       
-      // Adapter les charges selon le niveau et les 1RM
-      séance.blocs = adapterChargesRepetitions(séance.blocs, profilClient.niveau, profilClient.rm_values);
+      // Adapter les charges selon le niveau et les 1RM avec la vitesse de progression
+      séance.blocs = adapterChargesRepetitions(
+        séance.blocs, 
+        profilClient.niveau, 
+        profilClient.rm_values, 
+        profilClient.vitesse_progression
+      );
       
       // Ajouter la séance au programme
       programmeHebdomadaire[jour] = séance;
@@ -66,6 +72,19 @@ export function creerProgrammeOptimise(
   }
   
   return programmeHebdomadaire;
+}
+
+function determinerNombreExercices(vitesseProgression: string): number {
+  switch (vitesseProgression) {
+    case 'maintien':
+      return 3; // Programme léger
+    case 'progression_legere':
+      return 4; // Programme modéré
+    case 'progression_rapide':
+      return 6; // Programme intensif
+    default:
+      return 4;
+  }
 }
 
 function optimiserJoursSemaine(
@@ -164,20 +183,19 @@ function optimiserSequenceBlocs(
   blocs: BlocExercice[],
   objectif: string,
   age: number,
-  limitations?: string
+  limitations?: string,
+  vitesseProgression?: string
 ): BlocExercice[] {
   let blocsOptimisés = [...blocs];
   
   // Trier selon l'objectif
   if (objectif === 'prise_de_masse') {
-    // Prioriser les exercices composés
     blocsOptimisés.sort((a, b) => {
       if (a.type === 'composé' && b.type !== 'composé') return -1;
       if (a.type !== 'composé' && b.type === 'composé') return 1;
       return 0;
     });
   } else if (objectif === 'perte_de_poids') {
-    // Mélanger cardio et résistance
     blocsOptimisés.sort((a, b) => {
       if (a.type === 'cardio' && b.type !== 'cardio') return -1;
       if (a.type !== 'cardio' && b.type === 'cardio') return 1;
@@ -185,22 +203,36 @@ function optimiserSequenceBlocs(
     });
   }
   
+  // Adapter selon la vitesse de progression
+  if (vitesseProgression === 'progression_rapide') {
+    // Privilégier les exercices plus difficiles
+    blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté >= 2);
+    blocsOptimisés.sort((a, b) => b.difficulté - a.difficulté);
+  } else if (vitesseProgression === 'maintien') {
+    // Privilégier les exercices plus accessibles
+    blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté <= 3);
+  }
+  
   // Adapter selon l'âge
   if (age > 50) {
-    // Privilégier les exercices à faible impact
     blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté <= 3);
   }
   
   return blocsOptimisés;
 }
 
-function calculerPourcentageSeance(objectif: string, niveau: string, jourSemaine: string): number {
-  // Définir les pourcentages par séance selon l'objectif
+function calculerPourcentageSeance(
+  objectif: string, 
+  niveau: string, 
+  jourSemaine: string, 
+  vitesseProgression?: string
+): number {
+  // Définir les pourcentages de base par séance selon l'objectif
   const pourcentagesParObjectif: { [key: string]: { [key: string]: number } } = {
     'force': {
-      'seance1': 85, // Séance lourde
-      'seance2': 70, // Séance modérée  
-      'seance3': 90, // Séance très lourde
+      'seance1': 85,
+      'seance2': 70,
+      'seance3': 90,
     },
     'prise_de_masse': {
       'seance1': 75,
@@ -214,7 +246,6 @@ function calculerPourcentageSeance(objectif: string, niveau: string, jourSemaine
     }
   };
 
-  // Mapper les jours aux séances
   const jourToSeance: { [key: string]: string } = {
     'lundi': 'seance1',
     'mercredi': 'seance2', 
@@ -226,19 +257,29 @@ function calculerPourcentageSeance(objectif: string, niveau: string, jourSemaine
   };
 
   const seance = jourToSeance[jourSemaine] || 'seance1';
-  return pourcentagesParObjectif[objectif]?.[seance] || 70;
+  let pourcentageBase = pourcentagesParObjectif[objectif]?.[seance] || 70;
+
+  // Ajuster selon la vitesse de progression
+  if (vitesseProgression === 'maintien') {
+    pourcentageBase *= 0.85; // 15% de réduction pour maintien
+  } else if (vitesseProgression === 'progression_rapide') {
+    pourcentageBase *= 1.1; // 10% d'augmentation pour progression rapide
+  }
+
+  return Math.round(pourcentageBase);
 }
 
 function adapterChargesRepetitions(
   blocs: BlocExercice[], 
   niveau: string, 
-  rmValues?: { [key: string]: number }
+  rmValues?: { [key: string]: number },
+  vitesseProgression?: string
 ): BlocExercice[] {
   return blocs.map((bloc, index) => {
     const blocAdapte = { ...bloc };
     
-    // Calculer le pourcentage pour cette séance (varie selon la position dans la semaine)
-    const pourcentageSeance = calculerPourcentageSeance('force', niveau, 'lundi') - (index * 5); // Décroissance dans la séance
+    // Calculer le pourcentage pour cette séance avec la vitesse de progression
+    const pourcentageSeance = calculerPourcentageSeance('force', niveau, 'lundi', vitesseProgression) - (index * 3);
     
     // Si le bloc a une référence RM et que le client a fourni cette valeur
     if (bloc.exercice_rm && rmValues?.[bloc.exercice_rm]) {
@@ -248,48 +289,61 @@ function adapterChargesRepetitions(
       // Calculer la charge basée sur le pourcentage du 1RM
       blocAdapte.charge = Math.round((rmValue * pourcentage) / 100);
       
-      // Adapter les répétitions selon le pourcentage
+      // Adapter les répétitions et séries selon le pourcentage ET la vitesse de progression
       if (pourcentage >= 85) {
         blocAdapte.répétitions = '3-5';
-        blocAdapte.séries = 5;
+        blocAdapte.séries = vitesseProgression === 'progression_rapide' ? 6 : 5;
       } else if (pourcentage >= 75) {
         blocAdapte.répétitions = '6-8';
-        blocAdapte.séries = 4;
+        blocAdapte.séries = vitesseProgression === 'progression_rapide' ? 5 : 4;
       } else if (pourcentage >= 65) {
         blocAdapte.répétitions = '8-12';
-        blocAdapte.séries = 3;
+        blocAdapte.séries = vitesseProgression === 'maintien' ? 2 : 3;
       } else {
         blocAdapte.répétitions = '12-15';
-        blocAdapte.séries = 3;
+        blocAdapte.séries = vitesseProgression === 'maintien' ? 2 : 3;
       }
       
-      blocAdapte.description = `${pourcentage}% du 1RM (${rmValue}kg)`;
+      blocAdapte.description = `${pourcentage}% du 1RM (${rmValue}kg) - ${vitesseProgression}`;
     } else {
-      // Adaptation classique par niveau si pas de 1RM
+      // Adaptation classique par niveau et vitesse si pas de 1RM
+      let multiplicateurCharge = 1;
+      let ajustementSeries = 0;
+      
+      // Ajuster selon la vitesse de progression
+      if (vitesseProgression === 'maintien') {
+        multiplicateurCharge = 0.9;
+        ajustementSeries = -1;
+      } else if (vitesseProgression === 'progression_rapide') {
+        multiplicateurCharge = 1.15;
+        ajustementSeries = 1;
+      }
+      
       if (niveau === 'débutant') {
-        blocAdapte.charge = Math.max(0, bloc.charge * 0.7);
+        blocAdapte.charge = Math.max(0, bloc.charge * 0.7 * multiplicateurCharge);
         if (typeof bloc.répétitions === 'number') {
           blocAdapte.répétitions = Math.min(15, bloc.répétitions + 3);
         }
-        blocAdapte.séries = Math.max(2, (bloc.séries || 3) - 1);
+        blocAdapte.séries = Math.max(1, (bloc.séries || 3) - 1 + ajustementSeries);
       } else if (niveau === 'avancé') {
-        blocAdapte.charge = bloc.charge * 1.2;
+        blocAdapte.charge = bloc.charge * 1.2 * multiplicateurCharge;
         if (typeof bloc.répétitions === 'number') {
           blocAdapte.répétitions = Math.max(6, bloc.répétitions - 2);
         }
-        blocAdapte.séries = (bloc.séries || 3) + 1;
+        blocAdapte.séries = (bloc.séries || 3) + 1 + ajustementSeries;
       } else {
-        blocAdapte.séries = bloc.séries || 3;
+        blocAdapte.charge = bloc.charge * multiplicateurCharge;
+        blocAdapte.séries = Math.max(1, (bloc.séries || 3) + ajustementSeries);
       }
     }
     
-    // Ajouter temps de repos adapté
-    if (niveau === 'débutant') {
-      blocAdapte.temps_repos = '90-120s';
-    } else if (niveau === 'avancé') {
-      blocAdapte.temps_repos = '60-90s';
+    // Adapter temps de repos selon la vitesse de progression
+    if (vitesseProgression === 'progression_rapide') {
+      blocAdapte.temps_repos = '90-120s'; // Plus de repos pour récupération
+    } else if (vitesseProgression === 'maintien') {
+      blocAdapte.temps_repos = '45-60s'; // Moins de repos, rythme modéré
     } else {
-      blocAdapte.temps_repos = '60-90s';
+      blocAdapte.temps_repos = '60-90s'; // Standard
     }
     
     return blocAdapte;

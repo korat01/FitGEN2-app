@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -27,11 +28,11 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
   const getVitesseLabel = (vitesse: string) => {
     switch (vitesse) {
       case 'maintien':
-        return { label: '3 - Maintien', color: 'bg-blue-100 text-blue-800' };
+        return { label: 'Maintien', color: 'bg-blue-100 text-blue-800' };
       case 'progression_legere':
-        return { label: '4 - Progression légère', color: 'bg-orange-100 text-orange-800' };
+        return { label: 'Modérée', color: 'bg-orange-100 text-orange-800' };
       case 'progression_rapide':
-        return { label: '5 - Progression rapide', color: 'bg-red-100 text-red-800' };
+        return { label: 'Rapide', color: 'bg-red-100 text-red-800' };
       default:
         return { label: 'Standard', color: 'bg-gray-100 text-gray-800' };
     }

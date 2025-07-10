@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -207,19 +208,19 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
                 <SelectContent>
                   <SelectItem value="maintien">
                     <div className="flex flex-col">
-                      <span className="font-medium">3 - Maintien de forme</span>
+                      <span className="font-medium">Maintien</span>
                       <span className="text-xs text-gray-500">Préserver la condition actuelle</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="progression_legere">
                     <div className="flex flex-col">
-                      <span className="font-medium">4 - Progression légère</span>
+                      <span className="font-medium">Modérée</span>
                       <span className="text-xs text-gray-500">Prise de force et muscle modérée</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="progression_rapide">
                     <div className="flex flex-col">
-                      <span className="font-medium">5 - Progression rapide</span>
+                      <span className="font-medium">Rapide</span>
                       <span className="text-xs text-gray-500">Préparation compétition / gains maximaux</span>
                     </div>
                   </SelectItem>

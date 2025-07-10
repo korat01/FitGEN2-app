@@ -38,12 +38,64 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
     'swiss_ball', 'machine_guidée', 'cardio', 'piscine'
   ];
 
+  const equipementSalle = [
+    'haltères', 'barre', 'machine_guidée', 'cardio', 'swiss_ball', 'kettlebell'
+  ];
+
   const contraintesOptions = [
     'genou_fragile', 'dos_sensible', 'épaule_limitée', 'cheville_faible',
     'hypertension', 'asthme', 'diabète', 'arthrose', 'hernie_discale'
   ];
 
+  // Fonction pour gérer le changement de vitesse de progression
+  const handleVitesseProgressionChange = (vitesse: string) => {
+    setFormData(prev => ({ ...prev, vitesse_progression: vitesse as any }));
+    
+    // Si "rapide" est sélectionné, programmer tous les jours disponibles
+    if (vitesse === 'progression_rapide') {
+      const joursDisponibles = joursOptions.filter(jour => 
+        formData.jours_disponibles?.includes(jour) || 
+        !formData.jours_disponibles?.length
+      );
+      
+      // Si aucun jour n'est encore sélectionné, proposer tous les jours
+      if (!formData.jours_disponibles?.length) {
+        setFormData(prev => ({ 
+          ...prev, 
+          jours_disponibles: [...joursOptions],
+          vitesse_progression: vitesse as any
+        }));
+        setSelectedDaysCount(joursOptions.length);
+        toast.info('Mode rapide : Tous les jours ont été programmés pour maximiser les résultats');
+      } else {
+        // Sinon, garder tous les jours déjà sélectionnés
+        toast.info('Mode rapide : Tous vos jours disponibles seront utilisés');
+      }
+    }
+  };
+
+  // Fonction pour gérer le changement de format
+  const handleFormatChange = (format: string) => {
+    setFormData(prev => ({ ...prev, format_souhaite: format as any }));
+    
+    // Si "salle" est sélectionné, présélectionner l'équipement de salle
+    if (format === 'salle') {
+      setFormData(prev => ({ 
+        ...prev, 
+        equipement_disponible: [...equipementSalle],
+        format_souhaite: format as any
+      }));
+      toast.info('Équipement de salle de sport présélectionné');
+    }
+  };
+
   const handleJourChange = (jour: string, checked: boolean) => {
+    // En mode rapide, empêcher la désélection
+    if (formData.vitesse_progression === 'progression_rapide' && !checked) {
+      toast.warning('En mode rapide, tous les jours disponibles doivent être programmés');
+      return;
+    }
+
     if (checked && selectedDaysCount >= 5) {
       toast.warning('Vous ne pouvez sélectionner que 5 jours maximum');
       return;
@@ -103,6 +155,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
       const clientProfile: ClientProfile = {
         nom: formData.nom!,
         age: formData.age!,
+        poids: formData.poids,
         niveau: formData.niveau!,
         objectif: formData.objectif!,
         vitesse_progression: formData.vitesse_progression!,
@@ -170,6 +223,19 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
             </div>
 
             <div>
+              <Label htmlFor="poids">Poids (kg)</Label>
+              <Input
+                id="poids"
+                type="number"
+                value={formData.poids || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, poids: parseInt(e.target.value) }))}
+                placeholder="75"
+                min="30"
+                max="200"
+              />
+            </div>
+
+            <div>
               <Label>Niveau *</Label>
               <Select onValueChange={(value: any) => setFormData(prev => ({ ...prev, niveau: value }))}>
                 <SelectTrigger>
@@ -201,7 +267,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
 
             <div>
               <Label>Vitesse de progression souhaitée *</Label>
-              <Select onValueChange={(value: any) => setFormData(prev => ({ ...prev, vitesse_progression: value }))}>
+              <Select onValueChange={handleVitesseProgressionChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner la vitesse" />
                 </SelectTrigger>
@@ -240,6 +306,11 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
               <Label>Jours disponibles * (5 max)</Label>
               <div className="text-sm text-gray-500 mb-2">
                 {selectedDaysCount}/5 jours sélectionnés
+                {formData.vitesse_progression === 'progression_rapide' && (
+                  <span className="text-orange-600 font-medium ml-2">
+                    (Mode rapide : tous les jours recommandés)
+                  </span>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {joursOptions.map((jour) => (
@@ -263,7 +334,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
               <Label>Format souhaité</Label>
               <RadioGroup
                 value={formData.format_souhaite}
-                onValueChange={(value: any) => setFormData(prev => ({ ...prev, format_souhaite: value }))}
+                onValueChange={handleFormatChange}
                 className="mt-2"
               >
                 <div className="flex items-center space-x-2">

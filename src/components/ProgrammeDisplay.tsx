@@ -90,7 +90,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div>
               <div className="text-sm font-medium text-gray-500">Niveau</div>
               <Badge variant="secondary" className="mt-1">{clientProfile.niveau}</Badge>
@@ -99,6 +99,12 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
               <div className="text-sm font-medium text-gray-500">Âge</div>
               <div className="mt-1">{clientProfile.age} ans</div>
             </div>
+            {clientProfile.poids && (
+              <div>
+                <div className="text-sm font-medium text-gray-500">Poids</div>
+                <div className="mt-1">{clientProfile.poids} kg</div>
+              </div>
+            )}
             <div>
               <div className="text-sm font-medium text-gray-500">Format</div>
               <div className="mt-1 capitalize">{clientProfile.format_souhaite.replace('_', ' ')}</div>

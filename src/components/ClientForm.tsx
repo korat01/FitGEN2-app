@@ -22,10 +22,12 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
   const [formData, setFormData] = useState<Partial<ClientProfile>>({
     jours_disponibles: [],
     contraintes_medicales: [],
-    equipement_disponible: []
+    equipement_disponible: [],
+    rm_values: {}
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDaysCount, setSelectedDaysCount] = useState(0);
 
   const joursOptions = [
     'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'
@@ -42,10 +44,16 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
   ];
 
   const handleJourChange = (jour: string, checked: boolean) => {
+    if (checked && selectedDaysCount >= 5) {
+      toast.warning('Vous ne pouvez sélectionner que 5 jours maximum');
+      return;
+    }
+
     const newJours = checked 
       ? [...(formData.jours_disponibles || []), jour]
       : (formData.jours_disponibles || []).filter(j => j !== jour);
     
+    setSelectedDaysCount(newJours.length);
     setFormData(prev => ({ ...prev, jours_disponibles: newJours }));
   };
 
@@ -63,6 +71,17 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
       : (formData.contraintes_medicales || []).filter(c => c !== contrainte);
     
     setFormData(prev => ({ ...prev, contraintes_medicales: newContraintes }));
+  };
+
+  const handleRMChange = (exercice: string, value: string) => {
+    const numValue = value ? parseInt(value) : undefined;
+    setFormData(prev => ({
+      ...prev,
+      rm_values: {
+        ...prev.rm_values,
+        [exercice]: numValue
+      }
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,7 +109,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
         contraintes_medicales: formData.contraintes_medicales!,
         limitations_physiques: formData.limitations_physiques,
         equipement_disponible: formData.equipement_disponible!,
-        format_souhaite: formData.format_souhaite || 'salle'
+        format_souhaite: formData.format_souhaite || 'salle',
+        rm_values: formData.rm_values
       };
 
       const programme = creerProgrammeOptimise(
@@ -187,7 +207,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Jours disponibles *</Label>
+              <Label>Jours disponibles * (5 max)</Label>
+              <div className="text-sm text-gray-500 mb-2">
+                {selectedDaysCount}/5 jours sélectionnés
+              </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {joursOptions.map((jour) => (
                   <div key={jour} className="flex items-center space-x-2">
@@ -234,6 +257,75 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* 1RM (Répétitions Maximales) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">1RM - Répétitions maximales (optionnel)</CardTitle>
+          <p className="text-sm text-gray-600">
+            Renseignez vos charges maximales pour une répétition si vous les connaissez. Cela permettra de calculer des pourcentages précis.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="developpe_couche">Développé couché (kg)</Label>
+              <Input
+                id="developpe_couche"
+                type="number"
+                value={formData.rm_values?.developpe_couche || ''}
+                onChange={(e) => handleRMChange('developpe_couche', e.target.value)}
+                placeholder="80"
+                min="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="squat">Squat (kg)</Label>
+              <Input
+                id="squat"
+                type="number"
+                value={formData.rm_values?.squat || ''}
+                onChange={(e) => handleRMChange('squat', e.target.value)}
+                placeholder="100"
+                min="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="souleve_de_terre">Soulevé de terre (kg)</Label>
+              <Input
+                id="souleve_de_terre"
+                type="number"
+                value={formData.rm_values?.souleve_de_terre || ''}
+                onChange={(e) => handleRMChange('souleve_de_terre', e.target.value)}
+                placeholder="120"
+                min="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="developpe_militaire">Développé militaire (kg)</Label>
+              <Input
+                id="developpe_militaire"
+                type="number"
+                value={formData.rm_values?.developpe_militaire || ''}
+                onChange={(e) => handleRMChange('developpe_militaire', e.target.value)}
+                placeholder="50"
+                min="0"
+              />
+            </div>
+            <div>
+              <Label htmlFor="rowing">Rowing (kg)</Label>
+              <Input
+                id="rowing"
+                type="number"
+                value={formData.rm_values?.rowing || ''}
+                onChange={(e) => handleRMChange('rowing', e.target.value)}
+                placeholder="70"
+                min="0"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Équipement disponible */}
       <Card>

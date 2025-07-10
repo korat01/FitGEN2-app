@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ClientProfile, ProgrammeHebdomadaire, BlocExercice } from '@/types/programme';
-import { Calendar, Clock, Target, Dumbbell, User, Download, Mail } from 'lucide-react';
+import { Calendar, Clock, Target, Dumbbell, User, Download, Mail, Zap } from 'lucide-react';
 
 interface ProgrammeDisplayProps {
   programme: ProgrammeHebdomadaire;
@@ -28,6 +28,8 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
   const joursOrdonnés = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
   const joursAvecSeances = joursOrdonnés.filter(jour => programme[jour]);
 
+  const hasRM = clientProfile.rm_values && Object.values(clientProfile.rm_values).some(val => val && val > 0);
+
   return (
     <div className="space-y-6">
       {/* En-tête du programme */}
@@ -48,6 +50,12 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                   <Calendar className="h-4 w-4" />
                   <span>{joursAvecSeances.length} séance{joursAvecSeances.length > 1 ? 's' : ''}/semaine</span>
                 </div>
+                {hasRM && (
+                  <div className="flex items-center space-x-1">
+                    <Zap className="h-4 w-4" />
+                    <span>1RM configuré</span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="flex space-x-2">
@@ -86,6 +94,29 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
               </div>
             </div>
           </div>
+
+          {hasRM && (
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2">1RM configurés :</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                {clientProfile.rm_values?.developpe_couche && (
+                  <div>Développé couché: <strong>{clientProfile.rm_values.developpe_couche}kg</strong></div>
+                )}
+                {clientProfile.rm_values?.squat && (
+                  <div>Squat: <strong>{clientProfile.rm_values.squat}kg</strong></div>
+                )}
+                {clientProfile.rm_values?.souleve_de_terre && (
+                  <div>Soulevé de terre: <strong>{clientProfile.rm_values.souleve_de_terre}kg</strong></div>
+                )}
+                {clientProfile.rm_values?.developpe_militaire && (
+                  <div>Développé militaire: <strong>{clientProfile.rm_values.developpe_militaire}kg</strong></div>
+                )}
+                {clientProfile.rm_values?.rowing && (
+                  <div>Rowing: <strong>{clientProfile.rm_values.rowing}kg</strong></div>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -134,6 +165,12 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                             <Badge variant="outline" className="text-xs">
                               {bloc.type}
                             </Badge>
+                            {bloc.exercice_rm && hasRM && (
+                              <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800">
+                                <Zap className="h-3 w-3 mr-1" />
+                                % 1RM
+                              </Badge>
+                            )}
                           </div>
                         </div>
                         <div className="text-right text-sm">
@@ -145,6 +182,9 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                           {bloc.séries && (
                             <div className="text-gray-500">{bloc.séries} séries</div>
                           )}
+                          {bloc.charge > 0 && (
+                            <div className="text-blue-600 font-medium">{bloc.charge}kg</div>
+                          )}
                         </div>
                       </div>
                       
@@ -153,7 +193,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                       </div>
                       
                       {bloc.description && (
-                        <div className="text-sm text-gray-600 mb-2">
+                        <div className="text-sm text-gray-600 mb-2 italic">
                           {bloc.description}
                         </div>
                       )}
@@ -190,6 +230,11 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
             <div className="p-3 bg-yellow-50 rounded-lg">
               <strong>⚠️ Sécurité:</strong> Respectez les temps de repos et arrêtez en cas de douleur inhabituelle.
             </div>
+            {hasRM && (
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <strong>⚡ 1RM:</strong> Les charges sont calculées automatiquement selon vos maximales. Ajustez si nécessaire selon votre forme du jour.
+              </div>
+            )}
             {clientProfile.contraintes_medicales.length > 0 && (
               <div className="p-3 bg-red-50 rounded-lg">
                 <strong>🏥 Contraintes médicales:</strong> Tenez compte de vos contraintes: {clientProfile.contraintes_medicales.join(', ')}.

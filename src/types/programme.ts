@@ -9,6 +9,13 @@ export interface ClientProfile {
   limitations_physiques?: string;
   equipement_disponible: string[];
   format_souhaite: 'en_ligne' | 'presentiel' | 'salle' | 'exterieur';
+  rm_values?: {
+    developpe_couche?: number;
+    squat?: number;
+    souleve_de_terre?: number;
+    developpe_militaire?: number;
+    rowing?: number;
+  };
 }
 
 export interface BlocExercice {
@@ -24,6 +31,8 @@ export interface BlocExercice {
   équipement: string[];
   description?: string;
   contraintes_médicales?: string[];
+  pourcentage_rm?: number; // Nouveau champ pour les exercices de force
+  exercice_rm?: 'developpe_couche' | 'squat' | 'souleve_de_terre' | 'developpe_militaire' | 'rowing';
 }
 
 export interface SeanceJour {

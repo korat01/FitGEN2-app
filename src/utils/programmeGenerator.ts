@@ -57,8 +57,8 @@ export function creerProgrammeOptimise(
       // Ajouter à la séance
       séance.blocs = blocsOptimisés.slice(0, 5); // Limiter à 5 exercices par séance
       
-      // Adapter les charges selon le niveau
-      séance.blocs = adapterChargesRepetitions(séance.blocs, profilClient.niveau);
+      // Adapter les charges selon le niveau et les 1RM
+      séance.blocs = adapterChargesRepetitions(séance.blocs, profilClient.niveau, profilClient.rm_values);
       
       // Ajouter la séance au programme
       programmeHebdomadaire[jour] = séance;
@@ -194,27 +194,93 @@ function optimiserSequenceBlocs(
   return blocsOptimisés;
 }
 
-function adapterChargesRepetitions(blocs: BlocExercice[], niveau: string): BlocExercice[] {
-  return blocs.map(bloc => {
+function calculerPourcentageSeance(objectif: string, niveau: string, jourSemaine: string): number {
+  // Définir les pourcentages par séance selon l'objectif
+  const pourcentagesParObjectif: { [key: string]: { [key: string]: number } } = {
+    'force': {
+      'seance1': 85, // Séance lourde
+      'seance2': 70, // Séance modérée  
+      'seance3': 90, // Séance très lourde
+    },
+    'prise_de_masse': {
+      'seance1': 75,
+      'seance2': 80,
+      'seance3': 70,
+    },
+    'endurance': {
+      'seance1': 60,
+      'seance2': 65,
+      'seance3': 55,
+    }
+  };
+
+  // Mapper les jours aux séances
+  const jourToSeance: { [key: string]: string } = {
+    'lundi': 'seance1',
+    'mercredi': 'seance2', 
+    'vendredi': 'seance3',
+    'mardi': 'seance2',
+    'jeudi': 'seance1',
+    'samedi': 'seance3',
+    'dimanche': 'seance1'
+  };
+
+  const seance = jourToSeance[jourSemaine] || 'seance1';
+  return pourcentagesParObjectif[objectif]?.[seance] || 70;
+}
+
+function adapterChargesRepetitions(
+  blocs: BlocExercice[], 
+  niveau: string, 
+  rmValues?: { [key: string]: number }
+): BlocExercice[] {
+  return blocs.map((bloc, index) => {
     const blocAdapte = { ...bloc };
     
-    if (niveau === 'débutant') {
-      // Réduire la charge et augmenter les répétitions
-      blocAdapte.charge = Math.max(0, bloc.charge * 0.7);
-      if (typeof bloc.répétitions === 'number') {
-        blocAdapte.répétitions = Math.min(15, bloc.répétitions + 3);
+    // Calculer le pourcentage pour cette séance (varie selon la position dans la semaine)
+    const pourcentageSeance = calculerPourcentageSeance('force', niveau, 'lundi') - (index * 5); // Décroissance dans la séance
+    
+    // Si le bloc a une référence RM et que le client a fourni cette valeur
+    if (bloc.exercice_rm && rmValues?.[bloc.exercice_rm]) {
+      const rmValue = rmValues[bloc.exercice_rm];
+      const pourcentage = bloc.pourcentage_rm || pourcentageSeance;
+      
+      // Calculer la charge basée sur le pourcentage du 1RM
+      blocAdapte.charge = Math.round((rmValue * pourcentage) / 100);
+      
+      // Adapter les répétitions selon le pourcentage
+      if (pourcentage >= 85) {
+        blocAdapte.répétitions = '3-5';
+        blocAdapte.séries = 5;
+      } else if (pourcentage >= 75) {
+        blocAdapte.répétitions = '6-8';
+        blocAdapte.séries = 4;
+      } else if (pourcentage >= 65) {
+        blocAdapte.répétitions = '8-12';
+        blocAdapte.séries = 3;
+      } else {
+        blocAdapte.répétitions = '12-15';
+        blocAdapte.séries = 3;
       }
-      blocAdapte.séries = Math.max(2, (bloc.séries || 3) - 1);
-    } else if (niveau === 'avancé') {
-      // Augmenter la charge
-      blocAdapte.charge = bloc.charge * 1.2;
-      if (typeof bloc.répétitions === 'number') {
-        blocAdapte.répétitions = Math.max(6, bloc.répétitions - 2);
-      }
-      blocAdapte.séries = (bloc.séries || 3) + 1;
+      
+      blocAdapte.description = `${pourcentage}% du 1RM (${rmValue}kg)`;
     } else {
-      // Niveau intermédiaire - garder les valeurs par défaut
-      blocAdapte.séries = bloc.séries || 3;
+      // Adaptation classique par niveau si pas de 1RM
+      if (niveau === 'débutant') {
+        blocAdapte.charge = Math.max(0, bloc.charge * 0.7);
+        if (typeof bloc.répétitions === 'number') {
+          blocAdapte.répétitions = Math.min(15, bloc.répétitions + 3);
+        }
+        blocAdapte.séries = Math.max(2, (bloc.séries || 3) - 1);
+      } else if (niveau === 'avancé') {
+        blocAdapte.charge = bloc.charge * 1.2;
+        if (typeof bloc.répétitions === 'number') {
+          blocAdapte.répétitions = Math.max(6, bloc.répétitions - 2);
+        }
+        blocAdapte.séries = (bloc.séries || 3) + 1;
+      } else {
+        blocAdapte.séries = bloc.séries || 3;
+      }
     }
     
     // Ajouter temps de repos adapté

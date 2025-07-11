@@ -268,9 +268,13 @@ function optimiserSequenceBlocs(
     blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté <= 3);
   }
   
-  // Adapter selon l'âge
+  // Adapter selon l'âge et niveau avancé
   if (age > 50) {
     blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté <= 3);
+  } else if (niveau === 'avancé' && (!limitations || limitations === '')) {
+    // Pour les avancés sans limitation : privilégier exercices très difficiles
+    blocsOptimisés = blocsOptimisés.filter(bloc => bloc.difficulté >= 4);
+    blocsOptimisés.sort((a, b) => b.difficulté - a.difficulté);
   }
   
   return blocsOptimisés;

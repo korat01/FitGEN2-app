@@ -1,11 +1,13 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ClientProfile, ProgrammeHebdomadaire, BlocExercice } from '@/types/programme';
-import { Calendar, Clock, Target, Dumbbell, User, Download, Mail, Zap, TrendingUp } from 'lucide-react';
+import { Calendar, Clock, Target, Dumbbell, User, Download, Mail, Zap, TrendingUp, Edit, Check, X, Info } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 interface ProgrammeDisplayProps {
   programme: ProgrammeHebdomadaire;
@@ -13,6 +15,10 @@ interface ProgrammeDisplayProps {
 }
 
 const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientProfile }) => {
+  const [showJourModification, setShowJourModification] = useState(false);
+  const [joursSelectionnables, setJoursSelectionnables] = useState<string[]>([]);
+  const [nouveauxJours, setNouveauxJours] = useState<string[]>([]);
+
   const getBadgeColor = (difficulte: number) => {
     if (difficulte <= 2) return 'bg-green-100 text-green-800';
     if (difficulte <= 4) return 'bg-yellow-100 text-yellow-800';
@@ -42,8 +48,60 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
 
   const joursOrdonnés = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
   const joursAvecSeances = joursOrdonnés.filter(jour => programme[jour]);
-
+  
+  // Calculer les jours disponibles mais non programmés
+  const joursNonProgrammes = clientProfile.jours_disponibles.filter(jour => !joursAvecSeances.includes(jour));
+  
   const hasRM = clientProfile.rm_values && Object.values(clientProfile.rm_values).some(val => val && val > 0);
+
+  // Fonction pour obtenir les recommandations de jours selon la vitesse
+  const getRecommandationJours = () => {
+    const totalDisponible = clientProfile.jours_disponibles.length;
+    const totalProgramme = joursAvecSeances.length;
+    
+    switch (clientProfile.vitesse_progression) {
+      case 'progression_rapide':
+        if (totalProgramme < 5 && totalDisponible >= 5) {
+          return `Pour une progression rapide optimale, ${Math.min(5, totalDisponible)} jours sont recommandés (actuellement ${totalProgramme}).`;
+        }
+        break;
+      case 'progression_legere':
+        if (totalProgramme < 3 && totalDisponible >= 3) {
+          return `Pour une progression modérée, 3-4 jours sont recommandés (actuellement ${totalProgramme}).`;
+        }
+        break;
+    }
+    return null;
+  };
+
+  const recommandation = getRecommandationJours();
+
+  const handleShowModification = () => {
+    setJoursSelectionnables(clientProfile.jours_disponibles);
+    setNouveauxJours([...joursAvecSeances]);
+    setShowJourModification(true);
+  };
+
+  const handleJourToggle = (jour: string, checked: boolean) => {
+    if (checked) {
+      setNouveauxJours(prev => [...prev, jour]);
+    } else {
+      setNouveauxJours(prev => prev.filter(j => j !== jour));
+    }
+  };
+
+  const handleAnnulerModification = () => {
+    setShowJourModification(false);
+    setNouveauxJours([]);
+  };
+
+  const handleConfirmerModification = () => {
+    // Ici vous pourriez appeler une fonction pour regénérer le programme
+    // avec les nouveaux jours sélectionnés
+    console.log('Nouveaux jours sélectionnés:', nouveauxJours);
+    setShowJourModification(false);
+    // TODO: Implémenter la régénération du programme
+  };
 
   return (
     <div className="space-y-6">
@@ -119,6 +177,75 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
               </div>
             </div>
           </div>
+
+          {/* Section des jours programmés avec possibilité de modification */}
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium text-gray-900">Jours programmés :</h4>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleShowModification}
+                className="text-xs"
+              >
+                <Edit className="h-3 w-3 mr-1" />
+                Modifier
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {joursAvecSeances.map(jour => (
+                <Badge key={jour} variant="secondary" className="capitalize">
+                  {jour}
+                </Badge>
+              ))}
+            </div>
+            
+            {joursNonProgrammes.length > 0 && (
+              <div className="text-sm text-gray-600">
+                <strong>Jours disponibles non utilisés :</strong> {joursNonProgrammes.join(', ')}
+              </div>
+            )}
+            
+            {recommandation && (
+              <Alert className="mt-2">
+                <Info className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  {recommandation}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+
+          {/* Interface de modification des jours */}
+          {showJourModification && (
+            <div className="mt-4 p-4 border rounded-lg bg-blue-50">
+              <h4 className="font-medium text-blue-900 mb-3">Modifier les jours d'entraînement :</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                {joursSelectionnables.map((jour) => (
+                  <div key={jour} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`modif-${jour}`}
+                      checked={nouveauxJours.includes(jour)}
+                      onCheckedChange={(checked) => handleJourToggle(jour, !!checked)}
+                    />
+                    <Label htmlFor={`modif-${jour}`} className="capitalize text-sm">
+                      {jour}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              <div className="flex space-x-2">
+                <Button size="sm" onClick={handleConfirmerModification}>
+                  <Check className="h-4 w-4 mr-1" />
+                  Confirmer ({nouveauxJours.length} jours)
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleAnnulerModification}>
+                  <X className="h-4 w-4 mr-1" />
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )}
 
           {hasRM && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">

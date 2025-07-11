@@ -10,8 +10,14 @@ export function creerProgrammeOptimise(
   // Initialiser le programme complet
   const programmeHebdomadaire: ProgrammeHebdomadaire = {};
   
-  // 1. Déterminer la répartition optimale selon le profil et l'objectif
-  const joursOptimaux = optimiserJoursSemaine(disponibilite, objectif, profilClient.niveau, contraintes.médicales);
+  // 1. Optimiser automatiquement les jours selon la vitesse de progression
+  const joursOptimaux = optimiserJoursSemaine(
+    disponibilite, 
+    objectif, 
+    profilClient.niveau, 
+    contraintes.médicales,
+    profilClient.vitesse_progression
+  );
   
   // 2. Définir les focus par jour (basé sur le modèle)
   const focusJours: { [key: string]: string } = {
@@ -24,7 +30,7 @@ export function creerProgrammeOptimise(
     "dimanche": "repos_étirements"
   };
   
-  // 3. Pour chaque jour d'entraînement
+  // 3. Pour chaque jour d'entraînement optimisé
   for (const jour of joursOptimaux) {
     if (focusJours[jour] && !focusJours[jour].includes('repos')) {
       const focus = focusJours[jour];
@@ -91,26 +97,59 @@ function optimiserJoursSemaine(
   disponibilite: string[], 
   objectif: string, 
   niveau: string, 
-  contraintesMedicales: string[]
+  contraintesMedicales: string[],
+  vitesseProgression?: string
 ): string[] {
-  // Filtrer les jours disponibles et optimiser selon l'objectif
-  let joursOptimaux = [...disponibilite];
+  // Cloner le tableau des jours disponibles
+  let joursDisponibles = [...disponibilite];
   
-  // Logique d'optimisation selon l'objectif
-  if (objectif === 'perte_de_poids' && joursOptimaux.length > 4) {
-    // Pour la perte de poids, privilégier plus de séances
-    return joursOptimaux.slice(0, 5);
-  } else if (objectif === 'prise_de_masse' && joursOptimaux.length > 3) {
-    // Pour la prise de masse, 3-4 séances suffisent
-    return joursOptimaux.slice(0, 4);
+  // Optimisation intelligente selon la vitesse de progression
+  switch (vitesseProgression) {
+    case 'progression_rapide':
+      // Pour progression rapide : 5 jours maximum, prioriser l'efficacité
+      if (joursDisponibles.length >= 5) {
+        // Si 7 jours disponibles, choisir 5 jours optimaux avec repos
+        if (joursDisponibles.length === 7) {
+          return ['lundi', 'mardi', 'mercredi', 'vendredi', 'samedi'];
+        }
+        // Si 5-6 jours, prendre les 5 premiers
+        return joursDisponibles.slice(0, 5);
+      }
+      // Si moins de 5 jours, prendre tous les jours disponibles
+      return joursDisponibles;
+      
+    case 'progression_legere':
+      // Pour progression modérée : 3-4 jours optimaux
+      if (joursDisponibles.length > 4) {
+        return joursDisponibles.slice(0, 4);
+      } else if (joursDisponibles.length === 4) {
+        return joursDisponibles;
+      }
+      // Si moins de 4 jours, prendre ce qui est disponible
+      return joursDisponibles;
+      
+    case 'maintien':
+      // Pour maintien : 2-3 jours maximum
+      if (joursDisponibles.length > 3) {
+        return joursDisponibles.slice(0, 3);
+      }
+      return joursDisponibles;
+      
+    default:
+      // Logique par défaut selon objectif et niveau
+      if (objectif === 'perte_de_poids' && joursDisponibles.length > 4) {
+        return joursDisponibles.slice(0, 5);
+      } else if (objectif === 'prise_de_masse' && joursDisponibles.length > 3) {
+        return joursDisponibles.slice(0, 4);
+      }
+      
+      // Adapter selon le niveau
+      if (niveau === 'débutant' && joursDisponibles.length > 3) {
+        return joursDisponibles.slice(0, 3);
+      }
+      
+      return joursDisponibles;
   }
-  
-  // Adapter selon le niveau
-  if (niveau === 'débutant' && joursOptimaux.length > 3) {
-    return joursOptimaux.slice(0, 3);
-  }
-  
-  return joursOptimaux;
 }
 
 function filtrerBlocsCompatibles(

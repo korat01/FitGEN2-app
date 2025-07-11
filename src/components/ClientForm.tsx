@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,9 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ClientProfile, ProgrammeHebdomadaire } from '@/types/programme';
 import { creerProgrammeOptimise } from '@/utils/programmeGenerator';
 import { toast } from 'sonner';
+import { AlertTriangle, Info } from 'lucide-react';
 
 interface ClientFormProps {
   onProgrammeGenerated: (profile: ClientProfile, programme: ProgrammeHebdomadaire) => void;
@@ -47,31 +48,49 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
     'hypertension', 'asthme', 'diabète', 'arthrose', 'hernie_discale'
   ];
 
+  // Fonction pour obtenir la notice selon la vitesse et les jours disponibles
+  const getVitesseNotice = () => {
+    const joursDispos = formData.jours_disponibles?.length || 0;
+    
+    if (formData.vitesse_progression === 'progression_rapide') {
+      if (joursDispos < 5) {
+        return {
+          type: 'warning' as const,
+          message: `Pour une progression rapide optimale, 5 jours d'entraînement sont recommandés. Vous n'avez sélectionné que ${joursDispos} jour(s). Considérez ajouter plus de jours si possible.`
+        };
+      } else if (joursDispos === 7) {
+        return {
+          type: 'info' as const,
+          message: 'Programme rapide : 5 jours seront automatiquement sélectionnés parmi vos 7 jours disponibles pour optimiser la récupération.'
+        };
+      } else if (joursDispos >= 5) {
+        return {
+          type: 'info' as const,
+          message: `Programme rapide : ${Math.min(5, joursDispos)} jours seront utilisés pour maximiser les résultats.`
+        };
+      }
+    } else if (formData.vitesse_progression === 'progression_legere') {
+      if (joursDispos > 4) {
+        return {
+          type: 'info' as const,
+          message: 'Programme modéré : 3-4 jours seront sélectionnés automatiquement parmi vos jours disponibles.'
+        };
+      }
+    } else if (formData.vitesse_progression === 'maintien') {
+      if (joursDispos > 3) {
+        return {
+          type: 'info' as const,
+          message: 'Programme maintien : 2-3 jours seront sélectionnés pour préserver votre condition physique.'
+        };
+      }
+    }
+    
+    return null;
+  };
+
   // Fonction pour gérer le changement de vitesse de progression
   const handleVitesseProgressionChange = (vitesse: string) => {
     setFormData(prev => ({ ...prev, vitesse_progression: vitesse as any }));
-    
-    // Si "rapide" est sélectionné, programmer tous les jours disponibles
-    if (vitesse === 'progression_rapide') {
-      const joursDisponibles = joursOptions.filter(jour => 
-        formData.jours_disponibles?.includes(jour) || 
-        !formData.jours_disponibles?.length
-      );
-      
-      // Si aucun jour n'est encore sélectionné, proposer tous les jours
-      if (!formData.jours_disponibles?.length) {
-        setFormData(prev => ({ 
-          ...prev, 
-          jours_disponibles: [...joursOptions],
-          vitesse_progression: vitesse as any
-        }));
-        setSelectedDaysCount(joursOptions.length);
-        toast.info('Mode rapide : Tous les jours ont été programmés pour maximiser les résultats');
-      } else {
-        // Sinon, garder tous les jours déjà sélectionnés
-        toast.info('Mode rapide : Tous vos jours disponibles seront utilisés');
-      }
-    }
   };
 
   // Fonction pour gérer le changement de format
@@ -90,14 +109,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
   };
 
   const handleJourChange = (jour: string, checked: boolean) => {
-    // En mode rapide, empêcher la désélection
-    if (formData.vitesse_progression === 'progression_rapide' && !checked) {
-      toast.warning('En mode rapide, tous les jours disponibles doivent être programmés');
-      return;
-    }
-
-    if (checked && selectedDaysCount >= 5) {
-      toast.warning('Vous ne pouvez sélectionner que 5 jours maximum');
+    if (checked && selectedDaysCount >= 7) {
+      toast.warning('Vous ne pouvez sélectionner que 7 jours maximum');
       return;
     }
 
@@ -187,6 +200,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
       setIsLoading(false);
     }
   };
+
+  const vitesseNotice = getVitesseNotice();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -303,14 +318,9 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Jours disponibles * (5 max)</Label>
+              <Label>Jours disponibles *</Label>
               <div className="text-sm text-gray-500 mb-2">
-                {selectedDaysCount}/5 jours sélectionnés
-                {formData.vitesse_progression === 'progression_rapide' && (
-                  <span className="text-orange-600 font-medium ml-2">
-                    (Mode rapide : tous les jours recommandés)
-                  </span>
-                )}
+                {selectedDaysCount}/7 jours sélectionnés
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {joursOptions.map((jour) => (
@@ -326,6 +336,20 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
                   </div>
                 ))}
               </div>
+              
+              {/* Notice dynamique selon la vitesse */}
+              {vitesseNotice && (
+                <Alert className="mt-3">
+                  {vitesseNotice.type === 'warning' ? (
+                    <AlertTriangle className="h-4 w-4" />
+                  ) : (
+                    <Info className="h-4 w-4" />
+                  )}
+                  <AlertDescription className="text-sm">
+                    {vitesseNotice.message}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
             <Separator />

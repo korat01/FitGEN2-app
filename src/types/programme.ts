@@ -1,7 +1,10 @@
+
 export interface ClientProfile {
   nom: string;
   age: number;
   poids?: number;
+  taille?: number; // en cm
+  imc?: number; // calculé automatiquement
   niveau: 'débutant' | 'intermédiaire' | 'avancé';
   objectif: 'prise_de_masse' | 'perte_de_poids' | 'remise_en_forme' | 'endurance' | 'force';
   vitesse_progression: 'maintien' | 'progression_legere' | 'progression_rapide';

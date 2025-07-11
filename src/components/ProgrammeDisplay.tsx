@@ -148,7 +148,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <div>
               <div className="text-sm font-medium text-gray-500">Niveau</div>
               <Badge variant="secondary" className="mt-1">{clientProfile.niveau}</Badge>
@@ -163,18 +163,23 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                 <div className="mt-1">{clientProfile.poids} kg</div>
               </div>
             )}
+            {clientProfile.taille && (
+              <div>
+                <div className="text-sm font-medium text-gray-500">Taille</div>
+                <div className="mt-1">{clientProfile.taille} cm</div>
+              </div>
+            )}
+            {clientProfile.imc && (
+              <div>
+                <div className="text-sm font-medium text-gray-500">IMC</div>
+                <Badge className={getIMCStatus(clientProfile.imc).color} variant="secondary">
+                  {clientProfile.imc}
+                </Badge>
+              </div>
+            )}
             <div>
               <div className="text-sm font-medium text-gray-500">Format</div>
               <div className="mt-1 capitalize">{clientProfile.format_souhaite.replace('_', ' ')}</div>
-            </div>
-            <div>
-              <div className="text-sm font-medium text-gray-500">Équipement</div>
-              <div className="mt-1 text-sm">
-                {clientProfile.equipement_disponible.length > 0 
-                  ? clientProfile.equipement_disponible.slice(0, 2).join(', ') 
-                  : 'Aucun'}
-                {clientProfile.equipement_disponible.length > 2 && '...'}
-              </div>
             </div>
           </div>
 
@@ -400,6 +405,14 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
       </Card>
     </div>
   );
+};
+
+// Fonction helper pour le statut IMC
+const getIMCStatus = (imc: number) => {
+  if (imc < 18.5) return { label: 'Insuffisance pondérale', color: 'bg-blue-100 text-blue-800' };
+  if (imc < 25) return { label: 'Poids normal', color: 'bg-green-100 text-green-800' };
+  if (imc < 30) return { label: 'Surpoids', color: 'bg-yellow-100 text-yellow-800' };
+  return { label: 'Obésité', color: 'bg-red-100 text-red-800' };
 };
 
 export default ProgrammeDisplay;

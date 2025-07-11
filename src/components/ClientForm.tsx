@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +47,25 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
     'genou_fragile', 'dos_sensible', 'épaule_limitée', 'cheville_faible',
     'hypertension', 'asthme', 'diabète', 'arthrose', 'hernie_discale'
   ];
+
+  // Calculer l'IMC automatiquement
+  useEffect(() => {
+    if (formData.poids && formData.taille) {
+      const tailleEnMetres = formData.taille / 100;
+      const imc = formData.poids / (tailleEnMetres * tailleEnMetres);
+      setFormData(prev => ({ ...prev, imc: Math.round(imc * 10) / 10 }));
+    } else {
+      setFormData(prev => ({ ...prev, imc: undefined }));
+    }
+  }, [formData.poids, formData.taille]);
+
+  // Fonction pour obtenir le statut IMC
+  const getIMCStatus = (imc: number) => {
+    if (imc < 18.5) return { label: 'Insuffisance pondérale', color: 'bg-blue-100 text-blue-800' };
+    if (imc < 25) return { label: 'Poids normal', color: 'bg-green-100 text-green-800' };
+    if (imc < 30) return { label: 'Surpoids', color: 'bg-yellow-100 text-yellow-800' };
+    return { label: 'Obésité', color: 'bg-red-100 text-red-800' };
+  };
 
   // Fonction pour obtenir la notice selon la vitesse et les jours disponibles
   const getVitesseNotice = () => {
@@ -109,11 +128,6 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
   };
 
   const handleJourChange = (jour: string, checked: boolean) => {
-    if (checked && selectedDaysCount >= 7) {
-      toast.warning('Vous ne pouvez sélectionner que 7 jours maximum');
-      return;
-    }
-
     const newJours = checked 
       ? [...(formData.jours_disponibles || []), jour]
       : (formData.jours_disponibles || []).filter(j => j !== jour);
@@ -169,6 +183,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
         nom: formData.nom!,
         age: formData.age!,
         poids: formData.poids,
+        taille: formData.taille,
+        imc: formData.imc,
         niveau: formData.niveau!,
         objectif: formData.objectif!,
         vitesse_progression: formData.vitesse_progression!,
@@ -237,18 +253,47 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="poids">Poids (kg)</Label>
-              <Input
-                id="poids"
-                type="number"
-                value={formData.poids || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, poids: parseInt(e.target.value) }))}
-                placeholder="75"
-                min="30"
-                max="200"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="poids">Poids (kg)</Label>
+                <Input
+                  id="poids"
+                  type="number"
+                  value={formData.poids || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, poids: parseInt(e.target.value) }))}
+                  placeholder="75"
+                  min="30"
+                  max="200"
+                />
+              </div>
+              <div>
+                <Label htmlFor="taille">Taille (cm)</Label>
+                <Input
+                  id="taille"
+                  type="number"
+                  value={formData.taille || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, taille: parseInt(e.target.value) }))}
+                  placeholder="175"
+                  min="100"
+                  max="250"
+                />
+              </div>
             </div>
+
+            {/* Affichage de l'IMC */}
+            {formData.imc && (
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">IMC calculé :</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="font-bold text-lg">{formData.imc}</span>
+                    <Badge className={getIMCStatus(formData.imc).color}>
+                      {getIMCStatus(formData.imc).label}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div>
               <Label>Niveau *</Label>
@@ -320,7 +365,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
             <div>
               <Label>Jours disponibles *</Label>
               <div className="text-sm text-gray-500 mb-2">
-                {selectedDaysCount}/7 jours sélectionnés
+                Sélectionnez tous vos jours disponibles
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 {joursOptions.map((jour) => (

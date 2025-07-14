@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dumbbell, Users, FileText, Calendar } from 'lucide-react';
+import { Dumbbell, Users, FileText, Calendar, UtensilsCrossed } from 'lucide-react';
 import ClientForm from '@/components/ClientForm';
 import ProgrammeDisplay from '@/components/ProgrammeDisplay';
 import { ClientProfile, ProgrammeHebdomadaire } from '@/types/programme';
@@ -49,7 +49,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 lg:w-2/3 xl:w-1/2 h-14 p-1 gradient-card shadow-card">
+          <TabsList className="grid w-full grid-cols-5 lg:w-4/5 xl:w-3/5 h-14 p-1 gradient-card shadow-card">
             <TabsTrigger value="form" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Client</span>
@@ -61,6 +61,10 @@ const Index = () => {
             <TabsTrigger value="export" disabled={!programme} className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Export</span>
+            </TabsTrigger>
+            <TabsTrigger value="nutrition" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300" onClick={() => window.location.href = '/nutrition'}>
+              <UtensilsCrossed className="h-4 w-4" />
+              <span className="hidden sm:inline">Nutrition</span>
             </TabsTrigger>
             <TabsTrigger value="clients" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />

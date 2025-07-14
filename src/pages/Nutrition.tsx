@@ -17,8 +17,8 @@ const Nutrition = () => {
   const [currentTab, setCurrentTab] = useState('repas-types');
 
   return (
-    <div className="min-h-screen bg-background animate-fade-in">
-      {/* Header */}
+    <div className="bg-background animate-fade-in">
+      {/* Page Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-90"></div>
         <div className="relative bg-card/80 backdrop-blur-sm border-b border-border/50">

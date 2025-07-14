@@ -20,8 +20,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background animate-fade-in">
-      {/* Header */}
+    <div className="bg-background animate-fade-in">
+      {/* Page Header */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 gradient-hero opacity-90"></div>
         <div className="relative bg-card/80 backdrop-blur-sm border-b border-border/50">
@@ -35,10 +35,10 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  FitGen Pro
+                  Générateur de Programmes
                 </h1>
                 <p className="text-muted-foreground text-lg mt-1">
-                  Générateur de programmes sportifs personnalisés
+                  Créez des programmes sportifs personnalisés pour vos clients
                 </p>
               </div>
             </div>
@@ -49,7 +49,7 @@ const Index = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={currentTab} onValueChange={setCurrentTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5 lg:w-4/5 xl:w-3/5 h-14 p-1 gradient-card shadow-card">
+          <TabsList className="grid w-full grid-cols-4 lg:w-4/5 xl:w-3/5 h-14 p-1 gradient-card shadow-card">
             <TabsTrigger value="form" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Client</span>
@@ -61,10 +61,6 @@ const Index = () => {
             <TabsTrigger value="export" disabled={!programme} className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Export</span>
-            </TabsTrigger>
-            <TabsTrigger value="nutrition" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300" onClick={() => window.location.href = '/nutrition'}>
-              <UtensilsCrossed className="h-4 w-4" />
-              <span className="hidden sm:inline">Nutrition</span>
             </TabsTrigger>
             <TabsTrigger value="clients" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />

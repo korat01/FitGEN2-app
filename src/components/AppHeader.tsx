@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, UtensilsCrossed, Home } from 'lucide-react';
+import { Dumbbell, UtensilsCrossed, Home, Code } from 'lucide-react';
 
 const AppHeader = () => {
   const location = useLocation();
@@ -16,6 +16,11 @@ const AppHeader = () => {
       path: '/nutrition',
       label: 'Nutrition',
       icon: UtensilsCrossed,
+    },
+    {
+      path: '/developer',
+      label: 'Développeur',
+      icon: Code,
     }
   ];
 

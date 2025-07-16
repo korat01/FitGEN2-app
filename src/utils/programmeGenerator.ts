@@ -19,22 +19,15 @@ export function creerProgrammeOptimise(
     profilClient.vitesse_progression
   );
   
-  // 2. Définir les focus par jour (basé sur le modèle)
-  const focusJours: { [key: string]: string } = {
-    "lundi": "haut_corps_poussée",
-    "mardi": "repos_actif",
-    "mercredi": "bas_corps_gainage", 
-    "jeudi": "repos_complet",
-    "vendredi": "haut_corps_tirage",
-    "samedi": "full_body_léger",
-    "dimanche": "repos_étirements"
-  };
+  // 2. Générer une répartition intelligente des focus avec variété et respect des intervalles
+  const focusRepartition = genererFocusAvecVariete(joursOptimaux, objectif);
   
   // 3. Pour chaque jour d'entraînement optimisé
-  for (const jour of joursOptimaux) {
-    if (focusJours[jour] && !focusJours[jour].includes('repos')) {
-      const focus = focusJours[jour];
-      
+  for (let i = 0; i < joursOptimaux.length; i++) {
+    const jour = joursOptimaux[i];
+    const focus = focusRepartition[i];
+    
+    if (focus && !focus.includes('repos')) {
       // Initialiser la séance du jour
       const séance: SeanceJour = {
         nom: jour.charAt(0).toUpperCase() + jour.slice(1),
@@ -51,9 +44,17 @@ export function creerProgrammeOptimise(
         profilClient.equipement_disponible
       );
       
+      // Éviter les exercices déjà utilisés dans les séances précédentes
+      const exercicesDejaUtilises = Object.values(programmeHebdomadaire)
+        .flatMap(seance => seance.blocs.map(bloc => bloc.nom));
+      
+      const blocsNonUtilises = blocsCandidats.filter(bloc => 
+        !exercicesDejaUtilises.includes(bloc.nom)
+      );
+      
       // Optimiser la séquence des blocs selon la vitesse de progression
       const blocsOptimisés = optimiserSequenceBlocs(
-        blocsCandidats,
+        blocsNonUtilises.length > 0 ? blocsNonUtilises : blocsCandidats,
         objectif,
         profilClient.age,
         profilClient.limitations_physiques,
@@ -92,6 +93,69 @@ function determinerNombreExercices(vitesseProgression: string): number {
     default:
       return 4;
   }
+}
+
+function genererFocusAvecVariete(joursOptimaux: string[], objectif: string): string[] {
+  const focusVarietes = [
+    'haut_corps_poussée',
+    'bas_corps_force',
+    'haut_corps_tirage', 
+    'bas_corps_gainage',
+    'full_body_léger',
+    'cardio_interval',
+    'force_composée'
+  ];
+  
+  const focusRepartition: string[] = [];
+  const groupesMusculairesUtilises: { [key: string]: number } = {};
+  
+  // Mapping des focus vers les groupes musculaires principaux
+  const focusVersGroupes: { [key: string]: string[] } = {
+    'haut_corps_poussée': ['pectoraux', 'épaules', 'triceps'],
+    'haut_corps_tirage': ['dos', 'biceps'],
+    'bas_corps_force': ['quadriceps', 'fessiers', 'ischio'],
+    'bas_corps_gainage': ['fessiers', 'core', 'mollets'],
+    'full_body_léger': ['全身'],
+    'cardio_interval': ['cardio'],
+    'force_composée': ['全身']
+  };
+  
+  for (let i = 0; i < joursOptimaux.length; i++) {
+    let focusChoisi = '';
+    
+    // Pour chaque focus possible, vérifier s'il respecte l'intervalle de 2 jours
+    for (const focus of focusVarietes) {
+      const groupes = focusVersGroupes[focus] || [];
+      let peutUtiliser = true;
+      
+      // Vérifier si les groupes musculaires ont été utilisés dans les 2 derniers jours
+      for (const groupe of groupes) {
+        if (groupesMusculairesUtilises[groupe] !== undefined && 
+            i - groupesMusculairesUtilises[groupe] < 2) {
+          peutUtiliser = false;
+          break;
+        }
+      }
+      
+      if (peutUtiliser) {
+        focusChoisi = focus;
+        // Marquer les groupes musculaires comme utilisés à ce jour
+        for (const groupe of groupes) {
+          groupesMusculairesUtilises[groupe] = i;
+        }
+        break;
+      }
+    }
+    
+    // Si aucun focus ne respecte l'intervalle, prendre le premier disponible
+    if (!focusChoisi) {
+      focusChoisi = focusVarietes[i % focusVarietes.length];
+    }
+    
+    focusRepartition.push(focusChoisi);
+  }
+  
+  return focusRepartition;
 }
 
 function optimiserJoursSemaine(
@@ -181,8 +245,11 @@ function verifierFocusCompatible(bloc: BlocExercice, focus: string): boolean {
   const focusMapping: { [key: string]: string[] } = {
     'haut_corps_poussée': ['composé', 'isolé'],
     'haut_corps_tirage': ['composé', 'isolé'],
+    'bas_corps_force': ['composé'],
     'bas_corps_gainage': ['composé', 'gainage'],
     'full_body_léger': ['composé', 'cardio', 'étirement'],
+    'cardio_interval': ['cardio'],
+    'force_composée': ['composé'],
     'repos_actif': ['étirement', 'cardio'],
     'repos_étirements': ['étirement']
   };

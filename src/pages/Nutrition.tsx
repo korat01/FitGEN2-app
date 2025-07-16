@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { 
   UtensilsCrossed, 
   Apple, 
@@ -9,12 +10,90 @@ import {
   ShoppingCart, 
   Plus,
   Search,
-  Filter
+  Filter,
+  Trash2,
+  Download
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { getAliments, getRepas, deleteAliment, deleteRepas, generateShoppingList, getMenus } from '@/utils/nutritionData';
+import type { AlimentBlock, RepasBlock } from '@/utils/nutritionData';
+import { useToast } from '@/hooks/use-toast';
 
 const Nutrition = () => {
+  const { toast } = useToast();
   const [currentTab, setCurrentTab] = useState('repas-types');
+  const [aliments, setAliments] = useState<AlimentBlock[]>([]);
+  const [repas, setRepas] = useState<RepasBlock[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = () => {
+    setAliments(getAliments());
+    setRepas(getRepas());
+  };
+
+  const handleDeleteAliment = (id: string) => {
+    deleteAliment(id);
+    loadData();
+    toast({
+      title: "Aliment supprimé",
+      description: "L'aliment a été supprimé de votre bibliothèque."
+    });
+  };
+
+  const handleDeleteRepas = (id: string) => {
+    deleteRepas(id);
+    loadData();
+    toast({
+      title: "Repas supprimé", 
+      description: "Le repas a été supprimé de votre bibliothèque."
+    });
+  };
+
+  const generateShoppingListAction = () => {
+    const menus = getMenus();
+    const shoppingList = generateShoppingList(menus);
+    
+    // Créer un fichier texte de la liste
+    let listText = "LISTE DE COURSES\n=================\n\n";
+    Object.entries(shoppingList).forEach(([category, items]) => {
+      listText += `${category.toUpperCase()}\n`;
+      listText += "─".repeat(category.length) + "\n";
+      items.forEach(item => {
+        listText += `• ${item}\n`;
+      });
+      listText += "\n";
+    });
+    
+    // Télécharger le fichier
+    const blob = new Blob([listText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `liste-courses-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Liste de courses générée",
+      description: "La liste a été téléchargée."
+    });
+  };
+
+  const filteredAliments = aliments.filter(aliment =>
+    aliment.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    aliment.catégorie.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredRepas = repas.filter(repas =>
+    repas.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    repas.type_de_repas.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="bg-background animate-fade-in">
@@ -114,32 +193,60 @@ const Nutrition = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* Exemple de repas */}
-                  <Card className="hover-lift border border-border/50">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">Petit-déjeuner équilibré</CardTitle>
-                      <CardDescription>Avoine, fruits, yaourt grec</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-3 gap-2 text-sm mb-4">
-                        <div className="text-center">
-                          <div className="font-semibold text-primary">450</div>
-                          <div className="text-muted-foreground">kcal</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold text-accent">25g</div>
-                          <div className="text-muted-foreground">protéines</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold text-secondary">60g</div>
-                          <div className="text-muted-foreground">glucides</div>
-                        </div>
-                      </div>
-                      <Button variant="outline" className="w-full">
-                        Ajouter au menu
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  {filteredRepas.length > 0 ? (
+                    filteredRepas.map((repas) => (
+                      <Card key={repas.id} className="hover-lift border border-border/50">
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg">{repas.nom}</CardTitle>
+                              <CardDescription>{repas.type_de_repas}</CardDescription>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteRepas(repas.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {repas.objectif_nutritionnel.map((objectif) => (
+                              <Badge key={objectif} variant="secondary" className="text-xs">
+                                {objectif}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 text-sm mb-4">
+                            <div className="text-center">
+                              <div className="font-semibold text-primary">{repas.calories_totales}</div>
+                              <div className="text-muted-foreground">kcal</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-accent">{repas.macros.protéines}g</div>
+                              <div className="text-muted-foreground">protéines</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-secondary">{repas.macros.glucides}g</div>
+                              <div className="text-muted-foreground">glucides</div>
+                            </div>
+                          </div>
+                          <Button variant="outline" className="w-full">
+                            Ajouter au menu
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-12">
+                      <UtensilsCrossed className="h-16 w-16 mx-auto text-muted-foreground mb-4 opacity-50" />
+                      <p className="text-lg font-medium text-foreground mb-2">Aucun repas</p>
+                      <p className="text-muted-foreground">Créez vos premiers repas dans la section Développeur</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -167,18 +274,90 @@ const Nutrition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 gradient-accent rounded-full blur-xl opacity-20"></div>
-                    <Apple className="relative h-16 w-16 mx-auto text-accent" />
+                <div className="flex space-x-4 mb-6">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      placeholder="Rechercher un aliment..." 
+                      className="h-12 pl-10"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                   </div>
-                  <p className="text-lg font-medium text-foreground mb-2">Créez vos aliments personnalisés</p>
-                  <p className="text-muted-foreground mb-6">Ajoutez des aliments avec leurs valeurs nutritionnelles</p>
-                  <Button className="gradient-accent hover:gradient-primary transition-all duration-300">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Créer mon premier aliment
+                  <Button variant="outline" className="h-12 px-6">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filtres
                   </Button>
                 </div>
+
+                {filteredAliments.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredAliments.map((aliment) => (
+                      <Card key={aliment.id} className="hover-lift border border-border/50">
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg">{aliment.nom}</CardTitle>
+                              <CardDescription>{aliment.catégorie}</CardDescription>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteAliment(aliment.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-1 mb-4">
+                            {aliment.classes_nutritionnelles.slice(0, 2).map((classe) => (
+                              <Badge key={classe} variant="secondary" className="text-xs">
+                                {classe}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+                            <div className="text-center">
+                              <div className="font-semibold text-primary">{aliment.calories}</div>
+                              <div className="text-muted-foreground">kcal</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-semibold text-accent">{aliment.macros.protéines}g</div>
+                              <div className="text-muted-foreground">protéines</div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {aliment.quantité_standard}
+                          </p>
+                          <Button variant="outline" className="w-full">
+                            Ajouter à un repas
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 gradient-accent rounded-full blur-xl opacity-20"></div>
+                      <Apple className="relative h-16 w-16 mx-auto text-accent" />
+                    </div>
+                    <p className="text-lg font-medium text-foreground mb-2">
+                      {searchTerm ? 'Aucun aliment trouvé' : 'Créez vos aliments personnalisés'}
+                    </p>
+                    <p className="text-muted-foreground mb-6">
+                      {searchTerm ? 'Essayez un autre terme de recherche' : 'Ajoutez des aliments avec leurs valeurs nutritionnelles'}
+                    </p>
+                    {!searchTerm && (
+                      <Button className="gradient-accent hover:gradient-primary transition-all duration-300">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Créer mon premier aliment
+                      </Button>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -316,11 +495,12 @@ const Nutrition = () => {
                     <span className="text-2xl">Liste de courses</span>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="outline">
-                      Générer automatiquement
-                    </Button>
-                    <Button className="gradient-secondary hover:gradient-primary transition-all duration-300">
-                      Exporter PDF
+                    <Button 
+                      variant="outline"
+                      onClick={generateShoppingListAction}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Générer et télécharger
                     </Button>
                   </div>
                 </CardTitle>
@@ -329,16 +509,42 @@ const Nutrition = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 gradient-secondary rounded-full blur-xl opacity-20"></div>
-                    <ShoppingCart className="relative h-16 w-16 mx-auto text-secondary" />
+                <div className="space-y-6">
+                  {/* Instructions */}
+                  <div className="bg-card/50 rounded-lg p-4 border border-border/20">
+                    <h3 className="font-semibold mb-2">Comment ça marche ?</h3>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      <li>1. Ajoutez des repas à votre menu du jour</li>
+                      <li>2. Cliquez sur "Générer et télécharger" pour créer automatiquement votre liste</li>
+                      <li>3. La liste sera organisée par catégories d'aliments</li>
+                    </ul>
                   </div>
-                  <p className="text-lg font-medium text-foreground mb-2">Aucune liste de courses</p>
-                  <p className="text-muted-foreground mb-6">Ajoutez des repas à votre menu pour générer automatiquement votre liste</p>
-                  <Button className="gradient-secondary hover:gradient-primary transition-all duration-300">
-                    Générer ma première liste
-                  </Button>
+
+                  {/* Aperçu des catégories */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {['Protéines', 'Féculents', 'Légumes', 'Fruits', 'Matières grasses', 'Autres'].map((category) => (
+                      <Card key={category} className="text-center p-4 border border-border/50">
+                        <div className="text-sm font-medium text-muted-foreground">{category}</div>
+                        <div className="text-xs text-muted-foreground/70 mt-1">0 items</div>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <div className="text-center py-8">
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 gradient-secondary rounded-full blur-xl opacity-20"></div>
+                      <ShoppingCart className="relative h-16 w-16 mx-auto text-secondary" />
+                    </div>
+                    <p className="text-lg font-medium text-foreground mb-2">Liste de courses intelligente</p>
+                    <p className="text-muted-foreground mb-6">Organisée automatiquement par catégories</p>
+                    <Button 
+                      className="gradient-secondary hover:gradient-primary transition-all duration-300"
+                      onClick={generateShoppingListAction}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger la liste
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

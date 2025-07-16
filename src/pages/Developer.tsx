@@ -19,6 +19,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { saveAliment, saveRepas } from '@/utils/nutritionData';
 
 const Developer = () => {
   const { toast } = useToast();
@@ -164,54 +165,107 @@ const Developer = () => {
   };
 
   const handleSaveAliment = () => {
-    const alimentData = {
-      nom: alimentForm.nom,
-      catégorie: alimentForm.catégorie,
-      calories: `${alimentForm.calories} kcal pour ${alimentForm.quantité_standard}`,
-      macros: {
-        protéines: `${alimentForm.protéines}g`,
-        glucides: `${alimentForm.glucides}g`,
-        lipides: `${alimentForm.lipides}g`,
-        fibres: `${alimentForm.fibres}g`
-      },
-      quantité_standard: alimentForm.quantité_standard,
-      moment_de_consommation: alimentForm.moment_consommation,
-      classes_nutritionnelles: alimentForm.classes_nutritionnelles,
-      index_glycémique: alimentForm.index_glycémique,
-      bénéfices_clés: alimentForm.bénéfices_clés,
-      interdit_si: alimentForm.interdit_si
-    };
-
-    console.log('Nouvel aliment:', JSON.stringify(alimentData, null, 2));
-    toast({
-      title: "Aliment ajouté",
-      description: `L'aliment "${alimentForm.nom}" a été ajouté avec succès.`
-    });
-
-    // Reset form
-    setAlimentForm({
-      nom: '',
-      catégorie: '',
-      calories: '',
-      protéines: '',
-      glucides: '',
-      lipides: '',
-      fibres: '',
-      quantité_standard: '',
-      index_glycémique: '',
-      moment_consommation: [],
-      classes_nutritionnelles: [],
-      bénéfices_clés: [],
-      interdit_si: []
-    });
+    try {
+      const alimentData = {
+        nom: alimentForm.nom,
+        catégorie: alimentForm.catégorie as any,
+        calories: parseInt(alimentForm.calories),
+        macros: {
+          protéines: parseFloat(alimentForm.protéines),
+          glucides: parseFloat(alimentForm.glucides),
+          lipides: parseFloat(alimentForm.lipides),
+          fibres: parseFloat(alimentForm.fibres)
+        },
+        quantité_standard: alimentForm.quantité_standard,
+        moment_de_consommation: alimentForm.moment_consommation,
+        classes_nutritionnelles: alimentForm.classes_nutritionnelles,
+        index_glycémique: alimentForm.index_glycémique as any,
+        bénéfices_clés: alimentForm.bénéfices_clés,
+        interdit_si: alimentForm.interdit_si
+      };
+      
+      saveAliment(alimentData);
+      
+      toast({
+        title: "Aliment ajouté",
+        description: `L'aliment "${alimentForm.nom}" a été ajouté avec succès à votre bibliothèque.`
+      });
+      
+      // Reset form
+      setAlimentForm({
+        nom: '',
+        catégorie: '',
+        calories: '',
+        protéines: '',
+        glucides: '',
+        lipides: '',
+        fibres: '',
+        quantité_standard: '',
+        index_glycémique: '',
+        moment_consommation: [],
+        classes_nutritionnelles: [],
+        bénéfices_clés: [],
+        interdit_si: []
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la sauvegarde.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSaveRepas = () => {
-    console.log('Nouveau repas:', JSON.stringify(repasForm, null, 2));
-    toast({
-      title: "Repas ajouté",
-      description: `Le repas "${repasForm.nom}" a été ajouté avec succès.`
-    });
+    try {
+      const repasData = {
+        nom: repasForm.nom,
+        type_de_repas: repasForm.type_de_repas as any,
+        objectif_nutritionnel: repasForm.objectif_nutritionnel,
+        calories_totales: parseInt(repasForm.calories_totales),
+        macros: {
+          protéines: parseFloat(repasForm.protéines),
+          glucides: parseFloat(repasForm.glucides),
+          lipides: parseFloat(repasForm.lipides),
+          fibres: parseFloat(repasForm.fibres)
+        },
+        composition: repasForm.composition,
+        indice_satiété: repasForm.indice_satiété as any,
+        temps_de_préparation: parseInt(repasForm.temps_de_préparation),
+        adaptations_possibles: repasForm.adaptations_possibles,
+        contre_indications: repasForm.contre_indications
+      };
+      
+      saveRepas(repasData);
+      
+      toast({
+        title: "Repas ajouté",
+        description: `Le repas "${repasForm.nom}" a été ajouté avec succès à votre bibliothèque.`
+      });
+      
+      // Reset du formulaire
+      setRepasForm({
+        nom: '',
+        type_de_repas: '',
+        objectif_nutritionnel: [],
+        calories_totales: '',
+        protéines: '',
+        glucides: '',
+        lipides: '',
+        fibres: '',
+        composition: [],
+        indice_satiété: '',
+        temps_de_préparation: '',
+        adaptations_possibles: [],
+        contre_indications: []
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la sauvegarde.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSaveProgramme = () => {

@@ -1,5 +1,5 @@
 import { ClientProfile, BlocExercice, SeanceJour, ProgrammeHebdomadaire, Contraintes } from '@/types/programme';
-import { tousBlocs } from './blocsExercices';
+import { getAllBlocsEntrainement } from './blocsEntrainementData';
 
 export function creerProgrammeOptimise(
   profilClient: ClientProfile, 
@@ -40,6 +40,7 @@ export function creerProgrammeOptimise(
     };
     
     // Sélectionner blocs d'exercices compatibles pour ce jour
+    const tousBlocs = getAllBlocsEntrainement();
     const blocsCandidats = filtrerBlocsCompatibles(
       tousBlocs,
       focus,

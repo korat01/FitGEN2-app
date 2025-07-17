@@ -7,6 +7,7 @@ import AppHeader from "./components/AppHeader";
 import Index from "./pages/Index";
 import Nutrition from "./pages/Nutrition";
 import Developer from "./pages/Developer";
+import BlocsEntrainement from "./pages/BlocsEntrainement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/developer" element={<Developer />} />
+              <Route path="/blocs-entrainement" element={<BlocsEntrainement />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

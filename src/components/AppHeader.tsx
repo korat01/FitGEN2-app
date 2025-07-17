@@ -18,6 +18,11 @@ const AppHeader = () => {
       icon: UtensilsCrossed,
     },
     {
+      path: '/blocs-entrainement',
+      label: 'Blocs Sport',
+      icon: Dumbbell,
+    },
+    {
       path: '/developer',
       label: 'Développeur',
       icon: Code,

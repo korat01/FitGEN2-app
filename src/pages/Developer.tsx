@@ -78,6 +78,22 @@ const Developer = () => {
     recommandations: ''
   });
 
+  // États pour le formulaire de bloc d'entraînement
+  const [blocForm, setBlocForm] = useState({
+    nom: '',
+    type: 'composé' as 'composé' | 'isolé' | 'cardio' | 'accessoire' | 'étirement' | 'gainage',
+    focus: '',
+    difficulté: 1,
+    muscles_sollicités: [] as string[],
+    charge: 0,
+    répétitions: '',
+    séries: 1,
+    temps_repos: '',
+    équipement: [] as string[],
+    description: '',
+    contraintes_médicales: [] as string[]
+  });
+
   const momentConsommationOptions = [
     'petit-déjeuner', 'collation', 'déjeuner', 'collation-après-midi', 
     'dîner', 'post-entraînement', 'pré-entraînement', 'soir'
@@ -276,6 +292,30 @@ const Developer = () => {
     });
   };
 
+  const handleSaveBlocEntrainement = () => {
+    const { saveBlocEntrainement } = require('@/utils/blocsEntrainementData');
+    const savedBloc = saveBlocEntrainement(blocForm);
+    toast({
+      title: "Bloc d'entraînement sauvegardé",
+      description: `Le bloc "${blocForm.nom}" a été sauvegardé avec succès.`
+    });
+    // Réinitialiser le formulaire
+    setBlocForm({
+      nom: '',
+      type: 'composé',
+      focus: '',
+      difficulté: 1,
+      muscles_sollicités: [],
+      charge: 0,
+      répétitions: '',
+      séries: 1,
+      temps_repos: '',
+      équipement: [],
+      description: '',
+      contraintes_médicales: []
+    });
+  };
+
   return (
     <div className="bg-background animate-fade-in">
       {/* Page Header */}
@@ -326,7 +366,7 @@ const Developer = () => {
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <Dumbbell className="h-4 w-4" />
-              <span>Programmes Sportifs</span>
+              <span>Blocs Entraînement</span>
             </TabsTrigger>
           </TabsList>
 

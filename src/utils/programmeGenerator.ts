@@ -10,76 +10,90 @@ export function creerProgrammeOptimise(
   // Initialiser le programme complet
   const programmeHebdomadaire: ProgrammeHebdomadaire = {};
   
-  // 1. Optimiser automatiquement les jours selon la vitesse de progression
+  // 1. Définir le nombre de séances par semaine selon la vitesse de progression
+  const nombreSeances = determinerNombreSeances(profilClient.vitesse_progression);
+  
+  // 2. Optimiser les jours selon disponibilité et nombre de séances requis
   const joursOptimaux = optimiserJoursSemaine(
     disponibilite, 
-    objectif, 
-    profilClient.niveau, 
-    contraintes.médicales,
+    nombreSeances,
     profilClient.vitesse_progression
   );
   
-  // 2. Générer une répartition intelligente des focus avec variété et respect des intervalles
-  const focusRepartition = genererFocusAvecVariete(joursOptimaux, objectif);
+  // 3. Générer la répartition des types d'entraînement selon le sexe
+  const focusRepartition = genererRepartitionSelonSexe(
+    joursOptimaux.length,
+    profilClient.nom, // on utilise le nom pour détecter le sexe ou ajouter un champ sexe
+    objectif
+  );
   
-  // 3. Pour chaque jour d'entraînement optimisé
+  // 4. Pour chaque jour d'entraînement optimisé
   for (let i = 0; i < joursOptimaux.length; i++) {
     const jour = joursOptimaux[i];
     const focus = focusRepartition[i];
     
-    if (focus && !focus.includes('repos')) {
-      // Initialiser la séance du jour
-      const séance: SeanceJour = {
-        nom: jour.charAt(0).toUpperCase() + jour.slice(1),
-        focus: focus,
-        blocs: []
-      };
-      
-      // Sélectionner blocs d'exercices compatibles pour ce jour
-      const blocsCandidats = filtrerBlocsCompatibles(
-        tousBlocs,
-        focus,
-        profilClient.niveau,
-        contraintes.médicales,
-        profilClient.equipement_disponible
-      );
-      
-      // Éviter les exercices déjà utilisés dans les séances précédentes
-      const exercicesDejaUtilises = Object.values(programmeHebdomadaire)
-        .flatMap(seance => seance.blocs.map(bloc => bloc.nom));
-      
-      const blocsNonUtilises = blocsCandidats.filter(bloc => 
-        !exercicesDejaUtilises.includes(bloc.nom)
-      );
-      
-      // Optimiser la séquence des blocs selon la vitesse de progression
-      const blocsOptimisés = optimiserSequenceBlocs(
-        blocsNonUtilises.length > 0 ? blocsNonUtilises : blocsCandidats,
-        objectif,
-        profilClient.age,
-        profilClient.limitations_physiques,
-        profilClient.vitesse_progression,
-        profilClient.niveau
-      );
-      
-      // Ajouter à la séance (ajuster le nombre selon la vitesse)
-      const nombreExercices = determinerNombreExercices(profilClient.vitesse_progression);
-      séance.blocs = blocsOptimisés.slice(0, nombreExercices);
-      
-      // Adapter les charges selon le niveau et les 1RM avec la vitesse de progression
-      séance.blocs = adapterChargesRepetitions(
-        séance.blocs, 
-        profilClient.niveau, 
-        profilClient.rm_values, 
-        profilClient.vitesse_progression
-      );
-      
-      // Ajouter la séance au programme
-      programmeHebdomadaire[jour] = séance;
-    }
+    // Initialiser la séance du jour
+    const séance: SeanceJour = {
+      nom: `${jour.charAt(0).toUpperCase() + jour.slice(1)} - ${focus}`,
+      focus: focus,
+      blocs: []
+    };
+    
+    // Sélectionner blocs d'exercices compatibles pour ce jour
+    const blocsCandidats = filtrerBlocsCompatibles(
+      tousBlocs,
+      focus,
+      profilClient.niveau,
+      contraintes.médicales,
+      profilClient.equipement_disponible
+    );
+    
+    // Éviter les exercices identiques sur 2 jours consécutifs
+    const exercicesRecents = obtenirExercicesRecents(programmeHebdomadaire, joursOptimaux, i);
+    const blocsNonUtilises = blocsCandidats.filter(bloc => 
+      !exercicesRecents.includes(bloc.nom)
+    );
+    
+    // Optimiser la séquence des blocs
+    const blocsOptimisés = optimiserSequenceBlocs(
+      blocsNonUtilises.length > 0 ? blocsNonUtilises : blocsCandidats,
+      objectif,
+      profilClient.age,
+      profilClient.limitations_physiques,
+      profilClient.vitesse_progression,
+      profilClient.niveau
+    );
+    
+    // Ajouter à la séance (ajuster le nombre selon la vitesse)
+    const nombreExercices = determinerNombreExercices(profilClient.vitesse_progression);
+    séance.blocs = blocsOptimisés.slice(0, nombreExercices);
+    
+    // Adapter les charges selon le niveau et les 1RM
+    séance.blocs = adapterChargesRepetitions(
+      séance.blocs, 
+      profilClient.niveau, 
+      profilClient.rm_values, 
+      profilClient.vitesse_progression
+    );
+    
+    // Ajouter la séance au programme
+    programmeHebdomadaire[jour] = séance;
   }
   
   return programmeHebdomadaire;
+}
+
+function determinerNombreSeances(vitesseProgression: string): { min: number, max: number } {
+  switch (vitesseProgression) {
+    case 'maintien':
+      return { min: 2, max: 3 }; // 2 à 3 séances/semaine
+    case 'progression_legere':
+      return { min: 3, max: 4 }; // 3 à 4 séances/semaine
+    case 'progression_rapide':
+      return { min: 5, max: 6 }; // 5 à 6 séances/semaine
+    default:
+      return { min: 3, max: 4 };
+  }
 }
 
 function determinerNombreExercices(vitesseProgression: string): number {
@@ -95,126 +109,114 @@ function determinerNombreExercices(vitesseProgression: string): number {
   }
 }
 
-function genererFocusAvecVariete(joursOptimaux: string[], objectif: string): string[] {
-  const focusVarietes = [
-    'haut_corps_poussée',
-    'bas_corps_force',
-    'haut_corps_tirage', 
-    'bas_corps_gainage',
-    'full_body_léger',
-    'cardio_interval',
-    'force_composée'
-  ];
+function genererRepartitionSelonSexe(
+  nombreSeances: number, 
+  nom: string, 
+  objectif: string
+): string[] {
+  // Détection basique du sexe par le nom (à améliorer avec un champ dédié)
+  const prenomsFeminins = ['marie', 'sarah', 'emma', 'claire', 'julie', 'sophie', 'laura', 'camille'];
+  const estFemme = prenomsFeminins.some(prenom => 
+    nom.toLowerCase().includes(prenom)
+  );
   
-  const focusRepartition: string[] = [];
-  const groupesMusculairesUtilises: { [key: string]: number } = {};
+  const repartition: string[] = [];
   
-  // Mapping des focus vers les groupes musculaires principaux
-  const focusVersGroupes: { [key: string]: string[] } = {
-    'haut_corps_poussée': ['pectoraux', 'épaules', 'triceps'],
-    'haut_corps_tirage': ['dos', 'biceps'],
-    'bas_corps_force': ['quadriceps', 'fessiers', 'ischio'],
-    'bas_corps_gainage': ['fessiers', 'core', 'mollets'],
-    'full_body_léger': ['全身'],
-    'cardio_interval': ['cardio'],
-    'force_composée': ['全身']
-  };
-  
-  for (let i = 0; i < joursOptimaux.length; i++) {
-    let focusChoisi = '';
+  if (estFemme) {
+    // FEMME: 70% bas du corps, 30% haut du corps/full body
+    const seancesBasCorps = Math.ceil(nombreSeances * 0.7);
+    const seancesAutres = nombreSeances - seancesBasCorps;
     
-    // Pour chaque focus possible, vérifier s'il respecte l'intervalle de 2 jours
-    for (const focus of focusVarietes) {
-      const groupes = focusVersGroupes[focus] || [];
-      let peutUtiliser = true;
-      
-      // Vérifier si les groupes musculaires ont été utilisés dans les 2 derniers jours
-      for (const groupe of groupes) {
-        if (groupesMusculairesUtilises[groupe] !== undefined && 
-            i - groupesMusculairesUtilises[groupe] < 2) {
-          peutUtiliser = false;
-          break;
-        }
-      }
-      
-      if (peutUtiliser) {
-        focusChoisi = focus;
-        // Marquer les groupes musculaires comme utilisés à ce jour
-        for (const groupe of groupes) {
-          groupesMusculairesUtilises[groupe] = i;
-        }
-        break;
-      }
+    // Ajouter les séances bas du corps
+    for (let i = 0; i < seancesBasCorps; i++) {
+      repartition.push(i % 2 === 0 ? 'bas_corps_fessiers' : 'bas_corps_jambes');
     }
     
-    // Si aucun focus ne respecte l'intervalle, prendre le premier disponible
-    if (!focusChoisi) {
-      focusChoisi = focusVarietes[i % focusVarietes.length];
+    // Ajouter les autres séances
+    for (let i = 0; i < seancesAutres; i++) {
+      repartition.push(i % 2 === 0 ? 'haut_corps_leger' : 'full_body_leger');
     }
+  } else {
+    // HOMME: au moins 1 full body + variété
+    repartition.push('full_body_complet');
     
-    focusRepartition.push(focusChoisi);
+    for (let i = 1; i < nombreSeances; i++) {
+      const focus = ['haut_corps_poussee', 'haut_corps_tirage', 'bas_corps_force'][i % 3];
+      repartition.push(focus);
+    }
   }
   
-  return focusRepartition;
+  return repartition;
 }
+
+function obtenirExercicesRecents(
+  programme: ProgrammeHebdomadaire, 
+  joursOptimaux: string[], 
+  indexActuel: number
+): string[] {
+  const exercicesRecents: string[] = [];
+  
+  // Vérifier les 2 derniers jours pour éviter la répétition
+  for (let i = Math.max(0, indexActuel - 2); i < indexActuel; i++) {
+    const jourPrecedent = joursOptimaux[i];
+    if (programme[jourPrecedent]) {
+      exercicesRecents.push(
+        ...programme[jourPrecedent].blocs.map(bloc => bloc.nom)
+      );
+    }
+  }
+  
+  return exercicesRecents;
+}
+
 
 function optimiserJoursSemaine(
   disponibilite: string[], 
-  objectif: string, 
-  niveau: string, 
-  contraintesMedicales: string[],
+  nombreSeances: { min: number, max: number },
   vitesseProgression?: string
 ): string[] {
-  // Cloner le tableau des jours disponibles
-  let joursDisponibles = [...disponibilite];
-  
-  // Optimisation intelligente selon la vitesse de progression
-  switch (vitesseProgression) {
-    case 'progression_rapide':
-      // Pour progression rapide : 5 jours maximum, prioriser l'efficacité
-      if (joursDisponibles.length >= 5) {
-        // Si 7 jours disponibles, choisir 5 jours optimaux avec repos
-        if (joursDisponibles.length === 7) {
-          return ['lundi', 'mardi', 'mercredi', 'vendredi', 'samedi'];
-        }
-        // Si 5-6 jours, prendre les 5 premiers
-        return joursDisponibles.slice(0, 5);
-      }
-      // Si moins de 5 jours, prendre tous les jours disponibles
-      return joursDisponibles;
-      
-    case 'progression_legere':
-      // Pour progression modérée : 3-4 jours optimaux
-      if (joursDisponibles.length > 4) {
-        return joursDisponibles.slice(0, 4);
-      } else if (joursDisponibles.length === 4) {
-        return joursDisponibles;
-      }
-      // Si moins de 4 jours, prendre ce qui est disponible
-      return joursDisponibles;
-      
-    case 'maintien':
-      // Pour maintien : 2-3 jours maximum
-      if (joursDisponibles.length > 3) {
-        return joursDisponibles.slice(0, 3);
-      }
-      return joursDisponibles;
-      
-    default:
-      // Logique par défaut selon objectif et niveau
-      if (objectif === 'perte_de_poids' && joursDisponibles.length > 4) {
-        return joursDisponibles.slice(0, 5);
-      } else if (objectif === 'prise_de_masse' && joursDisponibles.length > 3) {
-        return joursDisponibles.slice(0, 4);
-      }
-      
-      // Adapter selon le niveau
-      if (niveau === 'débutant' && joursDisponibles.length > 3) {
-        return joursDisponibles.slice(0, 3);
-      }
-      
-      return joursDisponibles;
+  // Si l'utilisateur a moins de jours disponibles que recommandé
+  if (disponibilite.length < nombreSeances.min) {
+    return disponibilite; // Prendre tous les jours disponibles
   }
+  
+  // Si l'utilisateur a plus de jours disponibles que nécessaire
+  if (disponibilite.length > nombreSeances.max) {
+    // Choisir le nombre optimal avec espacement
+    return choisirJoursAvecEspacement(disponibilite, nombreSeances.max);
+  }
+  
+  // Si l'utilisateur a exactement le bon nombre de jours ou dans la fourchette
+  const nombreOptimal = Math.min(disponibilite.length, nombreSeances.max);
+  return choisirJoursAvecEspacement(disponibilite, nombreOptimal);
+}
+
+function choisirJoursAvecEspacement(joursDisponibles: string[], nombreVoulu: number): string[] {
+  // Si on veut tous les jours disponibles
+  if (nombreVoulu >= joursDisponibles.length) {
+    return joursDisponibles;
+  }
+  
+  // Ordre de priorité des jours (pour une meilleure répartition)
+  const ordrePriorite = ['lundi', 'mercredi', 'vendredi', 'mardi', 'jeudi', 'samedi', 'dimanche'];
+  
+  const joursChoisis: string[] = [];
+  
+  // Choisir les jours en priorité selon l'ordre et la disponibilité
+  for (const jour of ordrePriorite) {
+    if (joursDisponibles.includes(jour) && joursChoisis.length < nombreVoulu) {
+      joursChoisis.push(jour);
+    }
+  }
+  
+  // Si on n'a pas assez de jours, compléter avec les restants
+  for (const jour of joursDisponibles) {
+    if (!joursChoisis.includes(jour) && joursChoisis.length < nombreVoulu) {
+      joursChoisis.push(jour);
+    }
+  }
+  
+  return joursChoisis;
 }
 
 function filtrerBlocsCompatibles(
@@ -243,15 +245,16 @@ function filtrerBlocsCompatibles(
 
 function verifierFocusCompatible(bloc: BlocExercice, focus: string): boolean {
   const focusMapping: { [key: string]: string[] } = {
-    'haut_corps_poussée': ['composé', 'isolé'],
+    'haut_corps_poussee': ['composé', 'isolé'],
     'haut_corps_tirage': ['composé', 'isolé'],
+    'haut_corps_leger': ['composé', 'isolé', 'étirement'],
     'bas_corps_force': ['composé'],
-    'bas_corps_gainage': ['composé', 'gainage'],
-    'full_body_léger': ['composé', 'cardio', 'étirement'],
+    'bas_corps_fessiers': ['composé', 'isolé'],
+    'bas_corps_jambes': ['composé', 'isolé'],
+    'full_body_complet': ['composé'],
+    'full_body_leger': ['composé', 'cardio', 'étirement'],
     'cardio_interval': ['cardio'],
-    'force_composée': ['composé'],
-    'repos_actif': ['étirement', 'cardio'],
-    'repos_étirements': ['étirement']
+    'repos_actif': ['étirement', 'cardio']
   };
   
   const typesCompatibles = focusMapping[focus] || ['composé'];

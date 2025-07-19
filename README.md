@@ -1,73 +1,146 @@
-# Welcome to your Lovable project
+# 🏋️ Workout Alchemy
 
-## Project info
+Une application React moderne pour générer des programmes d'entraînement personnalisés avec un algorithme intelligent.
 
-**URL**: https://lovable.dev/projects/636bb9a2-99f0-42fb-9655-fcfc6fac4012
+## ✨ Fonctionnalités
 
-## How can I edit this code?
+### 🎯 **Génération de programmes personnalisés**
+- Algorithme intelligent qui utilise les informations du client
+- Adaptation selon l'objectif (prise de masse, perte de poids, force, endurance, remise en forme)
+- Prise en compte des contraintes médicales et de l'équipement disponible
+- Utilisation des valeurs 1RM pour calculer les charges
 
-There are several ways of editing your application.
+### 📚 **Bibliothèque d'exercices complète**
+- Plus de 50 exercices prédéfinis
+- Exercices de force avec références 1RM
+- Exercices cardio et d'endurance
+- Exercices spécifiques pour femmes et hommes
+- Système de sauvegarde d'exercices personnalisés
 
-**Use Lovable**
+### 🎨 **Interface moderne**
+- Design responsive avec Tailwind CSS
+- Composants UI avec shadcn/ui
+- Animations et transitions fluides
+- Mode sombre/clair
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/636bb9a2-99f0-42fb-9655-fcfc6fac4012) and start prompting.
+## 🚀 Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prérequis
+- Node.js (version 18 ou supérieure)
+- npm ou yarn
 
-**Use your preferred IDE**
+### Installation
+```bash
+# Cloner le dépôt
+git clone <URL_DE_VOTRE_DEPOT>
+cd workout-alchemy-app
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# Installer les dépendances
+npm install
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Lancer l'application
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Scripts de lancement
+- **Script PowerShell** : `.\start-app.ps1`
+- **Script Batch** : `start-app.bat`
+- **Configuration Git** : `.\setup-git.ps1`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📁 Structure du projet
 
-**Use GitHub Codespaces**
+```
+workout-alchemy-app/
+├── src/
+│   ├── components/          # Composants React
+│   │   ├── ui/             # Composants UI (shadcn/ui)
+│   │   ├── ClientForm.tsx  # Formulaire client
+│   │   └── ProgrammeDisplay.tsx
+│   ├── pages/              # Pages de l'application
+│   │   ├── Index.tsx       # Page d'accueil
+│   │   ├── BlocsEntrainement.tsx # Bibliothèque d'exercices
+│   │   └── Developer.tsx   # Panel développeur
+│   ├── utils/              # Utilitaires
+│   │   ├── programmeGenerator.ts # Algorithme de génération
+│   │   ├── blocsExercices.ts    # Exercices prédéfinis
+│   │   └── blocsEntrainementData.ts # Gestion des données
+│   └── types/              # Types TypeScript
+│       └── programme.ts    # Types du programme
+├── public/                 # Assets statiques
+└── package.json           # Dépendances et scripts
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🔧 Algorithme de génération
 
-## What technologies are used for this project?
+### Fonctionnalités principales
+- **Adaptation selon l'objectif** : Différentes stratégies selon le but
+- **Répartition intelligente** : Séances équilibrées selon le profil
+- **Gestion des contraintes** : Exclusion des exercices incompatibles
+- **Calcul des charges** : Utilisation des pourcentages 1RM
+- **Optimisation de séquence** : Ordre des exercices optimisé
 
-This project is built with:
+### Types d'objectifs supportés
+- **Prise de masse** : Focus sur exercices composés, charges lourdes
+- **Perte de poids** : Plus de cardio, séances plus longues
+- **Force** : Moins d'exercices mais plus intenses
+- **Endurance** : Plus de répétitions, repos courts
+- **Remise en forme** : Programme équilibré
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🎯 Utilisation
 
-## How can I deploy this project?
+### 1. Créer un profil client
+- Remplir le formulaire avec les informations personnelles
+- Définir l'objectif et la vitesse de progression
+- Spécifier les contraintes médicales et l'équipement disponible
 
-Simply open [Lovable](https://lovable.dev/projects/636bb9a2-99f0-42fb-9655-fcfc6fac4012) and click on Share -> Publish.
+### 2. Générer un programme
+- L'algorithme analyse le profil et génère un programme personnalisé
+- Les exercices sont sélectionnés selon les critères
+- Les charges sont calculées selon les 1RM fournis
 
-## Can I connect a custom domain to my Lovable project?
+### 3. Consulter la bibliothèque
+- Parcourir tous les exercices disponibles
+- Filtrer par type, focus, équipement
+- Sauvegarder des exercices personnalisés
 
-Yes, you can!
+## 🛠️ Technologies utilisées
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **React 18** : Framework frontend
+- **TypeScript** : Typage statique
+- **Vite** : Build tool rapide
+- **Tailwind CSS** : Framework CSS utilitaire
+- **shadcn/ui** : Composants UI modernes
+- **React Router** : Navigation
+- **Lucide React** : Icônes
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📝 Scripts disponibles
+
+```bash
+npm run dev          # Lancer en mode développement
+npm run build        # Construire pour la production
+npm run preview      # Prévisualiser la build
+npm run lint         # Vérifier le code
+```
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité
+3. Commiter vos changements
+4. Pousser vers la branche
+5. Ouvrir une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT.
+
+## 🙏 Remerciements
+
+- shadcn/ui pour les composants
+- Tailwind CSS pour le styling
+- Lucide pour les icônes
+- La communauté React
+
+---
+
+**Développé avec ❤️ pour la communauté fitness**

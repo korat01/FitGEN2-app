@@ -10,20 +10,16 @@ export function creerProgrammeOptimise(
   // Initialiser le programme complet
   const programmeHebdomadaire: ProgrammeHebdomadaire = {};
   
-  // 1. Définir le nombre de séances par semaine selon la vitesse de progression
-  const nombreSeances = determinerNombreSeances(profilClient.vitesse_progression);
+  // 1. Définir le nombre de séances selon la vitesse de progression et l'objectif
+  const nombreSeances = determinerNombreSeances(profilClient.vitesse_progression, profilClient.objectif);
   
   // 2. Optimiser les jours selon disponibilité et nombre de séances requis
-  const joursOptimaux = optimiserJoursSemaine(
-    disponibilite, 
-    nombreSeances,
-    profilClient.vitesse_progression
-  );
+  const joursOptimaux = optimiserJoursSemaine(disponibilite, nombreSeances);
   
-  // 3. Générer la répartition des types d'entraînement selon le sexe
-  const focusRepartition = genererRepartitionSelonSexe(
+  // 3. Générer la répartition des types d'entraînement selon le profil client
+  const focusRepartition = genererRepartitionSelonProfil(
     joursOptimaux.length,
-    profilClient.nom, // on utilise le nom pour détecter le sexe ou ajouter un champ sexe
+    profilClient,
     objectif
   );
   
@@ -34,7 +30,7 @@ export function creerProgrammeOptimise(
     
     // Initialiser la séance du jour
     const séance: SeanceJour = {
-      nom: `${jour.charAt(0).toUpperCase() + jour.slice(1)} - ${focus}`,
+      nom: `${jour.charAt(0).toUpperCase() + jour.slice(1)} - ${getFocusDisplayName(focus)}`,
       focus: focus,
       blocs: []
     };
@@ -55,7 +51,7 @@ export function creerProgrammeOptimise(
       !exercicesRecents.includes(bloc.nom)
     );
     
-    // Optimiser la séquence des blocs
+    // Optimiser la séquence des blocs selon l'objectif et le profil
     const blocsOptimisés = optimiserSequenceBlocs(
       blocsNonUtilises.length > 0 ? blocsNonUtilises : blocsCandidats,
       objectif,
@@ -65,8 +61,8 @@ export function creerProgrammeOptimise(
       profilClient.niveau
     );
     
-    // Ajouter à la séance (ajuster le nombre selon la vitesse)
-    const nombreExercices = determinerNombreExercices(profilClient.vitesse_progression);
+    // Déterminer le nombre d'exercices selon le profil
+    const nombreExercices = determinerNombreExercices(profilClient.vitesse_progression, profilClient.objectif);
     séance.blocs = blocsOptimisés.slice(0, nombreExercices);
     
     // Adapter les charges selon le niveau et les 1RM
@@ -74,8 +70,13 @@ export function creerProgrammeOptimise(
       séance.blocs, 
       profilClient.niveau, 
       profilClient.rm_values, 
-      profilClient.vitesse_progression
+      profilClient.vitesse_progression,
+      profilClient.objectif
     );
+    
+    // Calculer la durée estimée et l'intensité
+    séance.durée_estimée = calculerDureeSeance(séance.blocs, profilClient.niveau);
+    séance.niveau_intensité = determinerIntensite(profilClient.vitesse_progression, profilClient.objectif);
     
     // Ajouter la séance au programme
     programmeHebdomadaire[jour] = séance;
@@ -84,70 +85,159 @@ export function creerProgrammeOptimise(
   return programmeHebdomadaire;
 }
 
-function determinerNombreSeances(vitesseProgression: string): { min: number, max: number } {
+function determinerNombreSeances(vitesseProgression: string, objectif: string): { min: number, max: number } {
+  // Base selon la vitesse de progression
+  let baseSeances = { min: 2, max: 3 };
+  
   switch (vitesseProgression) {
     case 'maintien':
-      return { min: 2, max: 3 }; // 2 à 3 séances/semaine
+      baseSeances = { min: 2, max: 3 };
+      break;
     case 'progression_legere':
-      return { min: 3, max: 4 }; // 3 à 4 séances/semaine
+      baseSeances = { min: 3, max: 4 };
+      break;
     case 'progression_rapide':
-      return { min: 5, max: 6 }; // 5 à 6 séances/semaine
-    default:
-      return { min: 3, max: 4 };
+      baseSeances = { min: 4, max: 6 };
+      break;
   }
+  
+  // Ajuster selon l'objectif
+  switch (objectif) {
+    case 'prise_de_masse':
+      baseSeances.max = Math.min(baseSeances.max + 1, 6);
+      break;
+    case 'perte_de_poids':
+      baseSeances.min = Math.max(baseSeances.min, 3);
+      baseSeances.max = Math.min(baseSeances.max + 1, 6);
+      break;
+    case 'endurance':
+      baseSeances.min = Math.max(baseSeances.min, 3);
+      break;
+    case 'force':
+      baseSeances.max = Math.min(baseSeances.max, 4); // Éviter le surentraînement
+      break;
+  }
+  
+  return baseSeances;
 }
 
-function determinerNombreExercices(vitesseProgression: string): number {
+function determinerNombreExercices(vitesseProgression: string, objectif: string): number {
+  let baseExercices = 4;
+  
   switch (vitesseProgression) {
     case 'maintien':
-      return 3; // Programme léger
+      baseExercices = 3;
+      break;
     case 'progression_legere':
-      return 4; // Programme modéré
+      baseExercices = 4;
+      break;
     case 'progression_rapide':
-      return 6; // Programme intensif
-    default:
-      return 4;
+      baseExercices = 5;
+      break;
   }
+  
+  // Ajuster selon l'objectif
+  switch (objectif) {
+    case 'prise_de_masse':
+      baseExercices += 1;
+      break;
+    case 'perte_de_poids':
+      baseExercices += 1; // Plus d'exercices pour brûler des calories
+      break;
+    case 'endurance':
+      baseExercices += 1; // Plus d'exercices cardio
+      break;
+    case 'force':
+      baseExercices = Math.min(baseExercices, 4); // Moins d'exercices mais plus intenses
+      break;
+  }
+  
+  return baseExercices;
 }
 
-function genererRepartitionSelonSexe(
+function genererRepartitionSelonProfil(
   nombreSeances: number, 
-  nom: string, 
+  profilClient: ClientProfile, 
   objectif: string
 ): string[] {
-  // Détection basique du sexe par le nom (à améliorer avec un champ dédié)
-  const prenomsFeminins = ['marie', 'sarah', 'emma', 'claire', 'julie', 'sophie', 'laura', 'camille'];
-  const estFemme = prenomsFeminins.some(prenom => 
-    nom.toLowerCase().includes(prenom)
-  );
-  
   const repartition: string[] = [];
   
-  if (estFemme) {
-    // FEMME: 70% bas du corps, 30% haut du corps/full body
-    const seancesBasCorps = Math.ceil(nombreSeances * 0.7);
-    const seancesAutres = nombreSeances - seancesBasCorps;
-    
-    // Ajouter les séances bas du corps
-    for (let i = 0; i < seancesBasCorps; i++) {
-      repartition.push(i % 2 === 0 ? 'bas_corps_fessiers' : 'bas_corps_jambes');
+  // Déterminer le sexe (amélioration de la détection)
+  const estFemme = detecterSexe(profilClient.nom);
+  
+  // Créer une répartition équilibrée selon l'objectif et le profil
+  if (objectif === 'prise_de_masse') {
+    // Focus sur les exercices composés
+    const focuses = ['haut_corps_poussée', 'haut_corps_tirage', 'bas_corps_force', 'full_body_complet'];
+    for (let i = 0; i < nombreSeances; i++) {
+      repartition.push(focuses[i % focuses.length]);
     }
-    
-    // Ajouter les autres séances
-    for (let i = 0; i < seancesAutres; i++) {
-      repartition.push(i % 2 === 0 ? 'haut_corps_leger' : 'full_body_leger');
+  } else if (objectif === 'perte_de_poids') {
+    // Plus de cardio et full body
+    const focuses = ['full_body_complet', 'cardio_intensif', 'bas_corps_endurance', 'haut_corps_leger'];
+    for (let i = 0; i < nombreSeances; i++) {
+      repartition.push(focuses[i % focuses.length]);
     }
-  } else {
-    // HOMME: au moins 1 full body + variété
-    repartition.push('full_body_complet');
-    
-    for (let i = 1; i < nombreSeances; i++) {
-      const focus = ['haut_corps_poussee', 'haut_corps_tirage', 'bas_corps_force'][i % 3];
-      repartition.push(focus);
+  } else if (objectif === 'endurance') {
+    // Focus cardio et endurance
+    const focuses = ['cardio_intensif', 'bas_corps_endurance', 'full_body_leger', 'cardio_modere'];
+    for (let i = 0; i < nombreSeances; i++) {
+      repartition.push(focuses[i % focuses.length]);
+    }
+  } else if (objectif === 'force') {
+    // Focus sur les exercices de force
+    const focuses = ['haut_corps_poussée', 'haut_corps_tirage', 'bas_corps_force', 'full_body_complet'];
+    for (let i = 0; i < nombreSeances; i++) {
+      repartition.push(focuses[i % focuses.length]);
+    }
+  } else { // remise_en_forme
+    // Répartition équilibrée
+    if (estFemme) {
+      // Plus de focus bas du corps pour les femmes
+      const focuses = ['bas_corps_fessiers', 'bas_corps_jambes', 'haut_corps_leger', 'full_body_leger'];
+      for (let i = 0; i < nombreSeances; i++) {
+        repartition.push(focuses[i % focuses.length]);
+      }
+    } else {
+      // Répartition équilibrée pour les hommes
+      const focuses = ['haut_corps_poussée', 'haut_corps_tirage', 'bas_corps_force', 'full_body_complet'];
+      for (let i = 0; i < nombreSeances; i++) {
+        repartition.push(focuses[i % focuses.length]);
+      }
     }
   }
   
   return repartition;
+}
+
+function detecterSexe(nom: string): boolean {
+  const prenomsFeminins = [
+    'marie', 'sarah', 'emma', 'claire', 'julie', 'sophie', 'laura', 'camille',
+    'léa', 'chloé', 'manon', 'juliette', 'lola', 'zoé', 'agathe', 'inès',
+    'jade', 'louise', 'alice', 'eva', 'lucie', 'anna', 'nina', 'elisa'
+  ];
+  
+  return prenomsFeminins.some(prenom => 
+    nom.toLowerCase().includes(prenom)
+  );
+}
+
+function getFocusDisplayName(focus: string): string {
+  const displayNames: { [key: string]: string } = {
+    'haut_corps_poussée': 'Haut du corps - Poussée',
+    'haut_corps_tirage': 'Haut du corps - Tirage',
+    'haut_corps_leger': 'Haut du corps - Léger',
+    'bas_corps_force': 'Bas du corps - Force',
+    'bas_corps_endurance': 'Bas du corps - Endurance',
+    'bas_corps_fessiers': 'Bas du corps - Fessiers',
+    'bas_corps_jambes': 'Bas du corps - Jambes',
+    'full_body_complet': 'Full Body - Complet',
+    'full_body_leger': 'Full Body - Léger',
+    'cardio_intensif': 'Cardio - Intensif',
+    'cardio_modere': 'Cardio - Modéré'
+  };
+  
+  return displayNames[focus] || focus;
 }
 
 function obtenirExercicesRecents(
@@ -173,8 +263,7 @@ function obtenirExercicesRecents(
 
 function optimiserJoursSemaine(
   disponibilite: string[], 
-  nombreSeances: { min: number, max: number },
-  vitesseProgression?: string
+  nombreSeances: { min: number, max: number }
 ): string[] {
   // Si l'utilisateur a moins de jours disponibles que recommandé
   if (disponibilite.length < nombreSeances.min) {
@@ -246,15 +335,17 @@ function filtrerBlocsCompatibles(
 
 function verifierFocusCompatible(bloc: BlocExercice, focus: string): boolean {
   const focusMapping: { [key: string]: string[] } = {
-    'haut_corps_poussee': ['composé', 'isolé'],
+    'haut_corps_poussée': ['composé', 'isolé'],
     'haut_corps_tirage': ['composé', 'isolé'],
     'haut_corps_leger': ['composé', 'isolé', 'étirement'],
     'bas_corps_force': ['composé'],
+    'bas_corps_endurance': ['composé'],
     'bas_corps_fessiers': ['composé', 'isolé'],
     'bas_corps_jambes': ['composé', 'isolé'],
     'full_body_complet': ['composé'],
     'full_body_leger': ['composé', 'cardio', 'étirement'],
-    'cardio_interval': ['cardio'],
+    'cardio_intensif': ['cardio'],
+    'cardio_modere': ['cardio'],
     'repos_actif': ['étirement', 'cardio']
   };
   
@@ -403,7 +494,8 @@ function adapterChargesRepetitions(
   blocs: BlocExercice[], 
   niveau: string, 
   rmValues?: { [key: string]: number },
-  vitesseProgression?: string
+  vitesseProgression?: string,
+  objectif?: string
 ): BlocExercice[] {
   return blocs.map((bloc, index) => {
     const blocAdapte = { ...bloc };
@@ -478,4 +570,50 @@ function adapterChargesRepetitions(
     
     return blocAdapte;
   });
+}
+
+function calculerDureeSeance(blocs: BlocExercice[], niveau: string): number {
+  let dureeMinutes = 0;
+  
+  // Temps d'échauffement
+  dureeMinutes += 10;
+  
+  // Temps pour chaque exercice
+  for (const bloc of blocs) {
+    // Temps d'exécution des séries
+    const series = bloc.séries || 3;
+    const repetitions = typeof bloc.répétitions === 'number' ? bloc.répétitions : 10;
+    const tempsParRepetition = 3; // secondes par répétition
+    const tempsSeries = (repetitions * tempsParRepetition * series) / 60; // en minutes
+    
+    // Temps de repos entre les séries
+    let tempsRepos = 0;
+    if (bloc.temps_repos) {
+      const temps = bloc.temps_repos.split('-');
+      const min = parseInt(temps[0]);
+      const max = parseInt(temps[1]);
+      tempsRepos = ((min + max) / 2 * (series - 1)) / 60; // en minutes
+    }
+    
+    dureeMinutes += tempsSeries + tempsRepos;
+  }
+  
+  // Temps d'étirement final
+  dureeMinutes += 5;
+  
+  return Math.round(dureeMinutes);
+}
+
+function determinerIntensite(vitesseProgression: string, objectif: string): 'faible' | 'modérée' | 'élevée' {
+  if (objectif === 'force') {
+    return 'élevée';
+  } else if (objectif === 'prise_de_masse') {
+    return 'élevée';
+  } else if (objectif === 'perte_de_poids') {
+    return 'élevée';
+  } else if (objectif === 'endurance') {
+    return 'élevée';
+  } else { // remise_en_forme
+    return 'modérée';
+  }
 }

@@ -283,5 +283,272 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["swiss_ball"],
     description: "Dos sur le ballon, effectuer des crunchs"
+  },
+
+  // Exercices de force - Développé couché
+  {
+    nom: "Développé couché haltères",
+    type: "composé",
+    focus: "haut_corps_poussée",
+    difficulté: 4,
+    muscles_sollicités: ["pectoraux", "triceps", "deltoïdes antérieurs"],
+    charge: 25,
+    répétitions: 8,
+    séries: 4,
+    équipement: ["haltères"],
+    description: "Allongé sur un banc, pousser les haltères vers le haut",
+    pourcentage_rm: 75,
+    exercice_rm: "developpe_couche"
+  },
+  {
+    nom: "Développé couché barre",
+    type: "composé",
+    focus: "haut_corps_poussée",
+    difficulté: 5,
+    muscles_sollicités: ["pectoraux", "triceps", "deltoïdes antérieurs"],
+    charge: 40,
+    répétitions: 6,
+    séries: 4,
+    équipement: ["barre", "machine_guidée"],
+    description: "Allongé sur un banc, pousser la barre vers le haut",
+    pourcentage_rm: 80,
+    exercice_rm: "developpe_couche"
+  },
+
+  // Exercices de force - Squat
+  {
+    nom: "Squat barre",
+    type: "composé",
+    focus: "bas_corps_force",
+    difficulté: 5,
+    muscles_sollicités: ["quadriceps", "fessiers", "core"],
+    charge: 50,
+    répétitions: 6,
+    séries: 4,
+    équipement: ["barre"],
+    description: "Barre sur les épaules, descendre en pliant les genoux",
+    pourcentage_rm: 80,
+    exercice_rm: "squat",
+    contraintes_médicales: ["genou_fragile", "dos_sensible"]
+  },
+  {
+    nom: "Squat haltères",
+    type: "composé",
+    focus: "bas_corps_force",
+    difficulté: 4,
+    muscles_sollicités: ["quadriceps", "fessiers", "core"],
+    charge: 30,
+    répétitions: 8,
+    séries: 4,
+    équipement: ["haltères"],
+    description: "Haltères sur les épaules, effectuer un squat",
+    pourcentage_rm: 75,
+    exercice_rm: "squat",
+    contraintes_médicales: ["genou_fragile"]
+  },
+
+  // Exercices de force - Soulevé de terre
+  {
+    nom: "Soulevé de terre barre",
+    type: "composé",
+    focus: "bas_corps_force",
+    difficulté: 5,
+    muscles_sollicités: ["ischio-jambiers", "fessiers", "lombaires", "core"],
+    charge: 60,
+    répétitions: 5,
+    séries: 4,
+    équipement: ["barre"],
+    description: "Barre au sol, soulever en gardant le dos droit",
+    pourcentage_rm: 85,
+    exercice_rm: "souleve_de_terre",
+    contraintes_médicales: ["dos_sensible", "hernie_discale"]
+  },
+
+  // Exercices de force - Développé militaire
+  {
+    nom: "Développé militaire haltères",
+    type: "composé",
+    focus: "haut_corps_poussée",
+    difficulté: 4,
+    muscles_sollicités: ["deltoïdes", "triceps", "trapèzes"],
+    charge: 20,
+    répétitions: 8,
+    séries: 4,
+    équipement: ["haltères"],
+    description: "Debout, pousser les haltères au-dessus de la tête",
+    pourcentage_rm: 75,
+    exercice_rm: "developpe_militaire",
+    contraintes_médicales: ["épaule_limitée"]
+  },
+
+  // Exercices de force - Rowing
+  {
+    nom: "Rowing barre",
+    type: "composé",
+    focus: "haut_corps_tirage",
+    difficulté: 4,
+    muscles_sollicités: ["dorsaux", "biceps", "rhomboïdes"],
+    charge: 35,
+    répétitions: 8,
+    séries: 4,
+    équipement: ["barre"],
+    description: "Penché en avant, tirer la barre vers la poitrine",
+    pourcentage_rm: 75,
+    exercice_rm: "rowing"
+  },
+
+  // Exercices cardio intensifs
+  {
+    nom: "Sprint 30s",
+    type: "cardio",
+    focus: "cardio_intensif",
+    difficulté: 4,
+    muscles_sollicités: ["jambes", "cardio"],
+    charge: 0,
+    répétitions: "30s",
+    séries: 6,
+    équipement: ["aucun"],
+    description: "Course à vitesse maximale pendant 30 secondes"
+  },
+  {
+    nom: "Burpees avec pompe",
+    type: "cardio",
+    focus: "cardio_intensif",
+    difficulté: 5,
+    muscles_sollicités: ["full_body", "cardio"],
+    charge: 0,
+    répétitions: 10,
+    séries: 4,
+    équipement: ["aucun"],
+    description: "Squat, position planche, pompe, saut vertical"
+  },
+  {
+    nom: "Mountain climbers rapides",
+    type: "cardio",
+    focus: "cardio_intensif",
+    difficulté: 4,
+    muscles_sollicités: ["core", "épaules", "jambes"],
+    charge: 0,
+    répétitions: 30,
+    séries: 4,
+    équipement: ["aucun"],
+    description: "Position de planche, alterner genoux vers poitrine rapidement"
+  },
+
+  // Exercices d'endurance
+  {
+    nom: "Course lente",
+    type: "cardio",
+    focus: "cardio_modere",
+    difficulté: 2,
+    muscles_sollicités: ["jambes", "cardio"],
+    charge: 0,
+    répétitions: "20min",
+    séries: 1,
+    équipement: ["aucun"],
+    description: "Course à rythme modéré pendant 20 minutes"
+  },
+  {
+    nom: "Vélo stationnaire",
+    type: "cardio",
+    focus: "cardio_modere",
+    difficulté: 2,
+    muscles_sollicités: ["jambes", "cardio"],
+    charge: 0,
+    répétitions: "25min",
+    séries: 1,
+    équipement: ["cardio"],
+    description: "Pédaler à rythme modéré pendant 25 minutes"
+  },
+
+  // Exercices de remise en forme
+  {
+    nom: "Marche rapide",
+    type: "cardio",
+    focus: "cardio_modere",
+    difficulté: 1,
+    muscles_sollicités: ["jambes", "cardio"],
+    charge: 0,
+    répétitions: "30min",
+    séries: 1,
+    équipement: ["aucun"],
+    description: "Marche à rythme soutenu pendant 30 minutes"
+  },
+  {
+    nom: "Yoga flow",
+    type: "étirement",
+    focus: "repos_actif",
+    difficulté: 2,
+    muscles_sollicités: ["full_body", "flexibilité"],
+    charge: 0,
+    répétitions: "45min",
+    séries: 1,
+    équipement: ["tapis"],
+    description: "Séquence de postures de yoga enchaînées"
+  },
+
+  // Exercices pour femmes - Focus bas du corps
+  {
+    nom: "Hip thrust haltères",
+    type: "isolé",
+    focus: "bas_corps_fessiers",
+    difficulté: 3,
+    muscles_sollicités: ["fessiers", "ischio-jambiers"],
+    charge: 15,
+    répétitions: 15,
+    séries: 3,
+    équipement: ["haltères"],
+    description: "Allongé dos au sol, haltère sur le bassin, lever les hanches"
+  },
+  {
+    nom: "Fentes bulgares",
+    type: "composé",
+    focus: "bas_corps_fessiers",
+    difficulté: 4,
+    muscles_sollicités: ["quadriceps", "fessiers", "mollets"],
+    charge: 12,
+    répétitions: 12,
+    séries: 3,
+    équipement: ["haltères"],
+    description: "Pied arrière surélevé, effectuer des fentes",
+    contraintes_médicales: ["genou_fragile"]
+  },
+  {
+    nom: "Donkey kicks",
+    type: "isolé",
+    focus: "bas_corps_fessiers",
+    difficulté: 2,
+    muscles_sollicités: ["fessiers"],
+    charge: 0,
+    répétitions: 20,
+    séries: 3,
+    équipement: ["aucun"],
+    description: "Position à 4 pattes, lever la jambe vers l'arrière"
+  },
+
+  // Exercices pour hommes - Focus force
+  {
+    nom: "Pull-ups",
+    type: "composé",
+    focus: "haut_corps_tirage",
+    difficulté: 5,
+    muscles_sollicités: ["dorsaux", "biceps", "rhomboïdes"],
+    charge: 0,
+    répétitions: 6,
+    séries: 4,
+    équipement: ["barre"],
+    description: "Suspendu à une barre, tirer le corps vers le haut"
+  },
+  {
+    nom: "Dips barres parallèles",
+    type: "composé",
+    focus: "haut_corps_poussée",
+    difficulté: 4,
+    muscles_sollicités: ["triceps", "pectoraux", "deltoïdes"],
+    charge: 0,
+    répétitions: 8,
+    séries: 4,
+    équipement: ["barre"],
+    description: "Mains sur les barres parallèles, flexion/extension des bras"
   }
 ];

@@ -12,7 +12,10 @@ import {
   Search,
   Filter,
   Trash2,
-  Download
+  Download,
+  ChefHat,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { getAliments, getRepas, getAllAliments, getAllRepas, deleteAliment, deleteRepas, generateShoppingList, getMenus } from '@/utils/nutritionData';
@@ -25,6 +28,7 @@ const Nutrition = () => {
   const [aliments, setAliments] = useState<AlimentBlock[]>([]);
   const [repas, setRepas] = useState<RepasBlock[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedRecipes, setExpandedRecipes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadData();
@@ -51,6 +55,16 @@ const Nutrition = () => {
       title: "Repas supprimé", 
       description: "Le repas a été supprimé de votre bibliothèque."
     });
+  };
+
+  const toggleRecipe = (repasId: string) => {
+    const newExpanded = new Set(expandedRecipes);
+    if (newExpanded.has(repasId)) {
+      newExpanded.delete(repasId);
+    } else {
+      newExpanded.add(repasId);
+    }
+    setExpandedRecipes(newExpanded);
   };
 
   const generateShoppingListAction = () => {
@@ -234,9 +248,90 @@ const Nutrition = () => {
                               <div className="text-muted-foreground">glucides</div>
                             </div>
                           </div>
-                          <Button variant="outline" className="w-full">
-                            Ajouter au menu
-                          </Button>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              className="flex-1"
+                              onClick={() => toggleRecipe(repas.id)}
+                            >
+                              <ChefHat className="h-4 w-4 mr-2" />
+                              {expandedRecipes.has(repas.id) ? (
+                                <>
+                                  Masquer la recette
+                                  <ChevronUp className="h-4 w-4 ml-2" />
+                                </>
+                              ) : (
+                                <>
+                                  Afficher la recette
+                                  <ChevronDown className="h-4 w-4 ml-2" />
+                                </>
+                              )}
+                            </Button>
+                            <Button variant="default" size="sm">
+                              Ajouter au menu
+                            </Button>
+                          </div>
+                          
+                          {/* Recette détaillée */}
+                          {expandedRecipes.has(repas.id) && (
+                            <div className="mt-4 p-4 gradient-subtle rounded-lg border border-border/50 animate-fade-in">
+                              <h4 className="font-semibold text-foreground mb-3 flex items-center">
+                                <ChefHat className="h-4 w-4 mr-2 text-primary" />
+                                Recette détaillée
+                              </h4>
+                              
+                              {/* Composition */}
+                              <div className="mb-4">
+                                <h5 className="font-medium text-sm text-muted-foreground mb-2">Ingrédients :</h5>
+                                <div className="space-y-1">
+                                  {repas.composition.map((ingredient, idx) => (
+                                    <div key={idx} className="flex justify-between items-center text-sm">
+                                      <span className="text-foreground">{ingredient.aliment}</span>
+                                      <span className="text-muted-foreground font-medium">{ingredient.quantité}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              {/* Préparation */}
+                              <div className="mb-4">
+                                <h5 className="font-medium text-sm text-muted-foreground mb-2">Préparation :</h5>
+                                <div className="space-y-1">
+                                  {repas.composition.map((ingredient, idx) => (
+                                    <div key={idx} className="text-sm text-foreground">
+                                      <span className="font-medium">{ingredient.aliment}:</span> {ingredient.préparation}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              
+                              {/* Infos supplémentaires */}
+                              <div className="grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                  <span className="text-muted-foreground">Temps de préparation:</span>
+                                  <div className="font-medium text-primary">{repas.temps_de_préparation} min</div>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">Indice de satiété:</span>
+                                  <div className="font-medium text-accent capitalize">{repas.indice_satiété}</div>
+                                </div>
+                              </div>
+                              
+                              {/* Adaptations possibles */}
+                              {repas.adaptations_possibles.length > 0 && (
+                                <div className="mt-3">
+                                  <h5 className="font-medium text-xs text-muted-foreground mb-1">Adaptations possibles:</h5>
+                                  <div className="flex flex-wrap gap-1">
+                                    {repas.adaptations_possibles.map((adaptation, idx) => (
+                                      <Badge key={idx} variant="outline" className="text-xs">
+                                        {adaptation}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))

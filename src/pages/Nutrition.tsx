@@ -15,7 +15,7 @@ import {
   Download
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { getAliments, getRepas, deleteAliment, deleteRepas, generateShoppingList, getMenus } from '@/utils/nutritionData';
+import { getAliments, getRepas, getAllAliments, getAllRepas, deleteAliment, deleteRepas, generateShoppingList, getMenus } from '@/utils/nutritionData';
 import type { AlimentBlock, RepasBlock } from '@/utils/nutritionData';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,8 +31,8 @@ const Nutrition = () => {
   }, []);
 
   const loadData = () => {
-    setAliments(getAliments());
-    setRepas(getRepas());
+    setAliments(getAllAliments());
+    setRepas(getAllRepas());
   };
 
   const handleDeleteAliment = (id: string) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, UtensilsCrossed, Home, Code } from 'lucide-react';
+import { Dumbbell, UtensilsCrossed, Home, Code, ScanLine } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -19,6 +19,11 @@ const AppHeader = () => {
       path: '/nutrition',
       label: t('nav.nutrition'),
       icon: UtensilsCrossed,
+    },
+    {
+      path: '/scan',
+      label: t('nav.scan'),
+      icon: ScanLine,
     },
     {
       path: '/blocs-entrainement',

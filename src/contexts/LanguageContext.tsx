@@ -13,6 +13,7 @@ const translations: Translations = {
   // Navigation
   'nav.home': { fr: 'Accueil', en: 'Home' },
   'nav.nutrition': { fr: 'Nutrition', en: 'Nutrition' },
+  'nav.scan': { fr: 'Scan', en: 'Scan' },
   'nav.training': { fr: 'Blocs Sport', en: 'Training Blocks' },
   'nav.developer': { fr: 'Développeur', en: 'Developer' },
   
@@ -89,6 +90,17 @@ const translations: Translations = {
   // Additional messages
   'msg.try.search': { fr: 'Essayez un autre terme de recherche', en: 'Try a different search term' },
   'msg.add.foods.desc': { fr: 'Ajoutez des aliments avec leurs valeurs nutritionnelles', en: 'Add foods with their nutritional values' },
+  
+  // Scan module
+  'scan.title': { fr: 'Scanner un Aliment', en: 'Scan Food' },
+  'scan.subtitle': { fr: 'Analysez les valeurs nutritionnelles en prenant une photo', en: 'Analyze nutritional values by taking a photo' },
+  'scan.upload': { fr: 'Prendre/Choisir une photo', en: 'Take/Choose a photo' },
+  'scan.analyzing': { fr: 'Analyse en cours...', en: 'Analyzing...' },
+  'scan.results': { fr: 'Résultats de l\'analyse', en: 'Analysis Results' },
+  'scan.error': { fr: 'Erreur lors de l\'analyse', en: 'Analysis error' },
+  'scan.no.food': { fr: 'Aucun aliment détecté sur cette image', en: 'No food detected in this image' },
+  'scan.try.again': { fr: 'Réessayer', en: 'Try Again' },
+  'scan.save.food': { fr: 'Sauvegarder cet aliment', en: 'Save this food' },
 };
 
 interface LanguageContextType {

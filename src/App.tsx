@@ -7,6 +7,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import AppHeader from "./components/AppHeader";
 import Index from "./pages/Index";
 import Nutrition from "./pages/Nutrition";
+import Scan from "./pages/Scan";
 import Developer from "./pages/Developer";
 import BlocsEntrainement from "./pages/BlocsEntrainement";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/nutrition" element={<Nutrition />} />
+              <Route path="/scan" element={<Scan />} />
               <Route path="/developer" element={<Developer />} />
               <Route path="/blocs-entrainement" element={<BlocsEntrainement />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

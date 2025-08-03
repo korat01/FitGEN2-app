@@ -18,11 +18,13 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { getAliments, getRepas, getAllAliments, getAllRepas, deleteAliment, deleteRepas, generateShoppingList, getMenus } from '@/utils/nutritionData';
 import type { AlimentBlock, RepasBlock } from '@/utils/nutritionData';
 import { useToast } from '@/hooks/use-toast';
 
 const Nutrition = () => {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [currentTab, setCurrentTab] = useState('repas-types');
   const [aliments, setAliments] = useState<AlimentBlock[]>([]);
@@ -43,8 +45,8 @@ const Nutrition = () => {
     deleteAliment(id);
     loadData();
     toast({
-      title: "Aliment supprimé",
-      description: "L'aliment a été supprimé de votre bibliothèque."
+      title: t('toast.food.deleted'),
+      description: t('toast.food.deleted.desc')
     });
   };
 
@@ -52,8 +54,8 @@ const Nutrition = () => {
     deleteRepas(id);
     loadData();
     toast({
-      title: "Repas supprimé", 
-      description: "Le repas a été supprimé de votre bibliothèque."
+      title: t('toast.meal.deleted'), 
+      description: t('toast.meal.deleted.desc')
     });
   };
 
@@ -94,8 +96,8 @@ const Nutrition = () => {
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Liste de courses générée",
-      description: "La liste a été téléchargée."
+      title: t('toast.shopping.generated'),
+      description: t('toast.shopping.downloaded')
     });
   };
 
@@ -125,10 +127,10 @@ const Nutrition = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Module Nutrition
+                  {t('page.title.nutrition')}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-1">
-                  Gestion complète de l'alimentation et des repas
+                  {t('page.subtitle.nutrition')}
                 </p>
               </div>
             </div>
@@ -145,28 +147,28 @@ const Nutrition = () => {
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <UtensilsCrossed className="h-4 w-4" />
-              <span className="hidden sm:inline">Repas types</span>
+              <span className="hidden sm:inline">{t('tab.meals')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="mes-aliments" 
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <Apple className="h-4 w-4" />
-              <span className="hidden sm:inline">Mes aliments</span>
+              <span className="hidden sm:inline">{t('tab.foods')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="menu-jour" 
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">Menu du jour</span>
+              <span className="hidden sm:inline">{t('tab.menu')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="liste-courses" 
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Liste courses</span>
+              <span className="hidden sm:inline">{t('tab.shopping')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -180,15 +182,15 @@ const Nutrition = () => {
                     <div className="p-2 gradient-primary rounded-lg">
                       <UtensilsCrossed className="h-5 w-5 text-primary-foreground" />
                     </div>
-                    <span className="text-2xl">Repas types</span>
+                    <span className="text-2xl">{t('card.meals.title')}</span>
                   </div>
                   <Button className="gradient-primary hover:gradient-accent transition-all duration-300">
                     <Plus className="h-4 w-4 mr-2" />
-                    Nouveau repas
+                    {t('btn.new.meal')}
                   </Button>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Bibliothèque de repas prédéfinis avec informations nutritionnelles
+                  {t('card.meals.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -196,13 +198,13 @@ const Nutrition = () => {
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                      placeholder="Rechercher un repas..." 
+                      placeholder={t('search.meal')} 
                       className="h-12 pl-10"
                     />
                   </div>
                   <Button variant="outline" className="h-12 px-6">
                     <Filter className="h-4 w-4 mr-2" />
-                    Filtres
+                    {t('btn.filters')}
                   </Button>
                 </div>
                 
@@ -237,15 +239,15 @@ const Nutrition = () => {
                           <div className="grid grid-cols-3 gap-2 text-sm mb-4">
                             <div className="text-center">
                               <div className="font-semibold text-primary">{repas.calories_totales}</div>
-                              <div className="text-muted-foreground">kcal</div>
+                              <div className="text-muted-foreground">{t('nutrition.calories')}</div>
                             </div>
                             <div className="text-center">
                               <div className="font-semibold text-accent">{repas.macros.protéines}g</div>
-                              <div className="text-muted-foreground">protéines</div>
+                              <div className="text-muted-foreground">{t('nutrition.proteins')}</div>
                             </div>
                             <div className="text-center">
                               <div className="font-semibold text-secondary">{repas.macros.glucides}g</div>
-                              <div className="text-muted-foreground">glucides</div>
+                              <div className="text-muted-foreground">{t('nutrition.carbs')}</div>
                             </div>
                           </div>
                           <div className="flex space-x-2">
@@ -257,18 +259,18 @@ const Nutrition = () => {
                               <ChefHat className="h-4 w-4 mr-2" />
                               {expandedRecipes.has(repas.id) ? (
                                 <>
-                                  Masquer la recette
+                                  {t('btn.hide.recipe')}
                                   <ChevronUp className="h-4 w-4 ml-2" />
                                 </>
                               ) : (
                                 <>
-                                  Afficher la recette
+                                  {t('btn.show.recipe')}
                                   <ChevronDown className="h-4 w-4 ml-2" />
                                 </>
                               )}
                             </Button>
                             <Button variant="default" size="sm">
-                              Ajouter au menu
+                              {t('btn.add.menu')}
                             </Button>
                           </div>
                           
@@ -277,12 +279,12 @@ const Nutrition = () => {
                             <div className="mt-4 p-4 gradient-subtle rounded-lg border border-border/50 animate-fade-in">
                               <h4 className="font-semibold text-foreground mb-3 flex items-center">
                                 <ChefHat className="h-4 w-4 mr-2 text-primary" />
-                                Recette détaillée
+                                {t('nutrition.recipe')}
                               </h4>
                               
                               {/* Composition */}
                               <div className="mb-4">
-                                <h5 className="font-medium text-sm text-muted-foreground mb-2">Ingrédients :</h5>
+                                <h5 className="font-medium text-sm text-muted-foreground mb-2">{t('nutrition.ingredients')}</h5>
                                 <div className="space-y-1">
                                   {repas.composition.map((ingredient, idx) => (
                                     <div key={idx} className="flex justify-between items-center text-sm">
@@ -295,7 +297,7 @@ const Nutrition = () => {
                               
                               {/* Préparation */}
                               <div className="mb-4">
-                                <h5 className="font-medium text-sm text-muted-foreground mb-2">Préparation :</h5>
+                                <h5 className="font-medium text-sm text-muted-foreground mb-2">{t('nutrition.preparation')}</h5>
                                 <div className="space-y-1">
                                   {repas.composition.map((ingredient, idx) => (
                                     <div key={idx} className="text-sm text-foreground">
@@ -308,11 +310,11 @@ const Nutrition = () => {
                               {/* Infos supplémentaires */}
                               <div className="grid grid-cols-2 gap-4 text-xs">
                                 <div>
-                                  <span className="text-muted-foreground">Temps de préparation:</span>
+                                  <span className="text-muted-foreground">{t('nutrition.prep.time')}</span>
                                   <div className="font-medium text-primary">{repas.temps_de_préparation} min</div>
                                 </div>
                                 <div>
-                                  <span className="text-muted-foreground">Indice de satiété:</span>
+                                  <span className="text-muted-foreground">{t('nutrition.satiety')}</span>
                                   <div className="font-medium text-accent capitalize">{repas.indice_satiété}</div>
                                 </div>
                               </div>
@@ -320,7 +322,7 @@ const Nutrition = () => {
                               {/* Adaptations possibles */}
                               {repas.adaptations_possibles.length > 0 && (
                                 <div className="mt-3">
-                                  <h5 className="font-medium text-xs text-muted-foreground mb-1">Adaptations possibles:</h5>
+                                  <h5 className="font-medium text-xs text-muted-foreground mb-1">{t('nutrition.adaptations')}</h5>
                                   <div className="flex flex-wrap gap-1">
                                     {repas.adaptations_possibles.map((adaptation, idx) => (
                                       <Badge key={idx} variant="outline" className="text-xs">
@@ -338,8 +340,8 @@ const Nutrition = () => {
                   ) : (
                     <div className="col-span-full text-center py-12">
                       <UtensilsCrossed className="h-16 w-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-                      <p className="text-lg font-medium text-foreground mb-2">Aucun repas</p>
-                      <p className="text-muted-foreground">Créez vos premiers repas dans la section Développeur</p>
+                      <p className="text-lg font-medium text-foreground mb-2">{t('msg.no.meals')}</p>
+                      <p className="text-muted-foreground">{t('msg.create.meals')}</p>
                     </div>
                   )}
                 </div>
@@ -357,15 +359,15 @@ const Nutrition = () => {
                     <div className="p-2 gradient-accent rounded-lg">
                       <Apple className="h-5 w-5 text-accent-foreground" />
                     </div>
-                    <span className="text-2xl">Mes aliments</span>
+                    <span className="text-2xl">{t('card.foods.title')}</span>
                   </div>
                   <Button className="gradient-accent hover:gradient-primary transition-all duration-300">
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter aliment
+                    {t('btn.add.food')}
                   </Button>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Créez et gérez vos aliments personnalisés
+                  {t('card.foods.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -373,7 +375,7 @@ const Nutrition = () => {
                   <div className="flex-1 relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                      placeholder="Rechercher un aliment..." 
+                      placeholder={t('search.food')} 
                       className="h-12 pl-10"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -381,7 +383,7 @@ const Nutrition = () => {
                   </div>
                   <Button variant="outline" className="h-12 px-6">
                     <Filter className="h-4 w-4 mr-2" />
-                    Filtres
+                    {t('btn.filters')}
                   </Button>
                 </div>
 
@@ -416,11 +418,11 @@ const Nutrition = () => {
                           <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                             <div className="text-center">
                               <div className="font-semibold text-primary">{aliment.calories}</div>
-                              <div className="text-muted-foreground">kcal</div>
+                              <div className="text-muted-foreground">{t('nutrition.calories')}</div>
                             </div>
                             <div className="text-center">
                               <div className="font-semibold text-accent">{aliment.macros.protéines}g</div>
-                              <div className="text-muted-foreground">protéines</div>
+                              <div className="text-muted-foreground">{t('nutrition.proteins')}</div>
                             </div>
                           </div>
                           <p className="text-sm text-muted-foreground mb-3">
@@ -440,10 +442,10 @@ const Nutrition = () => {
                       <Apple className="relative h-16 w-16 mx-auto text-accent" />
                     </div>
                     <p className="text-lg font-medium text-foreground mb-2">
-                      {searchTerm ? 'Aucun aliment trouvé' : 'Créez vos aliments personnalisés'}
+                      {searchTerm ? t('msg.no.foods') : t('msg.create.foods')}
                     </p>
                     <p className="text-muted-foreground mb-6">
-                      {searchTerm ? 'Essayez un autre terme de recherche' : 'Ajoutez des aliments avec leurs valeurs nutritionnelles'}
+                      {searchTerm ? t('msg.try.search') : t('msg.add.foods.desc')}
                     </p>
                     {!searchTerm && (
                       <Button className="gradient-accent hover:gradient-primary transition-all duration-300">

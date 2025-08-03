@@ -2,29 +2,32 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Dumbbell, UtensilsCrossed, Home, Code } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const AppHeader = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   const navItems = [
     {
       path: '/',
-      label: 'Accueil',
+      label: t('nav.home'),
       icon: Home,
     },
     {
       path: '/nutrition',
-      label: 'Nutrition',
+      label: t('nav.nutrition'),
       icon: UtensilsCrossed,
     },
     {
       path: '/blocs-entrainement',
-      label: 'Blocs Sport',
+      label: t('nav.training'),
       icon: Dumbbell,
     },
     {
       path: '/developer',
-      label: 'Développeur',
+      label: t('nav.developer'),
       icon: Code,
     }
   ];
@@ -52,6 +55,7 @@ const AppHeader = () => {
 
           {/* Navigation */}
           <nav className="flex items-center space-x-2">
+            <LanguageSwitcher />
             {navItems.map((item) => {
               const Icon = item.icon;
               return (

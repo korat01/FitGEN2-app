@@ -7,11 +7,12 @@ import LanguageSwitcher from './LanguageSwitcher';
 
 const AppHeader = () => {
   const location = useLocation();
+  const isHomePage = location.pathname === '/';
   const { t } = useLanguage();
 
-  const navItems = [
+  const navItems = isHomePage ? [] : [
     {
-      path: '/',
+      path: '/dashboard',
       label: t('nav.home'),
       icon: Home,
     },
@@ -44,7 +45,7 @@ const AppHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link to={isHomePage ? "/" : "/dashboard"} className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="relative">
               <div className="absolute inset-0 gradient-primary rounded-lg blur-sm opacity-30"></div>
               <div className="relative p-2 gradient-primary rounded-lg shadow-glow">

@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import AppHeader from "./components/AppHeader";
-import Index from "./pages/Index";
+import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Nutrition from "./pages/Nutrition";
 import Scan from "./pages/Scan";
 import Developer from "./pages/Developer";
@@ -25,7 +26,8 @@ const App = () => (
           <AppHeader />
           <main className="flex-1">
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/scan" element={<Scan />} />
               <Route path="/developer" element={<Developer />} />

@@ -9,7 +9,7 @@ import ClientForm from '@/components/ClientForm';
 import ProgrammeDisplay from '@/components/ProgrammeDisplay';
 import { ClientProfile, ProgrammeHebdomadaire } from '@/types/programme';
 
-const Index = () => {
+const Dashboard = () => {
   const { t } = useLanguage();
   const [currentTab, setCurrentTab] = useState('form');
   const [clientProfile, setClientProfile] = useState<ClientProfile | null>(null);
@@ -160,4 +160,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dashboard;

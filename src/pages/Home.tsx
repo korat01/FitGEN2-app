@@ -3,65 +3,40 @@ import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Dumbbell, 
-  Apple, 
-  ScanLine, 
-  Users, 
-  TrendingUp, 
-  Shield,
-  ArrowRight,
-  Star,
-  CheckCircle
-} from 'lucide-react';
-
+import { Dumbbell, Apple, ScanLine, Users, TrendingUp, Shield, ArrowRight, Star, CheckCircle } from 'lucide-react';
 const Home = () => {
-  const { t } = useLanguage();
+  const {
+    t
+  } = useLanguage();
   const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: Users,
-      title: t('page.title.generator'),
-      description: 'Créez des programmes sportifs personnalisés pour vos clients',
-      color: 'text-primary'
-    },
-    {
-      icon: Apple,
-      title: t('page.title.nutrition'),
-      description: 'Gestion complète de l\'alimentation et des repas',
-      color: 'text-accent'
-    },
-    {
-      icon: ScanLine,
-      title: t('scan.title'),
-      description: 'Analysez les valeurs nutritionnelles par photo',
-      color: 'text-blue-400'
-    },
-    {
-      icon: Dumbbell,
-      title: t('training.title'),
-      description: 'Bibliothèque complète d\'exercices',
-      color: 'text-green-400'
-    }
-  ];
-
-  const benefits = [
-    'Interface intuitive et moderne',
-    'Génération automatique de programmes',
-    'Base de données nutritionnelle complète',
-    'Analyse par intelligence artificielle',
-    'Export PDF et partage email',
-    'Multi-langues (FR/EN)'
-  ];
-
-  return (
-    <div className="min-h-screen bg-background">
+  const features = [{
+    icon: Users,
+    title: t('page.title.generator'),
+    description: 'Créez des programmes sportifs personnalisés pour vos clients',
+    color: 'text-primary'
+  }, {
+    icon: Apple,
+    title: t('page.title.nutrition'),
+    description: 'Gestion complète de l\'alimentation et des repas',
+    color: 'text-accent'
+  }, {
+    icon: ScanLine,
+    title: t('scan.title'),
+    description: 'Analysez les valeurs nutritionnelles par photo',
+    color: 'text-blue-400'
+  }, {
+    icon: Dumbbell,
+    title: t('training.title'),
+    description: 'Bibliothèque complète d\'exercices',
+    color: 'text-green-400'
+  }];
+  const benefits = ['Interface intuitive et moderne', 'Génération automatique de programmes', 'Base de données nutritionnelle complète', 'Analyse par intelligence artificielle', 'Export PDF et partage email', 'Multi-langues (FR/EN)'];
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 gradient-hero opacity-90"></div>
-        <div className="relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 bg-black/80 rounded-3xl backdrop-blur-sm">
+        <div className="absolute inset-0 gradient-hero opacity-90 bg-zinc-950"></div>
+        <div className="py-20 rounded-2xl bg-zinc-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 backdrop-blur-sm bg-zinc-950 rounded-2xl">
             <div className="text-center animate-fade-in">
               <div className="flex justify-center mb-8">
                 <div className="relative">
@@ -83,21 +58,12 @@ const Home = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button 
-                  size="lg" 
-                  className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6"
-                  onClick={() => navigate('/dashboard')}
-                >
+                <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/dashboard')}>
                   Commencer maintenant
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className="border-primary/20 hover:bg-primary/10 text-lg px-8 py-6"
-                  onClick={() => navigate('/nutrition')}
-                >
+                <Button variant="outline" size="lg" className="border-primary/20 hover:bg-primary/10 text-lg px-8 py-6" onClick={() => navigate('/nutrition')}>
                   Explorer les fonctionnalités
                 </Button>
               </div>
@@ -132,8 +98,9 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="gradient-card shadow-card border-0 hover-lift animate-slide-up" style={{animationDelay: `${index * 0.1}s`}}>
+            {features.map((feature, index) => <Card key={index} className="gradient-card shadow-card border-0 hover-lift animate-slide-up" style={{
+            animationDelay: `${index * 0.1}s`
+          }}>
                 <CardHeader className="text-center">
                   <div className="mx-auto mb-4 p-3 gradient-primary rounded-xl shadow-glow w-fit">
                     <feature.icon className={`h-8 w-8 text-primary-foreground`} />
@@ -143,8 +110,7 @@ const Home = () => {
                 <CardContent>
                   <p className="text-muted-foreground text-center">{feature.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </div>
@@ -164,19 +130,15 @@ const Home = () => {
               </div>
               
               <div className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-3 animate-slide-up" style={{animationDelay: `${index * 0.1}s`}}>
+                {benefits.map((benefit, index) => <div key={index} className="flex items-center gap-3 animate-slide-up" style={{
+                animationDelay: `${index * 0.1}s`
+              }}>
                     <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
                     <span className="text-lg">{benefit}</span>
-                  </div>
-                ))}
+                  </div>)}
               </div>
               
-              <Button 
-                size="lg" 
-                className="gradient-primary text-primary-foreground shadow-glow hover-lift"
-                onClick={() => navigate('/dashboard')}
-              >
+              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift" onClick={() => navigate('/dashboard')}>
                 Démarrer gratuitement
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -224,11 +186,7 @@ const Home = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6"
-                onClick={() => navigate('/dashboard')}
-              >
+              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/dashboard')}>
                 Créer mon premier programme
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -240,8 +198,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Home;

@@ -19,10 +19,12 @@ import {
   Settings
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { saveAliment, saveRepas } from '@/utils/nutritionData';
 
 const Developer = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [currentTab, setCurrentTab] = useState('aliments');
 
   // États pour le formulaire d'aliment
@@ -332,10 +334,10 @@ const Developer = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Panel Développeur
+                  {t('dev.title')}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-1">
-                  Ajout de blocs nutrition et programmes sportifs
+                  {t('dev.subtitle')}
                 </p>
               </div>
             </div>
@@ -352,21 +354,21 @@ const Developer = () => {
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <Apple className="h-4 w-4" />
-              <span>Blocs Aliments</span>
+              <span>{t('dev.tab.foods')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="repas" 
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <UtensilsCrossed className="h-4 w-4" />
-              <span>Blocs Repas</span>
+              <span>{t('dev.tab.meals')}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="programmes" 
               className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300"
             >
               <Dumbbell className="h-4 w-4" />
-              <span>Blocs Entraînement</span>
+              <span>{t('dev.tab.training')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -379,10 +381,10 @@ const Developer = () => {
                   <div className="p-2 gradient-primary rounded-lg">
                     <Apple className="h-5 w-5 text-primary-foreground" />
                   </div>
-                  <span className="text-2xl">Ajouter un bloc aliment</span>
+                  <span className="text-2xl">{t('dev.food.title')}</span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Créer un nouvel aliment avec ses informations nutritionnelles
+                  {t('dev.food.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

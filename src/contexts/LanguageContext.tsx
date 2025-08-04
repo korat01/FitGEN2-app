@@ -101,6 +101,58 @@ const translations: Translations = {
   'scan.no.food': { fr: 'Aucun aliment détecté sur cette image', en: 'No food detected in this image' },
   'scan.try.again': { fr: 'Réessayer', en: 'Try Again' },
   'scan.save.food': { fr: 'Sauvegarder cet aliment', en: 'Save this food' },
+
+  // Developer module
+  'dev.title': { fr: 'Panel Développeur', en: 'Developer Panel' },
+  'dev.subtitle': { fr: 'Ajout de blocs nutrition et programmes sportifs', en: 'Add nutrition blocks and sports programs' },
+  'dev.tab.foods': { fr: 'Blocs Aliments', en: 'Food Blocks' },
+  'dev.tab.meals': { fr: 'Blocs Repas', en: 'Meal Blocks' },
+  'dev.tab.training': { fr: 'Blocs Entraînement', en: 'Training Blocks' },
+  'dev.food.title': { fr: 'Ajouter un bloc aliment', en: 'Add food block' },
+  'dev.food.desc': { fr: 'Créer un nouvel aliment avec ses informations nutritionnelles', en: 'Create a new food with its nutritional information' },
+  'dev.meal.title': { fr: 'Ajouter un bloc repas', en: 'Add meal block' },
+  'dev.meal.desc': { fr: 'Créer un nouveau repas avec ses ingrédients', en: 'Create a new meal with its ingredients' },
+  'dev.training.title': { fr: 'Ajouter un bloc d\'entraînement', en: 'Add training block' },
+  'dev.training.desc': { fr: 'Créer un nouveau bloc d\'exercice', en: 'Create a new exercise block' },
+
+  // Training blocks module
+  'training.title': { fr: 'Blocs d\'Entraînement', en: 'Training Blocks' },
+  'training.subtitle': { fr: 'Bibliothèque complète d\'exercices', en: 'Complete exercise library' },
+  'training.filters': { fr: 'Filtres', en: 'Filters' },
+  'training.search': { fr: 'Nom ou muscle...', en: 'Name or muscle...' },
+  'training.type': { fr: 'Type d\'exercice', en: 'Exercise type' },
+  'training.focus': { fr: 'Focus', en: 'Focus' },
+  'training.display': { fr: 'Affichage', en: 'Display' },
+  'training.all.types': { fr: 'Tous les types', en: 'All types' },
+  'training.all.focus': { fr: 'Tous les focus', en: 'All focus' },
+  'training.all.blocks': { fr: 'Tous les blocs', en: 'All blocks' },
+  'training.saved.only': { fr: 'Sauvegardés uniquement', en: 'Saved only' },
+  'training.no.blocks': { fr: 'Aucun bloc trouvé', en: 'No blocks found' },
+  'training.no.saved': { fr: 'Aucun bloc d\'entraînement sauvegardé. Rendez-vous dans le panel développeur pour en créer.', en: 'No saved training blocks. Go to the developer panel to create some.' },
+  'training.no.criteria': { fr: 'Aucun bloc ne correspond aux critères de recherche.', en: 'No blocks match the search criteria.' },
+  'training.saved': { fr: 'Sauvegardé', en: 'Saved' },
+  'training.muscles': { fr: 'Muscles sollicités:', en: 'Muscles worked:' },
+  'training.equipment': { fr: 'Équipement:', en: 'Equipment:' },
+  'training.description': { fr: 'Description:', en: 'Description:' },
+  'training.constraints': { fr: 'Contraintes:', en: 'Constraints:' },
+  'training.saved.on': { fr: 'Sauvegardé le:', en: 'Saved on:' },
+
+  // NotFound module
+  'notfound.title': { fr: 'Page non trouvée', en: 'Page Not Found' },
+  'notfound.message': { fr: 'Oops! La page que vous cherchez n\'existe pas', en: 'Oops! The page you are looking for does not exist' },
+  'notfound.back': { fr: 'Retour à l\'accueil', en: 'Back to Home' },
+
+  // Common labels
+  'label.name': { fr: 'Nom', en: 'Name' },
+  'label.category': { fr: 'Catégorie', en: 'Category' },
+  'label.calories': { fr: 'Calories (kcal)', en: 'Calories (kcal)' },
+  'label.proteins': { fr: 'Protéines (g)', en: 'Proteins (g)' },
+  'label.carbs': { fr: 'Glucides (g)', en: 'Carbs (g)' },
+  'label.fats': { fr: 'Lipides (g)', en: 'Fats (g)' },
+  'label.fiber': { fr: 'Fibres (g)', en: 'Fiber (g)' },
+  'label.save': { fr: 'Sauvegarder', en: 'Save' },
+  'label.delete': { fr: 'Supprimer', en: 'Delete' },
+  'label.search': { fr: 'Recherche', en: 'Search' },
 };
 
 interface LanguageContextType {

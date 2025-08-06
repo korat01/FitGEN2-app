@@ -142,6 +142,20 @@ const translations: Translations = {
   'notfound.message': { fr: 'Oops! La page que vous cherchez n\'existe pas', en: 'Oops! The page you are looking for does not exist' },
   'notfound.back': { fr: 'Retour à l\'accueil', en: 'Back to Home' },
 
+  // Auth module
+  'auth.title.login': { fr: 'Connexion', en: 'Login' },
+  'auth.title.signup': { fr: 'Inscription', en: 'Sign Up' },
+  'auth.subtitle.login': { fr: 'Connectez-vous pour accéder à votre tableau de bord', en: 'Log in to access your dashboard' },
+  'auth.subtitle.signup': { fr: 'Créez votre compte et votre profil sportif', en: 'Create your account and sports profile' },
+  'auth.email': { fr: 'Email', en: 'Email' },
+  'auth.phone': { fr: 'Téléphone', en: 'Phone' },
+  'auth.password': { fr: 'Mot de passe', en: 'Password' },
+  'auth.confirm.password': { fr: 'Confirmer le mot de passe', en: 'Confirm password' },
+  'auth.login.btn': { fr: 'Se connecter', en: 'Log in' },
+  'auth.signup.btn': { fr: 'Créer le compte', en: 'Create account' },
+  'auth.switch.signup': { fr: 'Créer un compte', en: 'Create account' },
+  'auth.switch.login': { fr: 'Se connecter', en: 'Log in' },
+
   // Common labels
   'label.name': { fr: 'Nom', en: 'Name' },
   'label.category': { fr: 'Catégorie', en: 'Category' },

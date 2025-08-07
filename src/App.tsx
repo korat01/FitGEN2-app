@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import AppHeader from "./components/AppHeader";
 import Home from "./pages/Home";
-import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Nutrition from "./pages/Nutrition";
 import Scan from "./pages/Scan";
@@ -28,7 +27,6 @@ const App = () => (
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/nutrition" element={<Nutrition />} />
               <Route path="/scan" element={<Scan />} />

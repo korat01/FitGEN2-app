@@ -58,8 +58,8 @@ const Home = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/auth')}>
-                  S'inscrire / Se connecter
+                <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/dashboard')}>
+                  Commencer maintenant
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 
@@ -138,7 +138,7 @@ const Home = () => {
                   </div>)}
               </div>
               
-              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift" onClick={() => navigate('/auth')}>
+              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift" onClick={() => navigate('/dashboard')}>
                 Démarrer gratuitement
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -186,7 +186,7 @@ const Home = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/auth')}>
+              <Button size="lg" className="gradient-primary text-primary-foreground shadow-glow hover-lift text-lg px-8 py-6" onClick={() => navigate('/dashboard')}>
                 Créer mon premier programme
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

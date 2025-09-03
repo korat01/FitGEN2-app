@@ -109,19 +109,19 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
 
   // Fonction pour gérer le changement de vitesse de progression
   const handleVitesseProgressionChange = (vitesse: string) => {
-    setFormData(prev => ({ ...prev, vitesse_progression: vitesse as any }));
+    setFormData(prev => ({ ...prev, vitesse_progression: vitesse as 'maintien' | 'progression_legere' | 'progression_rapide' }));
   };
 
   // Fonction pour gérer le changement de format
   const handleFormatChange = (format: string) => {
-    setFormData(prev => ({ ...prev, format_souhaite: format as any }));
+    setFormData(prev => ({ ...prev, format_souhaite: format as 'en_ligne' | 'presentiel' | 'salle' | 'exterieur' }));
     
     // Si "salle" est sélectionné, présélectionner l'équipement de salle
     if (format === 'salle') {
       setFormData(prev => ({ 
         ...prev, 
         equipement_disponible: [...equipementSalle],
-        format_souhaite: format as any
+        format_souhaite: format as 'en_ligne' | 'presentiel' | 'salle' | 'exterieur'
       }));
       toast.info('Équipement de salle de sport présélectionné');
     }
@@ -297,7 +297,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
 
             <div>
               <Label>Niveau *</Label>
-              <Select onValueChange={(value: any) => setFormData(prev => ({ ...prev, niveau: value }))}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, niveau: value as 'débutant' | 'intermédiaire' | 'avancé' }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner le niveau" />
                 </SelectTrigger>
@@ -311,7 +311,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onProgrammeGenerated }) => {
 
             <div>
               <Label>Objectif principal *</Label>
-              <Select onValueChange={(value: any) => setFormData(prev => ({ ...prev, objectif: value }))}>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, objectif: value as 'prise_de_masse' | 'perte_de_poids' | 'remise_en_forme' | 'endurance' | 'force' }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner l'objectif" />
                 </SelectTrigger>

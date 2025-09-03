@@ -186,7 +186,7 @@ const Developer = () => {
     try {
       const alimentData = {
         nom: alimentForm.nom,
-        catégorie: alimentForm.catégorie as any,
+        catégorie: alimentForm.catégorie as string,
         calories: parseInt(alimentForm.calories),
         macros: {
           protéines: parseFloat(alimentForm.protéines),
@@ -197,7 +197,7 @@ const Developer = () => {
         quantité_standard: alimentForm.quantité_standard,
         moment_de_consommation: alimentForm.moment_consommation,
         classes_nutritionnelles: alimentForm.classes_nutritionnelles,
-        index_glycémique: alimentForm.index_glycémique as any,
+        index_glycémique: alimentForm.index_glycémique as string,
         bénéfices_clés: alimentForm.bénéfices_clés,
         interdit_si: alimentForm.interdit_si
       };
@@ -238,7 +238,7 @@ const Developer = () => {
     try {
       const repasData = {
         nom: repasForm.nom,
-        type_de_repas: repasForm.type_de_repas as any,
+        type_de_repas: repasForm.type_de_repas as string,
         objectif_nutritionnel: repasForm.objectif_nutritionnel,
         calories_totales: parseInt(repasForm.calories_totales),
         macros: {
@@ -248,7 +248,7 @@ const Developer = () => {
           fibres: parseFloat(repasForm.fibres)
         },
         composition: repasForm.composition,
-        indice_satiété: repasForm.indice_satiété as any,
+        indice_satiété: repasForm.indice_satiété as string,
         temps_de_préparation: parseInt(repasForm.temps_de_préparation),
         adaptations_possibles: repasForm.adaptations_possibles,
         contre_indications: repasForm.contre_indications
@@ -294,8 +294,8 @@ const Developer = () => {
     });
   };
 
-  const handleSaveBlocEntrainement = () => {
-    const { saveBlocEntrainement } = require('@/utils/blocsEntrainementData');
+  const handleSaveBlocEntrainement = async () => {
+    const { saveBlocEntrainement } = await import('@/utils/blocsEntrainementData');
     const savedBloc = saveBlocEntrainement(blocForm);
     toast({
       title: "Bloc d'entraînement sauvegardé",

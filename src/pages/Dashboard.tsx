@@ -4,11 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dumbbell, Users, FileText, Calendar, UtensilsCrossed } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import ClientForm from '@/components/ClientForm';
 import ProgrammeDisplay from '@/components/ProgrammeDisplay';
 import { ClientProfile, ProgrammeHebdomadaire } from '@/types/programme';
 
-const Index = () => {
+const Dashboard = () => {
+  const { t } = useLanguage();
   const [currentTab, setCurrentTab] = useState('form');
   const [clientProfile, setClientProfile] = useState<ClientProfile | null>(null);
   const [programme, setProgramme] = useState<ProgrammeHebdomadaire | null>(null);
@@ -35,10 +37,10 @@ const Index = () => {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Générateur de Programmes
+                  {t('page.title.generator')}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-1">
-                  Créez des programmes sportifs personnalisés pour vos clients
+                  {t('page.subtitle.generator')}
                 </p>
               </div>
             </div>
@@ -52,19 +54,19 @@ const Index = () => {
           <TabsList className="grid w-full grid-cols-4 lg:w-4/5 xl:w-3/5 h-14 p-1 gradient-card shadow-card">
             <TabsTrigger value="form" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Client</span>
+              <span className="hidden sm:inline">{t('tab.client')}</span>
             </TabsTrigger>
             <TabsTrigger value="programme" disabled={!programme} className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">Programme</span>
+              <span className="hidden sm:inline">{t('tab.program')}</span>
             </TabsTrigger>
             <TabsTrigger value="export" disabled={!programme} className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Export</span>
+              <span className="hidden sm:inline">{t('tab.export')}</span>
             </TabsTrigger>
             <TabsTrigger value="clients" className="flex items-center space-x-2 data-[state=active]:gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-glow transition-all duration-300">
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Base</span>
+              <span className="hidden sm:inline">{t('tab.database')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -76,10 +78,10 @@ const Index = () => {
                   <div className="p-2 gradient-primary rounded-lg">
                     <Users className="h-5 w-5 text-primary-foreground" />
                   </div>
-                  <span className="text-2xl">Fiche technique client</span>
+                  <span className="text-2xl">{t('card.client.title')}</span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Remplissez les informations du client pour générer un programme personnalisé
+                  {t('card.client.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -105,21 +107,21 @@ const Index = () => {
                   <div className="p-2 gradient-accent rounded-lg">
                     <FileText className="h-5 w-5 text-accent-foreground" />
                   </div>
-                  <span className="text-2xl">Export et partage</span>
+                  <span className="text-2xl">{t('card.export.title')}</span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Exportez le programme en PDF ou envoyez-le par email
+                  {t('card.export.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Button className="h-24 flex-col space-y-3 gradient-primary hover:gradient-accent transition-all duration-300 shadow-glow hover:shadow-elegant">
                     <FileText className="h-8 w-8" />
-                    <span className="font-semibold">Exporter en PDF</span>
+                    <span className="font-semibold">{t('btn.export.pdf')}</span>
                   </Button>
                   <Button variant="outline" className="h-24 flex-col space-y-3 border-2 border-primary/20 hover:border-primary hover:gradient-card transition-all duration-300">
                     <span className="text-2xl">📧</span>
-                    <span className="font-semibold">Envoyer par email</span>
+                    <span className="font-semibold">{t('btn.send.email')}</span>
                   </Button>
                 </div>
               </CardContent>
@@ -134,10 +136,10 @@ const Index = () => {
                   <div className="p-2 gradient-primary rounded-lg">
                     <Users className="h-5 w-5 text-primary-foreground" />
                   </div>
-                  <span className="text-2xl">Base de données clients</span>
+                  <span className="text-2xl">{t('card.database.title')}</span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  Gérez vos clients et leurs programmes
+                  {t('card.database.desc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -146,8 +148,8 @@ const Index = () => {
                     <div className="absolute inset-0 gradient-primary rounded-full blur-xl opacity-20"></div>
                     <Users className="relative h-16 w-16 mx-auto text-primary" />
                   </div>
-                  <p className="text-lg font-medium text-foreground mb-2">Fonctionnalité à venir</p>
-                  <p className="text-muted-foreground">Sauvegarde et gestion des clients</p>
+                  <p className="text-lg font-medium text-foreground mb-2">{t('msg.coming.soon')}</p>
+                  <p className="text-muted-foreground">{t('msg.client.save')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -158,4 +160,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dashboard;

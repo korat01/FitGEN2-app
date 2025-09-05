@@ -1,4 +1,5 @@
 import { BlocExercice } from '@/types/programme';
+import { tousBlocs } from './blocsExercices';
 
 const STORAGE_KEY = 'blocs_entrainement';
 
@@ -40,7 +41,6 @@ export const deleteBlocEntrainement = (id: string): void => {
 // Fonction pour récupérer tous les blocs (sauvegardés + prédéfinis) pour la génération de programmes
 export const getAllBlocsEntrainement = (): BlocExercice[] => {
   const savedBlocs = getSavedBlocsEntrainement();
-  const { tousBlocs } = require('./blocsExercices');
   
   // Combiner les blocs sauvegardés et les blocs prédéfinis
   return [...tousBlocs, ...savedBlocs];

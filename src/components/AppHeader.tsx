@@ -1,30 +1,39 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, UtensilsCrossed, Home, Code } from 'lucide-react';
+import { Dumbbell, UtensilsCrossed, Home, Code, ScanLine } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const AppHeader = () => {
   const location = useLocation();
+  const isHomePage = location.pathname === '/';
+  const { t } = useLanguage();
 
-  const navItems = [
+  const navItems = isHomePage ? [] : [
     {
-      path: '/',
-      label: 'Accueil',
+      path: '/dashboard',
+      label: t('nav.home'),
       icon: Home,
     },
     {
       path: '/nutrition',
-      label: 'Nutrition',
+      label: t('nav.nutrition'),
       icon: UtensilsCrossed,
     },
     {
+      path: '/scan',
+      label: t('nav.scan'),
+      icon: ScanLine,
+    },
+    {
       path: '/blocs-entrainement',
-      label: 'Blocs Sport',
+      label: t('nav.training'),
       icon: Dumbbell,
     },
     {
       path: '/developer',
-      label: 'Développeur',
+      label: t('nav.developer'),
       icon: Code,
     }
   ];
@@ -36,7 +45,7 @@ const AppHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link to={isHomePage ? "/" : "/dashboard"} className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="relative">
               <div className="absolute inset-0 gradient-primary rounded-lg blur-sm opacity-30"></div>
               <div className="relative p-2 gradient-primary rounded-lg shadow-glow">
@@ -52,6 +61,7 @@ const AppHeader = () => {
 
           {/* Navigation */}
           <nav className="flex items-center space-x-2">
+            <LanguageSwitcher />
             {navItems.map((item) => {
               const Icon = item.icon;
               return (

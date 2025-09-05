@@ -9,6 +9,7 @@ import { getSavedBlocsEntrainement, deleteBlocEntrainement, SavedBlocEntrainemen
 import { getAllBlocsEntrainement } from '@/utils/blocsEntrainementData';
 import { BlocExercice } from '@/types/programme';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function BlocsEntrainement() {
   const [savedBlocs, setSavedBlocs] = useState<SavedBlocEntrainement[]>([]);
@@ -18,6 +19,7 @@ export default function BlocsEntrainement() {
   const [filterFocus, setFilterFocus] = useState<string>('tous');
   const [showOnlySaved, setShowOnlySaved] = useState<boolean>(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     loadBlocs();
@@ -114,10 +116,10 @@ export default function BlocsEntrainement() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Blocs d'Entraînement
+                  {t('training.title')}
                 </h1>
                 <p className="text-muted-foreground text-lg mt-1">
-                  Bibliothèque complète d'exercices ({allBlocs.length} blocs au total, {savedBlocs.length} sauvegardés)
+                  {t('training.subtitle')} ({allBlocs.length} {t('training.all.blocks').toLowerCase()}, {savedBlocs.length} {t('training.saved').toLowerCase()})
                 </p>
               </div>
             </div>
@@ -131,7 +133,7 @@ export default function BlocsEntrainement() {
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Filter className="h-5 w-5" />
-              <span>Filtres</span>
+              <span>{t('training.filters')}</span>
             </CardTitle>
           </CardHeader>
           <CardContent>

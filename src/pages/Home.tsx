@@ -1,32 +1,28 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dumbbell, Apple, ScanLine, Users, TrendingUp, Shield, ArrowRight, Star, CheckCircle } from 'lucide-react';
 const Home = () => {
-  const {
-    t
-  } = useLanguage();
   const navigate = useNavigate();
   const features = [{
     icon: Users,
-    title: t('page.title.generator'),
+    title: 'Générateur de programmes',
     description: 'Créez des programmes sportifs personnalisés pour vos clients',
     color: 'text-primary'
   }, {
     icon: Apple,
-    title: t('page.title.nutrition'),
+    title: 'Nutrition',
     description: 'Gestion complète de l\'alimentation et des repas',
     color: 'text-accent'
   }, {
     icon: ScanLine,
-    title: t('scan.title'),
+    title: 'Scanner de repas',
     description: 'Analysez les valeurs nutritionnelles par photo',
     color: 'text-blue-400'
   }, {
     icon: Dumbbell,
-    title: t('training.title'),
+    title: 'Exercices',
     description: 'Bibliothèque complète d\'exercices',
     color: 'text-green-400'
   }];

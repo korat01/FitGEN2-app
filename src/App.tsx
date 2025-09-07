@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import AppHeader from "@/components/AppHeader";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Nutrition from "./pages/Nutrition";
@@ -22,6 +23,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <div className="min-h-screen bg-background">
+            <AppHeader />
             <main>
               <Routes>
                 <Route path="/" element={<Home />} />

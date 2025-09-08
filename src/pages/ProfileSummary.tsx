@@ -1,258 +1,327 @@
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import PageLayout from '@/components/PageLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Mail, Phone, MapPin, Calendar, Target, Dumbbell, Clock, Settings, AlertTriangle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  User, 
+  Target, 
+  Calendar, 
+  Clock,
+  Dumbbell,
+  Save,
+  CheckCircle
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProfileSummary = () => {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profile, setProfile] = useState({
+    name: 'John Doe',
+    age: 28,
+    weight: 75,
+    height: 180,
+    goal: 'Perte de poids',
+    experience: 'Intermédiaire',
+    selectedDays: ['Lundi', 'Mercredi', 'Vendredi'],
+    workoutDuration: 75,
+    preferredTime: '18:00'
+  });
 
-  if (!user) {
-    return <div>Chargement...</div>;
-  }
+  const [editedProfile, setEditedProfile] = useState(profile);
 
-  const getLevelColor = (level?: string) => {
-    switch (level) {
-      case 'débutant': return 'bg-green-100 text-green-800';
-      case 'intermédiaire': return 'bg-yellow-100 text-yellow-800';
-      case 'avancé': return 'bg-orange-100 text-orange-800';
-      case 'expert': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  const goals = ['Perte de poids', 'Prise de masse', 'Maintien', 'Performance'];
+  const experienceLevels = ['Débutant', 'Intermédiaire', 'Avancé'];
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedProfile(profile);
+  };
+
+  const handleSave = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      setProfile(editedProfile);
+      setIsEditing(false);
+      setIsSaving(false);
+    }, 1000);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setEditedProfile(profile);
+  };
+
+  const handleDayToggle = (day: string) => {
+    if (editedProfile.selectedDays.includes(day)) {
+      setEditedProfile({
+        ...editedProfile,
+        selectedDays: editedProfile.selectedDays.filter(d => d !== day)
+      });
+    } else {
+      setEditedProfile({
+        ...editedProfile,
+        selectedDays: [...editedProfile.selectedDays, day]
+      });
     }
   };
 
-  const getObjectiveColor = (objective?: string) => {
-    switch (objective) {
-      case 'perte_poids': return 'bg-blue-100 text-blue-800';
-      case 'prise_masse': return 'bg-purple-100 text-purple-800';
-      case 'maintien': return 'bg-green-100 text-green-800';
-      case 'performance': return 'bg-orange-100 text-orange-800';
-      case 'santé': return 'bg-teal-100 text-teal-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const handleInputChange = (field: string, value: any) => {
+    setEditedProfile({
+      ...editedProfile,
+      [field]: value
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Mon Profil</h1>
-          <p className="text-gray-600">Récapitulatif de vos informations personnelles</p>
-        </div>
-
-        <div className="grid gap-6">
-          {/* Informations personnelles */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-blue-600" />
-                Informations personnelles
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback className="text-lg">
-                    {user.name?.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
+    <PageLayout
+      title="Profil utilisateur"
+      subtitle="Personnalisez votre expérience d'entraînement"
+      icon={<User className="h-6 w-6 text-blue-600" />}
+      actions={
+        !isEditing ? (
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleEdit}
+            className="border-2 border-slate-300 hover:border-slate-400"
+          >
+            Modifier le profil
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleCancel}
+              className="border-2 border-slate-300 hover:border-slate-400"
+            >
+              Annuler
+            </Button>
+            <Button 
+              size="sm"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white font-semibold"
+            >
+              {isSaving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Sauvegarde...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder
+                </>
+              )}
+            </Button>
+          </div>
+        )
+      }
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Informations personnelles */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
+              <div className="bg-blue-100 rounded-full p-2">
+                <User className="h-6 w-6 text-blue-600" />
+              </div>
+              Informations personnelles
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">{user.name}</h3>
-                  <p className="text-gray-600">{user.email}</p>
+                  <Label htmlFor="name">Nom</Label>
+                  {isEditing ? (
+                    <Input
+                      id="name"
+                      value={editedProfile.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      className="mt-1"
+                    />
+                  ) : (
+                    <p className="text-slate-800 font-medium mt-1">{profile.name}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="age">Âge</Label>
+                  {isEditing ? (
+                    <Input
+                      id="age"
+                      type="number"
+                      value={editedProfile.age}
+                      onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
+                      className="mt-1"
+                    />
+                  ) : (
+                    <p className="text-slate-800 font-medium mt-1">{profile.age} ans</p>
+                  )}
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">{user.phone}</span>
-                  </div>
-                )}
-                {user.address && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">{user.address}</span>
-                  </div>
-                )}
-                {user.birthDate && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">{user.birthDate}</span>
-                  </div>
-                )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="weight">Poids (kg)</Label>
+                  {isEditing ? (
+                    <Input
+                      id="weight"
+                      type="number"
+                      value={editedProfile.weight}
+                      onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
+                      className="mt-1"
+                    />
+                  ) : (
+                    <p className="text-slate-800 font-medium mt-1">{profile.weight} kg</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="height">Taille (cm)</Label>
+                  {isEditing ? (
+                    <Input
+                      id="height"
+                      type="number"
+                      value={editedProfile.height}
+                      onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
+                      className="mt-1"
+                    />
+                  ) : (
+                    <p className="text-slate-800 font-medium mt-1">{profile.height} cm</p>
+                  )}
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Objectifs et niveau */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-green-600" />
-                Objectifs et niveau
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {user.level && (
-                  <Badge className={getLevelColor(user.level)}>
-                    Niveau: {user.level}
-                  </Badge>
-                )}
-                {user.mainObjective && (
-                  <Badge className={getObjectiveColor(user.mainObjective)}>
-                    Objectif: {user.mainObjective.replace('_', ' ')}
-                  </Badge>
-                )}
-                {user.goal && (
-                  <Badge variant="outline">
-                    {user.goal}
-                  </Badge>
-                )}
+        {/* Objectifs et préférences */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
+              <div className="bg-emerald-100 rounded-full p-2">
+                <Target className="h-6 w-6 text-emerald-600" />
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Informations physiques */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Dumbbell className="h-5 w-5 text-purple-600" />
-                Informations physiques
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {user.age && (
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-gray-900">{user.age}</p>
-                    <p className="text-sm text-gray-600">Âge</p>
-                  </div>
-                )}
-                {user.height && (
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-gray-900">{user.height}</p>
-                    <p className="text-sm text-gray-600">Taille</p>
-                  </div>
-                )}
-                {user.weight && (
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-gray-900">{user.weight}</p>
-                    <p className="text-sm text-gray-600">Poids</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Préférences d'entraînement */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-orange-600" />
-                Préférences d'entraînement
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.trainingFrequency && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Fréquence</p>
-                    <p className="text-lg text-gray-900">{user.trainingFrequency} séances/semaine</p>
-                  </div>
-                )}
-                {user.trainingDuration && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Durée</p>
-                    <p className="text-lg text-gray-900">{user.trainingDuration} minutes/séance</p>
-                  </div>
+              Objectifs et préférences
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="goal">Objectif</Label>
+                {isEditing ? (
+                  <select
+                    id="goal"
+                    value={editedProfile.goal}
+                    onChange={(e) => handleInputChange('goal', e.target.value)}
+                    className="w-full mt-1 p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {goals.map(goal => (
+                      <option key={goal} value={goal}>{goal}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-slate-800 font-medium mt-1">{profile.goal}</p>
                 )}
               </div>
               
-              {user.trainingLocation && user.trainingLocation.length > 0 && (
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Lieux d'entraînement</p>
-                  <div className="flex flex-wrap gap-2">
-                    {user.trainingLocation.map((location, index) => (
-                      <Badge key={index} variant="outline">
-                        {location}
-                      </Badge>
+              <div>
+                <Label htmlFor="experience">Niveau d'expérience</Label>
+                {isEditing ? (
+                  <select
+                    id="experience"
+                    value={editedProfile.experience}
+                    onChange={(e) => handleInputChange('experience', e.target.value)}
+                    className="w-full mt-1 p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {experienceLevels.map(level => (
+                      <option key={level} value={level}>{level}</option>
                     ))}
-                  </div>
+                  </select>
+                ) : (
+                  <p className="text-slate-800 font-medium mt-1">{profile.experience}</p>
+                )}
+              </div>
+              
+              <div>
+                <Label htmlFor="duration">Durée d'entraînement (min)</Label>
+                {isEditing ? (
+                  <Input
+                    id="duration"
+                    type="number"
+                    value={editedProfile.workoutDuration}
+                    onChange={(e) => handleInputChange('workoutDuration', parseInt(e.target.value))}
+                    className="mt-1"
+                  />
+                ) : (
+                  <p className="text-slate-800 font-medium mt-1">{profile.workoutDuration} minutes</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Jours d'entraînement */}
+        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
+              <div className="bg-violet-100 rounded-full p-2">
+                <Calendar className="h-6 w-6 text-violet-600" />
+              </div>
+              Jours d'entraînement
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-slate-600">
+                Sélectionnez les jours où vous souhaitez vous entraîner. Les autres jours seront des jours de repos.
+              </p>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                {days.map(day => {
+                  const isSelected = isEditing 
+                    ? editedProfile.selectedDays.includes(day)
+                    : profile.selectedDays.includes(day);
+                  
+                  return (
+                    <Button
+                      key={day}
+                      variant={isSelected ? "default" : "outline"}
+                      className={`h-16 flex flex-col items-center justify-center gap-1 ${
+                        isSelected 
+                          ? 'bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white' 
+                          : 'border-2 border-slate-300 hover:border-slate-400'
+                      }`}
+                      onClick={isEditing ? () => handleDayToggle(day) : undefined}
+                      disabled={!isEditing}
+                    >
+                      <span className="text-sm font-medium">{day}</span>
+                      {isSelected && (
+                        <CheckCircle className="h-4 w-4" />
+                      )}
+                    </Button>
+                  );
+                })}
+              </div>
+              
+              {isEditing && (
+                <div className="text-sm text-slate-600">
+                  <p>Jours sélectionnés : {editedProfile.selectedDays.length}</p>
+                  <p>Jours de repos : {7 - editedProfile.selectedDays.length}</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Informations médicales */}
-          {(user.injuries?.length || user.medicalConditions?.length || user.medications?.length || user.allergies?.length) && (
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Informations médicales
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {user.injuries && user.injuries.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Blessures</p>
-                    <div className="flex flex-wrap gap-2">
-                      {user.injuries.map((injury, index) => (
-                        <Badge key={index} variant="destructive">
-                          {injury}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {user.medicalConditions && user.medicalConditions.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Conditions médicales</p>
-                    <div className="flex flex-wrap gap-2">
-                      {user.medicalConditions.map((condition, index) => (
-                        <Badge key={index} variant="destructive">
-                          {condition}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Actions */}
-          <Card className="shadow-lg">
-            <CardContent className="pt-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  onClick={() => navigate('/dashboard')}
-                  className="flex-1"
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Modifier le profil
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => navigate('/')}
-                  className="flex-1"
-                >
-                  Retour à l'accueil
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

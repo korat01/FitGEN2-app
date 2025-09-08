@@ -26,6 +26,7 @@ import { User, Mail, Phone, MapPin, Calendar, Target, Dumbbell, Clock, Settings,
 import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut } from 'lucide-react';
+import Planning from "./pages/Planning";
 
 const queryClient = new QueryClient();
 
@@ -299,7 +300,7 @@ const App = () => (
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                     <Route path="/profile-summary" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
-                    <Route path="/planning" element={<ProtectedRoute><Programme /></ProtectedRoute>} />
+                    <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
                     <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
                     <Route path="/blocs-entrainement" element={<ProtectedRoute><BlocsEntrainement /></ProtectedRoute>} />
                     <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />

@@ -1,56 +1,37 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
-import { Languages, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Globe } from 'lucide-react';
 
-const LanguageSwitcher = () => {
+export const LanguageSwitcher: React.FC = () => {
   const { language, setLanguage } = useLanguage();
 
   const languages = [
-    { code: 'fr' as const, name: 'Français', flag: '🇫🇷' },
-    { code: 'en' as const, name: 'English', flag: '🇺🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
   ];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="gap-2 hover:bg-accent hover:text-accent-foreground transition-all duration-300"
-        >
-          <Languages className="h-4 w-4" />
-          <span className="hidden sm:inline">
-            {languages.find(l => l.code === language)?.flag}
-          </span>
+        <Button variant="ghost" size="sm">
+          <Globe className="h-4 w-4 mr-2" />
+          {languages.find(lang => lang.code === language)?.flag}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        align="end" 
-        className="w-48 bg-background/95 backdrop-blur-sm border border-border/50 shadow-elegant"
-      >
+      <DropdownMenuContent align="end">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setLanguage(lang.code)}
-            className="flex items-center gap-3 cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
+            onClick={() => setLanguage(lang.code as 'fr' | 'en')}
+            className={language === lang.code ? 'bg-accent' : ''}
           >
-            <span className="text-lg">{lang.flag}</span>
-            <span className="flex-1">{lang.name}</span>
-            {language === lang.code && (
-              <Check className="h-4 w-4 text-primary" />
-            )}
+            <span className="mr-2">{lang.flag}</span>
+            {lang.name}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
-
-export default LanguageSwitcher;

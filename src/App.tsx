@@ -27,6 +27,9 @@ import { useNavigate } from 'react-router-dom';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { LogOut } from 'lucide-react';
 import Planning from "./pages/Planning";
+import Repas from './pages/Repas';
+import RecetteDetail from './pages/RecetteDetail';
+import AlimentDetail from './pages/AlimentDetail';
 
 const queryClient = new QueryClient();
 
@@ -302,9 +305,12 @@ const App = () => (
                     <Route path="/profile-summary" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
                     <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
                     <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
+                    <Route path="/nutrition/:id" element={<AlimentDetail />} />
                     <Route path="/blocs-entrainement" element={<ProtectedRoute><BlocsEntrainement /></ProtectedRoute>} />
                     <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />
                     <Route path="/overview" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
+                    <Route path="/repas" element={<Repas />} />
+                    <Route path="/repas/:id" element={<RecetteDetail />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

@@ -44,6 +44,65 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   const fullDayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
+  // Types de programmes avec exercices détaillés
+  const programTypes = {
+    'Push Day': {
+      name: 'Push Day',
+      exercises: [
+        { name: 'Développé couché', sets: '4x8-10', weight: '80kg', rest: '2-3 min' },
+        { name: 'Dips', sets: '3x12-15', weight: 'Poids du corps', rest: '90 sec' },
+        { name: 'Élévations latérales', sets: '3x15', weight: '12kg', rest: '60 sec' },
+        { name: 'Développé incliné', sets: '3x10-12', weight: '60kg', rest: '2 min' }
+      ],
+      duration: '75 min',
+      difficulty: 'Intermédiaire',
+      calories: 450
+    },
+    'Pull Day': {
+      name: 'Pull Day',
+      exercises: [
+        { name: 'Tractions', sets: '4x8-10', weight: 'Poids du corps', rest: '2-3 min' },
+        { name: 'Rowing barre', sets: '4x8-10', weight: '70kg', rest: '2 min' },
+        { name: 'Curl biceps', sets: '3x12-15', weight: '15kg', rest: '60 sec' },
+        { name: 'Face pull', sets: '3x15', weight: '20kg', rest: '60 sec' },
+        { name: 'Shrugs', sets: '3x12', weight: '40kg', rest: '60 sec' }
+      ],
+      duration: '80 min',
+      difficulty: 'Intermédiaire',
+      calories: 480
+    },
+    'Leg Day': {
+      name: 'Leg Day',
+      exercises: [
+        { name: 'Squat', sets: '4x8-10', weight: '100kg', rest: '3-4 min' },
+        { name: 'Fentes', sets: '3x12', weight: '20kg', rest: '2 min' },
+        { name: 'Soulevé de terre', sets: '4x6-8', weight: '120kg', rest: '3-4 min' },
+        { name: 'Extensions', sets: '3x15', weight: '60kg', rest: '90 sec' },
+        { name: 'Mollets', sets: '4x20', weight: '80kg', rest: '60 sec' },
+        { name: 'Planche', sets: '3x45 sec', weight: 'Poids du corps', rest: '60 sec' }
+      ],
+      duration: '90 min',
+      difficulty: 'Avancé',
+      calories: 600
+    },
+    'Full Body': {
+      name: 'Full Body',
+      exercises: [
+        { name: 'Squat', sets: '3x12', weight: '60kg', rest: '2 min' },
+        { name: 'Développé couché', sets: '3x10', weight: '60kg', rest: '2 min' },
+        { name: 'Tractions', sets: '3x8', weight: 'Poids du corps', rest: '2 min' },
+        { name: 'Fentes', sets: '3x10', weight: '15kg', rest: '90 sec' },
+        { name: 'Dips', sets: '3x10', weight: 'Poids du corps', rest: '90 sec' },
+        { name: 'Planche', sets: '3x30 sec', weight: 'Poids du corps', rest: '60 sec' },
+        { name: 'Burpees', sets: '3x10', weight: 'Poids du corps', rest: '60 sec' },
+        { name: 'Mountain climbers', sets: '3x20', weight: 'Poids du corps', rest: '60 sec' }
+      ],
+      duration: '60 min',
+      difficulty: 'Débutant',
+      calories: 400
+    }
+  };
+
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -227,7 +286,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                         {getStatusIcon(status)}
                       </div>
                       
-                      {day.program && (
+                      {day.program ? (
                         <div className="mt-1 space-y-1">
                           <div className="text-xs font-medium truncate">
                             {day.program.name}
@@ -237,13 +296,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                             {day.program.duration}
                           </div>
                         </div>
-                      )}
-                      
-                      {!day.program && day.isSelected && day.isCurrentMonth && (
+                      ) : day.isSelected && day.isCurrentMonth ? (
                         <div className="mt-1 text-xs text-slate-500">
                           Jour d'entraînement
                         </div>
-                      )}
+                      ) : !day.isSelected && day.isCurrentMonth ? (
+                        <div className="mt-1 text-xs text-slate-500">
+                          Repos
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 );
@@ -309,7 +370,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                       </div>
                       <div className="flex items-center gap-2 text-slate-600">
                         <Zap className="h-4 w-4" />
-                        <span className="font-medium">Calories estimées : 450</span>
+                        <span className="font-medium">Calories : {selectedProgram.calories}</span>
                       </div>
                     </div>
                   </div>
@@ -321,11 +382,13 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                       {selectedProgram.exercises && selectedProgram.exercises.length > 0 ? (
                         selectedProgram.exercises.map((exercise: any, index: number) => (
                           <div key={index} className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
-                            <span className="font-medium text-slate-800">{exercise.name || `Exercice ${index + 1}`}</span>
+                            <span className="font-medium text-slate-800">{exercise.name}</span>
                             <div className="text-sm text-slate-600">
-                              <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.sets || '3x12'}</span>
+                              <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.sets}</span>
                               <span className="mx-2">•</span>
-                              <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.weight || 'Poids libre'}</span>
+                              <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.weight}</span>
+                              <span className="mx-2">•</span>
+                              <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.rest}</span>
                             </div>
                           </div>
                         ))

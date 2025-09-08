@@ -1507,6 +1507,667 @@ export const alimentsPredefinis: AlimentBlock[] = [
     index_glycémique: "faible",
     bénéfices_clés: ["densité nutritionnelle", "goût piquant"],
     interdit_si: []
+  },
+  // NOUVEAUX ALIMENTS (101-120)
+  {
+    id: "aliment_101",
+    nom: "Quinoa rouge",
+    catégorie: "Glucide",
+    calories: 368,
+    macros: { protéines: 14, glucides: 64, lipides: 6, fibres: 7 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["protéine complète", "sans gluten"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["énergie durable", "minéraux"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_102",
+    nom: "Tempeh",
+    catégorie: "Protéine",
+    calories: 192,
+    macros: { protéines: 20, glucides: 8, lipides: 11, fibres: 9 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["protéine végétale", "probiotiques"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["digestion", "végétarien"],
+    interdit_si: ["allergie_soja"]
+  },
+  {
+    id: "aliment_103",
+    nom: "Spiruline",
+    catégorie: "Micronutriments",
+    calories: 290,
+    macros: { protéines: 57, glucides: 24, lipides: 8, fibres: 3 },
+    quantité_standard: "10g",
+    moment_de_consommation: ["petit-déjeuner", "collation"],
+    classes_nutritionnelles: ["vitamine B12", "fer", "antioxydants"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["énergie", "détox"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_104",
+    nom: "Graines de chanvre",
+    catégorie: "Mixte",
+    calories: 553,
+    macros: { protéines: 31, glucides: 9, lipides: 49, fibres: 4 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["petit-déjeuner", "collation"],
+    classes_nutritionnelles: ["oméga-3", "protéine complète"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé cardiovasculaire", "satiété"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_105",
+    nom: "Chou kale",
+    catégorie: "Micronutriments",
+    calories: 49,
+    macros: { protéines: 4.3, glucides: 8.8, lipides: 0.9, fibres: 3.6 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["vitamine K", "vitamine C", "calcium"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["antioxydants", "santé osseuse"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_106",
+    nom: "Miso",
+    catégorie: "Protéine",
+    calories: 199,
+    macros: { protéines: 12, glucides: 26, lipides: 6, fibres: 5 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["probiotiques", "fermentation"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["digestion", "immunité"],
+    interdit_si: ["allergie_soja"]
+  },
+  {
+    id: "aliment_107",
+    nom: "Noix du Brésil",
+    catégorie: "Lipide",
+    calories: 659,
+    macros: { protéines: 14, glucides: 12, lipides: 67, fibres: 8 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["collation"],
+    classes_nutritionnelles: ["sélénium", "magnésium"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["antioxydants", "santé thyroïdienne"],
+    interdit_si: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "aliment_108",
+    nom: "Patate douce violette",
+    catégorie: "Glucide",
+    calories: 86,
+    macros: { protéines: 1.6, glucides: 20, lipides: 0.1, fibres: 3 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["anthocyanes", "vitamine A"],
+    index_glycémique: "moyen",
+    bénéfices_clés: ["antioxydants", "santé oculaire"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_109",
+    nom: "Kéfir",
+    catégorie: "Mixte",
+    calories: 41,
+    macros: { protéines: 3.3, glucides: 4.5, lipides: 1, fibres: 0 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["petit-déjeuner", "collation"],
+    classes_nutritionnelles: ["probiotiques", "calcium"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["digestion", "immunité"],
+    interdit_si: ["intolérance_lactose"]
+  },
+  {
+    id: "aliment_110",
+    nom: "Graines de courge",
+    catégorie: "Mixte",
+    calories: 559,
+    macros: { protéines: 30, glucides: 11, lipides: 49, fibres: 6 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["collation"],
+    classes_nutritionnelles: ["magnésium", "zinc", "oméga-3"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé masculine", "satiété"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_111",
+    nom: "Champignons shiitake",
+    catégorie: "Micronutriments",
+    calories: 34,
+    macros: { protéines: 2.2, glucides: 7, lipides: 0.2, fibres: 2.5 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["vitamine D", "bêta-glucanes"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["immunité", "santé cardiovasculaire"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_112",
+    nom: "Açaí",
+    catégorie: "Micronutriments",
+    calories: 70,
+    macros: { protéines: 1, glucides: 16, lipides: 0.5, fibres: 2 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["petit-déjeuner", "collation"],
+    classes_nutritionnelles: ["anthocyanes", "antioxydants"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["anti-âge", "énergie"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_113",
+    nom: "Lentilles corail",
+    catégorie: "Protéine",
+    calories: 353,
+    macros: { protéines: 24, glucides: 60, lipides: 2, fibres: 11 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["protéine végétale", "fer", "folate"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["énergie durable", "santé cardiovasculaire"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_114",
+    nom: "Huile de coco vierge",
+    catégorie: "Lipide",
+    calories: 862,
+    macros: { protéines: 0, glucides: 0, lipides: 100, fibres: 0 },
+    quantité_standard: "15ml",
+    moment_de_consommation: ["petit-déjeuner", "cuisson"],
+    classes_nutritionnelles: ["TCM", "acide laurique"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["énergie rapide", "satiété"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_115",
+    nom: "Épinards baby",
+    catégorie: "Micronutriments",
+    calories: 23,
+    macros: { protéines: 2.9, glucides: 3.6, lipides: 0.4, fibres: 2.2 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["vitamine K", "folate", "fer"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé osseuse", "énergie"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_116",
+    nom: "Graines de lin",
+    catégorie: "Lipide",
+    calories: 534,
+    macros: { protéines: 18, glucides: 29, lipides: 42, fibres: 28 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["petit-déjeuner", "collation"],
+    classes_nutritionnelles: ["oméga-3", "lignanes"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé hormonale", "digestion"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_117",
+    nom: "Chou-fleur",
+    catégorie: "Micronutriments",
+    calories: 25,
+    macros: { protéines: 1.9, glucides: 5, lipides: 0.3, fibres: 2 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["vitamine C", "sulforaphane"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["détox", "santé cellulaire"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_118",
+    nom: "Noix de cajou",
+    catégorie: "Lipide",
+    calories: 553,
+    macros: { protéines: 18, glucides: 30, lipides: 44, fibres: 3 },
+    quantité_standard: "30g",
+    moment_de_consommation: ["collation"],
+    classes_nutritionnelles: ["magnésium", "zinc", "cuivre"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé cardiovasculaire", "satiété"],
+    interdit_si: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "aliment_119",
+    nom: "Grenade",
+    catégorie: "Micronutriments",
+    calories: 83,
+    macros: { protéines: 1.7, glucides: 19, lipides: 1.2, fibres: 4 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["collation"],
+    classes_nutritionnelles: ["ellagitanins", "vitamine C"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["antioxydants", "santé cardiovasculaire"],
+    interdit_si: []
+  },
+  {
+    id: "aliment_120",
+    nom: "Tofu ferme",
+    catégorie: "Protéine",
+    calories: 144,
+    macros: { protéines: 15, glucides: 4, lipides: 8, fibres: 2 },
+    quantité_standard: "100g",
+    moment_de_consommation: ["déjeuner", "dîner"],
+    classes_nutritionnelles: ["protéine végétale", "isoflavones"],
+    index_glycémique: "faible",
+    bénéfices_clés: ["santé hormonale", "végétarien"],
+    interdit_si: ["allergie_soja"]
+  },
+  {
+    id: "aliment_120",
+    nom: "Smoothie détox vert",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["détox", "vitamines", "hydratation"],
+    calories_totales: 180,
+    macros: { protéines: 6, glucides: 30, lipides: 6, fibres: 6 },
+    composition: [
+      { aliment: "Épinards baby", quantité: "50g", préparation: "mixés" },
+      { aliment: "Chou kale", quantité: "30g", préparation: "mixé" },
+      { aliment: "Pomme verte", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Citron", quantité: "1/2", préparation: "jus" },
+      { aliment: "Eau de coco", quantité: "200ml", préparation: "mixée" }
+    ],
+    indice_satiété: "faible",
+    temps_de_préparation: 5,
+    adaptations_possibles: ["autres légumes verts", "gingembre"],
+    contre_indications: []
+  },
+  // NOUVEAUX REPAS (121-140)
+  {
+    id: "repas_121",
+    nom: "Hummus aux pois chiches",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["protéines végétales", "fibres", "satiété"],
+    calories_totales: 280,
+    macros: { protéines: 12, glucides: 25, lipides: 15, fibres: 8 },
+    composition: [
+      { aliment: "Pois chiches", quantité: "100g", préparation: "mixés" },
+      { aliment: "Tahini", quantité: "20g", préparation: "mélangé" },
+      { aliment: "Citron", quantité: "1/2", préparation: "jus" },
+      { aliment: "Ail", quantité: "2 gousses", préparation: "écrasé" },
+      { aliment: "Huile d'olive", quantité: "10ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 10,
+    adaptations_possibles: ["épices", "herbes fraîches"],
+    contre_indications: ["allergie_sésame"]
+  },
+  {
+    id: "repas_122",
+    nom: "Salade de brocoli et noix",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["vitamines", "antioxydants", "satiété"],
+    calories_totales: 320,
+    macros: { protéines: 15, glucides: 20, lipides: 22, fibres: 8 },
+    composition: [
+      { aliment: "Brocoli", quantité: "150g", préparation: "cuit à la vapeur" },
+      { aliment: "Noix de Grenoble", quantité: "25g", préparation: "concassées" },
+      { aliment: "Graines de sésame", quantité: "10g", préparation: "séchées" },
+      { aliment: "Vinaigrette citron", quantité: "20ml", préparation: "mélangée" },
+      { aliment: "Roquette", quantité: "30g", préparation: "fraîche" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres noix", "herbes fraîches"],
+    contre_indications: ["allergie_fruits_à_coque", "allergie_sésame"]
+  },
+  {
+    id: "repas_123",
+    nom: "Smoothie aux graines de chia",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["oméga-3", "fibres", "satiété"],
+    calories_totales: 350,
+    macros: { protéines: 15, glucides: 45, lipides: 18, fibres: 12 },
+    composition: [
+      { aliment: "Graines de chia noires", quantité: "20g", préparation: "trempées" },
+      { aliment: "Banane", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Framboises", quantité: "80g", préparation: "mixées" },
+      { aliment: "Lait d'amande", quantité: "250ml", préparation: "mixé" },
+      { aliment: "Miel", quantité: "15g", préparation: "mélangé" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres fruits", "cannelle"],
+    contre_indications: []
+  },
+  {
+    id: "repas_124",
+    nom: "Risotto aux champignons de Paris",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["réconfort", "umami", "satiété"],
+    calories_totales: 420,
+    macros: { protéines: 12, glucides: 60, lipides: 15, fibres: 4 },
+    composition: [
+      { aliment: "Riz arborio", quantité: "70g", préparation: "cuit" },
+      { aliment: "Champignons de Paris", quantité: "120g", préparation: "sautés" },
+      { aliment: "Bouillon végétal", quantité: "300ml", préparation: "chaud" },
+      { aliment: "Parmesan", quantité: "15g", préparation: "râpé" },
+      { aliment: "Huile d'olive", quantité: "15ml", préparation: "ajoutée en fin" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 25,
+    adaptations_possibles: ["herbes fraîches", "autres champignons"],
+    contre_indications: ["intolérance_lactose"]
+  },
+  {
+    id: "repas_125",
+    nom: "Salade de radis et betterave",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["détox", "antioxydants", "couleur"],
+    calories_totales: 180,
+    macros: { protéines: 6, glucides: 25, lipides: 8, fibres: 6 },
+    composition: [
+      { aliment: "Radis", quantité: "100g", préparation: "en rondelles" },
+      { aliment: "Betterave", quantité: "80g", préparation: "cuite et coupée" },
+      { aliment: "Vinaigrette citron", quantité: "15ml", préparation: "mélangée" },
+      { aliment: "Persil", quantité: "10g", préparation: "haché" },
+      { aliment: "Noix de Grenoble", quantité: "10g", préparation: "concassées" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 12,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_126",
+    nom: "Granola aux graines variées",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["énergie durable", "fibres", "plaisir"],
+    calories_totales: 480,
+    macros: { protéines: 15, glucides: 50, lipides: 28, fibres: 10 },
+    composition: [
+      { aliment: "Avoine complète", quantité: "60g", préparation: "mélangée" },
+      { aliment: "Graines de tournesol", quantité: "15g", préparation: "mélangées" },
+      { aliment: "Graines de pavot", quantité: "10g", préparation: "mélangées" },
+      { aliment: "Noix de pécan", quantité: "20g", préparation: "concassées" },
+      { aliment: "Huile de coco", quantité: "20ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 25,
+    adaptations_possibles: ["autres noix", "cannelle"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_127",
+    nom: "Courgettes farcies aux légumes",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["légumes", "légèreté", "satiété"],
+    calories_totales: 280,
+    macros: { protéines: 12, glucides: 25, lipides: 15, fibres: 8 },
+    composition: [
+      { aliment: "Courgette", quantité: "200g", préparation: "évidée" },
+      { aliment: "Champignons de Paris", quantité: "80g", préparation: "sautés" },
+      { aliment: "Tomates", quantité: "60g", préparation: "concassées" },
+      { aliment: "Basilic", quantité: "10g", préparation: "haché" },
+      { aliment: "Huile d'olive", quantité: "15ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 30,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: []
+  },
+  {
+    id: "repas_128",
+    nom: "Smoothie aux noix de macadamia",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["graisses saines", "satiété", "plaisir"],
+    calories_totales: 320,
+    macros: { protéines: 8, glucides: 25, lipides: 22, fibres: 5 },
+    composition: [
+      { aliment: "Noix de macadamia", quantité: "25g", préparation: "mixées" },
+      { aliment: "Banane", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Lait de coco", quantité: "200ml", préparation: "mixé" },
+      { aliment: "Cacao en poudre", quantité: "10g", préparation: "mixé" },
+      { aliment: "Miel", quantité: "15g", préparation: "mélangé" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres noix", "vanille"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_129",
+    nom: "Asperges grillées aux graines",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["détox", "minéraux", "légèreté"],
+    calories_totales: 220,
+    macros: { protéines: 12, glucides: 15, lipides: 15, fibres: 6 },
+    composition: [
+      { aliment: "Asperges", quantité: "150g", préparation: "grillées" },
+      { aliment: "Graines de citrouille", quantité: "20g", préparation: "séchées" },
+      { aliment: "Huile d'olive", quantité: "15ml", préparation: "mélangée" },
+      { aliment: "Citron", quantité: "1/2", préparation: "jus" },
+      { aliment: "Persil", quantité: "10g", préparation: "haché" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres graines", "herbes fraîches"],
+    contre_indications: []
+  },
+  {
+    id: "repas_130",
+    nom: "Bowl d'aubergine et légumes",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["antioxydants", "légumes", "satiété"],
+    calories_totales: 350,
+    macros: { protéines: 15, glucides: 35, lipides: 20, fibres: 12 },
+    composition: [
+      { aliment: "Aubergine", quantité: "150g", préparation: "grillée" },
+      { aliment: "Tomates", quantité: "100g", préparation: "concassées" },
+      { aliment: "Champignons de Paris", quantité: "80g", préparation: "sautés" },
+      { aliment: "Basilic", quantité: "15g", préparation: "haché" },
+      { aliment: "Huile d'olive", quantité: "20ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 25,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: []
+  },
+  {
+    id: "repas_131",
+    nom: "Smoothie vert aux épinards",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["vitamines", "détox", "énergie"],
+    calories_totales: 250,
+    macros: { protéines: 10, glucides: 40, lipides: 8, fibres: 8 },
+    composition: [
+      { aliment: "Épinards baby", quantité: "60g", préparation: "mixés" },
+      { aliment: "Pomme verte", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Kiwi", quantité: "1 moyen", préparation: "mixé" },
+      { aliment: "Citron", quantité: "1/2", préparation: "jus" },
+      { aliment: "Eau de coco", quantité: "200ml", préparation: "mixée" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 6,
+    adaptations_possibles: ["autres légumes verts", "gingembre"],
+    contre_indications: []
+  },
+  {
+    id: "repas_132",
+    nom: "Salade de chou de Bruxelles",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["vitamines", "antioxydants", "satiété"],
+    calories_totales: 280,
+    macros: { protéines: 12, glucides: 20, lipides: 18, fibres: 8 },
+    composition: [
+      { aliment: "Chou de Bruxelles", quantité: "150g", préparation: "rôti" },
+      { aliment: "Noix de cajou crues", quantité: "20g", préparation: "concassées" },
+      { aliment: "Vinaigrette balsamique", quantité: "20ml", préparation: "mélangée" },
+      { aliment: "Cranberries", quantité: "20g", préparation: "séchées" },
+      { aliment: "Persil", quantité: "10g", préparation: "haché" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 20,
+    adaptations_possibles: ["autres noix", "herbes fraîches"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_133",
+    nom: "Bowl de haricots verts et légumes",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["légumes", "fibres", "légèreté"],
+    calories_totales: 240,
+    macros: { protéines: 10, glucides: 25, lipides: 12, fibres: 8 },
+    composition: [
+      { aliment: "Haricots verts", quantité: "120g", préparation: "cuits à la vapeur" },
+      { aliment: "Tomates cerises", quantité: "80g", préparation: "coupées" },
+      { aliment: "Concombre", quantité: "60g", préparation: "en rondelles" },
+      { aliment: "Vinaigrette citron", quantité: "15ml", préparation: "mélangée" },
+      { aliment: "Menthe", quantité: "10g", préparation: "hachée" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: []
+  },
+  {
+    id: "repas_134",
+    nom: "Smoothie aux noix de Grenoble",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["oméga-3", "santé cérébrale", "satiété"],
+    calories_totales: 380,
+    macros: { protéines: 12, glucides: 35, lipides: 25, fibres: 6 },
+    composition: [
+      { aliment: "Noix de Grenoble", quantité: "30g", préparation: "mixées" },
+      { aliment: "Banane", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Myrtilles", quantité: "60g", préparation: "mixées" },
+      { aliment: "Lait d'amande", quantité: "250ml", préparation: "mixé" },
+      { aliment: "Cannelle", quantité: "2g", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres fruits", "cacao"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_135",
+    nom: "Salade de betterave et noix",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["antioxydants", "performance", "couleur"],
+    calories_totales: 320,
+    macros: { protéines: 12, glucides: 30, lipides: 20, fibres: 8 },
+    composition: [
+      { aliment: "Betterave", quantité: "120g", préparation: "cuite et coupée" },
+      { aliment: "Noix de Grenoble", quantité: "25g", préparation: "concassées" },
+      { aliment: "Roquette", quantité: "50g", préparation: "fraîche" },
+      { aliment: "Vinaigrette balsamique", quantité: "20ml", préparation: "mélangée" },
+      { aliment: "Chèvre frais", quantité: "30g", préparation: "émietté" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres noix", "herbes fraîches"],
+    contre_indications: ["allergie_fruits_à_coque", "intolérance_lactose"]
+  },
+  {
+    id: "repas_136",
+    nom: "Bowl de noix de coco râpée",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["énergie", "graisses saines", "exotisme"],
+    calories_totales: 420,
+    macros: { protéines: 8, glucides: 35, lipides: 30, fibres: 8 },
+    composition: [
+      { aliment: "Noix de coco râpée", quantité: "40g", préparation: "séchée" },
+      { aliment: "Avoine complète", quantité: "50g", préparation: "mélangée" },
+      { aliment: "Mangue", quantité: "80g", préparation: "coupée" },
+      { aliment: "Lait de coco", quantité: "150ml", préparation: "mélangé" },
+      { aliment: "Miel", quantité: "20g", préparation: "mélangé" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 10,
+    adaptations_possibles: ["autres fruits tropicaux", "cannelle"],
+    contre_indications: []
+  },
+  {
+    id: "repas_137",
+    nom: "Smoothie aux graines de pavot",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["minéraux", "satiété", "originalité"],
+    calories_totales: 280,
+    macros: { protéines: 10, glucides: 35, lipides: 12, fibres: 8 },
+    composition: [
+      { aliment: "Graines de pavot", quantité: "15g", préparation: "mixées" },
+      { aliment: "Yaourt grec nature", quantité: "150g", préparation: "mixé" },
+      { aliment: "Pomme", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Cannelle", quantité: "2g", préparation: "mélangée" },
+      { aliment: "Miel", quantité: "15g", préparation: "mélangé" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres fruits", "vanille"],
+    contre_indications: ["intolérance_lactose"]
+  },
+  {
+    id: "repas_138",
+    nom: "Salade de courgette et légumes",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["légumes", "hydratation", "légèreté"],
+    calories_totales: 200,
+    macros: { protéines: 8, glucides: 20, lipides: 12, fibres: 6 },
+    composition: [
+      { aliment: "Courgette", quantité: "150g", préparation: "en spirales" },
+      { aliment: "Tomates cerises", quantité: "80g", préparation: "coupées" },
+      { aliment: "Concombre", quantité: "60g", préparation: "en rondelles" },
+      { aliment: "Vinaigrette citron", quantité: "15ml", préparation: "mélangée" },
+      { aliment: "Basilic", quantité: "10g", préparation: "haché" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 12,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: []
+  },
+  {
+    id: "repas_139",
+    nom: "Bowl de noix de cajou crues",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["graisses saines", "minéraux", "satiété"],
+    calories_totales: 350,
+    macros: { protéines: 12, glucides: 25, lipides: 28, fibres: 4 },
+    composition: [
+      { aliment: "Noix de cajou crues", quantité: "40g", préparation: "concassées" },
+      { aliment: "Dattes", quantité: "30g", préparation: "dénoyautées" },
+      { aliment: "Cacao en poudre", quantité: "10g", préparation: "mélangé" },
+      { aliment: "Huile de coco", quantité: "10ml", préparation: "mélangée" },
+      { aliment: "Cannelle", quantité: "2g", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 10,
+    adaptations_possibles: ["autres noix", "vanille"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_140",
+    nom: "Smoothie aux graines de tournesol",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["vitamine E", "antioxydants", "énergie"],
+    calories_totales: 320,
+    macros: { protéines: 12, glucides: 40, lipides: 15, fibres: 6 },
+    composition: [
+      { aliment: "Graines de tournesol", quantité: "20g", préparation: "mixées" },
+      { aliment: "Banane", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Framboises", quantité: "60g", préparation: "mixées" },
+      { aliment: "Lait d'amande", quantité: "250ml", préparation: "mixé" },
+      { aliment: "Miel", quantité: "15g", préparation: "mélangé" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres fruits", "cannelle"],
+    contre_indications: []
   }
 ];
 
@@ -3325,17 +3986,196 @@ export const repasPredefinis: RepasBlock[] = [
     temps_de_préparation: 4,
     adaptations_possibles: ["cannelle", "vanille"],
     contre_indications: ["intolérance_gluten"]
-  }
-];
-
-// Fonction pour obtenir tous les aliments (prédéfinis + sauvegardés)
-export const getAllAliments = (): AlimentBlock[] => {
-  const saved = getAliments();
-  return [...alimentsPredefinis, ...saved];
-};
-
-// Fonction pour obtenir tous les repas (prédéfinis + sauvegardés)
-export const getAllRepas = (): RepasBlock[] => {
-  const saved = getRepas();
-  return [...repasPredefinis, ...saved];
-};
+  },
+  // NOUVEAUX REPAS (101-120)
+  {
+    id: "repas_101",
+    nom: "Bowl quinoa protéiné",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["protéines complètes", "énergie durable", "satiété"],
+    calories_totales: 520,
+    macros: { protéines: 28, glucides: 65, lipides: 15, fibres: 12 },
+    composition: [
+      { aliment: "Quinoa rouge", quantité: "80g", préparation: "cuit" },
+      { aliment: "Tempeh", quantité: "100g", préparation: "grillé" },
+      { aliment: "Avocat", quantité: "60g", préparation: "en tranches" },
+      { aliment: "Épinards baby", quantité: "50g", préparation: "frais" },
+      { aliment: "Graines de chanvre", quantité: "15g", préparation: "séchées" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres légumes verts", "sauce tahini"],
+    contre_indications: ["allergie_soja"]
+  },
+  {
+    id: "repas_102",
+    nom: "Smoothie spiruline énergisant",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["énergie", "antioxydants", "détox"],
+    calories_totales: 280,
+    macros: { protéines: 18, glucides: 35, lipides: 8, fibres: 6 },
+    composition: [
+      { aliment: "Spiruline", quantité: "5g", préparation: "en poudre" },
+      { aliment: "Banane", quantité: "1 moyenne", préparation: "mixée" },
+      { aliment: "Açaí", quantité: "100g", préparation: "mixé" },
+      { aliment: "Lait d'amande", quantité: "200ml", préparation: "mixé" },
+      { aliment: "Graines de lin", quantité: "10g", préparation: "mixées" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 5,
+    adaptations_possibles: ["autres fruits rouges", "miel"],
+    contre_indications: []
+  },
+  {
+    id: "repas_103",
+    nom: "Salade kale complète",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["vitamines", "minéraux", "antioxydants"],
+    calories_totales: 380,
+    macros: { protéines: 22, glucides: 25, lipides: 25, fibres: 8 },
+    composition: [
+      { aliment: "Chou kale", quantité: "100g", préparation: "massé" },
+      { aliment: "Champignons shiitake", quantité: "80g", préparation: "sautés" },
+      { aliment: "Noix du Brésil", quantité: "15g", préparation: "concassées" },
+      { aliment: "Grenade", quantité: "60g", préparation: "graines" },
+      { aliment: "Vinaigrette tahini", quantité: "20ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 12,
+    adaptations_possibles: ["autres noix", "vinaigrette balsamique"],
+    contre_indications: ["allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_104",
+    nom: "Curry de lentilles corail",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["protéines végétales", "épices", "réconfort"],
+    calories_totales: 450,
+    macros: { protéines: 20, glucides: 55, lipides: 18, fibres: 15 },
+    composition: [
+      { aliment: "Lentilles corail", quantité: "100g", préparation: "cuites" },
+      { aliment: "Lait de coco", quantité: "150ml", préparation: "cuit" },
+      { aliment: "Épinards baby", quantité: "80g", préparation: "ajoutés en fin" },
+      { aliment: "Riz complet", quantité: "80g", préparation: "cuit" },
+      { aliment: "Épices curry", quantité: "5g", préparation: "torréfiées" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 25,
+    adaptations_possibles: ["autres légumineuses", "légumes variés"],
+    contre_indications: []
+  },
+  {
+    id: "repas_105",
+    nom: "Toast avocat tempeh",
+    type_de_repas: "petit-déjeuner",
+    objectif_nutritionnel: ["protéines végétales", "graisses saines", "satiété"],
+    calories_totales: 420,
+    macros: { protéines: 24, glucides: 35, lipides: 22, fibres: 8 },
+    composition: [
+      { aliment: "Pain complet", quantité: "60g", préparation: "grillé" },
+      { aliment: "Avocat", quantité: "80g", préparation: "écrasé" },
+      { aliment: "Tempeh", quantité: "80g", préparation: "mariné et grillé" },
+      { aliment: "Graines de chanvre", quantité: "10g", préparation: "séchées" },
+      { aliment: "Roquette", quantité: "20g", préparation: "fraîche" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 10,
+    adaptations_possibles: ["sans gluten", "autres légumes verts"],
+    contre_indications: ["allergie_soja"]
+  },
+  {
+    id: "repas_106",
+    nom: "Bowl açaí protéiné",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["antioxydants", "énergie", "plaisir"],
+    calories_totales: 320,
+    macros: { protéines: 15, glucides: 45, lipides: 12, fibres: 8 },
+    composition: [
+      { aliment: "Açaí", quantité: "150g", préparation: "mixé" },
+      { aliment: "Yaourt grec nature", quantité: "100g", préparation: "mélangé" },
+      { aliment: "Granola maison", quantité: "30g", préparation: "sans sucre" },
+      { aliment: "Myrtilles", quantité: "50g", préparation: "fraîches" },
+      { aliment: "Noix de cajou", quantité: "10g", préparation: "concassées" }
+    ],
+    indice_satiété: "moyen",
+    temps_de_préparation: 8,
+    adaptations_possibles: ["autres fruits rouges", "miel"],
+    contre_indications: ["intolérance_lactose", "allergie_fruits_à_coque"]
+  },
+  {
+    id: "repas_107",
+    nom: "Soupe miso aux légumes",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["réconfort", "probiotiques", "légèreté"],
+    calories_totales: 180,
+    macros: { protéines: 8, glucides: 25, lipides: 5, fibres: 6 },
+    composition: [
+      { aliment: "Miso", quantité: "20g", préparation: "dilué" },
+      { aliment: "Chou-fleur", quantité: "100g", préparation: "cuit" },
+      { aliment: "Champignons shiitake", quantité: "60g", préparation: "cuits" },
+      { aliment: "Épinards baby", quantité: "40g", préparation: "ajoutés en fin" },
+      { aliment: "Algues wakame", quantité: "5g", préparation: "réhydratées" }
+    ],
+    indice_satiété: "faible",
+    temps_de_préparation: 15,
+    adaptations_possibles: ["autres légumes", "tofu"],
+    contre_indications: ["allergie_soja"]
+  },
+  {
+    id: "repas_108",
+    nom: "Salade de patate douce violette",
+    type_de_repas: "déjeuner",
+    objectif_nutritionnel: ["antioxydants", "glucides complexes", "couleur"],
+    calories_totales: 350,
+    macros: { protéines: 12, glucides: 45, lipides: 15, fibres: 8 },
+    composition: [
+      { aliment: "Patate douce violette", quantité: "150g", préparation: "cuite au four" },
+      { aliment: "Tofu ferme", quantité: "80g", préparation: "cuit" },
+      { aliment: "Chou kale", quantité: "60g", préparation: "massé" },
+      { aliment: "Graines de courge", quantité: "15g", préparation: "séchées" },
+      { aliment: "Vinaigrette citron", quantité: "20ml", préparation: "mélangée" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 20,
+    adaptations_possibles: ["autres légumes", "herbes fraîches"],
+    contre_indications: ["allergie_soja"]
+  },
+  {
+    id: "repas_109",
+    nom: "Kéfir aux fruits",
+    type_de_repas: "collation",
+    objectif_nutritionnel: ["probiotiques", "hydratation", "légèreté"],
+    calories_totales: 150,
+    macros: { protéines: 8, glucides: 20, lipides: 4, fibres: 3 },
+    composition: [
+      { aliment: "Kéfir nature", quantité: "200ml", préparation: "froid" },
+      { aliment: "Grenade", quantité: "50g", préparation: "graines" },
+      { aliment: "Graines de lin", quantité: "5g", préparation: "moulues" },
+      { aliment: "Miel", quantité: "10g", préparation: "mélangé" }
+    ],
+    indice_satiété: "faible",
+    temps_de_préparation: 3,
+    adaptations_possibles: ["autres fruits", "cannelle"],
+    contre_indications: ["intolérance_lactose"]
+  },
+  {
+    id: "repas_110",
+    nom: "Risotto aux champignons shiitake",
+    type_de_repas: "dîner",
+    objectif_nutritionnel: ["réconfort", "umami", "satiété"],
+    calories_totales: 480,
+    macros: { protéines: 18, glucides: 65, lipides: 18, fibres: 6 },
+    composition: [
+      { aliment: "Riz arborio", quantité: "80g", préparation: "cuit" },
+      { aliment: "Champignons shiitake", quantité: "100g", préparation: "sautés" },
+      { aliment: "Bouillon végétal", quantité: "300ml", préparation: "chaud" },
+      { aliment: "Parmesan", quantité: "20g", préparation: "râpé" },
+      { aliment: "Huile d'olive", quantité: "15ml", préparation: "ajoutée en fin" }
+    ],
+    indice_satiété: "élevé",
+    temps_de_préparation: 30,
+    adaptations_possibles: ["autres champignons", "herbes fraîches"],
+    contre_indications: ["intolérance_lactose"]
+  },
+  {
+    id: "repas_

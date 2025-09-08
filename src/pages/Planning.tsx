@@ -96,6 +96,65 @@ const Planning = () => {
       const newPrograms = [];
       const today = new Date();
       
+      // Types de programmes avec exercices détaillés
+      const programTypes = [
+        { 
+          name: 'Push Day', 
+          exercises: [
+            { name: 'Développé couché', sets: '4x8-10', weight: '80kg', rest: '2-3 min' },
+            { name: 'Dips', sets: '3x12-15', weight: 'Poids du corps', rest: '90 sec' },
+            { name: 'Élévations latérales', sets: '3x15', weight: '12kg', rest: '60 sec' },
+            { name: 'Développé incliné', sets: '3x10-12', weight: '60kg', rest: '2 min' }
+          ],
+          duration: '75 min',
+          difficulty: 'Intermédiaire',
+          calories: 450
+        },
+        { 
+          name: 'Pull Day', 
+          exercises: [
+            { name: 'Tractions', sets: '4x8-10', weight: 'Poids du corps', rest: '2-3 min' },
+            { name: 'Rowing barre', sets: '4x8-10', weight: '70kg', rest: '2 min' },
+            { name: 'Curl biceps', sets: '3x12-15', weight: '15kg', rest: '60 sec' },
+            { name: 'Face pull', sets: '3x15', weight: '20kg', rest: '60 sec' },
+            { name: 'Shrugs', sets: '3x12', weight: '40kg', rest: '60 sec' }
+          ],
+          duration: '80 min',
+          difficulty: 'Intermédiaire',
+          calories: 480
+        },
+        { 
+          name: 'Leg Day', 
+          exercises: [
+            { name: 'Squat', sets: '4x8-10', weight: '100kg', rest: '3-4 min' },
+            { name: 'Fentes', sets: '3x12', weight: '20kg', rest: '2 min' },
+            { name: 'Soulevé de terre', sets: '4x6-8', weight: '120kg', rest: '3-4 min' },
+            { name: 'Extensions', sets: '3x15', weight: '60kg', rest: '90 sec' },
+            { name: 'Mollets', sets: '4x20', weight: '80kg', rest: '60 sec' },
+            { name: 'Planche', sets: '3x45 sec', weight: 'Poids du corps', rest: '60 sec' }
+          ],
+          duration: '90 min',
+          difficulty: 'Avancé',
+          calories: 600
+        },
+        { 
+          name: 'Full Body', 
+          exercises: [
+            { name: 'Squat', sets: '3x12', weight: '60kg', rest: '2 min' },
+            { name: 'Développé couché', sets: '3x10', weight: '60kg', rest: '2 min' },
+            { name: 'Tractions', sets: '3x8', weight: 'Poids du corps', rest: '2 min' },
+            { name: 'Fentes', sets: '3x10', weight: '15kg', rest: '90 sec' },
+            { name: 'Dips', sets: '3x10', weight: 'Poids du corps', rest: '90 sec' },
+            { name: 'Planche', sets: '3x30 sec', weight: 'Poids du corps', rest: '60 sec' },
+            { name: 'Burpees', sets: '3x10', weight: 'Poids du corps', rest: '60 sec' },
+            { name: 'Mountain climbers', sets: '3x20', weight: 'Poids du corps', rest: '60 sec' }
+          ],
+          duration: '60 min',
+          difficulty: 'Débutant',
+          calories: 400
+        }
+      ];
+      
       // Générer les programmes pour la durée sélectionnée
       for (let month = 0; month < planningDuration; month++) {
         const currentMonth = new Date(today.getFullYear(), today.getMonth() + month, 1);
@@ -106,13 +165,6 @@ const Planning = () => {
           const dayName = currentDate.toLocaleDateString('fr-FR', { weekday: 'long' });
           
           if (selectedDays.includes(dayName)) {
-            const programTypes = [
-              { name: 'Push Day', exercises: 4, duration: '75 min', difficulty: 'Intermédiaire' },
-              { name: 'Pull Day', exercises: 5, duration: '80 min', difficulty: 'Intermédiaire' },
-              { name: 'Leg Day', exercises: 6, duration: '90 min', difficulty: 'Avancé' },
-              { name: 'Full Body', exercises: 8, duration: '60 min', difficulty: 'Débutant' }
-            ];
-            
             const programType = programTypes[selectedDays.indexOf(dayName) % programTypes.length];
             
             newPrograms.push({
@@ -122,6 +174,7 @@ const Planning = () => {
               exercises: programType.exercises,
               duration: programType.duration,
               difficulty: programType.difficulty,
+              calories: programType.calories,
               completed: false,
               isToday: currentDate.toDateString() === new Date().toDateString()
             });

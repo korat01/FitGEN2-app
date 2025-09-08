@@ -2736,7 +2736,9 @@ const BlocsEntrainement = () => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'tous' || exercise.category === selectedCategory;
     const matchesDifficulty = selectedDifficulty === 'tous' || exercise.difficulty === selectedDifficulty;
-    const matchesSBD = selectedSBD === 'tous' || (selectedSBD === 'sbd' && exercise.name.includes('SBD'));
+    const matchesSBD = selectedSBD === 'tous' || 
+                      (selectedSBD === 'sbd' && exercise.name.includes('SBD')) ||
+                      (selectedSBD === 'populaires' && exercise.name.includes('⭐'));
     
     return matchesSearch && matchesCategory && matchesDifficulty && matchesSBD;
   });

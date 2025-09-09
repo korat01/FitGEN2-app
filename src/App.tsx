@@ -310,6 +310,7 @@ const App = () => (
                     <Route path="/blocs-entrainement" element={<ProtectedRoute><BlocsEntrainement /></ProtectedRoute>} />
                     <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />
                     <Route path="/overview" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
+                    <Route path="/programme" element={<Programme />} />
                     <Route path="/repas" element={<Repas />} />
                     <Route path="/repas/:id" element={<RecetteDetail />} />
                     <Route path="/stats" element={<Stats />} />

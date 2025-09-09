@@ -1,5 +1,7 @@
 import { ClientProfile, BlocExercice, SeanceJour, ProgrammeHebdomadaire, Contraintes } from '@/types/programme';
 import { getAllBlocsEntrainement } from './blocsEntrainementData';
+import { FocusArea, ForceFocus, UserProfile } from '@/types/profile';
+import { Exercice, Programme } from '@/types/programme';
 
 export function creerProgrammeOptimise(
   profilClient: ClientProfile, 
@@ -615,5 +617,541 @@ function determinerIntensite(vitesseProgression: string, objectif: string): 'fai
     return 'élevée';
   } else { // remise_en_forme
     return 'modérée';
+  }
+}
+
+export class ProgrammeGenerator {
+  private profile: UserProfile;
+  private focusAreas: FocusArea[];
+  private forceFocus: ForceFocus[];
+
+  constructor(profile: UserProfile, focusAreas: FocusArea[] = [], forceFocus: ForceFocus[] = []) {
+    this.profile = profile;
+    this.focusAreas = focusAreas;
+    this.forceFocus = forceFocus;
+  }
+
+  generateWeeklyProgramme(): Programme[] {
+    const programmes: Programme[] = [];
+    const jours = this.profile.frequence;
+    
+    if (this.profile.objectif === 'force' || this.profile.objectif === 'powerlifting') {
+      return this.generateForceProgramme(jours);
+    }
+    
+    if (this.profile.objectif === 'perte_poids' || this.profile.objectif === 'prise_masse' || this.profile.objectif === 'maintien') {
+      return this.generateMusculationProgramme(jours);
+    }
+    
+    return programmes;
+  }
+
+  private generateForceProgramme(jours: number): Programme[] {
+    const programmes: Programme[] = [];
+    const selectedFocus = this.forceFocus.filter(f => f.priorite > 0);
+    
+    if (selectedFocus.length === 0) {
+      // Programme équilibré si aucun focus sélectionné
+      return this.generateBalancedForceProgramme(jours);
+    }
+
+    // Générer les programmes selon les priorités
+    for (let i = 0; i < jours; i++) {
+      const focus = this.getFocusForDay(i, selectedFocus);
+      const programme = this.createForceProgramme(focus, i + 1);
+      programmes.push(programme);
+    }
+
+    return programmes;
+  }
+
+  private generateMusculationProgramme(jours: number): Programme[] {
+    const programmes: Programme[] = [];
+    const selectedAreas = this.focusAreas.filter(area => area.pourcentage > 0);
+    
+    if (selectedAreas.length === 0) {
+      // Programme équilibré si aucun focus sélectionné
+      return this.generateBalancedMusculationProgramme(jours);
+    }
+
+    // Calculer la répartition des jours
+    const dayDistribution = this.calculateDayDistribution(selectedAreas, jours);
+    
+    let dayIndex = 0;
+    for (const [areaId, days] of Object.entries(dayDistribution)) {
+      const area = selectedAreas.find(a => a.id === areaId);
+      if (!area) continue;
+
+      for (let i = 0; i < days; i++) {
+        const programme = this.createMusculationProgramme(area, dayIndex + 1);
+        programmes.push(programme);
+        dayIndex++;
+      }
+    }
+
+    return programmes;
+  }
+
+  private calculateDayDistribution(areas: FocusArea[], totalDays: number): Record<string, number> {
+    const distribution: Record<string, number> = {};
+    const totalPercentage = areas.reduce((sum, area) => sum + area.pourcentage, 0);
+    
+    areas.forEach(area => {
+      const days = Math.round((area.pourcentage / totalPercentage) * totalDays);
+      distribution[area.id] = days;
+    });
+
+    // Ajuster pour que la somme fasse exactement totalDays
+    const currentTotal = Object.values(distribution).reduce((sum, days) => sum + days, 0);
+    const difference = totalDays - currentTotal;
+    
+    if (difference !== 0) {
+      // Ajuster la zone avec le plus grand pourcentage
+      const maxArea = areas.reduce((max, area) => 
+        area.pourcentage > max.pourcentage ? area : max
+      );
+      distribution[maxArea.id] += difference;
+    }
+
+    return distribution;
+  }
+
+  private getFocusForDay(dayIndex: number, focusList: ForceFocus[]): ForceFocus {
+    // Rotation des focus selon les priorités
+    const sortedFocus = focusList.sort((a, b) => a.priorite - b.priorite);
+    return sortedFocus[dayIndex % sortedFocus.length];
+  }
+
+  private createForceProgramme(focus: ForceFocus, dayNumber: number): Programme {
+    const exercices = this.getForceExercices(focus);
+    
+    return {
+      id: dayNumber,
+      nom: `Force - ${focus.nom}`,
+      duree: this.profile.preferences.dureeSeance,
+      difficulte: this.profile.niveau,
+      objectif: focus.objectif,
+      exercices,
+      calories: this.calculateCalories(exercices),
+      progression: 0,
+      statut: 'Non commencé' as const,
+      streak: 0,
+      xp: 0
+    };
+  }
+
+  private createMusculationProgramme(area: FocusArea, dayNumber: number): Programme {
+    const exercices = this.getMusculationExercices(area);
+    
+    return {
+      id: dayNumber,
+      nom: `Musculation - ${area.nom}`,
+      duree: this.profile.preferences.dureeSeance,
+      difficulte: this.profile.niveau,
+      objectif: `Développement des ${area.nom}`,
+      exercices,
+      calories: this.calculateCalories(exercices),
+      progression: 0,
+      statut: 'Non commencé' as const,
+      streak: 0,
+      xp: 0
+    };
+  }
+
+  private getForceExercices(focus: ForceFocus): Exercice[] {
+    const baseExercices = this.getBaseForceExercices();
+    const focusExercices = this.getFocusSpecificExercices(focus);
+    
+    return [...baseExercices, ...focusExercices];
+  }
+
+  private getMusculationExercices(area: FocusArea): Exercice[] {
+    const baseExercices = this.getBaseMusculationExercices();
+    const areaExercices = this.getAreaSpecificExercices(area);
+    
+    return [...baseExercices, ...areaExercices];
+  }
+
+  private getBaseForceExercices(): Exercice[] {
+    return [
+      {
+        id: 1,
+        nom: "Échauffement",
+        series: 1,
+        repetitions: 10,
+        poids: 0,
+        repos: 60,
+        description: "Échauffement général",
+        muscle: "Tout le corps",
+        difficulte: 'Facile' as const,
+        termine: false,
+        calories: 20
+      }
+    ];
+  }
+
+  private getBaseMusculationExercices(): Exercice[] {
+    return [
+      {
+        id: 1,
+        nom: "Échauffement",
+        series: 1,
+        repetitions: 10,
+        poids: 0,
+        repos: 60,
+        description: "Échauffement général",
+        muscle: "Tout le corps",
+        difficulte: 'Facile' as const,
+        termine: false,
+        calories: 20
+      }
+    ];
+  }
+
+  private getFocusSpecificExercices(focus: ForceFocus): Exercice[] {
+    const exercicesMap: Record<string, Exercice[]> = {
+      squat: [
+        {
+          id: 2,
+          nom: "Squats",
+          series: 5,
+          repetitions: 5,
+          poids: this.calculateWeight('squat'),
+          repos: 180,
+          description: "Exercice roi pour les jambes",
+          muscle: "Quadriceps",
+          difficulte: 'Difficile' as const,
+          termine: false,
+          calories: 150
+        },
+        {
+          id: 3,
+          nom: "Squats frontaux",
+          series: 3,
+          repetitions: 8,
+          poids: this.calculateWeight('squat') * 0.8,
+          repos: 120,
+          description: "Variation du squat",
+          muscle: "Quadriceps",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 100
+        }
+      ],
+      deadlift: [
+        {
+          id: 2,
+          nom: "Deadlift",
+          series: 5,
+          repetitions: 5,
+          poids: this.calculateWeight('deadlift'),
+          repos: 180,
+          description: "Exercice roi pour le dos",
+          muscle: "Dorsaux",
+          difficulte: 'Difficile' as const,
+          termine: false,
+          calories: 200
+        },
+        {
+          id: 3,
+          nom: "Rack pulls",
+          series: 3,
+          repetitions: 8,
+          poids: this.calculateWeight('deadlift') * 1.2,
+          repos: 120,
+          description: "Variation du deadlift",
+          muscle: "Dorsaux",
+          difficulte: 'Difficile' as const,
+          termine: false,
+          calories: 120
+        }
+      ],
+      bench_press: [
+        {
+          id: 2,
+          nom: "Développé couché",
+          series: 5,
+          repetitions: 5,
+          poids: this.calculateWeight('bench_press'),
+          repos: 180,
+          description: "Exercice roi pour les pectoraux",
+          muscle: "Pectoraux",
+          difficulte: 'Difficile' as const,
+          termine: false,
+          calories: 120
+        },
+        {
+          id: 3,
+          nom: "Développé incliné",
+          series: 3,
+          repetitions: 8,
+          poids: this.calculateWeight('bench_press') * 0.8,
+          repos: 120,
+          description: "Variation du développé",
+          muscle: "Pectoraux",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 80
+        }
+      ]
+    };
+
+    return exercicesMap[focus.exercice] || [];
+  }
+
+  private getAreaSpecificExercices(area: FocusArea): Exercice[] {
+    const exercicesMap: Record<string, Exercice[]> = {
+      bras: [
+        {
+          id: 2,
+          nom: "Curls biceps",
+          series: 4,
+          repetitions: 12,
+          poids: this.calculateWeight('biceps'),
+          repos: 60,
+          description: "Développement des biceps",
+          muscle: "Biceps",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 80
+        },
+        {
+          id: 3,
+          nom: "Extensions triceps",
+          series: 4,
+          repetitions: 12,
+          poids: this.calculateWeight('triceps'),
+          repos: 60,
+          description: "Développement des triceps",
+          muscle: "Triceps",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 80
+        }
+      ],
+      fesses: [
+        {
+          id: 2,
+          nom: "Squats",
+          series: 4,
+          repetitions: 15,
+          poids: this.calculateWeight('squat'),
+          repos: 90,
+          description: "Exercice principal pour les fesses",
+          muscle: "Fesses",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 120
+        },
+        {
+          id: 3,
+          nom: "Hip thrust",
+          series: 4,
+          repetitions: 12,
+          poids: this.calculateWeight('hip_thrust'),
+          repos: 90,
+          description: "Exercice ciblé pour les fesses",
+          muscle: "Fesses",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 100
+        },
+        {
+          id: 4,
+          nom: "Lunges",
+          series: 3,
+          repetitions: 12,
+          poids: this.calculateWeight('lunges'),
+          repos: 60,
+          description: "Exercice unilatéral pour les fesses",
+          muscle: "Fesses",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 80
+        }
+      ],
+      jambes: [
+        {
+          id: 2,
+          nom: "Squats",
+          series: 4,
+          repetitions: 12,
+          poids: this.calculateWeight('squat'),
+          repos: 120,
+          description: "Exercice principal pour les jambes",
+          muscle: "Quadriceps",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 150
+        },
+        {
+          id: 3,
+          nom: "Leg press",
+          series: 4,
+          repetitions: 15,
+          poids: this.calculateWeight('leg_press'),
+          repos: 90,
+          description: "Exercice pour les jambes",
+          muscle: "Quadriceps",
+          difficulte: 'Facile' as const,
+          termine: false,
+          calories: 100
+        }
+      ],
+      dos: [
+        {
+          id: 2,
+          nom: "Tractions",
+          series: 4,
+          repetitions: 8,
+          poids: 0,
+          repos: 120,
+          description: "Exercice principal pour le dos",
+          muscle: "Dorsaux",
+          difficulte: 'Difficile' as const,
+          termine: false,
+          calories: 120
+        },
+        {
+          id: 3,
+          nom: "Rowing",
+          series: 4,
+          repetitions: 12,
+          poids: this.calculateWeight('rowing'),
+          repos: 90,
+          description: "Exercice pour le dos",
+          muscle: "Dorsaux",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 100
+        }
+      ],
+      pectoraux: [
+        {
+          id: 2,
+          nom: "Développé couché",
+          series: 4,
+          repetitions: 8,
+          poids: this.calculateWeight('bench_press'),
+          repos: 120,
+          description: "Exercice principal pour les pectoraux",
+          muscle: "Pectoraux",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 120
+        },
+        {
+          id: 3,
+          nom: "Pompes",
+          series: 3,
+          repetitions: 15,
+          poids: 0,
+          repos: 60,
+          description: "Exercice au poids du corps",
+          muscle: "Pectoraux",
+          difficulte: 'Facile' as const,
+          termine: false,
+          calories: 80
+        }
+      ],
+      abdominaux: [
+        {
+          id: 2,
+          nom: "Planche",
+          series: 3,
+          repetitions: 45,
+          poids: 0,
+          repos: 60,
+          description: "Exercice de gainage",
+          muscle: "Abdominaux",
+          difficulte: 'Moyen' as const,
+          termine: false,
+          calories: 60
+        },
+        {
+          id: 3,
+          nom: "Crunches",
+          series: 3,
+          repetitions: 20,
+          poids: 0,
+          repos: 45,
+          description: "Exercice pour les abdominaux",
+          muscle: "Abdominaux",
+          difficulte: 'Facile' as const,
+          termine: false,
+          calories: 40
+        }
+      ]
+    };
+
+    return exercicesMap[area.id] || [];
+  }
+
+  private calculateWeight(exercice: string): number {
+    // Logique de calcul du poids selon le niveau et l'exercice
+    const baseWeight = this.profile.poids;
+    const multipliers: Record<string, number> = {
+      squat: 0.8,
+      deadlift: 1.0,
+      bench_press: 0.6,
+      biceps: 0.1,
+      triceps: 0.1,
+      hip_thrust: 0.5,
+      lunges: 0.3,
+      leg_press: 1.5,
+      rowing: 0.4
+    };
+
+    const multiplier = multipliers[exercice] || 0.5;
+    const levelMultiplier = this.getLevelMultiplier();
+    
+    return Math.round(baseWeight * multiplier * levelMultiplier);
+  }
+
+  private getLevelMultiplier(): number {
+    const multipliers = {
+      debutant: 0.6,
+      intermediaire: 0.8,
+      avance: 1.0
+    };
+    return multipliers[this.profile.niveau] || 0.8;
+  }
+
+  private calculateCalories(exercices: Exercice[]): number {
+    return exercices.reduce((total, ex) => total + ex.calories, 0);
+  }
+
+  private generateBalancedForceProgramme(jours: number): Programme[] {
+    // Programme équilibré pour la force
+    const programmes: Programme[] = [];
+    const exercices = ['squat', 'deadlift', 'bench_press'];
+    
+    for (let i = 0; i < jours; i++) {
+      const focus = exercices[i % exercices.length];
+      const programme = this.createForceProgramme(
+        { id: focus, nom: focus, exercice: focus, priorite: 1, objectif: 'Développement équilibré' },
+        i + 1
+      );
+      programmes.push(programme);
+    }
+    
+    return programmes;
+  }
+
+  private generateBalancedMusculationProgramme(jours: number): Programme[] {
+    // Programme équilibré pour la musculation
+    const programmes: Programme[] = [];
+    const areas = ['bras', 'jambes', 'dos', 'pectoraux', 'abdominaux'];
+    
+    for (let i = 0; i < jours; i++) {
+      const area = areas[i % areas.length];
+      const programme = this.createMusculationProgramme(
+        { id: area, nom: area, pourcentage: 100, exercices: [], couleur: 'blue', icone: '' },
+        i + 1
+      );
+      programmes.push(programme);
+    }
+    
+    return programmes;
   }
 }

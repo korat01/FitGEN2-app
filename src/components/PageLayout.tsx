@@ -1,17 +1,20 @@
 import React from 'react';
+import AppHeader from '@/components/AppHeader';
+import BottomNavigation from '@/components/BottomNavigation';
 
 interface PageLayoutProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
+const PageLayout: React.FC<PageLayoutProps> = ({ children, className = '' }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 pt-20">
-      <div className="container mx-auto px-6 py-8">
-        <div className="animate-in fade-in-50 duration-700">
-          {children}
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
+      <main className={`pt-20 pb-20 md:pb-0 ${className}`}>
+        {children}
+      </main>
+      <BottomNavigation />
     </div>
   );
 };

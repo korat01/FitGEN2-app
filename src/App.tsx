@@ -32,6 +32,10 @@ import RecetteDetail from './pages/RecetteDetail';
 import AlimentDetail from './pages/AlimentDetail';
 import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
+import MobileNavigation from '@/components/MobileNavigation';
+import BottomNavigation from '@/components/BottomNavigation';
+import SwipeableCard from '@/components/SwipeableCard';
+import MobileCarousel from '@/components/MobileCarousel';
 
 const queryClient = new QueryClient();
 
@@ -55,7 +59,6 @@ const App = () => (
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                    <Route path="/profile-summary" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProfileSummary />} />
                     <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
                     <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Save, User, Target, Dumbbell, Mail, Calendar, Weight, Ruler } from 'lucide-react';
+import { X, Save, User, Target, Dumbbell, Settings } from 'lucide-react';
 import { UserProfile, FocusArea, ForceFocus } from '@/types/profile';
 import FocusSelector from './FocusSelector';
 
@@ -19,32 +19,50 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
   onSave,
   onClose
 }) => {
-  const [editedProfile, setEditedProfile] = useState<UserProfile>(profile);
+  const [formData, setFormData] = useState<UserProfile>(profile);
 
-  const handleSave = () => {
-    onSave(editedProfile);
-    onClose();
+  const handleInputChange = (field: keyof UserProfile, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleFocusChange = (focus: FocusArea[]) => {
-    setEditedProfile(prev => ({ ...prev, focus }));
+    setFormData(prev => ({
+      ...prev,
+      focus
+    }));
   };
 
   const handleForceFocusChange = (forceFocus: ForceFocus[]) => {
-    setEditedProfile(prev => ({ ...prev, focusForce: forceFocus }));
+    setFormData(prev => ({
+      ...prev,
+      forceFocus
+    }));
+  };
+
+  const handleSave = () => {
+    onSave(formData);
+    onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-        <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0">
+        <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
-              <User className="w-6 h-6" />
+              <Settings className="w-6 h-6" />
               Modifier le profil
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose} className="text-white hover:bg-white/20">
-              <X className="w-5 h-5" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-white hover:bg-white/20 border-0"
+            >
+              <X className="w-6 h-6" />
             </Button>
           </div>
         </CardHeader>
@@ -52,103 +70,87 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         <CardContent className="p-8 space-y-8">
           {/* Informations de base */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-black flex items-center gap-3 border-b border-gray-200 pb-3">
-              <User className="w-6 h-6 text-purple-600" />
-              Informations personnelles
-            </h3>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-black">Informations personnelles</h3>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="nom" className="text-black font-semibold">Nom complet</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="nom"
-                    value={editedProfile.nom}
-                    onChange={(e) => setEditedProfile(prev => ({ ...prev, nom: e.target.value }))}
-                    className="pl-10 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    placeholder="Votre nom complet"
-                  />
-                </div>
+                <Label htmlFor="nom" className="text-lg font-semibold text-black">Nom complet</Label>
+                <Input
+                  id="nom"
+                  value={formData.nom}
+                  onChange={(e) => handleInputChange('nom', e.target.value)}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-black font-semibold">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    value={editedProfile.email}
-                    onChange={(e) => setEditedProfile(prev => ({ ...prev, email: e.target.value }))}
-                    className="pl-10 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    placeholder="votre@email.com"
-                  />
-                </div>
+                <Label htmlFor="email" className="text-lg font-semibold text-black">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-black font-semibold">Âge</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="age"
-                    type="number"
-                    value={editedProfile.age}
-                    onChange={(e) => setEditedProfile(prev => ({ ...prev, age: parseInt(e.target.value) }))}
-                    className="pl-10 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    placeholder="25"
-                  />
-                </div>
+                <Label htmlFor="age" className="text-lg font-semibold text-black">Âge</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  value={formData.age}
+                  onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="poids" className="text-black font-semibold">Poids (kg)</Label>
-                <div className="relative">
-                  <Weight className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="poids"
-                    type="number"
-                    value={editedProfile.poids}
-                    onChange={(e) => setEditedProfile(prev => ({ ...prev, poids: parseFloat(e.target.value) }))}
-                    className="pl-10 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    placeholder="70"
-                  />
-                </div>
+                <Label htmlFor="poids" className="text-lg font-semibold text-black">Poids (kg)</Label>
+                <Input
+                  id="poids"
+                  type="number"
+                  value={formData.poids}
+                  onChange={(e) => handleInputChange('poids', parseFloat(e.target.value))}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="taille" className="text-black font-semibold">Taille (cm)</Label>
-                <div className="relative">
-                  <Ruler className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <Input
-                    id="taille"
-                    type="number"
-                    value={editedProfile.taille}
-                    onChange={(e) => setEditedProfile(prev => ({ ...prev, taille: parseFloat(e.target.value) }))}
-                    className="pl-10 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-                    placeholder="175"
-                  />
-                </div>
+                <Label htmlFor="taille" className="text-lg font-semibold text-black">Taille (cm)</Label>
+                <Input
+                  id="taille"
+                  type="number"
+                  value={formData.taille}
+                  onChange={(e) => handleInputChange('taille', parseFloat(e.target.value))}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
               </div>
             </div>
           </div>
 
           {/* Objectif et niveau */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold text-black flex items-center gap-3 border-b border-gray-200 pb-3">
-              <Target className="w-6 h-6 text-green-600" />
-              Objectif et niveau
-            </h3>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                <Target className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-black">Objectifs d'entraînement</h3>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="objectif" className="text-black font-semibold">Objectif</Label>
+                <Label htmlFor="objectif" className="text-lg font-semibold text-black">Objectif principal</Label>
                 <Select
-                  value={editedProfile.objectif}
-                  onValueChange={(value: any) => setEditedProfile(prev => ({ ...prev, objectif: value }))}
+                  value={formData.objectif}
+                  onValueChange={(value) => handleInputChange('objectif', value)}
                 >
-                  <SelectTrigger className="h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                  <SelectTrigger className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -162,12 +164,12 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="niveau" className="text-black font-semibold">Niveau</Label>
+                <Label htmlFor="niveau" className="text-lg font-semibold text-black">Niveau</Label>
                 <Select
-                  value={editedProfile.niveau}
-                  onValueChange={(value: any) => setEditedProfile(prev => ({ ...prev, niveau: value }))}
+                  value={formData.niveau}
+                  onValueChange={(value) => handleInputChange('niveau', value)}
                 >
-                  <SelectTrigger className="h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                  <SelectTrigger className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -177,85 +179,83 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="frequence" className="text-lg font-semibold text-black">Fréquence (jours/semaine)</Label>
+                <Input
+                  id="frequence"
+                  type="number"
+                  min="1"
+                  max="7"
+                  value={formData.frequence}
+                  onChange={(e) => handleInputChange('frequence', parseInt(e.target.value))}
+                  className="h-12 text-lg border-2 border-gray-300 focus:border-purple-500 rounded-lg"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Focus - seulement pour musculation */}
-          {(editedProfile.objectif === 'perte_poids' || editedProfile.objectif === 'prise_masse' || editedProfile.objectif === 'maintien') && (
+          {/* Focus pour musculation */}
+          {(formData.objectif === 'perte_poids' || formData.objectif === 'prise_masse' || formData.objectif === 'maintien') && (
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-black flex items-center gap-3 border-b border-gray-200 pb-3">
-                <Dumbbell className="w-6 h-6 text-orange-600" />
-                Focus d'entraînement
-              </h3>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                  <Dumbbell className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-black">Focus d'entraînement</h3>
+              </div>
               <FocusSelector
-                selectedFocus={editedProfile.focus || []}
+                selectedFocus={formData.focus || []}
                 onFocusChange={handleFocusChange}
               />
             </div>
           )}
 
-          {/* Focus Force - seulement pour force/powerlifting */}
-          {(editedProfile.objectif === 'force' || editedProfile.objectif === 'powerlifting') && (
+          {/* Focus pour force/powerlifting */}
+          {(formData.objectif === 'force' || formData.objectif === 'powerlifting') && (
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-black flex items-center gap-3 border-b border-gray-200 pb-3">
-                <Dumbbell className="w-6 h-6 text-yellow-600" />
-                Focus Force/Powerlifting
-              </h3>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                  <Dumbbell className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-black">Focus Force/Powerlifting</h3>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {['squat', 'deadlift', 'bench_press', 'overhead_press'].map((exercise) => (
-                  <label key={exercise} className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  <label key={exercise} className="flex items-center space-x-3 p-4 border-2 border-gray-300 rounded-lg hover:border-purple-500 cursor-pointer transition-colors">
                     <input
                       type="checkbox"
-                      checked={editedProfile.focusForce?.includes(exercise as ForceFocus) || false}
+                      checked={formData.focusForce?.includes(exercise as ForceFocus) || false}
                       onChange={(e) => {
-                        const currentFocus = editedProfile.focusForce || [];
+                        const currentFocus = formData.focusForce || [];
                         if (e.target.checked) {
-                          setEditedProfile(prev => ({
-                            ...prev,
-                            focusForce: [...currentFocus, exercise as ForceFocus]
-                          }));
+                          handleForceFocusChange([...currentFocus, exercise as ForceFocus]);
                         } else {
-                          setEditedProfile(prev => ({
-                            ...prev,
-                            focusForce: currentFocus.filter(f => f !== exercise)
-                          }));
+                          handleForceFocusChange(currentFocus.filter(f => f !== exercise));
                         }
                       }}
-                      className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      className="w-5 h-5 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                     />
-                    <span className="text-black font-medium capitalize">{exercise.replace('_', ' ')}</span>
+                    <span className="text-lg font-medium text-black capitalize">{exercise.replace('_', ' ')}</span>
                   </label>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Fréquence */}
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-black flex items-center gap-3 border-b border-gray-200 pb-3">
-              <Calendar className="w-6 h-6 text-blue-600" />
-              Fréquence d'entraînement
-            </h3>
-            <div className="max-w-xs">
-              <Label htmlFor="frequence" className="text-black font-semibold">Jours par semaine</Label>
-              <Input
-                id="frequence"
-                type="number"
-                min="1"
-                max="7"
-                value={editedProfile.frequence}
-                onChange={(e) => setEditedProfile(prev => ({ ...prev, frequence: parseInt(e.target.value) }))}
-                className="h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
           {/* Boutons d'action */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-            <Button variant="outline" onClick={onClose} className="h-12 px-8">
+          <div className="flex justify-end space-x-4 pt-8 border-t-2 border-gray-200">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="h-12 px-8 text-lg font-semibold border-2 border-gray-400 text-black hover:bg-gray-100 hover:border-gray-500 bg-white"
+            >
               Annuler
             </Button>
-            <Button onClick={handleSave} className="bg-gradient-to-r from-purple-600 to-blue-600 text-white h-12 px-8 hover:from-purple-700 hover:to-blue-700">
+            <Button
+              onClick={handleSave}
+              className="h-12 px-8 text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
+            >
               <Save className="w-5 h-5 mr-2" />
               Sauvegarder
             </Button>

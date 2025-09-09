@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Dumbbell, Clock, Target, Trophy, Star, Play, Pause, RotateCcw, CheckCircle, Calendar, Timer } from 'lucide-react';
+import { Dumbbell, Clock, Target, Trophy, Star, Play, Pause, RotateCcw, CheckCircle, Timer, Zap, Flame, Award, Activity, Heart, TrendingUp } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
 
 interface Exercice {
@@ -16,7 +16,8 @@ interface Exercice {
   description: string;
   muscle: string;
   difficulte: 'Facile' | 'Moyen' | 'Difficile';
-  termine?: boolean;
+  termine: boolean;
+  calories: number;
 }
 
 interface ProgrammeDuJour {
@@ -29,8 +30,9 @@ interface ProgrammeDuJour {
   exercices: Exercice[];
   calories: number;
   progression: number;
-  tempsTotal: number;
-  tempsRestant: number;
+  statut: 'En cours' | 'Terminé' | 'Non commencé';
+  streak: number;
+  xp: number;
 }
 
 const Programme: React.FC = () => {
@@ -40,72 +42,81 @@ const Programme: React.FC = () => {
   const [tempsRepos, setTempsRepos] = useState<number>(0);
   const [enCours, setEnCours] = useState<boolean>(false);
   const [tempsEcoule, setTempsEcoule] = useState<number>(0);
+  const [showCelebration, setShowCelebration] = useState<boolean>(false);
 
-  // Simulation du programme du jour
+  // Génération du programme du jour
   useEffect(() => {
-    const programme: ProgrammeDuJour = {
-      id: 1,
-      nom: "Programme Débutant",
-      date: new Date().toLocaleDateString('fr-FR'),
-      duree: 45,
-      difficulte: 'Débutant',
-      objectif: "Découverte de la musculation",
-      calories: 300,
-      progression: 0,
-      tempsTotal: 45,
-      tempsRestant: 45,
-      exercices: [
-        {
-          id: 1,
-          nom: "Squats",
-          series: 3,
-          repetitions: 12,
-          poids: 0,
-          repos: 60,
-          description: "Exercice de base pour les jambes",
-          muscle: "Quadriceps",
-          difficulte: 'Facile',
-          termine: false
-        },
-        {
-          id: 2,
-          nom: "Pompes",
-          series: 3,
-          repetitions: 10,
-          poids: 0,
-          repos: 45,
-          description: "Exercice au poids du corps",
-          muscle: "Pectoraux",
-          difficulte: 'Facile',
-          termine: false
-        },
-        {
-          id: 3,
-          nom: "Planche",
-          series: 3,
-          repetitions: 30,
-          poids: 0,
-          repos: 60,
-          description: "Gainage abdominal",
-          muscle: "Abdominaux",
-          difficulte: 'Moyen',
-          termine: false
-        },
-        {
-          id: 4,
-          nom: "Tractions",
-          series: 3,
-          repetitions: 5,
-          poids: 0,
-          repos: 90,
-          description: "Exercice pour le dos",
-          muscle: "Dorsaux",
-          difficulte: 'Difficile',
-          termine: false
-        }
-      ]
-    };
-    setProgrammeDuJour(programme);
+    const programmes = [
+      {
+        id: 1,
+        nom: "Force Maximale",
+        date: new Date().toLocaleDateString('fr-FR'),
+        duree: 60,
+        difficulte: 'Intermédiaire' as const,
+        objectif: "Développement de la force maximale",
+        calories: 450,
+        progression: 0,
+        statut: 'Non commencé' as const,
+        streak: 7,
+        xp: 1250,
+        exercices: [
+          {
+            id: 1,
+            nom: "Squats",
+            series: 4,
+            repetitions: 8,
+            poids: 80,
+            repos: 120,
+            description: "Exercice de base pour les jambes avec charge",
+            muscle: "Quadriceps",
+            difficulte: 'Moyen' as const,
+            termine: false,
+            calories: 120
+          },
+          {
+            id: 2,
+            nom: "Développé couché",
+            series: 4,
+            repetitions: 6,
+            poids: 70,
+            repos: 120,
+            description: "Exercice principal pour les pectoraux",
+            muscle: "Pectoraux",
+            difficulte: 'Moyen' as const,
+            termine: false,
+            calories: 100
+          },
+          {
+            id: 3,
+            nom: "Deadlift",
+            series: 3,
+            repetitions: 5,
+            poids: 100,
+            repos: 180,
+            description: "Exercice roi de la musculation",
+            muscle: "Dorsaux",
+            difficulte: 'Difficile' as const,
+            termine: false,
+            calories: 150
+          },
+          {
+            id: 4,
+            nom: "Tractions",
+            series: 3,
+            repetitions: 8,
+            poids: 0,
+            repos: 90,
+            description: "Exercice pour le dos au poids du corps",
+            muscle: "Dorsaux",
+            difficulte: 'Difficile' as const,
+            termine: false,
+            calories: 80
+          }
+        ]
+      }
+    ];
+
+    setProgrammeDuJour(programmes[0]);
   }, []);
 
   // Timer pour le temps écoulé
@@ -119,17 +130,30 @@ const Programme: React.FC = () => {
     return () => clearInterval(interval);
   }, [enCours]);
 
+  // Timer pour le repos
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (tempsRepos > 0) {
+      interval = setInterval(() => {
+        setTempsRepos(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [tempsRepos]);
+
   const demarrerProgramme = () => {
-    setEnCours(true);
-    setTempsEcoule(0);
+    if (programmeDuJour) {
+      setProgrammeDuJour({ ...programmeDuJour, statut: 'En cours' });
+      setEnCours(true);
+      setTempsEcoule(0);
+    }
   };
 
   const arreterProgramme = () => {
-    setEnCours(false);
-    setExerciceActuel(0);
-    setSerieActuelle(1);
-    setTempsRepos(0);
-    setTempsEcoule(0);
+    if (programmeDuJour) {
+      setProgrammeDuJour({ ...programmeDuJour, statut: 'Terminé' });
+      setEnCours(false);
+    }
   };
 
   const exerciceSuivant = () => {
@@ -139,61 +163,74 @@ const Programme: React.FC = () => {
       if (serieActuelle < exercice.series) {
         setSerieActuelle(serieActuelle + 1);
         setTempsRepos(exercice.repos);
-      } else {
+      } else if (exerciceActuel < programmeDuJour.exercices.length - 1) {
         // Marquer l'exercice comme terminé
-        const nouveauxExercices = [...programmeDuJour.exercices];
-        nouveauxExercices[exerciceActuel].termine = true;
-        setProgrammeDuJour({...programmeDuJour, exercices: nouveauxExercices});
+        const nouveauxExercices = programmeDuJour.exercices.map((ex, index) => 
+          index === exerciceActuel ? { ...ex, termine: true } : ex
+        );
         
-        if (exerciceActuel < programmeDuJour.exercices.length - 1) {
-          setExerciceActuel(exerciceActuel + 1);
-          setSerieActuelle(1);
-          setTempsRepos(0);
-        } else {
-          // Programme terminé
-          arreterProgramme();
-        }
+        const nouvelleProgression = ((exerciceActuel + 1) * 100) / programmeDuJour.exercices.length;
+        setProgrammeDuJour({ 
+          ...programmeDuJour, 
+          exercices: nouveauxExercices,
+          progression: nouvelleProgression
+        });
+        
+        setExerciceActuel(exerciceActuel + 1);
+        setSerieActuelle(1);
+        setTempsRepos(0);
+      } else {
+        // Programme terminé
+        const nouveauxExercices = programmeDuJour.exercices.map((ex, index) => 
+          index === exerciceActuel ? { ...ex, termine: true } : ex
+        );
+        setProgrammeDuJour({ 
+          ...programmeDuJour, 
+          exercices: nouveauxExercices,
+          statut: 'Terminé',
+          progression: 100
+        });
+        setEnCours(false);
+        setShowCelebration(true);
+        setTimeout(() => setShowCelebration(false), 3000);
       }
-    }
-  };
-
-  const getDifficulteColor = (difficulte: string) => {
-    switch (difficulte) {
-      case 'Facile': return 'bg-green-100 text-green-800';
-      case 'Moyen': return 'bg-yellow-100 text-yellow-800';
-      case 'Difficile': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getDifficulteColorProgramme = (difficulte: string) => {
-    switch (difficulte) {
-      case 'Débutant': return 'bg-green-100 text-green-800';
-      case 'Intermédiaire': return 'bg-yellow-100 text-yellow-800';
-      case 'Avancé': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const formatTemps = (secondes: number) => {
     const minutes = Math.floor(secondes / 60);
     const secs = secondes % 60;
-    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const calculerProgression = () => {
-    if (!programmeDuJour) return 0;
-    const exercicesTermines = programmeDuJour.exercices.filter(ex => ex.termine).length;
-    return (exercicesTermines / programmeDuJour.exercices.length) * 100;
+  const getDifficulteColor = (difficulte: string) => {
+    switch (difficulte) {
+      case 'Facile': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Moyen': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Difficile': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatutColor = (statut: string) => {
+    switch (statut) {
+      case 'En cours': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Terminé': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Non commencé': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
   };
 
   if (!programmeDuJour) {
     return (
       <PageLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-lg text-black">Chargement du programme...</p>
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center space-y-4">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-200 mx-auto"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent mx-auto absolute top-0 left-0"></div>
+            </div>
+            <p className="text-black text-lg font-medium">Chargement du programme...</p>
           </div>
         </div>
       </PageLayout>
@@ -201,88 +238,183 @@ const Programme: React.FC = () => {
   }
 
   const exercice = programmeDuJour.exercices[exerciceActuel];
-  const progression = calculerProgression();
+  const progression = programmeDuJour.progression;
+  const caloriesBrulées = programmeDuJour.exercices
+    .filter(ex => ex.termine)
+    .reduce((total, ex) => total + ex.calories, 0);
 
   return (
     <PageLayout>
       <div className="space-y-8">
-        {/* Header du programme du jour */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 text-white shadow-2xl">
+        {/* Animation de célébration */}
+        {showCelebration && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="text-8xl animate-bounce">🎉</div>
+            <div className="absolute top-1/4 left-1/4 text-6xl animate-pulse">🏆</div>
+            <div className="absolute top-1/4 right-1/4 text-6xl animate-pulse">⭐</div>
+            <div className="absolute bottom-1/4 left-1/3 text-6xl animate-pulse">💪</div>
+            <div className="absolute bottom-1/4 right-1/3 text-6xl animate-pulse">🎉</div>
+          </div>
+        )}
+
+        {/* Header du programme du jour avec particules */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
+          {/* Particules animées */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-4 left-4 w-2 h-2 bg-white/30 rounded-full animate-ping"></div>
+            <div className="absolute top-8 right-8 w-1 h-1 bg-blue-400/50 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-4 left-1/4 w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-8 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-ping"></div>
+          </div>
+          
           <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20"></div>
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm border border-white/30">
-                    <Calendar className="w-10 h-10" />
+                <div className="flex items-center gap-4 group">
+                  <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
+                    <Dumbbell className="w-8 h-8 group-hover:animate-pulse" />
                   </div>
                   <div>
-                    <h1 className="text-5xl font-bold tracking-tight text-white">Programme du Jour</h1>
-                    <p className="text-white/90 text-xl font-medium">{programmeDuJour.date}</p>
+                    <h1 className="text-4xl font-bold tracking-tight text-white group-hover:scale-105 transition-transform duration-300">
+                      Programme du Jour
+                    </h1>
+                    <p className="text-white/90 text-lg font-medium">{programmeDuJour.nom} - {programmeDuJour.date}</p>
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
-                  <Badge className={`${getDifficulteColorProgramme(programmeDuJour.difficulte)} text-lg px-6 py-3 rounded-full font-bold shadow-lg`}>
-                    {programmeDuJour.difficulte}
+                  <Badge className={`${getStatutColor(programmeDuJour.statut)} text-lg px-4 py-2 rounded-full font-semibold border-2 hover:scale-105 transition-transform duration-300`}>
+                    {programmeDuJour.statut}
                   </Badge>
-                  <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur-sm border border-white/30">
-                    <Timer className="w-6 h-6 text-blue-400" />
-                    <span className="text-xl font-bold text-white">{programmeDuJour.duree} min</span>
-                    <span className="text-white/90 text-sm font-medium">durée</span>
+                  <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
+                    <Clock className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                    <span className="text-white font-medium">{programmeDuJour.duree} min</span>
                   </div>
-                  <div className="flex items-center gap-3 bg-white/20 px-6 py-3 rounded-full backdrop-blur-sm border border-white/30">
-                    <Trophy className="w-6 h-6 text-yellow-400" />
-                    <span className="text-xl font-bold text-white">{programmeDuJour.calories} cal</span>
-                    <span className="text-white/90 text-sm font-medium">brûlées</span>
+                  <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
+                    <Zap className="w-4 h-4 group-hover:animate-pulse" />
+                    <span className="text-white font-medium">{programmeDuJour.calories} cal</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
+                    <Flame className="w-4 h-4 group-hover:animate-bounce" />
+                    <span className="text-white font-medium">{programmeDuJour.streak} jours</span>
                   </div>
                 </div>
               </div>
 
-              <div className="lg:text-right space-y-4">
-                <div className="text-white/90 font-medium text-lg">Progression</div>
+              <div className="lg:text-right space-y-3">
+                <div className="text-white/90 font-medium">Progression du programme</div>
                 <div className="w-80">
                   <Progress 
                     value={progression} 
-                    className="h-4 bg-white/20 rounded-full"
+                    className="h-4 bg-white/20 rounded-full overflow-hidden"
                   />
                 </div>
                 <div className="text-sm">
-                  <span className="text-white font-bold text-2xl">{Math.round(progression)}%</span>
-                  <span className="text-white/80 text-lg"> terminé</span>
+                  <span className="text-white font-bold text-lg">{progression}%</span> 
+                  <span className="text-white/80"> terminé</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Contrôles du programme */}
-        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-2xl">
-          <CardContent className="p-8">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-              <div className="text-center lg:text-left">
-                <h2 className="text-3xl font-bold text-black mb-2">{programmeDuJour.nom}</h2>
-                <p className="text-lg text-black">{programmeDuJour.objectif}</p>
+        {/* Stats en temps réel avec animations */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                <Timer className="w-6 h-6 text-white" />
               </div>
-              
-              <div className="flex items-center gap-4">
-                {!enCours ? (
+              <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                {formatTemps(tempsEcoule)}
+              </div>
+              <div className="text-sm text-black font-medium">Temps écoulé</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                {programmeDuJour.exercices.length}
+              </div>
+              <div className="text-sm text-black font-medium">Exercices</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                <CheckCircle className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                {programmeDuJour.exercices.filter(ex => ex.termine).length}
+              </div>
+              <div className="text-sm text-black font-medium">Terminés</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group">
+            <CardContent className="p-6 text-center">
+              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                {caloriesBrulées}
+              </div>
+              <div className="text-sm text-black font-medium">Calories</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Contrôles du programme avec style amélioré */}
+        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-xl hover:shadow-2xl transition-all duration-500">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-6">
+                <div className="text-center group">
+                  <div className="text-2xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                    {formatTemps(tempsEcoule)}
+                  </div>
+                  <div className="text-sm text-black">Temps écoulé</div>
+                </div>
+                <div className="text-center group">
+                  <div className="text-2xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                    {programmeDuJour.exercices.length}
+                  </div>
+                  <div className="text-sm text-black">Exercices</div>
+                </div>
+                <div className="text-center group">
+                  <div className="text-2xl font-bold text-black group-hover:scale-110 transition-transform duration-300">
+                    {programmeDuJour.exercices.filter(ex => ex.termine).length}
+                  </div>
+                  <div className="text-sm text-black">Terminés</div>
+                </div>
+      </div>
+
+              <div className="flex gap-3">
+                {!enCours && programmeDuJour.statut === 'Non commencé' && (
                   <Button 
                     onClick={demarrerProgramme}
                     size="lg"
-                    className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-xl px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                    className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold"
                   >
-                    <Play className="w-6 h-6 mr-3" />
+                    <Play className="w-5 h-5 mr-2" />
                     Commencer
                   </Button>
-                ) : (
+                )}
+                
+                {enCours && (
                   <Button 
                     onClick={arreterProgramme}
-                    size="lg"
                     variant="destructive"
-                    className="text-xl px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                    size="lg"
+                    className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold"
                   >
-                    <Pause className="w-6 h-6 mr-3" />
+                    <Pause className="w-5 h-5 mr-2" />
                     Arrêter
                   </Button>
                 )}
@@ -291,42 +423,49 @@ const Programme: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Exercice actuel */}
+        {/* Exercice actuel avec design amélioré */}
         {enCours && (
-          <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-300 shadow-2xl">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-3xl font-bold text-black flex items-center gap-4">
-                <Dumbbell className="w-8 h-8 text-blue-600" />
-                {exercice.nom}
-              </CardTitle>
-              <p className="text-black text-lg font-medium">{exercice.description}</p>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="text-center p-6 bg-white rounded-xl border-2 border-blue-200">
-                  <div className="text-4xl font-bold text-black mb-2">{serieActuelle}</div>
-                  <div className="text-lg text-black font-medium">Série</div>
+          <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-300 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-black">
+                <div className="p-2 bg-blue-500 rounded-lg">
+                  <Dumbbell className="w-6 h-6 text-white" />
                 </div>
-                <div className="text-center p-6 bg-white rounded-xl border-2 border-blue-200">
-                  <div className="text-4xl font-bold text-black mb-2">{exercice.series}</div>
-                  <div className="text-lg text-black font-medium">Total</div>
+                <span className="text-2xl font-bold">{exercice.nom}</span>
+                <Badge className={`${getDifficulteColor(exercice.difficulte)} text-sm px-3 py-1 border-2`}>
+                  {exercice.difficulte}
+                </Badge>
+          </CardTitle>
+        </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                  <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{serieActuelle}</div>
+                  <div className="text-sm text-black font-medium">Série actuelle</div>
                 </div>
-                <div className="text-center p-6 bg-white rounded-xl border-2 border-blue-200">
-                  <div className="text-4xl font-bold text-black mb-2">{exercice.repetitions}</div>
-                  <div className="text-lg text-black font-medium">Répétitions</div>
+                <div className="text-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                  <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{exercice.series}</div>
+                  <div className="text-sm text-black font-medium">Total séries</div>
                 </div>
-                <div className="text-center p-6 bg-white rounded-xl border-2 border-blue-200">
-                  <div className="text-4xl font-bold text-black mb-2">{exercice.poids}kg</div>
-                  <div className="text-lg text-black font-medium">Poids</div>
+                <div className="text-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                  <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{exercice.repetitions}</div>
+                  <div className="text-sm text-black font-medium">Répétitions</div>
+                </div>
+                <div className="text-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                  <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{exercice.poids}kg</div>
+                  <div className="text-sm text-black font-medium">Poids</div>
                 </div>
               </div>
 
-              <div className="text-center space-y-4">
-                <Badge className={getDifficulteColor(exercice.difficulte)}>
-                  {exercice.difficulte}
-                </Badge>
-                <div className="text-2xl font-bold text-black">
-                  Muscle: {exercice.muscle}
+              <div className="text-center space-y-3">
+                <p className="text-lg text-black font-medium">{exercice.description}</p>
+                <div className="flex items-center justify-center gap-2">
+                  <Target className="w-4 h-4 text-blue-600" />
+                  <p className="text-sm text-black font-medium">Muscle ciblé: {exercice.muscle}</p>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Zap className="w-4 h-4 text-orange-600" />
+                  <p className="text-sm text-black font-medium">{exercice.calories} calories</p>
                 </div>
               </div>
 
@@ -334,9 +473,9 @@ const Programme: React.FC = () => {
                 <Button 
                   onClick={exerciceSuivant}
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xl px-12 py-6 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold px-8 py-4"
                 >
-                  <Play className="w-6 h-6 mr-3" />
+                  <Play className="w-5 h-5 mr-2" />
                   {serieActuelle < exercice.series ? 'Série suivante' : 'Exercice suivant'}
                 </Button>
               </div>
@@ -344,110 +483,131 @@ const Programme: React.FC = () => {
           </Card>
         )}
 
-        {/* Temps de repos */}
+        {/* Temps de repos avec animation */}
         {tempsRepos > 0 && (
-          <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-300 shadow-2xl">
-            <CardHeader className="pb-6">
-              <CardTitle className="text-3xl font-bold text-black flex items-center gap-4">
-                <Clock className="w-8 h-8 text-orange-600" />
+          <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-300 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-black">
+                <div className="p-2 bg-orange-500 rounded-lg">
+                  <Timer className="w-6 h-6 text-white" />
+                </div>
                 Temps de repos
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center">
-                <div className="text-8xl font-bold text-black mb-6">{tempsRepos}s</div>
+              <div className="text-center space-y-6">
+                <div className="relative">
+                  <div className="text-8xl font-bold text-black animate-pulse">{tempsRepos}s</div>
+                  <div className="absolute inset-0 text-8xl font-bold text-orange-200 animate-ping">{tempsRepos}s</div>
+                </div>
                 <Button 
                   onClick={() => setTempsRepos(0)}
                   variant="outline"
-                  size="lg"
-                  className="text-lg px-8 py-4 rounded-xl"
+                  className="border-2 border-orange-300 text-orange-700 hover:bg-orange-100 transition-all duration-300 hover:scale-105 font-semibold"
                 >
-                  <RotateCcw className="w-5 h-5 mr-2" />
+                  <RotateCcw className="w-4 h-4 mr-2" />
                   Passer le repos
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+          </div>
+        </CardContent>
+      </Card>
         )}
 
-        {/* Liste des exercices */}
-        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-2xl">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-3xl font-bold text-black flex items-center gap-4">
-              <Target className="w-8 h-8 text-slate-600" />
-              Exercices du jour
+        {/* Liste des exercices avec animations */}
+        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-xl hover:shadow-2xl transition-all duration-500">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-black">
+              <div className="p-2 bg-purple-500 rounded-lg">
+                <Target className="w-6 h-6 text-white" />
+              </div>
+              Exercices du programme
             </CardTitle>
-            <p className="text-black text-lg font-medium">Vue d'ensemble de votre séance</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {programmeDuJour.exercices.map((exercice, index) => (
                 <div 
                   key={exercice.id} 
-                  className={`flex items-center justify-between p-6 rounded-xl border-2 transition-all duration-300 ${
+                  className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all duration-500 hover:shadow-lg hover:scale-105 ${
                     exercice.termine 
-                      ? 'bg-green-50 border-green-300' 
+                      ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-300 shadow-lg' 
                       : index === exerciceActuel && enCours
-                      ? 'bg-blue-50 border-blue-300'
-                      : 'bg-white border-slate-200'
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-300 shadow-lg'
+                      : 'bg-white border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <div className="flex items-center gap-6">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                       exercice.termine 
-                        ? 'bg-green-500 text-white' 
+                        ? 'bg-green-500 text-white shadow-lg' 
                         : index === exerciceActuel && enCours
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-blue-500 text-white shadow-lg animate-pulse'
                         : 'bg-slate-200 text-slate-600'
                     }`}>
-                      {exercice.termine ? <CheckCircle className="w-6 h-6" /> : index + 1}
+                      {exercice.termine ? (
+                        <CheckCircle className="w-6 h-6" />
+                      ) : (
+                        <span className="font-bold text-lg">{index + 1}</span>
+                      )}
                     </div>
                     <div>
-                      <h3 className="text-xl font-bold text-black">{exercice.nom}</h3>
-                      <p className="text-black">{exercice.description}</p>
+                      <div className="font-bold text-lg text-black">{exercice.nom}</div>
+                      <div className="text-sm text-black">{exercice.series} séries × {exercice.repetitions} reps</div>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-black">{exercice.series}x{exercice.repetitions}</div>
-                      <div className="text-sm text-black">séries x reps</div>
-                    </div>
-                    <Badge className={getDifficulteColor(exercice.difficulte)}>
+                  <div className="flex items-center gap-3">
+                    <Badge className={`${getDifficulteColor(exercice.difficulte)} text-sm px-3 py-1 border-2`}>
                       {exercice.difficulte}
                     </Badge>
-                  </div>
-                </div>
+                    {exercice.poids > 0 && (
+                      <span className="text-sm text-black font-medium bg-slate-100 px-3 py-1 rounded-full">
+                        {exercice.poids}kg
+                </span>
+                    )}
+                    <span className="text-sm text-black font-medium bg-orange-100 px-3 py-1 rounded-full">
+                      {exercice.calories} cal
+                </span>
+              </div>
+              </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Statistiques de la séance */}
-        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-300 shadow-2xl">
-          <CardHeader className="pb-6">
-            <CardTitle className="text-3xl font-bold text-black flex items-center gap-4">
-              <Star className="w-8 h-8 text-purple-600" />
-              Statistiques de la séance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center p-6 bg-white rounded-xl border-2 border-purple-200">
-                <div className="text-4xl font-bold text-black mb-2">{formatTemps(tempsEcoule)}</div>
-                <div className="text-lg text-black font-medium">Temps écoulé</div>
-              </div>
-              <div className="text-center p-6 bg-white rounded-xl border-2 border-purple-200">
-                <div className="text-4xl font-bold text-black mb-2">{Math.round(progression)}%</div>
-                <div className="text-lg text-black font-medium">Progression</div>
-              </div>
-              <div className="text-center p-6 bg-white rounded-xl border-2 border-purple-200">
-                <div className="text-4xl font-bold text-black mb-2">{programmeDuJour.calories}</div>
-                <div className="text-lg text-black font-medium">Calories brûlées</div>
-              </div>
+        {/* Résumé de la séance avec animations */}
+        {programmeDuJour.statut === 'Terminé' && (
+          <Card className="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-300 shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1">
+        <CardHeader>
+              <CardTitle className="flex items-center gap-3 text-black">
+                <div className="p-2 bg-green-500 rounded-lg">
+                  <Trophy className="w-6 h-6 text-white" />
             </div>
-          </CardContent>
-        </Card>
+                Séance terminée !
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+              <div className="text-center space-y-6">
+                <div className="text-6xl animate-bounce">🎉</div>
+                <h3 className="text-3xl font-bold text-black">Félicitations !</h3>
+                <p className="text-xl text-black font-medium">Vous avez terminé votre programme du jour</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                  <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                    <div className="text-4xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{formatTemps(tempsEcoule)}</div>
+                    <div className="text-sm text-black font-medium">Temps total</div>
+                  </div>
+                  <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                    <div className="text-4xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{programmeDuJour.exercices.length}</div>
+                    <div className="text-sm text-black font-medium">Exercices</div>
+                    </div>
+                  <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+                    <div className="text-4xl font-bold text-black group-hover:scale-110 transition-transform duration-300">{programmeDuJour.calories}</div>
+                    <div className="text-sm text-black font-medium">Calories</div>
+                </div>
+                </div>
+          </div>
+        </CardContent>
+      </Card>
+        )}
       </div>
     </PageLayout>
   );

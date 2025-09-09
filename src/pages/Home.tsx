@@ -1,300 +1,227 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Flame, Target, TrendingUp, Clock, Dumbbell, Apple, Activity, Play, Plus, BarChart3, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Dumbbell, Target, TrendingUp, Star, Zap, Award, Activity, Heart, Clock, Flame, CheckCircle } from 'lucide-react';
+import PageLayout from '@/components/PageLayout';
 
-const Home = () => {
-  const navigate = useNavigate();
-  const [isWorkoutStarted, setIsWorkoutStarted] = useState(false);
-
-  // Données d'exemple - à remplacer par vos vraies données
-  const todayProgram = {
-    name: "Push Day",
-    exercises: [
-      { name: "Développé couché", sets: "4x8-10", weight: "80kg" },
-      { name: "Dips", sets: "3x12-15", weight: "Poids du corps" },
-      { name: "Élévations latérales", sets: "3x15", weight: "12kg" }
-    ],
-    duration: "75 min",
-    difficulty: "Intermédiaire"
-  };
-
-  const todayStats = {
-    calories: 2450,
-    target: 2800,
-    protein: 180,
-    carbs: 250,
-    fat: 85
-  };
-
-  const weeklyProgress = {
-    workouts: 4,
-    target: 5,
-    calories: 16800,
-    target: 19600
-  };
-
-  const quickActions = [
-    { 
-      name: "Planning", 
-      icon: Calendar, 
-      color: 'blue' as const,
-      action: () => navigate('/planning')
-    },
-    { 
-      name: "Nouveau Programme", 
-      icon: Dumbbell, 
-      color: 'green' as const,
-      action: () => navigate('/programme')
-    },
-    { 
-      name: "Scanner Aliment", 
-      icon: Apple, 
-      color: 'purple' as const,
-      action: () => navigate('/scan')
-    },
-    { 
-      name: "Profil", 
-      icon: User, 
-      color: 'pink' as const,
-      action: () => navigate('/profile')
-    }
+const Home: React.FC = () => {
+  const stats = [
+    { label: 'Séances cette semaine', value: '4', icon: Dumbbell, color: 'blue', change: '+2' },
+    { label: 'Calories brûlées', value: '1,250', icon: Flame, color: 'orange', change: '+15%' },
+    { label: 'Temps d\'entraînement', value: '3h 45m', icon: Clock, color: 'green', change: '+30min' },
+    { label: 'Objectifs atteints', value: '8/10', icon: Target, color: 'purple', change: '+3' }
   ];
 
-  const handleStartWorkout = () => {
-    setIsWorkoutStarted(true);
-    setTimeout(() => {
-      setIsWorkoutStarted(false);
-    }, 2000);
-  };
+  const recentActivities = [
+    { exercice: 'Squats', series: '4x8', poids: '80kg', temps: '2h ago', status: 'completed' },
+    { exercice: 'Développé couché', series: '3x6', poids: '70kg', temps: '2h ago', status: 'completed' },
+    { exercice: 'Deadlift', series: '3x5', poids: '100kg', temps: '2h ago', status: 'completed' },
+    { exercice: 'Tractions', series: '3x8', poids: '0kg', temps: '2h ago', status: 'completed' }
+  ];
 
-  const handleAddExercise = () => {
-    navigate('/blocs-entrainement');
-  };
-
-  const handleViewProgress = () => {
-    navigate('/overview');
-  };
+  const achievements = [
+    { nom: 'Premier pas', description: 'Première séance terminée', icon: '👶', unlocked: true },
+    { nom: 'Régulier', description: '7 jours consécutifs', icon: '🔥', unlocked: true },
+    { nom: 'Force brute', description: '100kg au squat', icon: '💪', unlocked: false },
+    { nom: 'Marathonien', description: '5km en moins de 20min', icon: '🏃', unlocked: false }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* En-tête avec salutation et date */}
-        <div className="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20">
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">
-              Bonjour !
-            </h1>
-            <p className="text-slate-600 text-lg">Prêt pour votre séance d'aujourd'hui ?</p>
+    <PageLayout>
+      <div className="space-y-8">
+        {/* Hero Section avec animation */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden group">
+          {/* Particules animées */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-4 left-4 w-2 h-2 bg-white/30 rounded-full animate-ping"></div>
+            <div className="absolute top-8 right-8 w-1 h-1 bg-blue-400/50 rounded-full animate-pulse"></div>
+            <div className="absolute bottom-4 left-1/4 w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-bounce"></div>
+            <div className="absolute bottom-8 right-1/3 w-1 h-1 bg-white/20 rounded-full animate-ping"></div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-slate-500 font-medium">
-              {new Date().toLocaleDateString('fr-FR', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </p>
+          
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20"></div>
+          <div className="relative z-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4 group">
+                  <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 shadow-lg">
+                    <Dumbbell className="w-8 h-8 group-hover:animate-pulse" />
+                  </div>
+                  <div>
+                    <h1 className="text-5xl font-bold tracking-tight text-white group-hover:scale-105 transition-transform duration-300">
+                      Bienvenue sur FitGEN22
+                    </h1>
+                    <p className="text-white/90 text-xl font-medium mt-2">Votre coach personnel pour atteindre vos objectifs</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-4">
+                  <Badge className="bg-gradient-to-r from-green-500 to-blue-500 text-white text-lg px-6 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transition-transform duration-300">
+                    <Star className="w-4 h-4 mr-2" />
+                    Rang B
+                  </Badge>
+                  <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
+                    <Zap className="w-5 h-5 group-hover:animate-pulse" />
+                    <span className="text-white font-medium">×1.25 assiduité</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
+                    <Flame className="w-5 h-5 group-hover:animate-bounce" />
+                    <span className="text-white font-medium">7 jours de streak</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:text-right space-y-4">
+                <div className="text-white/90 font-medium text-lg">Progression vers le prochain rang</div>
+                <div className="w-80">
+                  <div className="w-full bg-white/20 rounded-full h-4 mb-2">
+                    <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-4 rounded-full transition-all duration-1000" style={{ width: '75%' }}></div>
+                  </div>
+                </div>
+                <div className="text-sm">
+                  <span className="text-white font-bold text-xl">2,450</span> 
+                  <span className="text-white/80"> / 3,000 XP</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Statistiques du jour */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-gradient-to-br from-blue-400 to-blue-500 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm font-medium">Calories</p>
-                  <p className="text-3xl font-bold">{todayStats.calories}</p>
-                  <p className="text-blue-100 text-xs">sur {todayStats.target}</p>
+        {/* Stats Grid avec animations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, index) => (
+            <Card key={index} className={`bg-gradient-to-br from-${stat.color}-50 to-${stat.color}-100 border-2 border-${stat.color}-300 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group`}>
+              <CardContent className="p-6 text-center">
+                <div className={`w-16 h-16 bg-${stat.color}-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg`}>
+                  <stat.icon className="w-8 h-8 text-white" />
                 </div>
-                <div className="bg-blue-100 rounded-full p-3">
-                  <Flame className="h-8 w-8 text-blue-600" />
+                <div className="text-3xl font-bold text-black group-hover:scale-110 transition-transform duration-300 mb-2">
+                  {stat.value}
                 </div>
-              </div>
-              <Progress 
-                value={(todayStats.calories / todayStats.target) * 100} 
-                className="mt-4 bg-white/20"
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-400 to-emerald-500 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-emerald-100 text-sm font-medium">Protéines</p>
-                  <p className="text-3xl font-bold">{todayStats.protein}g</p>
-                  <p className="text-emerald-100 text-xs">Objectif: 200g</p>
-                </div>
-                <div className="bg-emerald-100 rounded-full p-3">
-                  <Target className="h-8 w-8 text-emerald-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-violet-400 to-violet-500 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-violet-100 text-sm font-medium">Progression</p>
-                  <p className="text-3xl font-bold">{weeklyProgress.workouts}</p>
-                  <p className="text-violet-100 text-xs">séances cette semaine</p>
-                </div>
-                <div className="bg-violet-100 rounded-full p-3">
-                  <TrendingUp className="h-8 w-8 text-violet-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="text-sm text-black font-medium mb-2">{stat.label}</div>
+                <Badge className={`bg-${stat.color}-200 text-${stat.color}-800 border-${stat.color}-300 text-xs`}>
+                  {stat.change}
+                </Badge>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Programme du jour */}
-        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
-              <div className="bg-blue-100 rounded-full p-2">
-                <Calendar className="h-6 w-6 text-blue-600" />
+        {/* Activités récentes avec design amélioré */}
+        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-xl hover:shadow-2xl transition-all duration-500">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-black text-2xl">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Activity className="w-6 h-6 text-white" />
               </div>
-              Programme du jour
+              Activités récentes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-slate-800">{todayProgram.name}</h3>
-                <div className="flex gap-3">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 px-3 py-1 text-sm font-medium">
-                    {todayProgram.difficulty}
-                  </Badge>
-                  <Badge variant="outline" className="flex items-center gap-2 text-slate-600 px-3 py-1 text-sm font-medium border-slate-300">
-                    <Clock className="h-4 w-4" />
-                    {todayProgram.duration}
-                  </Badge>
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                {todayProgram.exercises.map((exercise, index) => (
-                  <div key={index} className="flex justify-between items-center p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl border border-slate-200 hover:shadow-md transition-all duration-200">
-                    <span className="font-semibold text-slate-800 text-lg">{exercise.name}</span>
-                    <div className="text-sm text-slate-600 font-medium">
-                      <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.sets}</span>
-                      <span className="mx-3">•</span>
-                      <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.weight}</span>
+            <div className="space-y-4">
+              {recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-lg text-black group-hover:scale-105 transition-transform duration-300">{activity.exercice}</div>
+                      <div className="text-sm text-black">{activity.series} • {activity.poids}</div>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-              <div className="flex gap-3">
-                <Button 
-                  className="flex-1 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-                  size="lg"
-                  onClick={handleStartWorkout}
-                  disabled={isWorkoutStarted}
-                >
-                  {isWorkoutStarted ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Démarrage...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="h-5 w-5 mr-2" />
-                      Commencer la séance
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  onClick={handleAddExercise}
-                  className="px-6 py-3 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-all duration-300"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Ajouter
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions rapides */}
-        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-slate-800 text-2xl">Actions rapides</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={`h-28 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 ${
-                    action.color === 'blue' ? 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300' :
-                    action.color === 'green' ? 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 hover:border-emerald-300' :
-                    action.color === 'purple' ? 'text-violet-600 bg-violet-50 hover:bg-violet-100 border-violet-200 hover:border-violet-300' :
-                    'text-pink-600 bg-pink-50 hover:bg-pink-100 border-pink-200 hover:border-pink-300'
-                  }`}
-                  onClick={action.action}
-                >
-                  <action.icon className="h-8 w-8" />
-                  <span className="text-sm font-semibold">{action.name}</span>
-                </Button>
+                  <div className="text-right">
+                    <div className="text-sm text-black font-medium">{activity.temps}</div>
+                    <Badge className="bg-green-200 text-green-800 border-green-300 text-xs">
+                      Terminé
+                    </Badge>
+                  </div>
+                </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Progression hebdomadaire */}
-        <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+        {/* Achievements avec animations */}
+        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-300 shadow-xl hover:shadow-2xl transition-all duration-500">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
-              <div className="bg-violet-100 rounded-full p-2">
-                <TrendingUp className="h-6 w-6 text-violet-600" />
+            <CardTitle className="flex items-center gap-3 text-black text-2xl">
+              <div className="p-2 bg-purple-500 rounded-lg">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              Progression de la semaine
+              Achievements
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600 font-semibold text-lg">Séances d'entraînement</span>
-                <span className="font-bold text-slate-800 text-lg">{weeklyProgress.workouts}/{weeklyProgress.target}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {achievements.map((achievement, index) => (
+                <div key={index} className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg hover:scale-105 group ${
+                  achievement.unlocked 
+                    ? 'bg-gradient-to-r from-green-50 to-green-100 border-green-300 shadow-lg' 
+                    : 'bg-white border-slate-200'
+                }`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`text-4xl group-hover:scale-110 transition-transform duration-300 ${
+                      achievement.unlocked ? 'animate-pulse' : 'grayscale'
+                    }`}>
+                      {achievement.icon}
+                    </div>
+                    <div>
+                      <div className={`font-bold text-lg group-hover:scale-105 transition-transform duration-300 ${
+                        achievement.unlocked ? 'text-black' : 'text-gray-400'
+                      }`}>
+                        {achievement.nom}
+                      </div>
+                      <div className={`text-sm ${
+                        achievement.unlocked ? 'text-black' : 'text-gray-400'
+                      }`}>
+                        {achievement.description}
+                      </div>
+                    </div>
+                    {achievement.unlocked && (
+                      <div className="ml-auto">
+                        <Badge className="bg-green-200 text-green-800 border-green-300">
+                          Débloqué
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Actions rapides */}
+        <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-xl hover:shadow-2xl transition-all duration-500">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3 text-black text-2xl">
+              <div className="p-2 bg-orange-500 rounded-lg">
+                <Zap className="w-6 h-6 text-white" />
               </div>
-              <Progress 
-                value={(weeklyProgress.workouts / weeklyProgress.target) * 100} 
-                className="h-3 bg-slate-200"
-              />
-              
-              <div className="flex justify-between items-center">
-                <span className="text-slate-600 font-semibold text-lg">Calories brûlées</span>
-                <span className="font-bold text-slate-800 text-lg">{weeklyProgress.calories.toLocaleString()}/{weeklyProgress.target.toLocaleString()}</span>
-              </div>
-              <Progress 
-                value={(weeklyProgress.calories / weeklyProgress.target) * 100} 
-                className="h-3 bg-slate-200"
-              />
-              
-              <Button 
-                variant="outline" 
-                className="w-full mt-4 border-2 border-violet-300 hover:border-violet-400 hover:bg-violet-50 text-violet-700 font-semibold py-3 transition-all duration-300"
-                onClick={handleViewProgress}
-              >
-                <BarChart3 className="h-5 w-5 mr-2" />
-                Voir le détail de la progression
+              Actions rapides
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Button className="h-20 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold text-lg">
+                <Dumbbell className="w-6 h-6 mr-3" />
+                Commencer l'entraînement
+              </Button>
+              <Button className="h-20 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold text-lg">
+                <Target className="w-6 h-6 mr-3" />
+                Voir mes objectifs
+              </Button>
+              <Button className="h-20 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold text-lg">
+                <TrendingUp className="w-6 h-6 mr-3" />
+                Mes statistiques
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

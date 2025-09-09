@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { User, LogOut, Settings, Home, BarChart3, Calendar, Dumbbell, Apple } from 'lucide-react';
+import { User, LogOut, Settings, Home, BarChart3, Calendar, Dumbbell, Apple, Scan } from 'lucide-react';
 
 const AppHeader = () => {
   const location = useLocation();
@@ -52,6 +52,14 @@ const AppHeader = () => {
               >
                 Blocs
               </Link>
+              <Link 
+                to="/stats" 
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  location.pathname === '/stats' ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                Stats
+              </Link>
             </nav>
           )}
         </div>
@@ -59,6 +67,32 @@ const AppHeader = () => {
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <LanguageSwitcher />
           </div>
+          <nav className="flex items-center space-x-1">
+            <Link to="/stats" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <BarChart3 className="w-4 h-4" />
+              Stats
+            </Link>
+            <Link to="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <Home className="w-4 h-4" />
+              Dashboard
+            </Link>
+            <Link to="/programme" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <Dumbbell className="w-4 h-4" />
+              Programme
+            </Link>
+            <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <Apple className="w-4 h-4" />
+              Nutrition
+            </Link>
+            <Link to="/planning" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <Calendar className="w-4 h-4" />
+              Planning
+            </Link>
+            <Link to="/scan" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100">
+              <Scan className="w-4 h-4" />
+              Scan
+            </Link>
+          </nav>
           <nav className="flex items-center space-x-2">
             {isAuthenticated && (
               <DropdownMenu>

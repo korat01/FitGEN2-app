@@ -30,6 +30,7 @@ import Planning from "./pages/Planning";
 import Repas from './pages/Repas';
 import RecetteDetail from './pages/RecetteDetail';
 import AlimentDetail from './pages/AlimentDetail';
+import Stats from './pages/Stats';
 
 const queryClient = new QueryClient();
 
@@ -311,6 +312,7 @@ const App = () => (
                     <Route path="/overview" element={<ProtectedRoute><Overview /></ProtectedRoute>} />
                     <Route path="/repas" element={<Repas />} />
                     <Route path="/repas/:id" element={<RecetteDetail />} />
+                    <Route path="/stats" element={<Stats />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

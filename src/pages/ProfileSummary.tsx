@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { User, Target, Dumbbell, Calendar, Settings, Edit, Trophy, Zap, Activity, Heart, Clock, Star, Award, Flame } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { User, Target, Dumbbell, Calendar, Settings, Edit, Award, Zap, Star, Trophy, Activity, Heart, Flame, Clock, Mail, Phone } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
 import ProfileEditModal from '@/components/ProfileEditModal';
 import { UserProfile } from '@/types/profile';
@@ -10,7 +11,7 @@ import { UserProfile } from '@/types/profile';
 const ProfileSummary: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
-  // Données du profil (à remplacer par les vraies données)
+  // Profil utilisateur par défaut
   const [profile, setProfile] = useState<UserProfile>({
     id: '1',
     nom: 'Alexandre Martin',
@@ -21,7 +22,7 @@ const ProfileSummary: React.FC = () => {
     objectif: 'prise_masse',
     niveau: 'intermediaire',
     frequence: 4,
-    focus: ['bras', 'fesses', 'jambes'],
+    focus: ['fesses', 'bras'],
     preferences: {
       dureeSeance: 60,
       equipement: ['haltères', 'barre', 'rack'],
@@ -33,7 +34,6 @@ const ProfileSummary: React.FC = () => {
 
   const handleSaveProfile = (updatedProfile: UserProfile) => {
     setProfile(updatedProfile);
-    console.log('Profil mis à jour:', updatedProfile);
   };
 
   const getObjectifLabel = (objectif: string) => {
@@ -62,239 +62,276 @@ const ProfileSummary: React.FC = () => {
       'fesses': 'Fesses',
       'jambes': 'Jambes',
       'dos': 'Dos',
-      'pecs': 'Pectoraux',
+      'pectoraux': 'Pectoraux',
       'epaules': 'Épaules',
       'abdos': 'Abdominaux'
     };
     return labels[focus as keyof typeof labels] || focus;
   };
 
-  const getObjectifColor = (objectif: string) => {
-    const colors = {
-      'perte_poids': 'from-red-500 to-pink-500',
-      'prise_masse': 'from-green-500 to-emerald-500',
-      'maintien': 'from-blue-500 to-cyan-500',
-      'force': 'from-purple-500 to-violet-500',
-      'powerlifting': 'from-orange-500 to-red-500'
+  const getForceFocusLabel = (focus: string) => {
+    const labels = {
+      'squat': 'Squat',
+      'deadlift': 'Deadlift',
+      'bench_press': 'Bench Press'
     };
-    return colors[objectif as keyof typeof colors] || 'from-gray-500 to-gray-600';
-  };
-
-  const getNiveauColor = (niveau: string) => {
-    const colors = {
-      'debutant': 'from-green-500 to-emerald-500',
-      'intermediaire': 'from-yellow-500 to-orange-500',
-      'avance': 'from-red-500 to-pink-500'
-    };
-    return colors[niveau as keyof typeof colors] || 'from-gray-500 to-gray-600';
+    return labels[focus as keyof typeof labels] || focus;
   };
 
   return (
     <PageLayout>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
-        <div className="space-y-8">
-          {/* Header avec photo de profil et bouton de modification */}
-          <div className="relative">
-            <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 h-32 rounded-t-2xl"></div>
-            <div className="absolute -bottom-16 left-8">
-              <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-xl flex items-center justify-center">
-                <div className="w-28 h-28 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                  <User className="w-16 h-16 text-white" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto p-6 space-y-8">
+          {/* Header principal */}
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 p-8">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                  <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                    <User className="w-12 h-12 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold text-white mb-2">{profile.nom}</h1>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Mail className="w-4 h-4 text-white/80" />
+                      <p className="text-white/90 text-lg">{profile.email}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm font-semibold">
+                        {getObjectifLabel(profile.objectif)}
+                      </Badge>
+                      <Badge className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm font-semibold">
+                        {getNiveauLabel(profile.niveau)}
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
+                <Button 
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="bg-white/20 hover:bg-white/30 text-white border-white/30 px-6 py-3 text-base font-semibold backdrop-blur-sm"
+                >
+                  <Edit className="w-5 h-5 mr-2" />
+                  Modifier le profil
+                </Button>
               </div>
-            </div>
-            <div className="absolute top-4 right-4">
-              <Button
-                onClick={() => setIsEditModalOpen(true)}
-                className="bg-white/90 backdrop-blur-sm text-black hover:bg-white shadow-lg border-0"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Modifier le profil
-              </Button>
             </div>
           </div>
 
-          {/* Informations principales */}
-          <div className="pt-20 px-8">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-4xl font-bold text-black mb-2">{profile.nom}</h1>
-                <p className="text-xl text-gray-600">{profile.email}</p>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-black">{profile.age} ans</div>
-                <div className="text-gray-600">{profile.poids} kg • {profile.taille} cm</div>
-                <div className="text-sm text-gray-500">
-                  IMC: {(profile.poids / ((profile.taille / 100) ** 2)).toFixed(1)}
-                </div>
-              </div>
-            </div>
-
-            {/* Stats rapides */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
-                <CardContent className="p-6 text-center">
-                  <Activity className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-black mb-1">4</div>
-                  <div className="text-sm text-gray-600">Séances/semaine</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-                <CardContent className="p-6 text-center">
-                  <Trophy className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-black mb-1">12</div>
-                  <div className="text-sm text-gray-600">Séances/mois</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200">
-                <CardContent className="p-6 text-center">
-                  <Zap className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-black mb-1">85%</div>
-                  <div className="text-sm text-gray-600">Assiduité</div>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
-                <CardContent className="p-6 text-center">
-                  <Flame className="w-8 h-8 text-orange-600 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-black mb-1">1,250</div>
-                  <div className="text-sm text-gray-600">Calories/semaine</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Objectifs et niveau */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-t-lg">
-                  <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Objectif principal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <Badge className={`text-white text-lg px-6 py-3 bg-gradient-to-r ${getObjectifColor(profile.objectif)}`}>
-                      {getObjectifLabel(profile.objectif)}
-                    </Badge>
-                    <div className="mt-4 text-gray-600">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <Clock className="w-4 h-4" />
-                        <span className="font-medium">{profile.preferences.dureeSeance} minutes par séance</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span className="font-medium">{profile.frequence} jours par semaine</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white shadow-lg border-0">
-                <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-t-lg">
-                  <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                    <Award className="w-5 h-5" />
-                    Niveau d'entraînement
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    <Badge className={`text-white text-lg px-6 py-3 bg-gradient-to-r ${getNiveauColor(profile.niveau)}`}>
-                      {getNiveauLabel(profile.niveau)}
-                    </Badge>
-                    <div className="mt-4 text-gray-600">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <Dumbbell className="w-4 h-4" />
-                        <span className="font-medium">Entraînement structuré</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <Star className="w-4 h-4" />
-                        <span className="font-medium">Progression continue</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Focus d'entraînement */}
-            {profile.focus && profile.focus.length > 0 && (
-              <Card className="bg-white shadow-lg border-0 mb-8">
-                <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-lg">
-                  <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                    <Dumbbell className="w-5 h-5" />
-                    Focus d'entraînement
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="text-center mb-4">
-                    <p className="text-gray-600 mb-4">Zones musculaires prioritaires pour votre objectif</p>
-                    <div className="flex flex-wrap justify-center gap-3">
-                      {profile.focus.map((focus) => (
-                        <Badge key={focus} className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-lg px-6 py-3">
-                          {getFocusLabel(focus)}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Équipement et préférences */}
-            <Card className="bg-white shadow-lg border-0">
-              <CardHeader className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-t-lg">
-                <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Équipement et préférences
-                </CardTitle>
-              </CardHeader>
+          {/* Stats principales */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-lg font-semibold text-black mb-3">Équipement disponible</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {profile.preferences.equipement.map((equip) => (
-                        <Badge key={equip} variant="outline" className="text-black border-gray-300 px-4 py-2">
-                          {equip}
-                        </Badge>
-                      ))}
-                    </div>
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Âge</p>
+                    <p className="text-3xl font-bold text-gray-900">{profile.age} ans</p>
                   </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Activity className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-lg font-semibold text-black mb-3">Restrictions</h4>
-                    <div className="text-gray-600">
-                      {profile.preferences.restrictions.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {profile.preferences.restrictions.map((restriction) => (
-                            <Badge key={restriction} variant="outline" className="text-black border-gray-300 px-4 py-2">
-                              {restriction}
-                            </Badge>
-                          ))}
-                        </div>
-                      ) : (
-                        <span>Aucune restriction</span>
-                      )}
-                    </div>
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Poids</p>
+                    <p className="text-3xl font-bold text-gray-900">{profile.poids} kg</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Taille</p>
+                    <p className="text-3xl font-bold text-gray-900">{profile.taille} cm</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Target className="w-6 h-6 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 mb-2">Fréquence</p>
+                    <p className="text-3xl font-bold text-gray-900">{profile.frequence}/semaine</p>
+                  </div>
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-orange-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
 
-        {/* Modal de modification */}
-        {isEditModalOpen && (
-          <ProfileEditModal
-            profile={profile}
-            onSave={handleSaveProfile}
-            onClose={() => setIsEditModalOpen(false)}
-          />
-        )}
+          {/* Contenu principal en 2 colonnes */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Colonne gauche */}
+            <div className="space-y-6">
+              {/* Focus musculation */}
+              {profile.focus && profile.focus.length > 0 && (
+                <Card className="bg-white border-0 shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
+                    <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                      <Dumbbell className="w-6 h-6 text-purple-600" />
+                      Focus Musculation
+                    </CardTitle>
+                    <p className="text-gray-600 text-sm">Zones prioritaires pour votre développement musculaire</p>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-3">
+                      {profile.focus.map((focus, index) => (
+                        <Badge 
+                          key={index} 
+                          className="bg-purple-100 text-purple-800 border-purple-200 px-4 py-2 text-sm font-semibold"
+                        >
+                          {getFocusLabel(focus)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Focus force/powerlifting */}
+              {profile.focusForce && profile.focusForce.length > 0 && (
+                <Card className="bg-white border-0 shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50">
+                    <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                      <Award className="w-6 h-6 text-orange-600" />
+                      Focus Force/Powerlifting
+                    </CardTitle>
+                    <p className="text-gray-600 text-sm">Exercices prioritaires pour votre développement de force</p>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="flex flex-wrap gap-3">
+                      {profile.focusForce.map((focus, index) => (
+                        <Badge 
+                          key={index} 
+                          className="bg-orange-100 text-orange-800 border-orange-200 px-4 py-2 text-sm font-semibold"
+                        >
+                          {getForceFocusLabel(focus)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Colonne droite */}
+            <div className="space-y-6">
+              {/* Préférences d'entraînement */}
+              <Card className="bg-white border-0 shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+                  <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                    <Settings className="w-6 h-6 text-green-600" />
+                    Préférences d'entraînement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Durée des séances</p>
+                      <p className="text-2xl font-bold text-gray-900">{profile.preferences.dureeSeance} minutes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600">Fréquence d'entraînement</p>
+                      <p className="text-2xl font-bold text-gray-900">{profile.frequence} jours/semaine</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Équipement */}
+              <Card className="bg-white border-0 shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
+                  <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                    <Dumbbell className="w-6 h-6 text-indigo-600" />
+                    Équipement disponible
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="flex flex-wrap gap-2">
+                    {profile.preferences.equipement.map((equip, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="outline" 
+                        className="bg-white text-gray-700 border-gray-300 px-3 py-2 text-sm font-medium"
+                      >
+                        {equip}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Progression */}
+          <Card className="bg-white border-0 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50">
+              <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-indigo-600" />
+                Progression et objectifs
+              </CardTitle>
+              <p className="text-gray-600 text-sm">Votre progression actuelle et vos objectifs</p>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm font-semibold text-gray-600">Niveau actuel</span>
+                    <span className="text-lg font-bold text-gray-900">{getNiveauLabel(profile.niveau)}</span>
+                  </div>
+                  <Progress 
+                    value={profile.niveau === 'debutant' ? 33 : profile.niveau === 'intermediaire' ? 66 : 100} 
+                    className="h-3 bg-gray-200" 
+                  />
+                </div>
+                
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm font-semibold text-gray-600">Objectif</span>
+                    <span className="text-lg font-bold text-gray-900">{getObjectifLabel(profile.objectif)}</span>
+                  </div>
+                  <Progress value={75} className="h-3 bg-gray-200" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {/* Modal de modification */}
+      {isEditModalOpen && (
+        <ProfileEditModal
+          profile={profile}
+          onSave={handleSaveProfile}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </PageLayout>
   );
 };

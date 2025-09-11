@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Home, Dumbbell, Apple, Calendar, Scan, User, Sparkles, Globe, Crown, Zap } from 'lucide-react';
+import { BarChart3, Home, Dumbbell, Apple, Calendar, Scan, User, Globe } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
 
@@ -20,10 +20,6 @@ const AppHeader: React.FC = () => {
 
   const handleProClick = () => {
     window.location.href = '/pro';
-  };
-
-  const handleLogout = () => {
-    console.log('Déconnexion');
   };
 
   return (
@@ -73,7 +69,6 @@ const AppHeader: React.FC = () => {
               onProfileClick={handleProfileClick}
               onSettingsClick={handleSettingsClick}
               onProClick={handleProClick}
-              onLogout={handleLogout}
             />
           </div>
         </div>

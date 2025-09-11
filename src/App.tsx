@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/PageLayout';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -10,24 +11,39 @@ import Planning from './pages/Planning';
 import Scan from './pages/Scan';
 import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
+import Login from './pages/Login';
+
+// Composant pour les routes protégées
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+  
+  return <PageLayout>{children}</PageLayout>;
+};
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<PageLayout><Home /></PageLayout>} />
-          <Route path="/dashboard" element={<PageLayout><Dashboard /></PageLayout>} />
-          <Route path="/programme" element={<PageLayout><Programme /></PageLayout>} />
-          <Route path="/nutrition" element={<PageLayout><Nutrition /></PageLayout>} />
-          <Route path="/planning" element={<PageLayout><Planning /></PageLayout>} />
-          <Route path="/scan" element={<PageLayout><Scan /></PageLayout>} />
-          <Route path="/stats" element={<PageLayout><Stats /></PageLayout>} />
-          <Route path="/profile" element={<PageLayout><ProfileSummary /></PageLayout>} />
-        </Routes>
-        <Toaster />
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/programme" element={<ProtectedRoute><Programme /></ProtectedRoute>} />
+            <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
+            <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
+            <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />
+            <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
+          </Routes>
+          <Toaster />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

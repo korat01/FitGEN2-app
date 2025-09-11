@@ -1,3 +1,7 @@
+export type FocusArea = 'bras' | 'fesses' | 'jambes' | 'dos' | 'pectoraux' | 'epaules' | 'abdos';
+
+export type ForceFocus = 'squat' | 'deadlift' | 'bench_press';
+
 export interface UserProfile {
   id: string;
   nom: string;
@@ -7,33 +11,16 @@ export interface UserProfile {
   taille: number;
   objectif: 'perte_poids' | 'prise_masse' | 'maintien' | 'force' | 'powerlifting';
   niveau: 'debutant' | 'intermediaire' | 'avance';
-  frequence: number; // jours par semaine
-  focus?: FocusArea[]; // Seulement pour musculation
-  focusForce?: ForceFocus[]; // Seulement pour force/powerlifting
+  frequence: number;
+  focus?: FocusArea[];
+  focusForce?: ForceFocus[];
   preferences: {
-    dureeSeance: number; // minutes
+    dureeSeance: number;
     equipement: string[];
     restrictions: string[];
   };
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface FocusArea {
-  id: string;
-  nom: string;
-  pourcentage: number; // Pourcentage d'entraînement dédié
-  exercices: string[]; // IDs des exercices associés
-  couleur: string;
-  icone: string;
-}
-
-export interface ForceFocus {
-  id: string;
-  nom: string;
-  exercice: string; // squat, deadlift, bench_press
-  priorite: number; // 1-3
-  objectif: string; // ex: "Atteindre 2x le poids corporel"
 }
 
 export const FOCUS_AREAS: FocusArea[] = [

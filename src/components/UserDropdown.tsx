@@ -2,24 +2,24 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Settings, Crown, LogOut, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserDropdownProps {
   userName: string;
   onProfileClick: () => void;
   onSettingsClick: () => void;
   onProClick: () => void;
-  onLogout: () => void;
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({
   userName,
   onProfileClick,
   onSettingsClick,
-  onProClick,
-  onLogout
+  onProClick
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,7 +48,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   };
 
   const handleLogout = () => {
-    onLogout();
+    logout();
     setIsOpen(false);
   };
 

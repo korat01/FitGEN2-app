@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import PageLayout from '@/components/PageLayout';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Programme from './pages/Programme';
 import Nutrition from './pages/Nutrition';
+import Planning from './pages/Planning';
 import Scan from './pages/Scan';
 import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
@@ -29,10 +31,11 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/programme" element={<ProtectedRoute><Programme /></ProtectedRoute>} />
             <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
+            <Route path="/planning" element={<ProtectedRoute><Planning /></ProtectedRoute>} />
             <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />
             <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />

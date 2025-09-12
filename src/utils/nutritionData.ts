@@ -4177,4 +4177,5 @@ export const repasPredefinis: RepasBlock[] = [
     adaptations_possibles: ["autres champignons", "herbes fraîches"],
     contre_indications: ["intolérance_lactose"]
   },
-];
+  {
+    id: "repas_

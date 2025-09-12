@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Home, Dumbbell, Apple, Calendar, Scan, User, Globe } from 'lucide-react';
+import { BarChart3, Home, Dumbbell, Apple, Calendar, User, Globe } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
 
@@ -38,10 +38,6 @@ const AppHeader: React.FC = () => {
                 <BarChart3 className="w-4 h-4" />
                 Stats
               </Link>
-              <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <Home className="w-4 h-4" />
-                Accueil
-              </Link>
               <Link to="/programme" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
                 <Dumbbell className="w-4 h-4" />
                 Programme
@@ -49,14 +45,6 @@ const AppHeader: React.FC = () => {
               <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
                 <Apple className="w-4 h-4" />
                 Nutrition
-              </Link>
-              <Link to="/planning" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <Calendar className="w-4 h-4" />
-                Planning
-              </Link>
-              <Link to="/scan" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <Scan className="w-4 h-4" />
-                Scan
               </Link>
             </nav>
           </div>

@@ -64,27 +64,27 @@ const ProgrammeSection = () => {
         weight: 'Corps libre',
         rest: '90s',
         completed: false
-      },
-      {
-        id: 2,
+          },
+          {
+            id: 2,
         name: 'Développé couché',
         sets: 3,
         reps: 10,
         weight: '60kg',
         rest: '120s',
         completed: false
-      },
-      {
-        id: 3,
+          },
+          {
+            id: 3,
         name: 'Soulevé de terre',
         sets: 3,
         reps: 8,
         weight: '80kg',
         rest: '120s',
         completed: false
-      },
-      {
-        id: 4,
+          },
+          {
+            id: 4,
         name: 'Tractions',
         sets: 3,
         reps: 'Max',
@@ -120,7 +120,7 @@ const ProgrammeSection = () => {
   const handleCompleteExercise = (exerciseId: number) => {
     if (completedExercises.includes(exerciseId)) {
       setCompletedExercises(completedExercises.filter(id => id !== exerciseId));
-    } else {
+      } else {
       setCompletedExercises([...completedExercises, exerciseId]);
     }
   };
@@ -139,7 +139,7 @@ const ProgrammeSection = () => {
 
   const progress = (completedExercises.length / todayProgram.exercises.length) * 100;
 
-  return (
+    return (
     <div className="space-y-6">
       {/* En-tête du programme du jour */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -223,8 +223,8 @@ const ProgrammeSection = () => {
                   <CheckCircle2 className="h-4 w-4" />
                   Terminer la Séance
                 </Button>
-              </div>
-            )}
+          </div>
+        )}
           </div>
         </CardContent>
       </Card>
@@ -252,9 +252,9 @@ const ProgrammeSection = () => {
                 <span>{todayProgram.exercises[currentExercise].reps} répétitions</span>
                 <span>•</span>
                 <span>{todayProgram.exercises[currentExercise].weight}</span>
-              </div>
-            </div>
-
+                  </div>
+                </div>
+                
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600">
@@ -311,8 +311,8 @@ const ProgrammeSection = () => {
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
 
       {/* Liste de tous les exercices */}
       <Card>
@@ -345,7 +345,7 @@ const ProgrammeSection = () => {
                         <Circle className="h-5 w-5 text-gray-400" />
                       )}
                       <span className="font-medium">{exercise.name}</span>
-                    </div>
+              </div>
                     <Badge variant="outline">
                       {exercise.sets} séries
                     </Badge>
@@ -355,7 +355,7 @@ const ProgrammeSection = () => {
                     <Badge variant="outline">
                       {exercise.weight}
                     </Badge>
-                  </div>
+              </div>
                   
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
@@ -368,13 +368,13 @@ const ProgrammeSection = () => {
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                  </div>
-                </div>
+              </div>
+              </div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
     </div>
   );
 };
@@ -433,7 +433,7 @@ const PlanningSection = () => {
             Organisez et suivez vos séances d'entraînement
           </p>
         </div>
-        
+
         <div className="flex gap-2">
           {['day', 'week', 'month'].map((mode) => (
             <Button
@@ -447,7 +447,7 @@ const PlanningSection = () => {
               {mode === 'month' && 'Mois'}
             </Button>
           ))}
-        </div>
+                </div>
       </div>
 
       {/* Statistiques rapides */}
@@ -463,7 +463,7 @@ const PlanningSection = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -484,9 +484,9 @@ const PlanningSection = () => {
                 <p className="text-sm font-medium">Temps Total</p>
                 <p className="text-2xl font-bold">8h 30min</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
         
         <Card>
           <CardContent className="p-4">
@@ -495,10 +495,10 @@ const PlanningSection = () => {
               <div>
                 <p className="text-sm font-medium">Objectif</p>
                 <p className="text-2xl font-bold">75%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+          </div>
+        </CardContent>
+      </Card>
       </div>
 
       {/* Calendrier et sessions */}
@@ -537,13 +537,13 @@ const PlanningSection = () => {
 
         {/* Liste des sessions */}
         <Card>
-          <CardHeader>
+        <CardHeader>
             <CardTitle>Prochaines Séances</CardTitle>
             <CardDescription>
               Vos entraînements à venir
             </CardDescription>
-          </CardHeader>
-          <CardContent>
+        </CardHeader>
+        <CardContent>
             <div className="space-y-3">
               {sessions.map((session) => (
                 <div key={session.id} className="p-3 border rounded-lg">
@@ -570,7 +570,7 @@ const PlanningSection = () => {
                         +{session.exercises.length - 2} autres
                       </div>
                     )}
-                  </div>
+                    </div>
                   
                   <div className="flex gap-1 mt-2">
                     <Button size="sm" variant="outline" className="flex-1">
@@ -580,12 +580,12 @@ const PlanningSection = () => {
                     <Button size="sm" variant="outline">
                       <Settings className="h-3 w-3" />
                     </Button>
-                  </div>
+                </div>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
       </div>
     </div>
   );

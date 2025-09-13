@@ -3,23 +3,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Settings, Crown, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/contexts/SubscriptionContext';
 
 interface UserDropdownProps {
   userName: string;
   onProfileClick: () => void;
   onSettingsClick: () => void;
-  onProClick: () => void;
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({
   userName,
   onProfileClick,
-  onSettingsClick,
-  onProClick
+  onSettingsClick
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { logout } = useAuth();
+  const { isSubscribed, createCheckoutSession, manageSubscription } = useSubscription();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -43,7 +43,11 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   };
 
   const handleProClick = () => {
-    onProClick();
+    if (isSubscribed) {
+      manageSubscription();
+    } else {
+      createCheckoutSession();
+    }
     setIsOpen(false);
   };
 
@@ -73,10 +77,12 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
         </span>
         
         {/* Badge PRO */}
-        <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full">
-          <Crown className="w-3 h-3 text-white" />
-          <span className="text-xs font-bold text-white">PRO</span>
-        </div>
+        {isSubscribed && (
+          <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full">
+            <Crown className="w-3 h-3 text-white" />
+            <span className="text-xs font-bold text-white">PRO</span>
+          </div>
+        )}
         
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </Button>
@@ -109,7 +115,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
                 className="w-full justify-start text-gray-700 hover:bg-gray-100 h-12 px-4 rounded-lg transition-colors"
               >
                 <Crown className="w-5 h-5 mr-3 text-yellow-600" />
-                <span className="font-medium">Devenir Pro</span>
+                <span className="font-medium">
+                  {isSubscribed ? 'Gérer l\'abonnement' : 'Devenir Pro'}
+                </span>
               </Button>
               
               <div className="border-t border-gray-200 my-2"></div>

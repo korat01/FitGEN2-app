@@ -22,8 +22,8 @@ import {
   ChefHat,
   ArrowLeft
 } from 'lucide-react';
-import { useNavigate, useParams } from 'react-router-dom';
-import AlimentDetail from './pages/AlimentDetail';
+import { useNavigate } from 'react-router-dom';
+import { AlimentBlock, RepasBlock, alimentsPredefinis } from '@/utils/nutritionData';
 
 const Nutrition = () => {
   const navigate = useNavigate();
@@ -31,10 +31,47 @@ const Nutrition = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('aliments');
 
-  // Données nutritionnelles avec emojis et objectifs
-  const nutritionData = [
+  // Conversion des données prédéfinies au format existant pour la compatibilité
+  const nutritionData = alimentsPredefinis.map((aliment, index) => ({
+    id: index + 1,
+    name: aliment.nom,
+    emoji: getEmojiForCategory(aliment.catégorie),
+    calories: aliment.calories,
+    protein: aliment.macros.protéines,
+    carbs: aliment.macros.glucides,
+    fat: aliment.macros.lipides,
+    category: aliment.catégorie,
+    goal: getGoalFromBenefits(aliment.bénéfices_clés),
+    popularity: Math.floor(Math.random() * 20) + 80,
+    isPopular: Math.random() > 0.5,
+    description: aliment.bénéfices_clés.join(", ")
+  }));
+
+  // Fonction helper pour obtenir les emojis selon la catégorie
+  function getEmojiForCategory(category: string): string {
+    const emojiMap: { [key: string]: string } = {
+      'Protéine': '🥩',
+      'Glucide': '🍞',
+      'Lipide': '🥑',
+      'Mixte': '🍽️',
+      'Micronutriments': '🥬'
+    };
+    return emojiMap[category] || '🍽️';
+  }
+
+  // Fonction helper pour déterminer l'objectif depuis les bénéfices
+  function getGoalFromBenefits(benefits: string[]): string {
+    if (benefits.some(b => b.includes('construction musculaire'))) return 'Prise de masse';
+    if (benefits.some(b => b.includes('faible calories'))) return 'Perte de poids';
+    if (benefits.some(b => b.includes('récupération'))) return 'Récupération';
+    if (benefits.some(b => b.includes('énergie'))) return 'Performance';
+    return 'Équilibre';
+  }
+
+  // Ajout de quelques aliments populaires pour compléter
+  const additionalFoods = [
     {
-      id: 1,
+      id: nutritionData.length + 1,
       name: "Pomme",
       emoji: "🍎",
       calories: 95,

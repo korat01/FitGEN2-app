@@ -33,68 +33,76 @@ const AccueilSection = () => {
   return (
     <div className="space-y-6">
       {/* En-tête de bienvenue */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Bienvenue sur FitGEN2
+      <div className="text-center space-y-4 animate-fade-in">
+        <h1 className="text-4xl md:text-5xl font-bold gradient-primary bg-clip-text text-transparent">
+          Bienvenue sur FitGEN22
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Votre assistant personnel pour la musculation et la nutrition. 
           Créez des programmes sur mesure et suivez vos progrès.
         </p>
       </div>
 
       {/* Actions rapides */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
+        <Card className="mobile-card hover-lift hover-glow cursor-pointer group">
           <CardContent className="p-6 text-center">
-            <Dumbbell className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-            <h3 className="font-semibold mb-2">Créer un Programme</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <div className="p-3 gradient-primary text-white rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Dumbbell className="h-8 w-8" />
+            </div>
+            <h3 className="font-semibold mb-2 text-lg">Créer un Programme</h3>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               Générez un programme personnalisé selon vos objectifs
             </p>
-            <Button className="w-full">
+            <Button className="w-full gradient-primary text-white hover:shadow-glow">
               <Plus className="h-4 w-4 mr-2" />
               Nouveau Programme
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card className="mobile-card hover-lift hover-glow cursor-pointer group">
           <CardContent className="p-6 text-center">
-            <Calendar className="h-12 w-12 mx-auto mb-4 text-green-600" />
-            <h3 className="font-semibold mb-2">Planning</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <div className="p-3 gradient-success text-white rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Calendar className="h-8 w-8" />
+            </div>
+            <h3 className="font-semibold mb-2 text-lg">Planning</h3>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               Organisez vos séances d'entraînement
             </p>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full border-2 hover:bg-muted/50">
               <ArrowRight className="h-4 w-4 mr-2" />
               Voir Planning
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card className="mobile-card hover-lift hover-glow cursor-pointer group">
           <CardContent className="p-6 text-center">
-            <Heart className="h-12 w-12 mx-auto mb-4 text-red-600" />
-            <h3 className="font-semibold mb-2">Nutrition</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <div className="p-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+              <Heart className="h-8 w-8" />
+            </div>
+            <h3 className="font-semibold mb-2 text-lg">Nutrition</h3>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               Suivez votre alimentation et vos macros
             </p>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full border-2 hover:bg-muted/50">
               <ArrowRight className="h-4 w-4 mr-2" />
               Voir Nutrition
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <Card className="mobile-card hover-lift hover-glow cursor-pointer group">
           <CardContent className="p-6 text-center">
-            <BarChart3 className="h-12 w-12 mx-auto mb-4 text-purple-600" />
-            <h3 className="font-semibold mb-2">Statistiques</h3>
-            <p className="text-sm text-muted-foreground mb-4">
+            <div className="p-3 gradient-accent text-white rounded-xl w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+              <BarChart3 className="h-8 w-8" />
+            </div>
+            <h3 className="font-semibold mb-2 text-lg">Statistiques</h3>
+            <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
               Analysez vos performances et progrès
             </p>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full border-2 hover:bg-muted/50">
               <ArrowRight className="h-4 w-4 mr-2" />
               Voir Stats
             </Button>
@@ -103,21 +111,23 @@ const AccueilSection = () => {
       </div>
 
       {/* Progrès récents */}
-      <Card>
+      <Card className="mobile-card shadow-float animate-slide-up">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <div className="p-2 gradient-primary text-white rounded-lg">
+              <TrendingUp className="h-5 w-5" />
+            </div>
             Progrès Récents
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-base">
             Vos dernières performances et améliorations
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
+                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
@@ -125,12 +135,12 @@ const AccueilSection = () => {
                   <p className="text-sm text-muted-foreground">Hier à 18h30</p>
                 </div>
               </div>
-              <Badge variant="secondary">+5kg</Badge>
+              <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">+5kg</Badge>
             </div>
             
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                   <Target className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
@@ -138,12 +148,12 @@ const AccueilSection = () => {
                   <p className="text-sm text-muted-foreground">3/3 séances cette semaine</p>
                 </div>
               </div>
-              <Badge variant="default">100%</Badge>
+              <Badge className="gradient-primary text-white">100%</Badge>
             </div>
             
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
+                <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                   <Star className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
@@ -151,47 +161,52 @@ const AccueilSection = () => {
                   <p className="text-sm text-muted-foreground">Développé couché : 120kg</p>
                 </div>
               </div>
-              <Badge variant="outline">Record!</Badge>
+              <Badge variant="outline" className="border-2 border-primary text-primary">Record!</Badge>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Objectifs du mois */}
-      <Card>
+      <Card className="mobile-card shadow-float animate-slide-up">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <div className="p-2 gradient-accent text-white rounded-lg">
+              <Trophy className="h-5 w-5" />
+            </div>
             Objectifs du Mois
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-base">
             Vos objectifs pour le mois en cours
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm font-medium">
                 <span>Séances d'entraînement</span>
-                <span>12/16</span>
+                <span className="text-primary">12/16</span>
               </div>
-              <Progress value={75} className="h-2" />
+              <Progress value={75} className="h-3 bg-muted/50" />
+              <p className="text-xs text-muted-foreground">Excellent progrès! Continuez comme ça</p>
             </div>
             
-            <div>
-              <div className="flex justify-between text-sm mb-2">
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm font-medium">
                 <span>Objectif calorique quotidien</span>
-                <span>2,400/2,500 cal</span>
+                <span className="text-primary">2,400/2,500 cal</span>
               </div>
-              <Progress value={96} className="h-2" />
+              <Progress value={96} className="h-3 bg-muted/50" />
+              <p className="text-xs text-muted-foreground">Presque parfait! Encore 100 calories</p>
             </div>
             
-            <div>
-              <div className="flex justify-between text-sm mb-2">
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm font-medium">
                 <span>Protéines quotidiennes</span>
-                <span>180/200g</span>
+                <span className="text-primary">180/200g</span>
               </div>
-              <Progress value={90} className="h-2" />
+              <Progress value={90} className="h-3 bg-muted/50" />
+              <p className="text-xs text-muted-foreground">Bien joué! Plus que 20g à atteindre</p>
             </div>
           </div>
         </CardContent>
@@ -439,21 +454,31 @@ const StatsSection = () => {
 // Page Stats fusionnée
 export default function Stats() {
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="space-y-8 animate-fade-in">
       <Tabs defaultValue="accueil" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="accueil">Accueil</TabsTrigger>
-          <TabsTrigger value="stats">Statistiques</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 h-12 bg-muted/50 rounded-xl p-1">
+          <TabsTrigger 
+            value="accueil" 
+            className="rounded-lg text-base font-medium data-[state=active]:shadow-glow data-[state=active]:gradient-primary data-[state=active]:text-white"
+          >
+            Accueil
+          </TabsTrigger>
+          <TabsTrigger 
+            value="stats"
+            className="rounded-lg text-base font-medium data-[state=active]:shadow-glow data-[state=active]:gradient-primary data-[state=active]:text-white"
+          >
+            Statistiques
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="accueil" className="space-y-6">
+        <TabsContent value="accueil" className="space-y-6 mt-6">
           <AccueilSection />
         </TabsContent>
         
-        <TabsContent value="stats" className="space-y-6">
+        <TabsContent value="stats" className="space-y-6 mt-6">
           <StatsSection />
         </TabsContent>
       </Tabs>
     </div>
   );
-} 
+}

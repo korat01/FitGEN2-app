@@ -141,7 +141,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit, initialData }) => {
             <Label htmlFor="objectif" className="text-black font-medium">Objectif principal</Label>
             <Select
               value={profile.objectif}
-              onValueChange={(value) => setProfile({ ...profile, objectif: value })}
+              onValueChange={(value) => setProfile({ ...profile, objectif: value as 'perte_poids' | 'prise_masse' | 'maintien' | 'force' | 'powerlifting' })}
             >
               <SelectTrigger className="mt-1">
                 <SelectValue placeholder="Sélectionnez votre objectif" />
@@ -161,7 +161,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit, initialData }) => {
               <Label htmlFor="niveau" className="text-black font-medium">Niveau</Label>
               <Select
                 value={profile.niveau}
-                onValueChange={(value) => setProfile({ ...profile, niveau: value })}
+                onValueChange={(value) => setProfile({ ...profile, niveau: value as 'debutant' | 'intermediaire' | 'avance' })}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Sélectionnez votre niveau" />
@@ -198,13 +198,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit, initialData }) => {
 
       {/* Focus Selector */}
       <FocusSelector
-        objectif={profile.objectif || ''}
+        selectedFocus={focusAreas}
         onFocusChange={(focus, force) => {
           setFocusAreas(focus);
-          setForceFocus(force);
+          setForceFocus(force || []);
         }}
-        initialFocus={focusAreas}
-        initialForceFocus={forceFocus}
       />
 
       <div className="text-center">

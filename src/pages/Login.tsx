@@ -21,7 +21,7 @@ const Login: React.FC = () => {
       email: email,
       isAuthenticated: true
     };
-    login(userData);
+    login(userData.email, 'password'); // Mock password
     // Rediriger vers la page d'accueil après connexion
     window.location.href = '/';
   };

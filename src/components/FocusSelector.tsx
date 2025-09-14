@@ -6,7 +6,7 @@ import { FocusArea } from '@/types/profile';
 
 interface FocusSelectorProps {
   selectedFocus: FocusArea[];
-  onFocusChange: (focus: FocusArea[]) => void;
+  onFocusChange: (focus: FocusArea[], force?: any) => void;
 }
 
 const FocusSelector: React.FC<FocusSelectorProps> = ({
@@ -55,7 +55,7 @@ const FocusSelector: React.FC<FocusSelectorProps> = ({
     const newFocus = selectedFocus.includes(focus)
       ? selectedFocus.filter(f => f !== focus)
       : [...selectedFocus, focus];
-    onFocusChange(newFocus);
+    onFocusChange(newFocus, []);
   };
 
   return (

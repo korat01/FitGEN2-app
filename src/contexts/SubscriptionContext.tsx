@@ -29,8 +29,8 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     try {
       setLoading(true);
-      // TODO: Implémenter avec Supabase après avoir configuré l'intégration
-      // Pour l'instant, version de test
+      // Mock implementation - Supabase needs to be connected first
+      console.log('Subscription check - Supabase not connected yet');
       setIsSubscribed(false);
       setProductId(null);
       setSubscriptionEnd(null);
@@ -46,7 +46,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      // TODO: Implémenter avec Supabase Edge Functions
+      // Mock implementation - Supabase needs to be connected first
       console.log('Creating checkout session...');
       alert('Fonctionnalité de paiement en développement. Veuillez connecter Supabase d\'abord.');
     } catch (error) {
@@ -58,7 +58,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      // TODO: Implémenter avec Supabase Edge Functions  
+      // Mock implementation - Supabase needs to be connected first
       console.log('Opening customer portal...');
       alert('Fonctionnalité de gestion d\'abonnement en développement.');
     } catch (error) {

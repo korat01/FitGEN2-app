@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { useAuth } from './AuthContext';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || 'your-supabase-url',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'your-supabase-anon-key'
-);
 
 interface SubscriptionContextType {
   isSubscribed: boolean;
@@ -23,7 +17,7 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [productId, setProductId] = useState<string | null>(null);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
   const checkSubscription = async () => {
@@ -35,17 +29,11 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     try {
       setLoading(true);
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      setIsSubscribed(data.subscribed || false);
-      setProductId(data.product_id || null);
-      setSubscriptionEnd(data.subscription_end || null);
+      // TODO: Implémenter avec Supabase après avoir configuré l'intégration
+      // Pour l'instant, version de test
+      setIsSubscribed(false);
+      setProductId(null);
+      setSubscriptionEnd(null);
     } catch (error) {
       console.error('Error checking subscription:', error);
       setIsSubscribed(false);
@@ -58,16 +46,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
+      // TODO: Implémenter avec Supabase Edge Functions
+      console.log('Creating checkout session...');
+      alert('Fonctionnalité de paiement en développement. Veuillez connecter Supabase d\'abord.');
     } catch (error) {
       console.error('Error creating checkout session:', error);
     }
@@ -77,16 +58,9 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-      if (data.url) {
-        window.open(data.url, '_blank');
-      }
+      // TODO: Implémenter avec Supabase Edge Functions  
+      console.log('Opening customer portal...');
+      alert('Fonctionnalité de gestion d\'abonnement en développement.');
     } catch (error) {
       console.error('Error opening customer portal:', error);
     }
@@ -94,10 +68,6 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   useEffect(() => {
     checkSubscription();
-    
-    // Check subscription status every 60 seconds
-    const interval = setInterval(checkSubscription, 60000);
-    return () => clearInterval(interval);
   }, [user]);
 
   return (

@@ -22,24 +22,24 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border shadow-elegant">
-      <div className={cn(
-        "flex items-center justify-between py-3",
-        isMobile ? "px-4" : "container mx-auto px-6"
-      )}>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-20 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent animate-bounce-in">
-            FitGEN22
-          </h1>
+          {/* Logo FitGEN - 3 fois plus gros */}
+          <img 
+            src="/Logo_FITGEN_6_Calligraphique.png" 
+            alt="FitGEN Logo" 
+            className="h-24 w-auto"
+          />
           
-          {/* Navigation principale - cachée sur mobile */}
+          {/* Navigation principale - plus grande */}
           {!isMobile && (
             <nav className="flex items-center space-x-1">
               <Link 
                 to="/stats" 
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300",
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
                   isActive("/stats") || isActive("/")
                     ? "bg-primary/10 text-primary shadow-glow" 
                     : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
@@ -51,7 +51,7 @@ const AppHeader: React.FC = () => {
               <Link 
                 to="/programme" 
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300",
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
                   isActive("/programme")
                     ? "bg-primary/10 text-primary shadow-glow" 
                     : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
@@ -63,7 +63,7 @@ const AppHeader: React.FC = () => {
               <Link 
                 to="/nutrition" 
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300",
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
                   isActive("/nutrition")
                     ? "bg-primary/10 text-primary shadow-glow" 
                     : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"

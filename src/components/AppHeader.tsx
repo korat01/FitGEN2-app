@@ -1,7 +1,16 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Home, Dumbbell, Apple, Calendar, User, Globe } from 'lucide-react';
+import { 
+  BarChart3, 
+  Home, 
+  Dumbbell, 
+  Apple, 
+  Calendar, 
+  User, 
+  Globe,
+  Activity
+} from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -59,6 +68,18 @@ const AppHeader: React.FC = () => {
               >
                 <Dumbbell className="w-4 h-4" />
                 Programme
+              </Link>
+              <Link 
+                to="/exercices" 
+                className={cn(
+                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
+                  isActive("/exercices")
+                    ? "bg-primary/10 text-primary shadow-glow" 
+                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Activity className="w-4 h-4" />
+                Exercices
               </Link>
               <Link 
                 to="/nutrition" 

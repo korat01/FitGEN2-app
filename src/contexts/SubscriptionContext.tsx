@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { createClient } from '@supabase/supabase-js';
 
 interface SubscriptionContextType {
   isSubscribed: boolean;
@@ -29,14 +30,45 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     try {
       setLoading(true);
-      // Mock implementation - Supabase needs to be connected first
-      console.log('Subscription check - Supabase not connected yet');
-      setIsSubscribed(false);
-      setProductId(null);
-      setSubscriptionEnd(null);
+      
+      const supabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL!,
+        import.meta.env.VITE_SUPABASE_ANON_KEY!
+      );
+
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        console.log('No Supabase session found');
+        setIsSubscribed(false);
+        setProductId(null);
+        setSubscriptionEnd(null);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error checking subscription:', error);
+        setIsSubscribed(false);
+        setProductId(null);
+        setSubscriptionEnd(null);
+        return;
+      }
+
+      setIsSubscribed(data.subscribed || false);
+      setProductId(data.product_id || null);
+      setSubscriptionEnd(data.subscription_end || null);
+      
+      console.log('Subscription status:', data);
     } catch (error) {
       console.error('Error checking subscription:', error);
       setIsSubscribed(false);
+      setProductId(null);
+      setSubscriptionEnd(null);
     } finally {
       setLoading(false);
     }
@@ -46,11 +78,35 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      // Mock implementation - Supabase needs to be connected first
-      console.log('Creating checkout session...');
-      alert('Fonctionnalité de paiement en développement. Veuillez connecter Supabase d\'abord.');
+      const supabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL!,
+        import.meta.env.VITE_SUPABASE_ANON_KEY!
+      );
+
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        alert('Vous devez être connecté pour vous abonner.');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error creating checkout session:', error);
+        alert('Erreur lors de la création de la session de paiement.');
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
     } catch (error) {
       console.error('Error creating checkout session:', error);
+      alert('Erreur lors de la création de la session de paiement.');
     }
   };
 
@@ -58,11 +114,35 @@ export const SubscriptionProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (!user) return;
 
     try {
-      // Mock implementation - Supabase needs to be connected first
-      console.log('Opening customer portal...');
-      alert('Fonctionnalité de gestion d\'abonnement en développement.');
+      const supabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL!,
+        import.meta.env.VITE_SUPABASE_ANON_KEY!
+      );
+
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        alert('Vous devez être connecté pour gérer votre abonnement.');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Error opening customer portal:', error);
+        alert('Erreur lors de l\'ouverture du portail client.');
+        return;
+      }
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
     } catch (error) {
       console.error('Error opening customer portal:', error);
+      alert('Erreur lors de l\'ouverture du portail client.');
     }
   };
 

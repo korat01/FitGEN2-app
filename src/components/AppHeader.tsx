@@ -1,111 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { 
-  BarChart3, 
-  Home, 
-  Dumbbell, 
-  Apple, 
-  Calendar, 
-  User, 
-  Globe,
-  Activity
-} from 'lucide-react';
+import { BarChart3, Dumbbell, Apple, Activity, Menu, X, Bell, User } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const AppHeader: React.FC = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+  const isActive = (p: string) => location.pathname === p;
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const handleProfileClick = () => {
-    window.location.href = '/profile';
-  };
-
-  const handleSettingsClick = () => {
-    window.location.href = '/settings';
-  };
+  const nav = [
+    { to: '/stats', label: 'Stats', icon: BarChart3 },
+    { to: '/programme', label: 'Programme', icon: Dumbbell },
+    { to: '/exercices', label: 'Exercices', icon: Activity },
+    { to: '/nutrition', label: 'Nutrition', icon: Apple },
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between px-4">
-        {/* Logo */}
-        <div className="flex items-center gap-4">
-          {/* Logo FitGEN - 3 fois plus gros */}
-          <img 
-            src="/Logo_FITGEN_6_Calligraphique.png" 
-            alt="FitGEN Logo" 
-            className="h-24 w-auto"
-          />
-          
-          {/* Navigation principale - plus grande */}
+      <div className="container-app">
+        <div className="flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/Logo_FITGEN_6_Calligraphique.png" alt="FitGEN" className="h-8 w-auto" />
+            <span className="hidden sm:block font-semibold">FitGEN</span>
+          </Link>
+
           {!isMobile && (
-            <nav className="flex items-center space-x-1">
-              <Link 
-                to="/stats" 
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
-                  isActive("/stats") || isActive("/")
-                    ? "bg-primary/10 text-primary shadow-glow" 
-                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <BarChart3 className="w-4 h-4" />
-                Stats
-              </Link>
-              <Link 
-                to="/programme" 
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
-                  isActive("/programme")
-                    ? "bg-primary/10 text-primary shadow-glow" 
-                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Dumbbell className="w-4 h-4" />
-                Programme
-              </Link>
-              <Link 
-                to="/exercices" 
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
-                  isActive("/exercices")
-                    ? "bg-primary/10 text-primary shadow-glow" 
-                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Activity className="w-4 h-4" />
-                Exercices
-              </Link>
-              <Link 
-                to="/nutrition" 
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-base",
-                  isActive("/nutrition")
-                    ? "bg-primary/10 text-primary shadow-glow" 
-                    : "hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Apple className="w-4 h-4" />
-                Nutrition
-              </Link>
+            <nav className="flex items-center gap-1">
+              {nav.map((n) => {
+                const Icon = n.icon;
+                return (
+                  <Link key={n.to} to={n.to} className={cn('nav-link', isActive(n.to) && 'active')}>
+                    <Icon className="w-4 h-4 mr-2" /> {n.label}
+                  </Link>
+                );
+              })}
             </nav>
           )}
+
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon">
+              <Bell className="w-5 h-5" />
+            </Button>
+            <LanguageSwitcher />
+            <UserDropdown userName="Alexandre" onProfileClick={() => (window.location.href = '/profile')} onSettingsClick={() => (window.location.href = '/settings')} />
+            {isMobile && (
+              <Button variant="ghost" size="icon" onClick={() => setOpen((v) => !v)}>
+                {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* Actions utilisateur */}
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
-          <UserDropdown
-            userName="Alexandre"
-            onProfileClick={handleProfileClick}
-            onSettingsClick={handleSettingsClick}
-          />
-        </div>
+        {isMobile && open && (
+          <nav className="border-t py-2">
+            {nav.map((n) => {
+              const Icon = n.icon;
+              return (
+                <Link key={n.to} to={n.to} className={cn('nav-link block', isActive(n.to) && 'active')} onClick={() => setOpen(false)}>
+                  <Icon className="w-4 h-4 mr-2 inline-block" /> {n.label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </header>
   );

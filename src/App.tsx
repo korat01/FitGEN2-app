@@ -11,6 +11,7 @@ import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
 import Login from './pages/Login';
 import Success from './pages/Success';
+import Exercices from './pages/Exercices';
 
 // Composant pour les routes protégées
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,6 +35,7 @@ function App() {
               <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/programme" element={<ProtectedRoute><Programme /></ProtectedRoute>} />
+              <Route path="/exercices" element={<ProtectedRoute><Exercices /></ProtectedRoute>} />
               <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
               <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />

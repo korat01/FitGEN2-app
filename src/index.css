@@ -6,15 +6,58 @@
 
 @layer base {
 	:root {
-		/* Palette minimaliste sportive */
-		--background: 0 0% 100%;
+		/* Thème sombre premium */
+		--background: 216 19% 8%;          /* Noir profond */
+		--foreground: 0 0% 95%;
+		--card: 217 19% 12%;               /* Gris anthracite foncé */
+		--card-foreground: 0 0% 95%;
+		--popover: 217 19% 12%;
+		--popover-foreground: 0 0% 95%;
+		--primary: 45 100% 65%;            /* Doré pour XP/Progression */
+		--primary-foreground: 216 19% 8%;
+		--secondary: 217 19% 16%;
+		--secondary-foreground: 0 0% 85%;
+		--muted: 217 19% 16%;
+		--muted-foreground: 0 0% 65%;
+		--accent: 217 19% 20%;
+		--accent-foreground: 0 0% 95%;
+		--destructive: 0 75% 55%;
+		--destructive-foreground: 0 0% 98%;
+		--border: 217 19% 22%;
+		--input: 217 19% 16%;
+		--ring: 45 100% 65%;
+		--radius: 0.75rem;
+
+		/* Couleurs rangs dynamiques */
+		--rank-e: 0 0% 75%;                /* Gris clair */
+		--rank-d: 210 100% 75%;            /* Bleu clair */
+		--rank-c: 142 76% 55%;             /* Vert */
+		--rank-b: 270 75% 70%;             /* Violet */
+		--rank-a: 45 100% 65%;             /* Or */
+		--rank-s: 0 85% 60%;               /* Rouge feu */
+		--rank-nation: 220 85% 60%;        /* Couleurs nationales */
+		--rank-world: 0 0% 85%;            /* Platine */
+		
+		/* Couleurs XP et progression */
+		--xp-gold: 45 100% 65%;
+		--progress-glow: 45 100% 50%;
+		
+		/* Effets premium */
+		--glow-primary: 0 0 30px hsl(45 100% 65% / 0.5);
+		--glow-world: 0 0 40px hsl(0 0% 85% / 0.6);
+		--shadow-premium: 0 20px 40px -12px hsl(0 0% 0% / 0.8);
+	}
+
+	.light {
+		/* Mode clair (optionnel) */
+		--background: 0 0% 98%;
 		--foreground: 222.2 84% 4.9%;
 		--card: 0 0% 100%;
 		--card-foreground: 222.2 84% 4.9%;
 		--popover: 0 0% 100%;
 		--popover-foreground: 222.2 84% 4.9%;
-		--primary: 201 100% 45%;           /* Cyan sportif (accent unique) */
-		--primary-foreground: 210 40% 98%;
+		--primary: 45 100% 50%;
+		--primary-foreground: 0 0% 98%;
 		--secondary: 210 40% 96%;
 		--secondary-foreground: 222.2 84% 4.9%;
 		--muted: 210 40% 96%;
@@ -25,40 +68,7 @@
 		--destructive-foreground: 0 0% 98%;
 		--border: 214 32% 91%;
 		--input: 214 32% 91%;
-		--ring: 201 100% 45%;
-		--radius: 0.75rem;
-
-		/* Couleurs rang (sobres) */
-		--rank-e: 215 16% 70%;
-		--rank-d: 210 95% 70%;
-		--rank-c: 158 64% 43%;
-		--rank-b: 262 83% 60%;
-		--rank-a: 35 92% 50%;
-		--rank-s: 0 75% 55%;
-		--rank-nation: 220 85% 56%;
-		--rank-world: 270 80% 60%;
-	}
-
-	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 0 0% 98%;
-		--card: 224 14% 12%;
-		--card-foreground: 0 0% 98%;
-		--popover: 224 14% 12%;
-		--popover-foreground: 0 0% 98%;
-		--primary: 201 100% 45%;
-		--primary-foreground: 0 0% 98%;
-		--secondary: 217 16% 17%;
-		--secondary-foreground: 0 0% 98%;
-		--muted: 217 16% 17%;
-		--muted-foreground: 215 15% 65%;
-		--accent: 217 16% 17%;
-		--accent-foreground: 0 0% 98%;
-		--destructive: 0 62% 35%;
-		--destructive-foreground: 0 0% 98%;
-		--border: 217 16% 22%;
-		--input: 217 16% 22%;
-		--ring: 201 100% 45%;
+		--ring: 45 100% 50%;
 	}
 }
 
@@ -70,35 +80,76 @@
 	}
 }
 
-/* Composants: clean et cohérents */
+/* Composants premium */
 @layer components {
-	/* Rang badges sobres */
-	.rank-e { background-color: hsl(var(--rank-e)); @apply text-white; }
-	.rank-d { background-color: hsl(var(--rank-d)); @apply text-white; }
-	.rank-c { background-color: hsl(var(--rank-c)); @apply text-white; }
-	.rank-b { background-color: hsl(var(--rank-b)); @apply text-white; }
-	.rank-a { background-color: hsl(var(--rank-a)); @apply text-white; }
-	.rank-s { background-color: hsl(var(--rank-s)); @apply text-white; }
-	.rank-nation { background-color: hsl(var(--rank-nation)); @apply text-white; }
+	/* Rangs avec effets premium */
+	.rank-e { 
+		background-color: hsl(var(--rank-e)); 
+		@apply text-background font-bold shadow-lg;
+	}
+	.rank-d { 
+		background-color: hsl(var(--rank-d)); 
+		@apply text-white font-bold shadow-lg;
+		box-shadow: 0 4px 20px hsl(var(--rank-d) / 0.4);
+	}
+	.rank-c { 
+		background-color: hsl(var(--rank-c)); 
+		@apply text-white font-bold shadow-lg;
+		box-shadow: 0 4px 20px hsl(var(--rank-c) / 0.4);
+	}
+	.rank-b { 
+		background-color: hsl(var(--rank-b)); 
+		@apply text-white font-bold shadow-lg;
+		box-shadow: 0 4px 20px hsl(var(--rank-b) / 0.4);
+	}
+	.rank-a { 
+		background: linear-gradient(135deg, hsl(var(--rank-a)) 0%, hsl(45 100% 75%) 100%);
+		@apply text-background font-bold shadow-lg;
+		box-shadow: var(--glow-primary);
+	}
+	.rank-s { 
+		background: linear-gradient(135deg, hsl(var(--rank-s)) 0%, hsl(15 100% 70%) 100%);
+		@apply text-white font-bold shadow-lg;
+		box-shadow: 0 4px 30px hsl(var(--rank-s) / 0.6);
+	}
+	.rank-nation { 
+		background: linear-gradient(135deg, hsl(var(--rank-nation)) 0%, hsl(220 85% 70%) 100%);
+		@apply text-white font-bold shadow-lg;
+		box-shadow: 0 4px 30px hsl(var(--rank-nation) / 0.5);
+	}
 	.rank-world {
-		background: linear-gradient(90deg, hsl(var(--rank-world)) 0%, hsl(var(--primary)) 100%);
-		@apply text-white;
+		background: linear-gradient(135deg, hsl(var(--rank-world)) 0%, hsl(0 0% 95%) 50%, hsl(var(--rank-world)) 100%);
+		@apply text-background font-bold shadow-lg;
+		box-shadow: var(--glow-world);
+		animation: shimmer 3s ease-in-out infinite;
 	}
 
-	/* Cartes */
+	/* Cartes premium */
 	.card-elevated {
-		@apply bg-card border rounded-2xl shadow-sm;
-		transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+		@apply bg-card border rounded-2xl;
+		box-shadow: var(--shadow-premium);
+		transition: all .3s ease;
+		border-color: hsl(var(--border));
 	}
-	.card-elevated:hover { @apply shadow-md; transform: translateY(-2px); border-color: hsl(var(--border)); }
+	.card-elevated:hover { 
+		transform: translateY(-4px); 
+		box-shadow: 0 25px 50px -12px hsl(0 0% 0% / 0.9);
+		border-color: hsl(var(--primary) / 0.3);
+	}
 
-	/* Boutons */
+	/* Boutons premium */
 	.btn-primary {
-		@apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-semibold text-white;
-		background-color: hsl(var(--primary));
-		transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+		@apply inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold;
+		background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(45 100% 75%) 100%);
+		color: hsl(var(--primary-foreground));
+		transition: all .2s ease;
+		box-shadow: var(--glow-primary);
 	}
-	.btn-primary:hover { filter: brightness(1.05); box-shadow: 0 6px 20px hsl(var(--primary)/.25); transform: translateY(-1px); }
+	.btn-primary:hover { 
+		transform: translateY(-2px) scale(1.02); 
+		box-shadow: 0 8px 30px hsl(var(--primary) / 0.4);
+		filter: brightness(1.1);
+	}
 	.btn-outline {
 		@apply inline-flex items-center justify-center px-4 py-2 rounded-xl font-medium border;
 		border-color: hsl(var(--border));
@@ -110,10 +161,37 @@
 	.nav-link.active { @apply bg-primary text-primary-foreground; }
 	.nav-link:not(.active) { @apply text-muted-foreground hover:text-foreground hover:bg-secondary; }
 
-	/* Progress bar */
-	.progress-clean { @apply h-2 w-full rounded-full bg-muted overflow-hidden; }
-	.progress-clean > span { @apply block h-full rounded-full; background-color: hsl(var(--primary)); transition: width .4s ease; }
+	/* Progress bar avec glow */
+	.progress-clean { 
+		@apply h-3 w-full rounded-full overflow-hidden;
+		background-color: hsl(var(--muted));
+		box-shadow: inset 0 2px 4px hsl(0 0% 0% / 0.3);
+	}
+	.progress-clean > span { 
+		@apply block h-full rounded-full; 
+		background: linear-gradient(90deg, hsl(var(--xp-gold)) 0%, hsl(45 100% 75%) 100%);
+		box-shadow: var(--glow-primary);
+		transition: width .4s ease;
+	}
 
 	/* Layouts */
 	.container-app { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+	
+	/* Animations premium */
+	@keyframes shimmer {
+		0%, 100% { background-position: 0% 50%; }
+		50% { background-position: 100% 50%; }
+	}
+	
+	.shimmer {
+		background: linear-gradient(45deg, transparent 30%, hsl(var(--primary) / 0.3) 50%, transparent 70%);
+		background-size: 200% 200%;
+		animation: shimmer 2s ease-in-out infinite;
+	}
+	
+	/* XP et stats dorés */
+	.xp-gold {
+		color: hsl(var(--xp-gold));
+		text-shadow: 0 0 10px hsl(var(--xp-gold) / 0.5);
+	}
 }

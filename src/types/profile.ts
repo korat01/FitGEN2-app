@@ -9,11 +9,11 @@ export interface UserProfile {
   age: number;
   poids: number;
   taille: number;
-  objectif: 'perte_poids' | 'prise_masse' | 'maintien' | 'force' | 'powerlifting';
-  niveau: 'debutant' | 'intermediaire' | 'avance';
+  objectif: string;
+  niveau: string;
   frequence: number;
-  focus?: FocusArea[];
-  focusForce?: ForceFocus[];
+  focus: string[];
+  focusForce: string[];
   preferences: {
     dureeSeance: number;
     equipement: string[];
@@ -21,6 +21,10 @@ export interface UserProfile {
   };
   createdAt: Date;
   updatedAt: Date;
+  // AJOUTER CES CHAMPS
+  sex?: 'male' | 'female';
+  profileType?: 'powerlifter' | 'runner' | 'allround' | 'calisthenics';
+  sportClass?: 'crossfit' | 'power' | 'classique' | 'marathon' | 'calisthenics' | 'yoga' | 'natation' | 'cyclisme';
 }
 
 export const FOCUS_AREAS: FocusArea[] = [

@@ -7,9 +7,57 @@ import { User, Target, Dumbbell, Calendar, Settings, Edit, Award, Zap, Star, Tro
 import PageLayout from '@/components/PageLayout';
 import ProfileEditModal from '@/components/ProfileEditModal';
 import { UserProfile } from '@/types/profile';
+import { ProfileInfo } from '../components/ProfileInfo';
+import { useAuth } from '../contexts/AuthContext';
+import { LiveRankCalculator } from '../components/LiveRankCalculator';
 
-const ProfileSummary: React.FC = () => {
+export const ProfileSummary: React.FC = () => {
+  const { user } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditingSex, setIsEditingSex] = useState(false);
+  const [isEditingSport, setIsEditingSport] = useState(false);
+  const [tempSex, setTempSex] = useState(user?.sex || 'male');
+  const [tempSport, setTempSport] = useState(user?.sportClass || 'classique');
+  
+  const handleSexChange = (newSex: 'male' | 'female') => {
+    setTempSex(newSex);
+    // Ici vous pouvez ajouter la logique pour sauvegarder le changement
+    setIsEditingSex(false);
+  };
+  
+  const handleSportChange = (newSport: string) => {
+    setTempSport(newSport);
+    // Ici vous pouvez ajouter la logique pour sauvegarder le changement
+    setIsEditingSport(false);
+  };
+  
+  const getSportIcon = (sport: string) => {
+    const icons = {
+      'crossfit': '🏋️',
+      'power': '💪',
+      'classique': '🏃',
+      'marathon': '��‍♂️',
+      'calisthenics': '🤸',
+      'yoga': '🧘',
+      'natation': '🏊',
+      'cyclisme': '��'
+    };
+    return icons[sport as keyof typeof icons] || '🏃';
+  };
+  
+  const getSportLabel = (sport: string) => {
+    const labels = {
+      'crossfit': 'CrossFit',
+      'power': 'Powerlifting',
+      'classique': 'Musculation',
+      'marathon': 'Marathon',
+      'calisthenics': 'Calisthenics',
+      'yoga': 'Yoga',
+      'natation': 'Natation',
+      'cyclisme': 'Cyclisme'
+    };
+    return labels[sport as keyof typeof labels] || 'Musculation';
+  };
   
   // Profil utilisateur par défaut
   const [profile, setProfile] = useState<UserProfile>({
@@ -117,60 +165,118 @@ const ProfileSummary: React.FC = () => {
             </div>
           </div>
 
-          {/* Stats principales */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600 mb-2">Âge</p>
-                    <p className="text-3xl font-bold text-gray-900">{profile.age} ans</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Activity className="w-6 h-6 text-blue-600" />
-                  </div>
+          {/* Statistiques utilisateur - MODIFIER CETTE SECTION */}
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">28</div>
+                  <div className="text-sm text-muted-foreground">Âge</div>
                 </div>
               </CardContent>
             </Card>
-
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600 mb-2">Poids</p>
-                    <p className="text-3xl font-bold text-gray-900">{profile.poids} kg</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-green-600" />
-                  </div>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">75</div>
+                  <div className="text-sm text-muted-foreground">Poids (kg)</div>
                 </div>
               </CardContent>
             </Card>
-
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600 mb-2">Taille</p>
-                    <p className="text-3xl font-bold text-gray-900">{profile.taille} cm</p>
-                  </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Target className="w-6 h-6 text-purple-600" />
-                  </div>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">180</div>
+                  <div className="text-sm text-muted-foreground">Taille (cm)</div>
                 </div>
               </CardContent>
             </Card>
-
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600 mb-2">Fréquence</p>
-                    <p className="text-3xl font-bold text-gray-900">{profile.frequence}/semaine</p>
-                  </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-orange-600" />
-                  </div>
+            
+            <Card>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-primary">4</div>
+                  <div className="text-sm text-muted-foreground">Fréquence</div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* CHAMP SEXE MODIFIABLE */}
+            <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setIsEditingSex(true)}>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  {isEditingSex ? (
+                    <div className="space-y-2">
+                      <select
+                        value={tempSex}
+                        onChange={(e) => setTempSex(e.target.value as 'male' | 'female')}
+                        className="text-2xl font-bold text-primary bg-transparent border-none outline-none text-center"
+                        onBlur={() => setIsEditingSex(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSexChange(tempSex);
+                          }
+                          if (e.key === 'Escape') {
+                            setIsEditingSex(false);
+                            setTempSex(user?.sex || 'male');
+                          }
+                        }}
+                        autoFocus
+                      >
+                        <option value="male">♂</option>
+                        <option value="female">♀</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="text-2xl font-bold text-primary">
+                      {user?.sex === 'male' ? '♂' : user?.sex === 'female' ? '♀' : '?'}
+                    </div>
+                  )}
+                  <div className="text-sm text-muted-foreground">Sexe</div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* NOUVEAU CHAMP SPORT MODIFIABLE */}
+            <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setIsEditingSport(true)}>
+              <CardContent className="p-4">
+                <div className="text-center">
+                  {isEditingSport ? (
+                    <div className="space-y-2">
+                      <select
+                        value={tempSport}
+                        onChange={(e) => setTempSport(e.target.value)}
+                        className="text-2xl font-bold text-primary bg-transparent border-none outline-none text-center"
+                        onBlur={() => setIsEditingSport(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSportChange(tempSport);
+                          }
+                          if (e.key === 'Escape') {
+                            setIsEditingSport(false);
+                            setTempSport(user?.sportClass || 'classique');
+                          }
+                        }}
+                        autoFocus
+                      >
+                        <option value="crossfit">��️ CrossFit</option>
+                        <option value="power">💪 Powerlifting</option>
+                        <option value="classique">🏃 Musculation</option>
+                        <option value="marathon">🏃‍♂️ Marathon</option>
+                        <option value="calisthenics">🤸 Calisthenics</option>
+                        <option value="yoga">🧘 Yoga</option>
+                        <option value="natation">�� Natation</option>
+                        <option value="cyclisme">�� Cyclisme</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div className="text-2xl font-bold text-primary">
+                      {getSportIcon(user?.sportClass || 'classique')}
+                    </div>
+                  )}
+                  <div className="text-sm text-muted-foreground">Classe</div>
                 </div>
               </CardContent>
             </Card>
@@ -321,6 +427,12 @@ const ProfileSummary: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Nouvelle section pour les informations de scoring */}
+          <ProfileInfo user={user} />
+
+          {/* NOUVEAU COMPOSANT POUR LE RANG EN TEMPS RÉEL */}
+          <LiveRankCalculator user={user} />
         </div>
       </div>
 

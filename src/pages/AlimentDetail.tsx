@@ -2576,19 +2576,19 @@ const AlimentDetail = () => {
   if (!aliment) {
     return (
       <PageLayout
-        title="Aliment non trouvé"
-        subtitle="L'aliment demandé n'existe pas"
-        icon={<Apple className="h-6 w-6 text-red-600" />}
-        actions={
-          <Button 
-            onClick={() => navigate('/nutrition')}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour à la nutrition
-          </Button>
-        }
+        header={{
+          title: "Aliment non trouvé",
+          subtitle: "L'aliment demandé n'existe pas",
+          icon: <Apple className="h-6 w-6 text-red-600" />,
+          actions: (
+            <Button 
+              onClick={() => navigate('/nutrition')}
+              variant="outline"
+            >
+              View Nutrition
+            </Button>
+          )
+        }}
       >
         <Card className="bg-white border-0 shadow-lg">
           <CardContent className="p-8 text-center">

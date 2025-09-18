@@ -6,28 +6,27 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserProfile, FocusArea, ForceFocus } from '@/types/profile';
 import FocusSelector from './FocusSelector';
+import { useAuth } from '@/hooks/useAuth';
+import PageLayout from './PageLayout';
 
 interface ProfileFormProps {
   onSubmit: (profile: UserProfile, focusAreas: FocusArea[], forceFocus: ForceFocus[]) => void;
   initialData?: Partial<UserProfile>;
+  onCancel?: () => void;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit, initialData }) => {
-  const [profile, setProfile] = useState<Partial<UserProfile>>({
-    nom: '',
-    email: '',
-    age: 25,
-    poids: 70,
-    taille: 175,
-    objectif: 'maintien',
-    niveau: 'debutant',
-    frequence: 3,
-    preferences: {
-      dureeSeance: 60,
-      equipement: [],
-      restrictions: []
-    },
-    ...initialData
+export const ProfileForm: React.FC<ProfileFormProps> = ({ user, onSubmit, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    // ... existing fields ...
+    
+    // AJOUTER CES CHAMPS
+    weight: user?.weight || 75,
+    age: user?.age || 28,
+    sex: user?.sex || 'male',
+    profileType: user?.profileType || 'allround',
+    taille: user?.taille || 180
   });
 
   const [focusAreas, setFocusAreas] = useState<FocusArea[]>([]);
@@ -35,170 +34,137 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ onSubmit, initialData }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (profile.nom && profile.email) {
+    if (formData.name && formData.email) {
       const completeProfile: UserProfile = {
         id: Date.now().toString(),
-        nom: profile.nom,
-        email: profile.email,
-        age: profile.age || 25,
-        poids: profile.poids || 70,
-        taille: profile.taille || 175,
-        objectif: profile.objectif as any,
-        niveau: profile.niveau as any,
-        frequence: profile.frequence || 3,
+        nom: formData.name,
+        email: formData.email,
+        age: formData.age || 25,
+        poids: formData.weight || 70,
+        taille: formData.taille || 180,
+        objectif: 'maintien', // Placeholder, will be updated from user
+        niveau: 'debutant', // Placeholder, will be updated from user
+        frequence: 3, // Placeholder, will be updated from user
         focus: focusAreas,
         focusForce: forceFocus,
-        preferences: profile.preferences || {
+        preferences: {
           dureeSeance: 60,
           equipement: [],
           restrictions: []
         },
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+        // AJOUTER CES CHAMPS
+        sex: formData.sex,
+        profileType: formData.profileType
       };
       onSubmit(completeProfile, focusAreas, forceFocus);
     }
   };
 
-  const isMusculation = ['perte_poids', 'prise_masse', 'maintien'].includes(profile.objectif || '');
-  const isForce = ['force', 'powerlifting'].includes(profile.objectif || '');
+  const isMusculation = ['perte_poids', 'prise_masse', 'maintien'].includes(formData.objectif || '');
+  const isForce = ['force', 'powerlifting'].includes(formData.objectif || '');
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-black">Informations personnelles</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="nom" className="text-black font-medium">Nom</Label>
-              <Input
-                id="nom"
-                value={profile.nom}
-                onChange={(e) => setProfile({ ...profile, nom: e.target.value })}
-                className="mt-1"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email" className="text-black font-medium">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="mt-1"
-                required
-              />
-            </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* ... existing fields ... */}
+      
+      {/* AJOUTER CETTE SECTION AVANT LE FOCUS SELECTOR */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="age" className="text-black font-medium">Âge</Label>
-              <Input
-                id="age"
-                type="number"
-                value={profile.age}
-                onChange={(e) => setProfile({ ...profile, age: parseInt(e.target.value) })}
-                className="mt-1"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="poids" className="text-black font-medium">Poids (kg)</Label>
-              <Input
-                id="poids"
-                type="number"
-                value={profile.poids}
-                onChange={(e) => setProfile({ ...profile, poids: parseInt(e.target.value) })}
-                className="mt-1"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="taille" className="text-black font-medium">Taille (cm)</Label>
-              <Input
-                id="taille"
-                type="number"
-                value={profile.taille}
-                onChange={(e) => setProfile({ ...profile, taille: parseInt(e.target.value) })}
-                className="mt-1"
-                required
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-300 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-black">Objectifs d'entraînement</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          <h3 className="text-lg font-medium">Informations personnelles</h3>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="objectif" className="text-black font-medium">Objectif principal</Label>
-            <Select
-              value={profile.objectif}
-              onValueChange={(value) => setProfile({ ...profile, objectif: value })}
+            <label className="block text-sm font-medium mb-1">Nom complet</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Âge</label>
+            <input
+              type="number"
+              value={formData.age}
+              onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
+              className="w-full px-3 py-2 border rounded-md"
+              min="16"
+              max="100"
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Poids (kg)</label>
+            <input
+              type="number"
+              value={formData.weight}
+              onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
+              className="w-full px-3 py-2 border rounded-md"
+              min="30"
+              max="200"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Taille (cm)</label>
+            <input
+              type="number"
+              value={formData.taille}
+              onChange={(e) => setFormData({ ...formData, taille: Number(e.target.value) })}
+              className="w-full px-3 py-2 border rounded-md"
+              min="100"
+              max="250"
+            />
+          </div>
+        </div>
+        
+        {/* NOUVEAU CHAMP SEXE */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Sexe</label>
+            <select
+              value={formData.sex}
+              onChange={(e) => setFormData({ ...formData, sex: e.target.value as 'male' | 'female' })}
+              className="w-full px-3 py-2 border rounded-md"
             >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Sélectionnez votre objectif" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="perte_poids">Perte de poids</SelectItem>
-                <SelectItem value="prise_masse">Prise de masse</SelectItem>
-                <SelectItem value="maintien">Maintien</SelectItem>
-                <SelectItem value="force">Force</SelectItem>
-                <SelectItem value="powerlifting">Powerlifting</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="male">Homme</option>
+              <option value="female">Femme</option>
+            </select>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="niveau" className="text-black font-medium">Niveau</Label>
-              <Select
-                value={profile.niveau}
-                onValueChange={(value) => setProfile({ ...profile, niveau: value })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionnez votre niveau" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="debutant">Débutant</SelectItem>
-                  <SelectItem value="intermediaire">Intermédiaire</SelectItem>
-                  <SelectItem value="avance">Avancé</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="frequence" className="text-black font-medium">Fréquence (jours/semaine)</Label>
-              <Select
-                value={profile.frequence?.toString()}
-                onValueChange={(value) => setProfile({ ...profile, frequence: parseInt(value) })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Sélectionnez la fréquence" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2">2 jours</SelectItem>
-                  <SelectItem value="3">3 jours</SelectItem>
-                  <SelectItem value="4">4 jours</SelectItem>
-                  <SelectItem value="5">5 jours</SelectItem>
-                  <SelectItem value="6">6 jours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-1">Type de profil</label>
+            <select
+              value={formData.profileType}
+              onChange={(e) => setFormData({ ...formData, profileType: e.target.value as any })}
+              className="w-full px-3 py-2 border rounded-md"
+            >
+              <option value="powerlifter">Powerlifter</option>
+              <option value="runner">Coureur</option>
+              <option value="allround">Polyvalent</option>
+              <option value="calisthenics">Calisthenics</option>
+            </select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+      
+      {/* ... existing fields ... */}
 
       {/* Focus Selector */}
       <FocusSelector
-        objectif={profile.objectif || ''}
+        objectif={formData.objectif || ''}
         onFocusChange={(focus, force) => {
           setFocusAreas(focus);
           setForceFocus(force);

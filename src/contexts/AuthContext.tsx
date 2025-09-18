@@ -2,9 +2,20 @@
 
 interface User {
   id: string;
-  nom: string;
+  name: string;
   email: string;
   isAuthenticated: boolean;
+  // Nouveaux champs pour le système de scoring
+  weight?: number;
+  age?: number;
+  sex?: 'male' | 'female';
+  profileType?: 'powerlifter' | 'runner' | 'allround' | 'calisthenics';
+  weights?: {
+    force: number;
+    endurance: number;
+    explosivite: number;
+    calisthenics: number;
+  };
 }
 
 interface AuthContextType {

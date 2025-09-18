@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,11 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Dumbbell, Heart, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
+import { LiveRankCalculator } from '../components/LiveRankCalculator';
+import { PerformanceInput } from '../components/PerformanceInput';
+import { useAuth } from '../contexts/AuthContext';
+import { ScoringEngine } from '../utils/scoring';
+import { getSportProfile } from '../utils/standardsData';
 
 interface UserStats {
   nom: string;
@@ -50,50 +55,339 @@ interface UserStats {
   };
 }
 
-const Stats: React.FC = () => {
-  const [userStats] = useState<UserStats>({
-    nom: "Alexandre Martin",
-    rang: "B",
-    xp: 2450,
-    xpMax: 3000,
-    multiplicateur: 1.25,
-    stats: {
-      force: 78,
-      endurance: 60,
-      vitesse: 45,
-      poidsCorps: 85
-    },
-    records: {
+export const Stats: React.FC = () => {
+  const { user } = useAuth();
+  const [performances, setPerformances] = useState<any[]>([]);
+  const [userRank, setUserRank] = useState<any>(null);
+  
+  // ÉTAT POUR LE FORMULAIRE DE PERFORMANCE
+  const [performance, setPerformance] = useState({
+    discipline: '',
+    value: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+
+  // Charger les performances depuis le localStorage
+  useEffect(() => {
+    const savedPerformances = localStorage.getItem('userPerformances');
+    if (savedPerformances) {
+      setPerformances(JSON.parse(savedPerformances));
+    }
+  }, []);
+
+  // Sauvegarder les performances
+  const savePerformances = (newPerformances: any[]) => {
+    setPerformances(newPerformances);
+    localStorage.setItem('userPerformances', JSON.stringify(newPerformances));
+  };
+
+  // Ajouter une nouvelle performance
+  const handlePerformanceAdded = (performance: any) => {
+    const newPerformances = [...performances, performance];
+    savePerformances(newPerformances);
+  };
+
+  // Supprimer une performance
+  const handlePerformanceDeleted = (performanceId: string) => {
+    const newPerformances = performances.filter(p => p.id !== performanceId);
+    savePerformances(newPerformances);
+  };
+
+  // FONCTION SIMPLIFIÉE POUR CALCULER LE RANG DIRECTEMENT
+  const calculateSimpleRank = (performancesList: any[]) => {
+    if (!user || performancesList.length === 0) {
+      return { rank: 'D', score: 0, reason: 'Aucune performance' };
+    }
+
+    let totalScore = 0;
+    let performanceCount = 0;
+
+    performancesList.forEach((perf) => {
+      const weight = user.weight || 75;
+      let score = 0;
+
+      switch (perf.discipline) {
+        case 'bench':
+          // Avec 180kg pour 75kg = 2.4x poids corporel
+          if (perf.value >= 180) score = 800; // Rang A/S
+          else if (perf.value >= 150) score = 600; // Rang B
+          else if (perf.value >= 120) score = 400; // Rang C
+          else score = 200; // Rang D
+          break;
+          
+        case 'squat':
+          if (perf.value >= 200) score = 800;
+          else if (perf.value >= 160) score = 600;
+          else if (perf.value >= 120) score = 400;
+          else score = 200;
+          break;
+          
+        case 'deadlift':
+          if (perf.value >= 250) score = 800;
+          else if (perf.value >= 200) score = 600;
+          else if (perf.value >= 150) score = 400;
+          else score = 200;
+          break;
+          
+        case '5k':
+          if (perf.value <= 20) score = 800; // Très rapide
+          else if (perf.value <= 25) score = 600;
+          else if (perf.value <= 30) score = 400;
+          else score = 200;
+          break;
+          
+        case 'pullups':
+          if (perf.value >= 25) score = 800;
+          else if (perf.value >= 15) score = 600;
+          else if (perf.value >= 10) score = 400;
+          else score = 200;
+          break;
+      }
+
+      totalScore += score;
+      performanceCount++;
+    });
+
+    const averageScore = totalScore / performanceCount;
+    
+    // Déterminer le rang
+    let rank = 'D';
+    if (averageScore >= 750) rank = 'S';
+    else if (averageScore >= 650) rank = 'A';
+    else if (averageScore >= 500) rank = 'B';
+    else if (averageScore >= 350) rank = 'C';
+
+    return {
+      rank,
+      score: Math.round(averageScore),
+      reason: `Basé sur ${performanceCount} performance(s)`
+    };
+  };
+
+  // MODIFIER LA FONCTION handleAddPerformance
+  const handleAddPerformance = () => {
+    if (performance.discipline && performance.value) {
+      const newPerformance = {
+        id: Date.now().toString(),
+        discipline: performance.discipline,
+        value: parseFloat(performance.value),
+        date: new Date(performance.date),
+        userId: user?.id || '1'
+      };
+      
+      // Ajouter la performance
+      const newPerformances = [...performances, newPerformance];
+      setPerformances(newPerformances);
+      localStorage.setItem('userPerformances', JSON.stringify(newPerformances));
+      
+      // CALCULER LE RANG SIMPLE IMMÉDIATEMENT
+      const simpleRank = calculateSimpleRank(newPerformances);
+      setUserRank(simpleRank);
+      
+      // Mettre à jour l'utilisateur
+      const updatedUser = {
+        ...user,
+        rank: simpleRank.rank,
+        globalScore: simpleRank.score
+      };
+      localStorage.setItem('userData', JSON.stringify(updatedUser));
+      
+      // FORCER LE RECHARGEMENT DE LA PAGE POUR ACTUALISER L'AFFICHAGE
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+      // Reset form
+      setPerformance({
+        discipline: '',
+        value: '',
+        date: new Date().toISOString().split('T')[0]
+      });
+      
+      alert(`Performance ajoutée ! Votre rang est maintenant : ${simpleRank.rank} (${simpleRank.score}/1000)`);
+    } else {
+      alert('Veuillez remplir tous les champs');
+    }
+  };
+
+  // FONCTION POUR RECALCULER LE RANG AVEC LES PERFORMANCES
+  const calculateRealRankWithPerformances = (performancesList: any[]) => {
+    if (!user || performancesList.length === 0) {
+      setUserRank(null);
+      return;
+    }
+
+    try {
+      const scoringEngine = new ScoringEngine();
+      
+      // Calculer les scores normalisés pour chaque performance
+      const userScores: { [discipline: string]: number } = {};
+      
+      performancesList.forEach((perf: any) => {
+        const normalizedScore = scoringEngine.calculateNormalizedScore(
+          perf.value,
+          perf.discipline,
+          user.sex || 'male',
+          user.weight || 75,
+          user.age || 28
+        );
+        
+        // Garder le meilleur score pour chaque discipline
+        if (!userScores[perf.discipline] || normalizedScore > userScores[perf.discipline]) {
+          userScores[perf.discipline] = normalizedScore;
+        }
+      });
+      
+      // Créer le profil utilisateur
+      const userProfile = {
+        id: user.id || '1',
+        name: user.name || 'Utilisateur',
+        weights: getSportProfile(user.sportClass || 'classique')
+      };
+      
+      // Calculer le score global
+      const globalScore = scoringEngine.calculateGlobalScore(
+        userScores,
+        userProfile,
+        user.sportClass || 'classique'
+      );
+      
+      setUserRank(globalScore);
+      
+      // METTRE À JOUR LE RANG DE L'UTILISATEUR
+      updateUserRank(globalScore);
+      
+      console.log('Rang recalculé:', globalScore);
+      console.log('Performances utilisées:', performancesList);
+      
+    } catch (error) {
+      console.error('Erreur lors du calcul du rang:', error);
+    }
+  };
+
+  // Modifier la fonction calculateRealRank pour utiliser les performances actuelles
+  const calculateRealRank = () => {
+    calculateRealRankWithPerformances(performances);
+  };
+
+  useEffect(() => {
+    calculateRealRank();
+  }, [performances, user]);
+
+  // AJOUTER CET EFFET POUR CHARGER LE RANG AU DÉMARRAGE
+  useEffect(() => {
+    const savedPerformances = localStorage.getItem('userPerformances');
+    if (savedPerformances) {
+      const performancesList = JSON.parse(savedPerformances);
+      const simpleRank = calculateSimpleRank(performancesList);
+      setUserRank(simpleRank);
+      console.log('Rang chargé au démarrage:', simpleRank);
+    }
+  }, [user]);
+
+  // FONCTION POUR METTRE À JOUR LE RANG DE L'UTILISATEUR
+  const updateUserRank = (newRank: any) => {
+    if (!user || !newRank) return;
+    
+    // Mettre à jour l'utilisateur avec le nouveau rang
+    const updatedUser = {
+      ...user,
+      rank: newRank.rank,
+      globalScore: newRank.globalScore,
+      breakdown: newRank.breakdown
+    };
+    
+    // Sauvegarder dans le localStorage
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    
+    // Mettre à jour le contexte d'authentification si possible
+    // Note: Vous devrez peut-être ajuster cela selon votre contexte d'auth
+    console.log('Rang mis à jour:', newRank.rank);
+  };
+
+  // FONCTION POUR METTRE À JOUR LES RECORDS ET L'HISTORIQUE
+  const updateRecordsAndHistory = (performancesList: any[]) => {
+    if (!user || performancesList.length === 0) return;
+
+    // Créer les records à partir des performances
+    const records = {
       force: {
-        squat: { poids: 180, ratio: 2.1 },
-        bench: { poids: 120, ratio: 1.4 },
-        deadlift: { poids: 200, ratio: 2.3 }
+        squat: { poids: 0, ratio: 0 },
+        bench: { poids: 0, ratio: 0 },
+        deadlift: { poids: 0, ratio: 0 }
       },
       endurance: {
-        km1: { temps: "3:45" },
-        km5: { temps: "22:30" }
+        km1: { temps: "0:00" },
+        km5: { temps: "0:00" }
       },
       vitesse: {
-        sprint100m: { temps: "12.8s" }
+        sprint100m: { temps: "0.0s" }
       },
       poidsCorps: {
-        pushups: { max: 45 },
-        tractions: { max: 18 }
+        pushups: { max: 0 },
+        tractions: { max: 0 }
       }
-    },
-    historique: [
-      { date: "2024-01", squat: 160, km5: 25, pushups: 35 },
-      { date: "2024-02", squat: 165, km5: 24, pushups: 38 },
-      { date: "2024-03", squat: 170, km5: 23, pushups: 40 },
-      { date: "2024-04", squat: 175, km5: 23, pushups: 42 },
-      { date: "2024-05", squat: 180, km5: 22.5, pushups: 45 }
-    ],
-    prochainObjectif: {
-      description: "Atteins 2.5× ton poids au squat",
-      valeur: "212.5 kg",
-      rangCible: "A"
-    }
-  });
+    };
+
+    // Trouver les meilleures performances
+    performancesList.forEach((perf) => {
+      const weight = user.weight || 75;
+      
+      switch (perf.discipline) {
+        case 'bench':
+          if (perf.value > records.force.bench.poids) {
+            records.force.bench.poids = perf.value;
+            records.force.bench.ratio = Math.round((perf.value / weight) * 10) / 10;
+          }
+          break;
+        case 'squat':
+          if (perf.value > records.force.squat.poids) {
+            records.force.squat.poids = perf.value;
+            records.force.squat.ratio = Math.round((perf.value / weight) * 10) / 10;
+          }
+          break;
+        case 'deadlift':
+          if (perf.value > records.force.deadlift.poids) {
+            records.force.deadlift.poids = perf.value;
+            records.force.deadlift.ratio = Math.round((perf.value / weight) * 10) / 10;
+          }
+          break;
+        case '5k':
+          if (records.endurance.km5.temps === "0:00" || perf.value < parseFloat(records.endurance.km5.temps)) {
+            records.endurance.km5.temps = `${perf.value}:00`;
+          }
+          break;
+        case 'pullups':
+          if (perf.value > records.poidsCorps.tractions.max) {
+            records.poidsCorps.tractions.max = perf.value;
+          }
+          break;
+      }
+    });
+
+    // Créer l'historique à partir des performances
+    const historique = performancesList
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5) // Garder les 5 dernières performances
+      .map((perf) => ({
+        date: new Date(perf.date).toLocaleDateString(),
+        squat: perf.discipline === 'squat' ? perf.value : 0,
+        km5: perf.discipline === '5k' ? perf.value : 0,
+        pushups: perf.discipline === 'pullups' ? perf.value : 0
+      }));
+
+    // Mettre à jour l'utilisateur avec les nouveaux records et historique
+    const updatedUser = {
+      ...user,
+      records: records,
+      historique: historique
+    };
+
+    // Sauvegarder dans le localStorage
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+    
+    return updatedUser;
+  };
 
   // Stats du tableau de bord
   const dashboardStats = [
@@ -192,20 +486,34 @@ const Stats: React.FC = () => {
                   </div>
                   <div>
                     <h1 className="text-5xl font-bold tracking-tight text-white group-hover:scale-105 transition-transform duration-300">
-                      Bienvenue, {userStats.nom}
+                      Bienvenue, {user?.name || "Utilisateur"}
                     </h1>
                     <p className="text-white/90 text-xl font-medium mt-2">Tableau de bord & Statistiques</p>
                   </div>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
-                  <Badge className={`${getRangColor(userStats.rang)} text-white text-lg px-6 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transition-transform duration-300`}>
+                  <Badge className={`${getRangColor(userRank?.rank || "D")} text-white text-lg px-6 py-3 rounded-full font-semibold shadow-lg hover:scale-105 transition-transform duration-300`}>
                     <Star className="w-4 h-4 mr-2" />
-                    Rang {userStats.rang}
+                    Rang {userRank?.rank || "D"}
                   </Badge>
+                  <Button
+                    onClick={() => {
+                      const savedPerformances = localStorage.getItem('userPerformances');
+                      if (savedPerformances) {
+                        const performancesList = JSON.parse(savedPerformances);
+                        const simpleRank = calculateSimpleRank(performancesList);
+                        setUserRank(simpleRank);
+                        alert(`Rang recalculé : ${simpleRank.rank} (${simpleRank.score}/1000)`);
+                      }
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    🔄 Recalculer mon rang
+                  </Button>
                   <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
                     <Zap className="w-5 h-5 group-hover:animate-pulse" />
-                    <span className="text-white font-medium">×{userStats.multiplicateur} assiduité</span>
+                    <span className="text-white font-medium">×{user?.multiplicateur || 1.25} assiduité</span>
                   </div>
                   <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm hover:bg-white/30 transition-all duration-300 group">
                     <Flame className="w-5 h-5 group-hover:animate-bounce" />
@@ -218,13 +526,13 @@ const Stats: React.FC = () => {
                 <div className="text-white/90 font-medium text-lg">Progression vers le prochain rang</div>
                 <div className="w-80">
                   <Progress 
-                    value={(userStats.xp / userStats.xpMax) * 100} 
+                    value={(user?.xp || 0 / user?.xpMax || 3000) * 100} 
                     className="h-4 bg-white/20 rounded-full"
                   />
                 </div>
                 <div className="text-sm">
-                  <span className="text-white font-bold text-xl">{userStats.xp}</span> 
-                  <span className="text-white/80"> / {userStats.xpMax} XP</span>
+                  <span className="text-white font-bold text-xl">{user?.xp || 0}</span> 
+                  <span className="text-white/80"> / {user?.xpMax || 3000} XP</span>
                 </div>
               </div>
             </div>
@@ -562,25 +870,128 @@ const Stats: React.FC = () => {
 
           {/* Stats Globales */}
           <TabsContent value="stats" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Object.entries(userStats.stats).map(([stat, valeur]) => (
-                <Card key={stat} className={`${getStatBgColor(stat)} border-2 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group`}>
-                  <CardContent className="p-6 text-center">
-                    <div className={`${getStatColor(stat)} mb-4 flex justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      {getStatIcon(stat)}
-                    </div>
-                    <h3 className="text-xl font-bold capitalize mb-3 text-black">
-                      {stat === 'poidsCorps' ? 'Poids du Corps' : stat}
-                    </h3>
-                    <div className="text-4xl font-bold mb-4 text-black group-hover:scale-110 transition-transform duration-300">{valeur}/100</div>
-                    <Progress value={valeur} className="h-3 mb-3" />
-                    <div className="text-sm font-semibold text-black">
-                      {valeur >= 80 ? '🔥 Excellent' : valeur >= 60 ? '⭐ Bon' : valeur >= 40 ? '📈 Moyen' : '💪 À améliorer'}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            {/* BOUTON TRÈS VISIBLE POUR AJOUTER DES PERFORMANCES */}
+            <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl p-8 text-white text-center shadow-2xl">
+              <h2 className="text-3xl font-bold mb-4">🎯 Ajoutez vos performances !</h2>
+              <p className="text-xl mb-6">Entrez vos performances pour calculer votre rang réel</p>
+              
+              <div className="max-w-md mx-auto space-y-4">
+                <select
+                  value={performance.discipline}
+                  onChange={(e) => setPerformance({ ...performance, discipline: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-black text-lg font-semibold"
+                >
+                  <option value="">Choisissez votre discipline</option>
+                  <option value="bench">💪 Développé couché (kg)</option>
+                  <option value="squat">🏋️ Squat (kg)</option>
+                  <option value="deadlift">⚡ Soulevé de terre (kg)</option>
+                  <option value="5k">�� 5km (min)</option>
+                  <option value="pullups">��‍♂️ Tractions (reps)</option>
+                </select>
+                
+                <input
+                  type="number"
+                  value={performance.value}
+                  onChange={(e) => setPerformance({ ...performance, value: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-black text-lg font-semibold"
+                  placeholder="Entrez votre performance"
+                  step="0.1"
+                />
+                
+                <input
+                  type="date"
+                  value={performance.date}
+                  onChange={(e) => setPerformance({ ...performance, date: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg text-black text-lg font-semibold"
+                />
+                
+                <button
+                  onClick={handleAddPerformance}
+                  className="w-full bg-white text-green-600 px-6 py-4 rounded-lg text-xl font-bold hover:bg-gray-100 transition-colors"
+                >
+                  �� AJOUTER MA PERFORMANCE
+                </button>
+              </div>
             </div>
+
+            {/* AFFICHAGE DU RANG CALCULÉ */}
+            {userRank && (
+              <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                    �� Votre rang calculé : {userRank.rank}
+                    <Button
+                      onClick={() => {
+                        const savedPerformances = localStorage.getItem('userPerformances');
+                        if (savedPerformances) {
+                          const performancesList = JSON.parse(savedPerformances);
+                          const simpleRank = calculateSimpleRank(performancesList);
+                          setUserRank(simpleRank);
+                        }
+                      }}
+                      size="sm"
+                      variant="outline"
+                      className="ml-2"
+                    >
+                      🔄 Actualiser
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <div className="text-4xl font-bold text-purple-600 mb-2">
+                    {userRank.score}/1000
+                  </div>
+                  <div className="text-lg text-gray-600 mb-4">Score global</div>
+                  
+                  <div className="text-sm text-gray-600">
+                    {userRank.reason}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* LISTE DES PERFORMANCES AJOUTÉES */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">
+                  📊 Vos performances ({performances.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {performances.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    Aucune performance enregistrée. Ajoutez votre première performance !
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {performances.map((perf) => (
+                      <div key={perf.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                        <div>
+                          <div className="font-medium text-lg">
+                            {perf.discipline === 'bench' ? '💪 Développé couché' :
+                             perf.discipline === 'squat' ? '🏋️ Squat' :
+                             perf.discipline === 'deadlift' ? '⚡ Soulevé de terre' :
+                             perf.discipline === '5k' ? '🏃 5km' :
+                             perf.discipline === 'pullups' ? '🤸‍♂️ Tractions' : perf.discipline}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {perf.value} {perf.discipline === '5k' ? 'min' : 'kg'} - {new Date(perf.date).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePerformanceDeleted(perf.id)}
+                          className="text-red-600 hover:bg-red-50"
+                        >
+                          Supprimer
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Profil de Performance */}
             <Card className="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-300 shadow-2xl hover:shadow-3xl transition-all duration-500">
@@ -593,7 +1004,7 @@ const Stats: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  {Object.entries(userStats.stats).map(([stat, valeur]) => (
+                  {Object.entries(user?.stats || {}).map(([stat, valeur]) => (
                     <div key={stat} className="text-center space-y-3 group">
                       <div className={`w-20 h-20 mx-auto rounded-full ${getStatColor(stat)} bg-opacity-20 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300`}>
                         {getStatIcon(stat)}
@@ -620,27 +1031,43 @@ const Stats: React.FC = () => {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-xl font-bold text-red-800 flex items-center gap-3">
                     <Weight className="w-6 h-6" />
-                    Force
+                    Force - Vos Records
                   </CardTitle>
-                  <p className="text-red-700 font-medium">Vos records en musculation</p>
+                  <p className="text-red-700 font-medium">Basés sur vos performances réelles</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Object.entries(userStats.records.force).map(([exercice, data]) => (
-                    <div key={exercice} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-red-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
-                      <div className="space-y-1">
-                        <div className="font-bold text-lg capitalize text-black">{exercice}</div>
-                        <div className="text-sm font-semibold text-black">
-                          Ratio: <span className="font-bold text-red-600">{data.ratio}×</span> poids corporel
+                  {/* Afficher les records calculés à partir des performances */}
+                  {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).map((perf) => {
+                    const weight = user?.weight || 75;
+                    const ratio = Math.round((perf.value / weight) * 10) / 10;
+                    
+                    return (
+                      <div key={perf.id} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-red-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                        <div className="space-y-1">
+                          <div className="font-bold text-lg capitalize text-black">
+                            {perf.discipline === 'bench' ? 'Développé couché' :
+                             perf.discipline === 'squat' ? 'Squat' :
+                             perf.discipline === 'deadlift' ? 'Soulevé de terre' : perf.discipline}
+                          </div>
+                          <div className="text-sm font-semibold text-black">
+                            Ratio: <span className="font-bold text-red-600">{ratio}×</span> poids corporel
+                          </div>
+                        </div>
+                        <div className="text-right space-y-2">
+                          <div className="text-2xl font-bold text-red-600">{perf.value} kg</div>
+                          <Badge className="bg-red-200 text-red-800 border-red-400 font-semibold">
+                            {getBadgeTitle(perf.discipline, perf.value)}
+                          </Badge>
                         </div>
                       </div>
-                      <div className="text-right space-y-2">
-                        <div className="text-2xl font-bold text-red-600">{data.poids} kg</div>
-                        <Badge className="bg-red-200 text-red-800 border-red-400 font-semibold">
-                          {getBadgeTitle(exercice, data.poids)}
-                        </Badge>
-                      </div>
+                    );
+                  })}
+                  
+                  {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      Aucun record de force enregistré. Ajoutez vos performances !
                     </div>
-                  ))}
+                  )}
                 </CardContent>
               </Card>
 
@@ -649,50 +1076,31 @@ const Stats: React.FC = () => {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-xl font-bold text-blue-800 flex items-center gap-3">
                     <Clock className="w-6 h-6" />
-                    Endurance
+                    Endurance - Vos Records
                   </CardTitle>
-                  <p className="text-blue-700 font-medium">Vos meilleurs chronos de course</p>
+                  <p className="text-blue-700 font-medium">Basés sur vos performances réelles</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Object.entries(userStats.records.endurance).map(([distance, data]) => (
-                    <div key={distance} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  {performances.filter(p => p.discipline === '5k').map((perf) => (
+                    <div key={perf.id} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-blue-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
                       <div className="space-y-1">
-                        <div className="font-bold text-lg text-black">{distance}</div>
+                        <div className="font-bold text-lg text-black">5km</div>
                         <div className="text-sm font-semibold text-black">Meilleur chrono</div>
                       </div>
                       <div className="text-right space-y-2">
-                        <div className="text-2xl font-bold text-blue-600">{data.temps}</div>
+                        <div className="text-2xl font-bold text-blue-600">{perf.value} min</div>
                         <Badge className="bg-blue-200 text-blue-800 border-blue-400 font-semibold">
-                          {getBadgeTitle(distance, parseFloat(data.temps))}
+                          {getBadgeTitle('5k', perf.value)}
                         </Badge>
                       </div>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
-
-              {/* Vitesse */}
-              <Card className="border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-bold text-amber-800 flex items-center gap-3">
-                    <Gauge className="w-6 h-6" />
-                    Vitesse
-                  </CardTitle>
-                  <p className="text-amber-700 font-medium">Vos performances en sprint</p>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-amber-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
-                    <div className="space-y-1">
-                      <div className="font-bold text-lg text-black">100m Sprint</div>
-                      <div className="text-sm font-semibold text-black">Meilleur temps</div>
+                  
+                  {performances.filter(p => p.discipline === '5k').length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      Aucun record d'endurance enregistré. Ajoutez vos performances !
                     </div>
-                    <div className="text-right space-y-2">
-                      <div className="text-2xl font-bold text-amber-600">{userStats.records.vitesse.sprint100m.temps}</div>
-                      <Badge className="bg-amber-200 text-amber-800 border-amber-400 font-semibold">
-                        {getBadgeTitle('sprint100m', parseFloat(userStats.records.vitesse.sprint100m.temps))}
-                      </Badge>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -701,25 +1109,31 @@ const Stats: React.FC = () => {
                 <CardHeader className="pb-4">
                   <CardTitle className="text-xl font-bold text-green-800 flex items-center gap-3">
                     <Activity className="w-6 h-6" />
-                    Poids du Corps
+                    Poids du Corps - Vos Records
                   </CardTitle>
-                  <p className="text-green-700 font-medium">Exercices au poids du corps</p>
+                  <p className="text-green-700 font-medium">Basés sur vos performances réelles</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {Object.entries(userStats.records.poidsCorps).map(([exercice, data]) => (
-                    <div key={exercice} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-green-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  {performances.filter(p => p.discipline === 'pullups').map((perf) => (
+                    <div key={perf.id} className="flex justify-between items-center p-4 bg-white rounded-xl border-2 border-green-200 hover:shadow-lg transition-all duration-300 hover:scale-105">
                       <div className="space-y-1">
-                        <div className="font-bold text-lg capitalize text-black">{exercice}</div>
+                        <div className="font-bold text-lg capitalize text-black">Tractions</div>
                         <div className="text-sm font-semibold text-black">Maximum en une série</div>
                       </div>
                       <div className="text-right space-y-2">
-                        <div className="text-2xl font-bold text-green-600">{data.max}</div>
+                        <div className="text-2xl font-bold text-green-600">{perf.value}</div>
                         <Badge className="bg-green-200 text-green-800 border-green-400 font-semibold">
-                          {getBadgeTitle(exercice, data.max)}
+                          {getBadgeTitle('pullups', perf.value)}
                         </Badge>
                       </div>
                     </div>
                   ))}
+                  
+                  {performances.filter(p => p.discipline === 'pullups').length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      Aucun record au poids du corps enregistré. Ajoutez vos performances !
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -733,37 +1147,44 @@ const Stats: React.FC = () => {
                   <TrendingUp className="w-6 h-6 text-green-600" />
                   Évolution de vos performances
                 </CardTitle>
-                <p className="text-black font-medium">Suivi de votre progression au fil du temps</p>
+                <p className="text-black font-medium">Basé sur vos performances réelles</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {userStats.historique.map((periode, index) => (
-                    <div key={index} className="p-6 bg-white rounded-xl border-2 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-bold text-black group-hover:scale-105 transition-transform duration-300">{periode.date}</h4>
-                        <Badge className="bg-blue-200 text-blue-800 border-blue-300">
-                          Progression
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200 group-hover:shadow-md transition-all duration-300">
-                          <div className="text-2xl font-bold text-red-600">{periode.squat} kg</div>
-                          <div className="text-sm font-semibold text-black">Squat</div>
+                  {performances
+                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                    .slice(0, 10)
+                    .map((perf, index) => (
+                      <div key={perf.id} className="p-6 bg-white rounded-xl border-2 border-slate-200 hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-bold text-black group-hover:scale-105 transition-transform duration-300">
+                            {new Date(perf.date).toLocaleDateString()}
+                          </h4>
+                          <Badge className="bg-blue-200 text-blue-800 border-blue-300">
+                            Performance
+                          </Badge>
                         </div>
                         
-                        <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200 group-hover:shadow-md transition-all duration-300">
-                          <div className="text-2xl font-bold text-blue-600">{periode.km5} min</div>
-                          <div className="text-sm font-semibold text-black">5km</div>
-                        </div>
-                        
-                        <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200 group-hover:shadow-md transition-all duration-300">
-                          <div className="text-2xl font-bold text-green-600">{periode.pushups}</div>
-                          <div className="text-sm font-semibold text-black">Pompes</div>
+                        <div className="text-center p-4 bg-gray-50 rounded-lg border">
+                          <div className="text-3xl font-bold text-blue-600 mb-2">
+                            {perf.value} {perf.discipline === '5k' ? 'min' : perf.discipline === 'pullups' ? 'reps' : 'kg'}
+                          </div>
+                          <div className="text-lg font-semibold text-black">
+                            {perf.discipline === 'bench' ? '💪 Développé couché' :
+                             perf.discipline === 'squat' ? '🏋️ Squat' :
+                             perf.discipline === 'deadlift' ? '⚡ Soulevé de terre' :
+                             perf.discipline === '5k' ? '🏃 5km' :
+                             perf.discipline === 'pullups' ? '🤸‍♂️ Tractions' : perf.discipline}
+                          </div>
                         </div>
                       </div>
+                    ))}
+                  
+                  {performances.length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      Aucune performance enregistrée. Ajoutez vos performances pour voir votre historique !
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -784,11 +1205,11 @@ const Stats: React.FC = () => {
                   <div className="text-6xl animate-bounce">🎯</div>
                   
                   <div className="space-y-4">
-                    <h3 className="text-2xl font-bold text-black">{userStats.prochainObjectif.description}</h3>
-                    <div className="text-4xl font-bold text-purple-600">{userStats.prochainObjectif.valeur}</div>
+                    <h3 className="text-2xl font-bold text-black">{user?.prochainObjectif?.description}</h3>
+                    <div className="text-4xl font-bold text-purple-600">{user?.prochainObjectif?.valeur}</div>
                     <div className="text-lg font-semibold text-black">
-                      Pour atteindre le rang <Badge className={`${getRangColor(userStats.prochainObjectif.rangCible)} text-white ml-2`}>
-                        {userStats.prochainObjectif.rangCible}
+                      Pour atteindre le rang <Badge className={`${getRangColor(user?.prochainObjectif?.rangCible || "D")} text-white ml-2`}>
+                        {user?.prochainObjectif?.rangCible || "D"}
                       </Badge>
                     </div>
                   </div>

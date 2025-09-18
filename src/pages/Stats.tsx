@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Dumbbell, Heart, CheckCircle } from 'lucide-react';
+import { Trophy, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Dumbbell, Heart, CheckCircle, Play, Pause, RotateCcw } from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
 
 interface UserStats {
@@ -170,7 +170,8 @@ const Stats: React.FC = () => {
 
   return (
     <PageLayout>
-      <div className="space-y-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
         {/* Header Principal avec animation */}
         <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
           {/* Particules animées */}
@@ -230,10 +231,14 @@ const Stats: React.FC = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="dashboard" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5 bg-white p-2 rounded-xl shadow-lg border-2 border-slate-200">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md font-semibold rounded-lg transition-all duration-300">
+        <Tabs defaultValue="overview" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-6 bg-white p-2 rounded-xl shadow-lg border-2 border-slate-200">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md font-semibold rounded-lg transition-all duration-300">
               <Dumbbell className="w-4 h-4 mr-2" />
+              Accueil
+            </TabsTrigger>
+            <TabsTrigger value="dashboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md font-semibold rounded-lg transition-all duration-300">
+              <Activity className="w-4 h-4 mr-2" />
               Tableau de bord
             </TabsTrigger>
             <TabsTrigger value="stats" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md font-semibold rounded-lg transition-all duration-300">
@@ -254,7 +259,172 @@ const Stats: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Tableau de bord (ancienne page Home) */}
+          {/* Vue Accueil (ancienne page Overview) */}
+          <TabsContent value="overview" className="space-y-8">
+            {/* Cartes principales */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Programme du jour */}
+              <Card className="lg:col-span-2 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-2xl">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                      <Dumbbell className="w-6 h-6 text-white" />
+                    </div>
+                    Programme du jour
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="bg-white/80 rounded-xl p-6 border border-blue-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-semibold text-gray-800">Séance Force - Haut du corps</h3>
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                        45 min
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600">6</p>
+                        <p className="text-sm text-gray-600">Exercices</p>
+                      </div>
+                      <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600">3</p>
+                        <p className="text-sm text-gray-600">Terminés</p>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Progression</span>
+                        <span>50%</span>
+                      </div>
+                      <Progress value={50} className="h-3" />
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold">
+                        <Play className="w-4 h-4 mr-2" />
+                        Commencer
+                      </Button>
+                      <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <Pause className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Calories et nutrition */}
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                      <Flame className="w-6 h-6 text-white" />
+                    </div>
+                    Nutrition
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-gray-800 mb-1">1850</div>
+                    <div className="text-sm text-gray-600 mb-2">/ 2200 calories</div>
+                    <Progress value={84} className="h-3 mb-4" />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Protéines</span>
+                      <span className="text-sm font-semibold text-gray-800">120g / 150g</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Glucides</span>
+                      <span className="text-sm font-semibold text-gray-800">180g / 220g</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Lipides</span>
+                      <span className="text-sm font-semibold text-gray-800">65g / 80g</span>
+                    </div>
+                  </div>
+
+                  <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold">
+                    Voir le détail
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Progression hebdomadaire */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                    Progression hebdomadaire
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/80 rounded-lg border border-purple-200">
+                        <div className="flex items-center gap-3">
+                          <span className="font-semibold text-gray-800 w-12">{day}</span>
+                          {index < 3 ? (
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                          ) : (
+                            <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
+                          )}
+                        </div>
+                        <div className="text-right">
+                          {index < 3 ? (
+                            <span className="font-semibold text-gray-800">{75.2 - index * 0.2} kg</span>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200 shadow-xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                      <Target className="w-6 h-6 text-white" />
+                    </div>
+                    Objectifs du mois
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Séances complétées</span>
+                      <span className="text-sm font-semibold text-gray-800">12 / 16</span>
+                    </div>
+                    <Progress value={75} className="h-3" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Perte de poids</span>
+                      <span className="text-sm font-semibold text-gray-800">2.1 / 4 kg</span>
+                    </div>
+                    <Progress value={52.5} className="h-3" />
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Force générale</span>
+                      <span className="text-sm font-semibold text-gray-800">+15%</span>
+                    </div>
+                    <Progress value={60} className="h-3" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
           <TabsContent value="dashboard" className="space-y-8">
             {/* Stats Grid avec animations */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -632,6 +802,7 @@ const Stats: React.FC = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </PageLayout>
   );

@@ -1,1 +1,0 @@
-// Ce fichier est supprimé - le contenu a été fusionné dans Stats.tsx

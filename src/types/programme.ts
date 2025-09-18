@@ -1,27 +1,4 @@
 
-// Exercice types for backwards compatibility
-export interface Exercice {
-  nom: string;
-  type: string;
-  muscles: string[];
-  difficulte: number;
-  charge?: number;
-  repetitions?: string;
-  series?: number;
-  repos?: string;
-  equipement?: string[];
-  description?: string;
-}
-
-// Programme types for backwards compatibility
-export interface Programme {
-  nom: string;
-  niveau: string;
-  objectif: string;
-  duree: number;
-  exercices: Exercice[];
-}
-
 export interface ClientProfile {
   nom: string;
   age: number;

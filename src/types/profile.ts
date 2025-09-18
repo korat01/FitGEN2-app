@@ -1,23 +1,6 @@
-export type FocusArea = 'bras' | 'fesses' | 'jambes' | 'dos' | 'pectoraux' | 'epaules' | 'abdominaux' | 'abdos';
+export type FocusArea = 'bras' | 'fesses' | 'jambes' | 'dos' | 'pectoraux' | 'epaules' | 'abdos';
 
-export type ForceFocus = 'squat' | 'deadlift' | 'bench_press' | 'overhead_press' | 'row';
-
-export interface FocusAreaData {
-  id: FocusArea;
-  nom: string;
-  pourcentage: number;
-  exercices: string[];
-  couleur: string;
-  icone: string;
-}
-
-export interface ForceFocusData {
-  id: ForceFocus;
-  nom: string;
-  exercice: string;
-  priorite: number;
-  objectif: string;
-}
+export type ForceFocus = 'squat' | 'deadlift' | 'bench_press';
 
 export interface UserProfile {
   id: string;
@@ -40,7 +23,7 @@ export interface UserProfile {
   updatedAt: Date;
 }
 
-export const FOCUS_AREAS: FocusAreaData[] = [
+export const FOCUS_AREAS: FocusArea[] = [
   {
     id: 'bras',
     nom: 'Bras',
@@ -91,7 +74,7 @@ export const FOCUS_AREAS: FocusAreaData[] = [
   }
 ];
 
-export const FORCE_FOCUS_OPTIONS: ForceFocusData[] = [
+export const FORCE_FOCUS_OPTIONS: ForceFocus[] = [
   {
     id: 'squat',
     nom: 'Squat',

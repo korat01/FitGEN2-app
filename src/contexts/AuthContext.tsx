@@ -1,18 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   id: string;
+  nom: string;
   email: string;
-  name?: string;
+  isAuthenticated: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name: string) => Promise<boolean>;
+  login: (userData: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
-  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,7 +26,6 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Vérifier si l'utilisateur est connecté au chargement de l'app
@@ -37,54 +35,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      // Simulation d'authentification - à remplacer par Supabase
-      if (email && password) {
-        const userData = { id: '1', email, name: 'Utilisateur' };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const register = async (email: string, password: string, name: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      // Simulation d'inscription - à remplacer par Supabase
-      if (email && password && name) {
-        const userData = { id: '1', email, name };
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Erreur d\'inscription:', error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
+  const login = (userData: User) => {
+    const userWithAuth = { ...userData, isAuthenticated: true };
+    setUser(userWithAuth);
+    localStorage.setItem('user', JSON.stringify(userWithAuth));
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    // Rediriger vers la page de connexion
     window.location.href = '/login';
   };
 
-  const isAuthenticated = !!user;
+  const isAuthenticated = user?.isAuthenticated || false;
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

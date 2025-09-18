@@ -1,699 +1,1034 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import PageLayout from '@/components/PageLayout';
+import StatCard from '@/components/StatCard';
+import ActionButton from '@/components/ActionButton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Apple, 
-  Utensils, 
-  ChefHat,
-  Search,
-  Plus,
+  Search, 
+  Camera, 
+  Target,
+  Flame,
   Clock,
-  Users
+  Plus,
+  TrendingUp,
+  Zap,
+  Utensils,
+  Star,
+  ChefHat,
+  ArrowLeft
 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import AlimentDetail from './pages/AlimentDetail';
 
-const Nutrition: React.FC = () => {
+const Nutrition = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('aliments');
 
-  // Base de données étendue des aliments (60 au total)
-  const aliments = [
-    // Protéines
-    { name: 'Poulet', calories: 165, protein: 31, carbs: 0, fat: 3.6, category: 'Viande' },
-    { name: 'Dinde', calories: 135, protein: 30, carbs: 0, fat: 1.5, category: 'Viande' },
-    { name: 'Boeuf maigre', calories: 250, protein: 26, carbs: 0, fat: 15, category: 'Viande' },
-    { name: 'Porc', calories: 242, protein: 27, carbs: 0, fat: 14, category: 'Viande' },
-    { name: 'Agneau', calories: 294, protein: 25, carbs: 0, fat: 21, category: 'Viande' },
-    { name: 'Veau', calories: 172, protein: 24, carbs: 0, fat: 8, category: 'Viande' },
-    { name: 'Canard', calories: 337, protein: 19, carbs: 0, fat: 28, category: 'Viande' },
-    { name: 'Saumon', calories: 208, protein: 25, carbs: 0, fat: 12, category: 'Poisson' },
-    { name: 'Thon', calories: 144, protein: 30, carbs: 0, fat: 1, category: 'Poisson' },
-    { name: 'Cabillaud', calories: 82, protein: 18, carbs: 0, fat: 0.7, category: 'Poisson' },
-    { name: 'Crevettes', calories: 99, protein: 24, carbs: 0, fat: 0.3, category: 'Poisson' },
-    { name: 'Maquereau', calories: 205, protein: 19, carbs: 0, fat: 14, category: 'Poisson' },
-    { name: 'Sardines', calories: 208, protein: 25, carbs: 0, fat: 12, category: 'Poisson' },
-    { name: 'Oeufs', calories: 155, protein: 13, carbs: 1.1, fat: 11, category: 'Protéines' },
-    { name: 'Fromage blanc', calories: 98, protein: 11, carbs: 3.4, fat: 4.3, category: 'Protéines' },
-    { name: 'Yaourt grec', calories: 59, protein: 10, carbs: 3.6, fat: 0.4, category: 'Protéines' },
-    { name: 'Tofu', calories: 76, protein: 8, carbs: 1.9, fat: 4.8, category: 'Protéines' },
-    { name: 'Lentilles', calories: 116, protein: 9, carbs: 20, fat: 0.4, category: 'Protéines' },
-    { name: 'Haricots noirs', calories: 132, protein: 8.9, carbs: 24, fat: 0.5, category: 'Protéines' },
-    { name: 'Pois chiches', calories: 164, protein: 8.9, carbs: 27, fat: 2.6, category: 'Protéines' },
-    { name: 'Tempeh', calories: 192, protein: 20, carbs: 8, fat: 11, category: 'Protéines' },
-    { name: 'Seitan', calories: 370, protein: 75, carbs: 14, fat: 1.9, category: 'Protéines' },
-    
-    // Céréales
-    { name: 'Riz brun', calories: 111, protein: 2.6, carbs: 23, fat: 0.9, category: 'Céréales' },
-    { name: 'Quinoa', calories: 120, protein: 4.4, carbs: 22, fat: 1.9, category: 'Céréales' },
-    { name: 'Avoine', calories: 389, protein: 17, carbs: 66, fat: 7, category: 'Céréales' },
-    { name: 'Pâtes complètes', calories: 124, protein: 5, carbs: 25, fat: 1.1, category: 'Céréales' },
-    { name: 'Pain complet', calories: 247, protein: 13, carbs: 41, fat: 4.2, category: 'Céréales' },
-    { name: 'Sarrasin', calories: 343, protein: 13, carbs: 72, fat: 3.4, category: 'Céréales' },
-    { name: 'Millet', calories: 378, protein: 11, carbs: 73, fat: 4.2, category: 'Céréales' },
-    { name: 'Orge', calories: 352, protein: 12, carbs: 73, fat: 2.3, category: 'Céréales' },
-    { name: 'Épeautre', calories: 338, protein: 15, carbs: 70, fat: 2.4, category: 'Céréales' },
-    { name: 'Riz sauvage', calories: 101, protein: 4, carbs: 21, fat: 0.3, category: 'Céréales' },
-    
-    // Légumes
-    { name: 'Brocolis', calories: 34, protein: 2.8, carbs: 7, fat: 0.4, category: 'Légumes' },
-    { name: 'Épinards', calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4, category: 'Légumes' },
-    { name: 'Chou-fleur', calories: 25, protein: 1.9, carbs: 5, fat: 0.3, category: 'Légumes' },
-    { name: 'Carottes', calories: 41, protein: 0.9, carbs: 10, fat: 0.2, category: 'Légumes' },
-    { name: 'Courgettes', calories: 17, protein: 1.2, carbs: 3.4, fat: 0.2, category: 'Légumes' },
-    { name: 'Tomates', calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2, category: 'Légumes' },
-    { name: 'Poivrons', calories: 31, protein: 1, carbs: 7.3, fat: 0.3, category: 'Légumes' },
-    { name: 'Concombre', calories: 16, protein: 0.7, carbs: 4, fat: 0.1, category: 'Légumes' },
-    { name: 'Patate douce', calories: 86, protein: 1.6, carbs: 20, fat: 0.1, category: 'Légumes' },
-    { name: 'Champignons', calories: 22, protein: 3.1, carbs: 3.3, fat: 0.3, category: 'Légumes' },
-    { name: 'Aubergines', calories: 25, protein: 1, carbs: 6, fat: 0.2, category: 'Légumes' },
-    { name: 'Asperges', calories: 20, protein: 2.2, carbs: 4, fat: 0.1, category: 'Légumes' },
-    { name: 'Artichauts', calories: 47, protein: 3.3, carbs: 11, fat: 0.2, category: 'Légumes' },
-    { name: 'Betteraves', calories: 43, protein: 1.6, carbs: 10, fat: 0.2, category: 'Légumes' },
-    { name: 'Céleri', calories: 16, protein: 0.7, carbs: 3, fat: 0.2, category: 'Légumes' },
-    { name: 'Endives', calories: 17, protein: 1.3, carbs: 4, fat: 0.1, category: 'Légumes' },
-    { name: 'Fenouil', calories: 31, protein: 1.2, carbs: 7, fat: 0.2, category: 'Légumes' },
-    { name: 'Radis', calories: 16, protein: 0.7, carbs: 3.4, fat: 0.1, category: 'Légumes' },
-    { name: 'Navets', calories: 28, protein: 0.9, carbs: 6, fat: 0.1, category: 'Légumes' },
-    { name: 'Pommes de terre', calories: 77, protein: 2, carbs: 17, fat: 0.1, category: 'Légumes' },
-    
-    // Fruits
-    { name: 'Avocat', calories: 160, protein: 2, carbs: 9, fat: 15, category: 'Fruits' },
-    { name: 'Banane', calories: 89, protein: 1.1, carbs: 23, fat: 0.3, category: 'Fruits' },
-    { name: 'Pomme', calories: 52, protein: 0.3, carbs: 14, fat: 0.2, category: 'Fruits' },
-    { name: 'Orange', calories: 47, protein: 0.9, carbs: 12, fat: 0.1, category: 'Fruits' },
-    { name: 'Baies', calories: 57, protein: 0.7, carbs: 14, fat: 0.3, category: 'Fruits' },
-    { name: 'Kiwi', calories: 61, protein: 1.1, carbs: 15, fat: 0.5, category: 'Fruits' },
-    { name: 'Mangue', calories: 60, protein: 0.8, carbs: 15, fat: 0.4, category: 'Fruits' },
-    { name: 'Ananas', calories: 50, protein: 0.5, carbs: 13, fat: 0.1, category: 'Fruits' },
-    { name: 'Pêche', calories: 39, protein: 0.9, carbs: 10, fat: 0.3, category: 'Fruits' },
-    { name: 'Poire', calories: 57, protein: 0.4, carbs: 15, fat: 0.1, category: 'Fruits' },
-    { name: 'Raisins', calories: 67, protein: 0.6, carbs: 17, fat: 0.4, category: 'Fruits' },
-    { name: 'Fraise', calories: 32, protein: 0.7, carbs: 8, fat: 0.3, category: 'Fruits' },
-    { name: 'Cerise', calories: 50, protein: 1, carbs: 12, fat: 0.3, category: 'Fruits' },
-    { name: 'Pamplemousse', calories: 42, protein: 0.8, carbs: 11, fat: 0.1, category: 'Fruits' },
-    { name: 'Melon', calories: 34, protein: 0.8, carbs: 8, fat: 0.2, category: 'Fruits' },
-    { name: 'Pastèque', calories: 30, protein: 0.6, carbs: 8, fat: 0.2, category: 'Fruits' },
-    { name: 'Figue', calories: 74, protein: 0.8, carbs: 19, fat: 0.3, category: 'Fruits' },
-    { name: 'Datte', calories: 277, protein: 2.5, carbs: 75, fat: 0.4, category: 'Fruits' },
-    { name: 'Grenade', calories: 83, protein: 1.7, carbs: 19, fat: 1.2, category: 'Fruits' },
-    { name: 'Coco', calories: 354, protein: 3.3, carbs: 15, fat: 33, category: 'Fruits' },
-    
-    // Graisses saines
-    { name: 'Huile d\'olive', calories: 884, protein: 0, carbs: 0, fat: 100, category: 'Graisses' },
-    { name: 'Noix', calories: 654, protein: 15, carbs: 14, fat: 65, category: 'Graisses' },
-    { name: 'Amandes', calories: 579, protein: 21, carbs: 22, fat: 50, category: 'Graisses' },
-    { name: 'Graines de chia', calories: 486, protein: 17, carbs: 42, fat: 31, category: 'Graisses' },
-    { name: 'Noix de cajou', calories: 553, protein: 18, carbs: 30, fat: 44, category: 'Graisses' },
-    { name: 'Pistaches', calories: 560, protein: 20, carbs: 28, fat: 45, category: 'Graisses' },
-    { name: 'Noix de pécan', calories: 691, protein: 9, carbs: 14, fat: 72, category: 'Graisses' },
-    { name: 'Graines de lin', calories: 534, protein: 18, carbs: 29, fat: 42, category: 'Graisses' },
-    { name: 'Graines de tournesol', calories: 584, protein: 21, carbs: 20, fat: 51, category: 'Graisses' },
-    { name: 'Avocat', calories: 160, protein: 2, carbs: 9, fat: 15, category: 'Graisses' }
-  ];
-
-  // Base de données étendue des repas (40 au total)
-  const repas = [
+  // Données nutritionnelles avec emojis et objectifs
+  const nutritionData = [
     {
-      name: 'Salade de poulet grillé',
-      calories: 420,
-      protein: 35,
-      carbs: 15,
-      fat: 18,
-      temps: '15 min',
-      portions: 2,
-      ingredients: ['Poulet grillé', 'Salade verte', 'Tomates', 'Concombre', 'Vinaigrette'],
-      recette: '1. Griller le poulet 2. Couper les légumes 3. Mélanger avec la vinaigrette'
-    },
-    {
-      name: 'Saumon aux légumes',
-      calories: 380,
-      protein: 28,
-      carbs: 20,
-      fat: 22,
-      temps: '25 min',
-      portions: 2,
-      ingredients: ['Saumon', 'Brocolis', 'Carottes', 'Riz brun', 'Huile d\'olive'],
-      recette: '1. Cuire le saumon au four 2. Vapeur les légumes 3. Servir avec le riz'
-    },
-    {
-      name: 'Omelette aux épinards',
-      calories: 280,
-      protein: 18,
-      carbs: 8,
-      fat: 20,
-      temps: '10 min',
-      portions: 1,
-      ingredients: ['Oeufs', 'Épinards', 'Fromage', 'Beurre'],
-      recette: '1. Battre les oeufs 2. Ajouter les épinards 3. Cuire à la poêle'
-    },
-    {
-      name: 'Bowl de quinoa aux légumes',
-      calories: 350,
-      protein: 12,
-      carbs: 45,
-      fat: 12,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Quinoa', 'Courgettes', 'Poivrons', 'Tomates', 'Huile d\'olive'],
-      recette: '1. Cuire le quinoa 2. Sauter les légumes 3. Mélanger et servir'
-    },
-    {
-      name: 'Poulet au curry et riz',
-      calories: 450,
-      protein: 32,
-      carbs: 35,
-      fat: 18,
-      temps: '30 min',
-      portions: 2,
-      ingredients: ['Poulet', 'Riz brun', 'Lait de coco', 'Curry', 'Oignons'],
-      recette: '1. Faire revenir le poulet 2. Ajouter le curry et le lait de coco 3. Servir avec le riz'
-    },
-    {
-      name: 'Smoothie bowl protéiné',
-      calories: 320,
-      protein: 25,
-      carbs: 35,
-      fat: 8,
-      temps: '5 min',
-      portions: 1,
-      ingredients: ['Yaourt grec', 'Banane', 'Baies', 'Graines de chia', 'Miel'],
-      recette: '1. Mixer tous les ingrédients 2. Verser dans un bol 3. Garnir avec les baies'
-    },
-    {
-      name: 'Tacos de thon',
-      calories: 380,
-      protein: 28,
+      id: 1,
+      name: "Pomme",
+      emoji: "🍎",
+      calories: 95,
+      protein: 0.5,
       carbs: 25,
-      fat: 18,
-      temps: '15 min',
-      portions: 2,
-      ingredients: ['Thon', 'Tortillas', 'Avocat', 'Tomates', 'Laitue'],
-      recette: '1. Écraser le thon 2. Préparer les légumes 3. Assembler les tacos'
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Équilibre",
+      popularity: 95,
+      isPopular: true,
+      description: "Fruit riche en fibres et vitamine C"
     },
     {
-      name: 'Risotto aux champignons',
-      calories: 420,
-      protein: 15,
-      carbs: 55,
-      fat: 16,
-      temps: '35 min',
-      portions: 2,
-      ingredients: ['Riz arborio', 'Champignons', 'Bouillon', 'Parmesan', 'Oignons'],
-      recette: '1. Faire revenir les oignons 2. Ajouter le riz 3. Incorporer le bouillon progressivement'
-    },
-    {
-      name: 'Salade de lentilles',
-      calories: 290,
-      protein: 18,
-      carbs: 35,
-      fat: 8,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Lentilles', 'Tomates', 'Concombre', 'Persil', 'Vinaigrette'],
-      recette: '1. Cuire les lentilles 2. Couper les légumes 3. Mélanger avec la vinaigrette'
-    },
-    {
-      name: 'Pancakes protéinés',
-      calories: 280,
-      protein: 22,
-      carbs: 25,
-      fat: 8,
-      temps: '15 min',
-      portions: 2,
-      ingredients: ['Oeufs', 'Avoine', 'Banane', 'Fromage blanc', 'Miel'],
-      recette: '1. Mixer tous les ingrédients 2. Cuire à la poêle 3. Servir avec du miel'
-    },
-    {
-      name: 'Buddha bowl',
-      calories: 480,
-      protein: 20,
-      carbs: 55,
-      fat: 22,
-      temps: '25 min',
-      portions: 1,
-      ingredients: ['Quinoa', 'Chou-fleur', 'Avocat', 'Haricots noirs', 'Tahini'],
-      recette: '1. Cuire le quinoa 2. Rôtir le chou-fleur 3. Assembler dans un bol'
-    },
-    {
-      name: 'Soupe de légumes',
-      calories: 180,
-      protein: 8,
-      carbs: 25,
-      fat: 5,
-      temps: '30 min',
-      portions: 4,
-      ingredients: ['Carottes', 'Courgettes', 'Tomates', 'Oignons', 'Bouillon'],
-      recette: '1. Couper tous les légumes 2. Faire revenir 3. Ajouter le bouillon et cuire'
-    },
-    {
-      name: 'Wrap au poulet',
-      calories: 420,
+      id: 2,
+      name: "Poulet grillé",
+      emoji: "🍗",
+      calories: 200,
       protein: 30,
-      carbs: 35,
-      fat: 16,
-      temps: '10 min',
-      portions: 1,
-      ingredients: ['Tortilla', 'Poulet', 'Laitue', 'Tomates', 'Sauce'],
-      recette: '1. Réchauffer le poulet 2. Préparer les légumes 3. Enrouler dans la tortilla'
+      carbs: 0,
+      fat: 8,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 92,
+      isPopular: true,
+      description: "Source de protéines maigres"
     },
     {
-      name: 'Pâtes aux légumes',
-      calories: 380,
-      protein: 12,
-      carbs: 45,
-      fat: 14,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Pâtes complètes', 'Brocolis', 'Poivrons', 'Tomates', 'Huile d\'olive'],
-      recette: '1. Cuire les pâtes 2. Sauter les légumes 3. Mélanger et servir'
-    },
-    {
-      name: 'Burger de saumon',
-      calories: 520,
-      protein: 35,
-      carbs: 30,
-      fat: 28,
-      temps: '25 min',
-      portions: 1,
-      ingredients: ['Saumon', 'Pain complet', 'Avocat', 'Laitue', 'Sauce'],
-      recette: '1. Griller le saumon 2. Griller le pain 3. Assembler le burger'
-    },
-    {
-      name: 'Chili con carne',
-      calories: 350,
-      protein: 25,
-      carbs: 30,
-      fat: 15,
-      temps: '45 min',
-      portions: 4,
-      ingredients: ['Boeuf maigre', 'Haricots rouges', 'Tomates', 'Oignons', 'Épices'],
-      recette: '1. Faire revenir la viande 2. Ajouter les légumes 3. Laisser mijoter'
-    },
-    {
-      name: 'Salade de fruits',
-      calories: 120,
-      protein: 2,
-      carbs: 30,
-      fat: 0.5,
-      temps: '10 min',
-      portions: 2,
-      ingredients: ['Pomme', 'Orange', 'Kiwi', 'Baies', 'Miel'],
-      recette: '1. Couper tous les fruits 2. Mélanger 3. Arroser de miel'
-    },
-    {
-      name: 'Tofu sauté',
-      calories: 280,
-      protein: 20,
-      carbs: 15,
-      fat: 16,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Tofu', 'Brocolis', 'Carottes', 'Sauce soja', 'Huile'],
-      recette: '1. Couper le tofu 2. Sauter avec les légumes 3. Ajouter la sauce'
-    },
-    {
-      name: 'Ratatouille',
-      calories: 150,
-      protein: 4,
-      carbs: 20,
-      fat: 6,
-      temps: '40 min',
-      portions: 4,
-      ingredients: ['Aubergines', 'Courgettes', 'Tomates', 'Poivrons', 'Herbes'],
-      recette: '1. Couper tous les légumes 2. Faire revenir 3. Laisser mijoter'
-    },
-    {
-      name: 'Granola maison',
-      calories: 320,
-      protein: 8,
-      carbs: 35,
-      fat: 18,
-      temps: '30 min',
-      portions: 4,
-      ingredients: ['Avoine', 'Noix', 'Miel', 'Huile de coco', 'Baies'],
-      recette: '1. Mélanger tous les ingrédients 2. Cuire au four 3. Laisser refroidir'
-    },
-    // 20 nouveaux repas
-    {
-      name: 'Ceviche de poisson',
+      id: 3,
+      name: "Riz brun",
+      emoji: "🍚",
       calories: 220,
-      protein: 25,
-      carbs: 15,
-      fat: 6,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Poisson blanc', 'Citron vert', 'Oignons', 'Coriandre', 'Avocat'],
-      recette: '1. Couper le poisson en dés 2. Mariner dans le citron 3. Ajouter les légumes'
-    },
-    {
-      name: 'Lasagnes aux légumes',
-      calories: 380,
-      protein: 18,
+      protein: 5,
       carbs: 45,
+      fat: 2,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 88,
+      isPopular: true,
+      description: "Glucides complexes à index glycémique bas"
+    },
+    {
+      id: 4,
+      name: "Avocat",
+      emoji: "🥑",
+      calories: 160,
+      protein: 2,
+      carbs: 9,
       fat: 15,
-      temps: '60 min',
-      portions: 6,
-      ingredients: ['Pâtes lasagnes', 'Courgettes', 'Aubergines', 'Tomates', 'Fromage'],
-      recette: '1. Préparer les légumes 2. Alterner pâtes et légumes 3. Cuire au four'
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 85,
+      isPopular: true,
+      description: "Riche en acides gras monoinsaturés"
     },
     {
-      name: 'Couscous aux légumes',
-      calories: 320,
-      protein: 12,
-      carbs: 55,
-      fat: 8,
-      temps: '25 min',
-      portions: 4,
-      ingredients: ['Couscous', 'Carottes', 'Courgettes', 'Pois chiches', 'Épices'],
-      recette: '1. Cuire le couscous 2. Préparer les légumes 3. Mélanger et servir'
-    },
-    {
-      name: 'Tartare de saumon',
-      calories: 280,
-      protein: 22,
-      carbs: 8,
-      fat: 18,
-      temps: '15 min',
-      portions: 2,
-      ingredients: ['Saumon frais', 'Avocat', 'Concombre', 'Sésame', 'Sauce soja'],
-      recette: '1. Couper le saumon en dés 2. Mélanger avec l\'avocat 3. Servir frais'
-    },
-    {
-      name: 'Curry de légumes',
-      calories: 250,
-      protein: 8,
-      carbs: 35,
-      fat: 10,
-      temps: '30 min',
-      portions: 4,
-      ingredients: ['Légumes variés', 'Lait de coco', 'Curry', 'Riz', 'Épices'],
-      recette: '1. Faire revenir les légumes 2. Ajouter le curry 3. Servir avec le riz'
-    },
-    {
-      name: 'Salade de quinoa',
-      calories: 340,
-      protein: 12,
-      carbs: 45,
-      fat: 12,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Quinoa', 'Tomates cerises', 'Concombre', 'Feta', 'Vinaigrette'],
-      recette: '1. Cuire le quinoa 2. Couper les légumes 3. Mélanger avec la feta'
-    },
-    {
-      name: 'Poisson en papillote',
-      calories: 290,
-      protein: 28,
-      carbs: 12,
-      fat: 15,
-      temps: '25 min',
-      portions: 2,
-      ingredients: ['Cabillaud', 'Tomates', 'Courgettes', 'Herbes', 'Huile d\'olive'],
-      recette: '1. Envelopper le poisson 2. Ajouter les légumes 3. Cuire au four'
-    },
-    {
-      name: 'Risotto aux asperges',
-      calories: 380,
-      protein: 12,
-      carbs: 50,
-      fat: 14,
-      temps: '30 min',
-      portions: 3,
-      ingredients: ['Riz arborio', 'Asperges', 'Bouillon', 'Parmesan', 'Oignons'],
-      recette: '1. Faire revenir les oignons 2. Ajouter le riz 3. Incorporer les asperges'
-    },
-    {
-      name: 'Soupe miso',
-      calories: 120,
-      protein: 8,
-      carbs: 15,
-      fat: 3,
-      temps: '15 min',
-      portions: 2,
-      ingredients: ['Pâte miso', 'Tofu', 'Algues', 'Champignons', 'Bouillon'],
-      recette: '1. Faire chauffer le bouillon 2. Ajouter la pâte miso 3. Garnir avec le tofu'
-    },
-    {
-      name: 'Tacos végétariens',
-      calories: 320,
-      protein: 15,
-      carbs: 40,
-      fat: 12,
-      temps: '20 min',
-      portions: 3,
-      ingredients: ['Tortillas', 'Haricots noirs', 'Avocat', 'Tomates', 'Laitue'],
-      recette: '1. Réchauffer les haricots 2. Préparer les légumes 3. Assembler les tacos'
-    },
-    {
-      name: 'Poke bowl',
-      calories: 450,
-      protein: 25,
-      carbs: 35,
-      fat: 22,
-      temps: '15 min',
-      portions: 1,
-      ingredients: ['Thon', 'Riz', 'Avocat', 'Concombre', 'Sauce soja'],
-      recette: '1. Couper le thon en dés 2. Préparer le riz 3. Assembler dans un bol'
-    },
-    {
-      name: 'Gratin de chou-fleur',
-      calories: 280,
-      protein: 15,
-      carbs: 20,
-      fat: 16,
-      temps: '35 min',
-      portions: 4,
-      ingredients: ['Chou-fleur', 'Fromage', 'Crème', 'Noix de muscade', 'Chapelure'],
-      recette: '1. Cuire le chou-fleur 2. Préparer la béchamel 3. Gratiner au four'
-    },
-    {
-      name: 'Salade de betteraves',
-      calories: 180,
-      protein: 6,
-      carbs: 25,
-      fat: 6,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Betteraves', 'Chèvre', 'Noix', 'Mâche', 'Vinaigrette'],
-      recette: '1. Cuire les betteraves 2. Couper en dés 3. Mélanger avec le chèvre'
-    },
-    {
-      name: 'Paella végétarienne',
-      calories: 420,
-      protein: 15,
-      carbs: 60,
-      fat: 12,
-      temps: '45 min',
-      portions: 4,
-      ingredients: ['Riz', 'Artichauts', 'Poivrons', 'Tomates', 'Safran'],
-      recette: '1. Faire revenir le riz 2. Ajouter les légumes 3. Laisser mijoter'
-    },
-    {
-      name: 'Carpaccio de boeuf',
-      calories: 320,
-      protein: 25,
-      carbs: 8,
-      fat: 22,
-      temps: '20 min',
-      portions: 2,
-      ingredients: ['Boeuf', 'Roquette', 'Parmesan', 'Huile d\'olive', 'Citron'],
-      recette: '1. Couper le boeuf très fin 2. Disposer sur l\'assiette 3. Garnir et arroser'
-    },
-    {
-      name: 'Soupe de potiron',
-      calories: 150,
+      id: 5,
+      name: "Brocoli",
+      emoji: "🥦",
+      calories: 55,
       protein: 4,
-      carbs: 25,
-      fat: 5,
-      temps: '30 min',
-      portions: 4,
-      ingredients: ['Potiron', 'Oignons', 'Bouillon', 'Crème', 'Épices'],
-      recette: '1. Cuire le potiron 2. Mixer avec le bouillon 3. Ajouter la crème'
+      carbs: 11,
+      fat: 0.6,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 82,
+      isPopular: false,
+      description: "Légume crucifère riche en vitamines"
     },
     {
-      name: 'Tartine avocat',
-      calories: 320,
-      protein: 12,
-      carbs: 25,
-      fat: 22,
-      temps: '10 min',
-      portions: 2,
-      ingredients: ['Pain complet', 'Avocat', 'Tomates', 'Graines', 'Citron'],
-      recette: '1. Griller le pain 2. Écraser l\'avocat 3. Garnir et servir'
+      id: 6,
+      name: "Saumon",
+      emoji: "🐟",
+      calories: 250,
+      protein: 25,
+      carbs: 0,
+      fat: 15,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 90,
+      isPopular: true,
+      description: "Poisson riche en oméga-3"
     },
     {
-      name: 'Boulettes de lentilles',
-      calories: 280,
-      protein: 18,
-      carbs: 35,
-      fat: 8,
-      temps: '30 min',
-      portions: 4,
-      ingredients: ['Lentilles', 'Oignons', 'Ail', 'Épices', 'Chapelure'],
-      recette: '1. Cuire les lentilles 2. Mixer avec les légumes 3. Former des boulettes'
+      id: 7,
+      name: "Patate douce",
+      emoji: "🥔",
+      calories: 180,
+      protein: 4,
+      carbs: 41,
+      fat: 0.2,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 87,
+      isPopular: true,
+      description: "Glucides complexes et bêta-carotène"
     },
     {
-      name: 'Salade de pâtes',
-      calories: 380,
-      protein: 15,
-      carbs: 45,
-      fat: 16,
-      temps: '20 min',
-      portions: 3,
-      ingredients: ['Pâtes', 'Tomates', 'Mozzarella', 'Basilic', 'Huile d\'olive'],
-      recette: '1. Cuire les pâtes 2. Couper les légumes 3. Mélanger et assaisonner'
-    },
-    {
-      name: 'Crumble aux fruits',
-      calories: 320,
+      id: 8,
+      name: "Amandes",
+      emoji: "🌰",
+      calories: 160,
       protein: 6,
-      carbs: 45,
+      carbs: 6,
       fat: 14,
-      temps: '40 min',
-      portions: 4,
-      ingredients: ['Pommes', 'Baies', 'Farine', 'Beurre', 'Sucre'],
-      recette: '1. Préparer les fruits 2. Faire la pâte à crumble 3. Cuire au four'
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 83,
+      isPopular: false,
+      description: "Noix riches en vitamine E"
+    },
+    {
+      id: 9,
+      name: "Épinards",
+      emoji: "🥬",
+      calories: 23,
+      protein: 3,
+      carbs: 4,
+      fat: 0.4,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 79,
+      isPopular: false,
+      description: "Légume vert riche en fer et folates"
+    },
+    {
+      id: 10,
+      name: "Œufs",
+      emoji: "🥚",
+      calories: 140,
+      protein: 12,
+      carbs: 1,
+      fat: 10,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 91,
+      isPopular: true,
+      description: "Protéines complètes de haute qualité"
+    },
+    {
+      id: 11,
+      name: "Banane",
+      emoji: "🍌",
+      calories: 89,
+      protein: 1.1,
+      carbs: 23,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Performance",
+      popularity: 88,
+      isPopular: true,
+      description: "Riche en potassium et énergie"
+    },
+    {
+      id: 12,
+      name: "Concombre",
+      emoji: "🥒",
+      calories: 16,
+      protein: 0.7,
+      carbs: 4,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 75,
+      isPopular: false,
+      description: "Légume hydratant et peu calorique"
+    },
+    // NOUVEAUX ALIMENTS
+    {
+      id: 13,
+      name: "Thon",
+      emoji: "��",
+      calories: 116,
+      protein: 26,
+      carbs: 0,
+      fat: 0.8,
+      category: "Protéines",
+      goal: "Perte de poids",
+      popularity: 86,
+      isPopular: true,
+      description: "Poisson maigre riche en protéines"
+    },
+    {
+      id: 14,
+      name: "Quinoa",
+      emoji: "🌾",
+      calories: 120,
+      protein: 4.4,
+      carbs: 22,
+      fat: 1.9,
+      category: "Glucides",
+      goal: "Équilibre",
+      popularity: 84,
+      isPopular: true,
+      description: "Céréale complète avec protéines complètes"
+    },
+    {
+      id: 15,
+      name: "Myrtilles",
+      emoji: "🫐",
+      calories: 57,
+      protein: 0.7,
+      carbs: 14,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 89,
+      isPopular: true,
+      description: "Antioxydants puissants et vitamine C"
+    },
+    {
+      id: 16,
+      name: "Tofu",
+      emoji: "🥜",
+      calories: 76,
+      protein: 8,
+      carbs: 1.9,
+      fat: 4.8,
+      category: "Protéines",
+      goal: "Équilibre",
+      popularity: 78,
+      isPopular: false,
+      description: "Protéines végétales et isoflavones"
+    },
+    {
+      id: 17,
+      name: "Carottes",
+      emoji: "🥕",
+      calories: 41,
+      protein: 0.9,
+      carbs: 10,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Équilibre",
+      popularity: 81,
+      isPopular: true,
+      description: "Riches en bêta-carotène et vitamine A"
+    },
+    {
+      id: 18,
+      name: "Noix",
+      emoji: "🌰",
+      calories: 200,
+      protein: 4.3,
+      carbs: 3.9,
+      fat: 20,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 87,
+      isPopular: true,
+      description: "Oméga-3 et vitamine E"
+    },
+    {
+      id: 19,
+      name: "Yaourt grec",
+      emoji: "🥛",
+      calories: 59,
+      protein: 10,
+      carbs: 3.6,
+      fat: 0.4,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 85,
+      isPopular: true,
+      description: "Probiotiques et protéines"
+    },
+    {
+      id: 20,
+      name: "Tomates",
+      emoji: "🍅",
+      calories: 18,
+      protein: 0.9,
+      carbs: 3.9,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 80,
+      isPopular: false,
+      description: "Lycopène et vitamine C"
+    },
+    {
+      id: 21,
+      name: "Framboises",
+      emoji: "🫐",
+      calories: 52,
+      protein: 1.2,
+      carbs: 12,
+      fat: 0.7,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 83,
+      isPopular: false,
+      description: "Antioxydants et fibres"
+    },
+    {
+      id: 22,
+      name: "Graines de chia",
+      emoji: "🌱",
+      calories: 486,
+      protein: 17,
+      carbs: 42,
+      fat: 31,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 88,
+      isPopular: true,
+      description: "Oméga-3 et fibres solubles"
     }
   ];
 
-  const filteredAliments = aliments.filter(aliment =>
-    aliment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    aliment.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Données des repas avec emojis et objectifs
+  const repasData = [
+    {
+      id: 1,
+      name: "Bowl protéiné aux fruits",
+      emoji: "🥣",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 650,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 35,
+      carbs: 65,
+      fat: 18,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 2,
+      name: "Omelette aux 3 œufs et fromage",
+      emoji: "🍳",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 520,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 42,
+      carbs: 8,
+      fat: 35,
+      fiber: 2,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 3,
+      name: "Poulet rôti aux patates douces",
+      emoji: "🍗",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 720,
+      prepTime: 45,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 55,
+      carbs: 75,
+      fat: 18,
+      fiber: 10,
+      servings: 2,
+      isPopular: true
+    },
+    {
+      id: 4,
+      name: "Saumon aux légumes vapeur",
+      emoji: "🐟",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 380,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 35,
+      carbs: 25,
+      fat: 18,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 5,
+      name: "Smoothie récupération",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Récupération",
+      calories: 250,
+      prepTime: 5,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 20,
+      carbs: 35,
+      fat: 8,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 6,
+      name: "Bowl d'énergie pré-entraînement",
+      emoji: "⚡",
+      category: "Pre-workout",
+      goal: "Performance",
+      calories: 320,
+      prepTime: 10,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 55,
+      fat: 8,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 7,
+      name: "Salade de thon aux légumes",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 280,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 32,
+      carbs: 20,
+      fat: 8,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 8,
+      name: "Pancakes protéinés",
+      emoji: "🥞",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 580,
+      prepTime: 20,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 38,
+      carbs: 45,
+      fat: 22,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    // NOUVEAUX REPAS
+    {
+      id: 9,
+      name: "Bowl de quinoa aux légumes",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 420,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 18,
+      carbs: 55,
+      fat: 12,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 10,
+      name: "Smoothie vert détox",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Perte de poids",
+      calories: 150,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 4,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 11,
+      name: "Burger de bœuf aux patates douces",
+      emoji: "🍔",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 850,
+      prepTime: 35,
+      difficulty: "Moyen",
+      rating: 4.8,
+      protein: 45,
+      carbs: 65,
+      fat: 35,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 12,
+      name: "Poisson blanc aux herbes",
+      emoji: "🐟",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 220,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 35,
+      carbs: 15,
+      fat: 5,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 13,
+      name: "Energy balls aux dattes",
+      emoji: "🥧",
+      category: "Collation",
+      goal: "Performance",
+      calories: 180,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 6,
+      carbs: 25,
+      fat: 8,
+      fiber: 4,
+      servings: 4,
+      isPopular: true
+    },
+    {
+      id: 14,
+      name: "Pâtes complètes au thon",
+      emoji: "🍝",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 480,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 30,
+      carbs: 65,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 15,
+      name: "Toast à l'avocat et œufs",
+      emoji: "🥑",
+      category: "Petit-déjeuner",
+      goal: "Performance",
+      calories: 380,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 20,
+      carbs: 25,
+      fat: 25,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 16,
+      name: "Soupe de légumes minceur",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 5,
+      fiber: 12,
+      servings: 2,
+      isPopular: false
+    },
+    {
+      id: 17,
+      name: "Bowl de riz au poulet teriyaki",
+      emoji: "🍱",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 750,
+      prepTime: 30,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 55,
+      carbs: 85,
+      fat: 18,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 18,
+      name: "Smoothie chocolat-banane",
+      emoji: "🥤",
+      category: "Post-workout",
+      goal: "Récupération",
+      calories: 350,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 25,
+      carbs: 45,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    }
+  ];
 
-  const filteredRepas = repas.filter(repas =>
-    repas.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const stats = {
+    totalFoods: nutritionData.length,
+    totalRepas: repasData.length,
+    popularFoods: nutritionData.filter(food => food.isPopular).length,
+    popularRepas: repasData.filter(repas => repas.isPopular).length,
+    totalCalories: nutritionData.reduce((sum, food) => sum + food.calories, 0),
+    averageCalories: Math.round(nutritionData.reduce((sum, food) => sum + food.calories, 0) / nutritionData.length)
+  };
 
-  const AlimentCard = ({ aliment }: any) => (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold">{aliment.name}</h3>
-          <Badge variant="secondary">{aliment.category}</Badge>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-          <div>Calories: {aliment.calories}</div>
-          <div>Protéines: {aliment.protein}g</div>
-          <div>Glucides: {aliment.carbs}g</div>
-          <div>Lipides: {aliment.fat}g</div>
-        </div>
-        <Button size="sm" className="w-full mt-3">
-          <Plus className="w-4 h-4 mr-1" />
-          Ajouter
-        </Button>
-      </CardContent>
-    </Card>
-  );
+  const filters = [
+    { value: 'all', label: 'Tous', icon: Apple },
+    { value: 'popular', label: 'Populaires', icon: Target },
+    { value: 'fruits', label: 'Fruits', icon: Apple },
+    { value: 'protéines', label: 'Protéines', icon: Target },
+    { value: 'glucides', label: 'Glucides', icon: Target },
+    { value: 'lipides', label: 'Lipides', icon: Target },
+    { value: 'légumes', label: 'Légumes', icon: Apple }
+  ];
 
-  const RepasCard = ({ repas }: any) => (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader>
-          <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{repas.name}</CardTitle>
-          <div className="flex gap-2">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {repas.temps}
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              {repas.portions}
-            </Badge>
-          </div>
-        </div>
-        <CardDescription>
-          {repas.calories} kcal • {repas.protein}g protéines • {repas.carbs}g glucides • {repas.fat}g lipides
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-            <div>
-            <h4 className="font-medium mb-2">Ingrédients :</h4>
-            <div className="flex flex-wrap gap-1">
-              {repas.ingredients.map((ingredient: string, index: number) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {ingredient}
-                </Badge>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h4 className="font-medium mb-2">Recette :</h4>
-            <p className="text-sm text-muted-foreground">{repas.recette}</p>
-          </div>
-          <Button className="w-full">
-            <ChefHat className="w-4 h-4 mr-2" />
-            Voir la recette complète
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const repasFilters = [
+    { value: 'all', label: 'Tous', icon: Utensils },
+    { value: 'popular', label: 'Populaires', icon: Star },
+    { value: 'petit-déjeuner', label: 'Petit-déjeuner', icon: Utensils },
+    { value: 'déjeuner', label: 'Déjeuner', icon: Utensils },
+    { value: 'dîner', label: 'Dîner', icon: Utensils },
+    { value: 'collation', label: 'Collation', icon: Utensils },
+    { value: 'pre-workout', label: 'Pre-workout', icon: Zap }
+  ];
+
+  const goalFilters = [
+    { value: 'all', label: 'Tous objectifs', icon: Target },
+    { value: 'prise-de-masse', label: 'Prise de masse', icon: Target },
+    { value: 'perte-de-poids', label: 'Perte de poids', icon: Target },
+    { value: 'récupération', label: 'Récupération', icon: Target },
+    { value: 'performance', label: 'Performance', icon: Target },
+    { value: 'équilibre', label: 'Équilibre', icon: Target }
+  ];
+
+  const filteredFoods = nutritionData.filter(food => {
+    const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         food.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'popular' && food.isPopular) ||
+      food.category.toLowerCase() === selectedFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const filteredRepas = repasData.filter(repas => {
+    const matchesSearch = repas.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'popular' && repas.isPopular) ||
+      repas.category.toLowerCase() === selectedFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Facile': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Moyen': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Difficile': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getGoalColor = (goal: string) => {
+    switch (goal) {
+      case 'Prise de masse': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Perte de poids': return 'bg-red-100 text-red-800 border-red-200';
+      case 'Récupération': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Performance': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'Équilibre': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Apple className="w-8 h-8 text-primary" />
-            Nutrition
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Aliments et recettes pour une nutrition optimale
-          </p>
-        </div>
+    <PageLayout
+      title="Nutrition"
+      subtitle="Gérez votre alimentation et vos apports"
+      icon={<Apple className="h-6 w-6 text-blue-600" />}
+      actions={
+        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
+          <Plus className="h-4 w-4 mr-2" />
+          Ajouter aliment
+        </Button>
+      }
+    >
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard
+          title="Aliments"
+          value={stats.totalFoods}
+          icon={Apple}
+          color="blue"
+        />
+        <StatCard
+          title="Repas"
+          value={stats.totalRepas}
+          icon={Utensils}
+          color="green"
+        />
+        <StatCard
+          title="Populaires"
+          value={stats.popularFoods + stats.popularRepas}
+          icon={Target}
+          color="orange"
+        />
+        <StatCard
+          title="Moyenne"
+          value={`${stats.averageCalories} cal`}
+          icon={TrendingUp}
+          color="purple"
+        />
         </div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Rechercher un aliment ou un repas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-                </div>
-              </CardContent>
-            </Card>
+      {/* Recherche et filtres */}
+      <Card className="bg-white border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-gray-800 text-2xl">
+            <div className="bg-blue-100 rounded-full p-2">
+              <Search className="h-6 w-6 text-blue-600" />
+            </div>
+            Recherche et filtres
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Input
+                placeholder="Rechercher un aliment ou un repas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-12 text-lg border-2 border-gray-200 focus:border-blue-500 bg-white"
+              />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="aliments" className="flex items-center gap-2">
-            <Apple className="w-4 h-4" />
-            Aliments ({aliments.length})
-          </TabsTrigger>
+      {/* Onglets */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="aliments" className="flex items-center gap-2">
+            <Apple className="h-4 w-4" />
+              Aliments ({filteredFoods.length})
+            </TabsTrigger>
           <TabsTrigger value="repas" className="flex items-center gap-2">
-            <Utensils className="w-4 h-4" />
-            Repas & Recettes ({repas.length})
+            <Utensils className="h-4 w-4" />
+            Repas ({filteredRepas.length})
           </TabsTrigger>
-        </TabsList>
+          </TabsList>
 
-        <TabsContent value="aliments" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAliments.map((aliment, index) => (
-              <AlimentCard key={index} aliment={aliment} />
+        {/* Onglet Aliments */}
+        <TabsContent value="aliments" className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            {filters.map((filter) => (
+              <Button
+                key={filter.value}
+                variant={selectedFilter === filter.value ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedFilter(filter.value)}
+                className={`flex items-center gap-2 ${
+                  selectedFilter === filter.value 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                }`}
+              >
+                <filter.icon className="h-4 w-4" />
+                {filter.label}
+              </Button>
+            ))}
+                        </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredFoods.map((food) => (
+              <Card 
+                key={food.id} 
+                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                onClick={() => navigate(`/nutrition/${food.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="text-4xl mb-2">{food.emoji}</div>
+                    {food.isPopular && (
+                      <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                        <Target className="h-3 w-3 mr-1" />
+                        Populaire
+                      </Badge>
+                    )}
+                      </div>
+                  <CardTitle className="text-gray-800 text-xl">{food.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-gray-600 text-sm">{food.description}</p>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{food.calories}</div>
+                        <div className="text-sm text-gray-600">Calories</div>
+                        </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{food.protein}g</div>
+                        <div className="text-sm text-gray-600">Protéines</div>
+                        </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{food.carbs}g</div>
+                        <div className="text-sm text-gray-600">Glucides</div>
+                      </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{food.fat}g</div>
+                        <div className="text-sm text-gray-600">Lipides</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Catégorie</span>
+                      <Badge 
+                        variant="outline" 
+                        className="border-blue-300 text-blue-700 bg-blue-50"
+                      >
+                        {food.category}
+                        </Badge>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Objectif</span>
+                      <Badge className={getGoalColor(food.goal)}>
+                        {food.goal}
+                        </Badge>
+                      </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Popularité</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full"
+                            style={{ width: `${food.popularity}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm font-medium text-gray-600">{food.popularity}%</span>
+                        </div>
+                      </div>
+
+                    <Button 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/nutrition/${food.id}`);
+                      }}
+                    >
+                      <Zap className="h-4 w-4 mr-2" />
+                      Ajouter
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+          </TabsContent>
+
+        {/* Onglet Repas */}
+        <TabsContent value="repas" className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            {repasFilters.map((filter) => (
+              <Button
+                key={filter.value}
+                variant={selectedFilter === filter.value ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedFilter(filter.value)}
+                className={`flex items-center gap-2 ${
+                  selectedFilter === filter.value 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                }`}
+              >
+                <filter.icon className="h-4 w-4" />
+                {filter.label}
+              </Button>
             ))}
           </div>
-        </TabsContent>
 
-        <TabsContent value="repas" className="mt-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredRepas.map((repas, index) => (
-              <RepasCard key={index} repas={repas} />
-          ))}
-        </div>
-        </TabsContent>
-      </Tabs>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredRepas.map((repas) => (
+              <Card 
+                key={repas.id} 
+                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                onClick={() => navigate(`/repas/${repas.id}`)}
+              >
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="text-4xl mb-2">{repas.emoji}</div>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <span className="text-sm font-semibold text-gray-700">{repas.rating}</span>
+                    </div>
+                  </div>
+                  <CardTitle className="text-gray-800 text-xl">{repas.name}</CardTitle>
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                      {repas.calories} cal
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      {repas.prepTime} min
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ChefHat className="h-4 w-4 text-purple-500" />
+                      {repas.servings} portion{repas.servings > 1 ? 's' : ''}
+                        </div>
+                      </div>
+                    </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge className={getDifficultyColor(repas.difficulty)}>
+                        {repas.difficulty}
+                        </Badge>
+                      <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
+                        {repas.category}
+                        </Badge>
+                      <Badge className={getGoalColor(repas.goal)}>
+                        {repas.goal}
+                      </Badge>
+                      {repas.isPopular && (
+                        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                          <Star className="h-3 w-3 mr-1" />
+                          Populaire
+                        </Badge>
+                      )}
+                      </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{repas.protein}g</div>
+                        <div className="text-sm text-gray-600">Protéines</div>
+                        </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{repas.carbs}g</div>
+                        <div className="text-sm text-gray-600">Glucides</div>
+                        </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{repas.fat}g</div>
+                        <div className="text-sm text-gray-600">Lipides</div>
+                        </div>
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{repas.fiber}g</div>
+                        <div className="text-sm text-gray-600">Fibres</div>
+                        </div>
+                      </div>
+
+                    <Button 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/repas/${repas.id}`);
+                      }}
+                    >
+                      <ChefHat className="h-4 w-4 mr-2" />
+                      Voir la recette
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+          </TabsContent>
+        </Tabs>
+    </PageLayout>
   );
 };
 

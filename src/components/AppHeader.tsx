@@ -34,10 +34,6 @@ const AppHeader: React.FC = () => {
             
             {/* Navigation principale */}
             <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/stats" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <BarChart3 className="w-4 h-4" />
-                Stats
-              </Link>
               <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
                 <Home className="w-4 h-4" />
                 Accueil
@@ -49,14 +45,6 @@ const AppHeader: React.FC = () => {
               <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
                 <Apple className="w-4 h-4" />
                 Nutrition
-              </Link>
-              <Link to="/planning" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <Calendar className="w-4 h-4" />
-                Planning
-              </Link>
-              <Link to="/scan" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
-                <Scan className="w-4 h-4" />
-                Scan
               </Link>
             </nav>
           </div>

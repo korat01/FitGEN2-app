@@ -4,12 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dumbbell, Clock, Target, Trophy, Star, Play, Pause, RotateCcw, CheckCircle, Timer, Zap, Flame, Award, Activity, Heart, TrendingUp, Calendar, Settings, Grid3X3, CalendarDays } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { 
+  Dumbbell, Clock, Target, Trophy, Star, Play, Pause, RotateCcw, CheckCircle, Timer, 
+  Zap, Flame, Award, Activity, Heart, TrendingUp, Calendar, Settings, Grid3X3, 
+  CalendarDays, Coffee, Save, XCircle
+} from 'lucide-react';
 import PageLayout from '@/components/PageLayout';
-import PlanningCalendar from '@/components/PlanningCalendar';
 import ProgramGenerator from '@/components/ProgramGenerator';
 import MonthlyCalendar from '@/components/MonthlyCalendar';
-import PlanningConfig from '@/components/PlanningConfig';
 import StatCard from '@/components/StatCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,6 +62,9 @@ const Programme: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [planningDuration, setPlanningDuration] = useState(3);
   const [viewMode, setViewMode] = useState<'workout' | 'weekly' | 'monthly'>('workout');
+  const [currentWeek, setCurrentWeek] = useState(0);
+  const [isEditingConfig, setIsEditingConfig] = useState(false);
+  const [tempDays, setTempDays] = useState<string[]>([]);
 
   // Génération du programme du jour
   useEffect(() => {
@@ -224,6 +231,68 @@ const Programme: React.FC = () => {
       setSelectedDays(selectedDays.filter(d => d !== day));
     } else {
       setSelectedDays([...selectedDays, day]);
+    }
+  };
+
+  const handleDayToggle = (day: string) => {
+    if (tempDays.includes(day)) {
+      setTempDays(tempDays.filter(d => d !== day));
+    } else {
+      setTempDays([...tempDays, day]);
+    }
+  };
+
+  const handleSaveConfig = () => {
+    setSelectedDays(tempDays);
+    setIsEditingConfig(false);
+  };
+
+  const handleCancelConfig = () => {
+    setTempDays(selectedDays);
+    setIsEditingConfig(false);
+  };
+
+  const getDayProgram = (dayName: string) => {
+    return programs.find(program => program.day === dayName);
+  };
+
+  const getDayStatus = (dayName: string) => {
+    const isSelected = selectedDays.includes(dayName);
+    const program = getDayProgram(dayName);
+    
+    if (!isSelected) return 'rest';
+    if (program?.completed) return 'completed';
+    if (program?.isToday) return 'today';
+    return 'scheduled';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'rest': return 'bg-slate-100 text-slate-500 border-slate-200';
+      case 'scheduled': return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 'today': return 'bg-green-50 text-green-700 border-green-200';
+      case 'completed': return 'bg-purple-50 text-purple-700 border-purple-200';
+      default: return 'bg-slate-100 text-slate-500 border-slate-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'rest': return <Coffee className="h-4 w-4" />;
+      case 'scheduled': return <Dumbbell className="h-4 w-4" />;
+      case 'today': return <Play className="h-4 w-4" />;
+      case 'completed': return <CheckCircle className="h-4 w-4" />;
+      default: return <Coffee className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'rest': return 'Repos';
+      case 'scheduled': return 'Programmé';
+      case 'today': return "Aujourd'hui";
+      case 'completed': return 'Terminé';
+      default: return 'Repos';
     }
   };
 
@@ -411,34 +480,25 @@ const Programme: React.FC = () => {
     .reduce((total, ex) => total + ex.calories, 0);
 
   return (
-    <PageLayout
-      title="Programme & Planning"
-      subtitle="Votre entraînement du jour et planification"
-      icon={<Dumbbell className="h-6 w-6 text-blue-600" />}
-      actions={
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/profile')}
-            className="border-2 border-slate-300 hover:border-slate-400"
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Paramètres
-          </Button>
-        </div>
-      }
-    >
-      {/* Animation de célébration */}
-      {showCelebration && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="text-8xl animate-bounce">🎉</div>
-          <div className="absolute top-1/4 left-1/4 text-6xl animate-pulse">🏆</div>
-          <div className="absolute top-1/4 right-1/4 text-6xl animate-pulse">⭐</div>
-          <div className="absolute bottom-1/4 left-1/3 text-6xl animate-pulse">💪</div>
-          <div className="absolute bottom-1/4 right-1/3 text-6xl animate-pulse">🎉</div>
-        </div>
-      )}
+    <PageLayout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-slate-900">Programme & Planning</h1>
+            <p className="text-slate-600 text-lg">Votre entraînement du jour et planification</p>
+          </div>
+
+          {/* Animation de célébration */}
+          {showCelebration && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+              <div className="text-8xl animate-bounce">🎉</div>
+              <div className="absolute top-1/4 left-1/4 text-6xl animate-pulse">🏆</div>
+              <div className="absolute top-1/4 right-1/4 text-6xl animate-pulse">⭐</div>
+              <div className="absolute bottom-1/4 left-1/3 text-6xl animate-pulse">💪</div>
+              <div className="absolute bottom-1/4 right-1/3 text-6xl animate-pulse">🎉</div>
+            </div>
+          )}
 
       <Tabs value={viewMode} onValueChange={(value: string) => setViewMode(value as any)} className="space-y-8">
         <TabsList className="grid w-full grid-cols-3 bg-white p-2 rounded-xl shadow-lg border-2 border-slate-200">
@@ -815,26 +875,6 @@ const Programme: React.FC = () => {
             />
           </div>
 
-          {/* Configuration du planning */}
-          <PlanningConfig
-            selectedDays={selectedDays}
-            onDaysChange={handleDaysChange}
-            onDurationChange={handleDurationChange}
-            onGeneratePlanning={generateMonthlyPlanning}
-          />
-
-          {/* Générateur de programmes */}
-          <ProgramGenerator
-            selectedDays={selectedDays}
-            onProgramsGenerated={handleProgramsGenerated}
-          />
-
-          {/* Calendrier de planning */}
-          <PlanningCalendar
-            selectedDays={selectedDays}
-            programs={programs}
-            onDayClick={handleDayClick}
-          />
 
           {/* Actions rapides pour les programmes */}
           {programs.length > 0 && (
@@ -916,6 +956,8 @@ const Programme: React.FC = () => {
           />
         </TabsContent>
       </Tabs>
+        </div>
+      </div>
     </PageLayout>
   );
 };

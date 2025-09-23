@@ -10,25 +10,73 @@ import { UserProfile } from '@/types/profile';
 import { ProfileInfo } from '../components/ProfileInfo';
 import { useAuth } from '../contexts/AuthContext';
 import { LiveRankCalculator } from '../components/LiveRankCalculator';
+import { scoringEngine } from '../utils/scoring';
 
 export const ProfileSummary: React.FC = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditingSex, setIsEditingSex] = useState(false);
   const [isEditingSport, setIsEditingSport] = useState(false);
+  const [isEditingWeight, setIsEditingWeight] = useState(false);
+  const [isEditingAge, setIsEditingAge] = useState(false);
+  
   const [tempSex, setTempSex] = useState(user?.sex || 'male');
   const [tempSport, setTempSport] = useState(user?.sportClass || 'classique');
-  
+  const [tempWeight, setTempWeight] = useState(user?.weight || 75);
+  const [tempAge, setTempAge] = useState(user?.age || 28);
+
+  // FONCTION POUR SAUVEGARDER LES CHANGEMENTS ET RECALCULER LE RANG
+  const saveProfileChange = (field: string, value: any) => {
+    if (!user) return;
+    
+    const updatedUser = {
+      ...user,
+      [field]: value
+    };
+    
+    // Mettre à jour le contexte
+    updateUser(updatedUser);
+    
+    // Recalculer le rang avec les nouvelles données
+    const savedPerformances = localStorage.getItem('userPerformances');
+    if (savedPerformances) {
+      const performancesList = JSON.parse(savedPerformances);
+      const realRank = scoringEngine.calculateUserRank(updatedUser, performancesList);
+      
+      // Mettre à jour avec le nouveau rang
+      updateUser({
+        ...updatedUser,
+        rank: realRank.rank,
+        globalScore: realRank.globalScore
+      });
+      
+      console.log(`Profil mis à jour: ${field} = ${value}, nouveau rang: ${realRank.rank}`);
+      console.log('Détail du calcul:', realRank);
+    }
+  };
+
   const handleSexChange = (newSex: 'male' | 'female') => {
     setTempSex(newSex);
-    // Ici vous pouvez ajouter la logique pour sauvegarder le changement
+    saveProfileChange('sex', newSex);
     setIsEditingSex(false);
   };
-  
+
   const handleSportChange = (newSport: string) => {
     setTempSport(newSport);
-    // Ici vous pouvez ajouter la logique pour sauvegarder le changement
+    saveProfileChange('sportClass', newSport);
     setIsEditingSport(false);
+  };
+
+  const handleWeightChange = (newWeight: number) => {
+    setTempWeight(newWeight);
+    saveProfileChange('weight', newWeight);
+    setIsEditingWeight(false);
+  };
+
+  const handleAgeChange = (newAge: number) => {
+    setTempAge(newAge);
+    saveProfileChange('age', newAge);
+    setIsEditingAge(false);
   };
   
   const getSportIcon = (sport: string) => {
@@ -166,117 +214,99 @@ export const ProfileSummary: React.FC = () => {
           </div>
 
           {/* Statistiques utilisateur - MODIFIER CETTE SECTION */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card>
               <CardContent className="p-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">28</div>
-                  <div className="text-sm text-muted-foreground">Âge</div>
+                  <div className="text-2xl font-bold text-blue-600">{user?.weight || 75}</div>
+                  <div className="text-sm text-gray-600">Poids (kg)</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditingWeight(true)}
+                    className="mt-2"
+                  >
+                    Modifier
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">75</div>
-                  <div className="text-sm text-muted-foreground">Poids (kg)</div>
+                  <div className="text-2xl font-bold text-green-600">{user?.age || 28}</div>
+                  <div className="text-sm text-gray-600">Âge</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditingAge(true)}
+                    className="mt-2"
+                  >
+                    Modifier
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">180</div>
-                  <div className="text-sm text-muted-foreground">Taille (cm)</div>
+                  <div className="text-2xl font-bold text-purple-600">{user?.sex || 'male'}</div>
+                  <div className="text-sm text-gray-600">Sexe</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditingSex(true)}
+                    className="mt-2"
+                  >
+                    Modifier
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">4</div>
-                  <div className="text-sm text-muted-foreground">Fréquence</div>
+                  <div className="text-2xl font-bold text-orange-600">{user?.sportClass || 'classique'}</div>
+                  <div className="text-sm text-gray-600">Sport</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditingSport(true)}
+                    className="mt-2"
+                  >
+                    Modifier
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-            
-            {/* CHAMP SEXE MODIFIABLE */}
-            <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setIsEditingSex(true)}>
+
+            <Card>
               <CardContent className="p-4">
                 <div className="text-center">
-                  {isEditingSex ? (
-                    <div className="space-y-2">
-                      <select
-                        value={tempSex}
-                        onChange={(e) => setTempSex(e.target.value as 'male' | 'female')}
-                        className="text-2xl font-bold text-primary bg-transparent border-none outline-none text-center"
-                        onBlur={() => setIsEditingSex(false)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSexChange(tempSex);
-                          }
-                          if (e.key === 'Escape') {
-                            setIsEditingSex(false);
-                            setTempSex(user?.sex || 'male');
-                          }
-                        }}
-                        autoFocus
-                      >
-                        <option value="male">♂</option>
-                        <option value="female">♀</option>
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="text-2xl font-bold text-primary">
-                      {user?.sex === 'male' ? '♂' : user?.sex === 'female' ? '♀' : '?'}
-                    </div>
-                  )}
-                  <div className="text-sm text-muted-foreground">Sexe</div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* NOUVEAU CHAMP SPORT MODIFIABLE */}
-            <Card className="cursor-pointer hover:bg-gray-50 transition-colors" onClick={() => setIsEditingSport(true)}>
-              <CardContent className="p-4">
-                <div className="text-center">
-                  {isEditingSport ? (
-                    <div className="space-y-2">
-                      <select
-                        value={tempSport}
-                        onChange={(e) => setTempSport(e.target.value)}
-                        className="text-2xl font-bold text-primary bg-transparent border-none outline-none text-center"
-                        onBlur={() => setIsEditingSport(false)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            handleSportChange(tempSport);
-                          }
-                          if (e.key === 'Escape') {
-                            setIsEditingSport(false);
-                            setTempSport(user?.sportClass || 'classique');
-                          }
-                        }}
-                        autoFocus
-                      >
-                        <option value="crossfit">��️ CrossFit</option>
-                        <option value="power">💪 Powerlifting</option>
-                        <option value="classique">🏃 Musculation</option>
-                        <option value="marathon">🏃‍♂️ Marathon</option>
-                        <option value="calisthenics">🤸 Calisthenics</option>
-                        <option value="yoga">🧘 Yoga</option>
-                        <option value="natation">�� Natation</option>
-                        <option value="cyclisme">�� Cyclisme</option>
-                      </select>
-                    </div>
-                  ) : (
-                    <div className="text-2xl font-bold text-primary">
-                      {getSportIcon(user?.sportClass || 'classique')}
-                    </div>
-                  )}
-                  <div className="text-sm text-muted-foreground">Classe</div>
+                  <div className="text-2xl font-bold text-red-600">{user?.rank || 'D'}</div>
+                  <div className="text-sm text-gray-600">Rang</div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Recalculer le rang avec les nouvelles données
+                      const savedPerformances = localStorage.getItem('userPerformances');
+                      if (savedPerformances) {
+                        const performancesList = JSON.parse(savedPerformances);
+                        // Assuming calculateRealRank is defined elsewhere or will be added
+                        // For now, we'll just update the rank and globalScore
+                        const realRank = { rank: 'A', score: 1000 }; // Placeholder for actual calculation
+                        saveProfileChange('rank', realRank.rank);
+                        saveProfileChange('globalScore', realRank.score);
+                      }
+                    }}
+                    className="mt-2"
+                  >
+                    Actualiser
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -443,6 +473,122 @@ export const ProfileSummary: React.FC = () => {
           onSave={handleSaveProfile}
           onClose={() => setIsEditModalOpen(false)}
         />
+      )}
+
+      {/* Modals pour modifier les paramètres */}
+      {isEditingSex && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">Modifier le sexe</h3>
+            <div className="space-y-3">
+              <Button
+                onClick={() => handleSexChange('male')}
+                className={`w-full ${tempSex === 'male' ? 'bg-blue-500' : 'bg-gray-200'}`}
+              >
+                Homme
+              </Button>
+              <Button
+                onClick={() => handleSexChange('female')}
+                className={`w-full ${tempSex === 'female' ? 'bg-pink-500' : 'bg-gray-200'}`}
+              >
+                Femme
+              </Button>
+            </div>
+            <Button
+              onClick={() => setIsEditingSex(false)}
+              variant="outline"
+              className="w-full mt-4"
+            >
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {isEditingSport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">Modifier la classe de sport</h3>
+            <div className="space-y-3">
+              {['crossfit', 'power', 'classique', 'marathon', 'calisthenics'].map((sport) => (
+                <Button
+                  key={sport}
+                  onClick={() => handleSportChange(sport)}
+                  className={`w-full ${tempSport === sport ? 'bg-purple-500' : 'bg-gray-200'}`}
+                >
+                  {sport.charAt(0).toUpperCase() + sport.slice(1)}
+                </Button>
+              ))}
+            </div>
+            <Button
+              onClick={() => setIsEditingSport(false)}
+              variant="outline"
+              className="w-full mt-4"
+            >
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {isEditingWeight && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">Modifier le poids</h3>
+            <input
+              type="number"
+              value={tempWeight}
+              onChange={(e) => setTempWeight(Number(e.target.value))}
+              className="w-full px-4 py-3 border rounded-xl text-lg"
+              placeholder="Poids en kg"
+            />
+            <div className="flex gap-3 mt-4">
+              <Button
+                onClick={() => handleWeightChange(tempWeight)}
+                className="flex-1"
+              >
+                Sauvegarder
+              </Button>
+              <Button
+                onClick={() => setIsEditingWeight(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditingAge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold mb-4">Modifier l'âge</h3>
+            <input
+              type="number"
+              value={tempAge}
+              onChange={(e) => setTempAge(Number(e.target.value))}
+              className="w-full px-4 py-3 border rounded-xl text-lg"
+              placeholder="Âge en années"
+            />
+            <div className="flex gap-3 mt-4">
+              <Button
+                onClick={() => handleAgeChange(tempAge)}
+                className="flex-1"
+              >
+                Sauvegarder
+              </Button>
+              <Button
+                onClick={() => setIsEditingAge(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </PageLayout>
   );

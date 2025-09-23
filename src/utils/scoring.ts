@@ -1,319 +1,213 @@
-// Système de scoring et normalisation
-export class ScoringEngine {
-  private standards: StandardReference[] = [];
-  private disciplines: Discipline[] = [];
+import { STANDARDS_DATA, getBenchReferences, getSquatReferences, getDeadliftReferences, getRunReferences, getSportProfile } from './standardsData';
 
-  constructor() {
-    this.loadStandards();
-    this.loadDisciplines();
-  }
+export interface PerformanceRecord {
+  id: string;
+  userId: string;
+  discipline: string;
+  value: number;
+  units: string;
+  date: Date;
+  context?: string;
+  verified?: boolean;
+}
 
-  // Normalisation simple (méthode 3.1)
-  calculateNormalizedScore(
-    performance: number,
-    discipline: string,
-    userSex: 'male' | 'female',
-    userWeight?: number,
-    userAge?: number
-  ): number {
-    const weightCategory = userWeight ? getWeightCategory(userWeight, userSex) : undefined;
-    const refs = this.getReferences(discipline, userSex, weightCategory);
-    
-    if (refs.length < 3) {
-      // Valeurs par défaut si pas de références
-      return Math.min(1000, Math.max(0, performance * 2));
-    }
-
-    const [refA, refS, refWorld] = refs;
-    
-    let adjustedPerformance = performance;
-    
-    // Ajustement poids si nécessaire
-    if (userWeight && this.isWeightAdjustedDiscipline(discipline)) {
-      adjustedPerformance = this.applyWeightAdjustment(performance, userWeight, userSex);
-    }
-    
-    // Ajustement âge si nécessaire
-    if (userAge && this.isAgeAdjustedDiscipline(discipline)) {
-      adjustedPerformance = this.applyAgeAdjustment(adjustedPerformance, userAge);
-    }
-
-    // Calcul du score normalisé avec progression plus réaliste
-    if (adjustedPerformance < refA.thresholdValue) {
-      // 0-400 points pour les performances sous le minima national
-      return Math.floor(400 * (adjustedPerformance / refA.thresholdValue));
-    } else if (adjustedPerformance < refS.thresholdValue) {
-      // 400-700 points pour les performances entre minima national et élite
-      return Math.floor(400 + 300 * ((adjustedPerformance - refA.thresholdValue) / (refS.thresholdValue - refA.thresholdValue)));
-    } else {
-      // 700-1000 points pour les performances d'élite et records
-      return Math.floor(700 + 300 * ((adjustedPerformance - refS.thresholdValue) / (refWorld.thresholdValue - refS.thresholdValue)));
-    }
-  }
-
-  // Calcul du score global avec pondérations par profil et bonus
-  calculateGlobalScore(
-    userScores: { [discipline: string]: number },
-    userProfile: UserProfile,
-    sportClass?: string
-  ): GlobalScore {
-    // Utiliser le profil selon la classe de sport si disponible
-    const profileWeights = sportClass ? getSportProfile(sportClass) : userProfile.weights;
-    
-    const categoryScores = this.aggregateByCategory(userScores);
-    
-    // Calcul du score de base
-    let globalScore = Math.floor(
-      categoryScores.force * profileWeights.force +
-      categoryScores.endurance * profileWeights.endurance +
-      categoryScores.explosivite * profileWeights.explosivite +
-      categoryScores.calisthenics * profileWeights.calisthenics
-    );
-
-    // Bonus de polyvalence si l'utilisateur excelle dans plusieurs catégories
-    const maxCategory = Math.max(categoryScores.force, categoryScores.endurance, categoryScores.explosivite, categoryScores.calisthenics);
-    const minCategory = Math.min(categoryScores.force, categoryScores.endurance, categoryScores.explosivite, categoryScores.calisthenics);
-    
-    // Si l'écart entre max et min est faible, bonus de polyvalence
-    if (maxCategory - minCategory < 200) {
-      globalScore = Math.floor(globalScore * 1.05); // +5% bonus polyvalence
-    }
-
-    // Bonus de spécialisation si l'utilisateur excelle dans sa catégorie principale
-    const mainCategoryScore = categoryScores[this.getMainCategory(sportClass)];
-    if (mainCategoryScore > 600) {
-      globalScore = Math.floor(globalScore * 1.03); // +3% bonus spécialisation
-    }
-
-    // Limiter le score à 1000
-    globalScore = Math.min(1000, globalScore);
-
-    const rank = this.determineRank(globalScore);
-
-    return {
-      userId: '', // sera rempli par l'appelant
-      date: new Date(),
-      globalScore,
-      rank,
-      breakdown: categoryScores,
-      profile: userProfile
-    };
-  }
-
-  // Détermination du rang basé sur le score global - ajusté pour être plus réaliste
-  private determineRank(score: number): RankLevel {
-    // Seuils ajustés pour être plus progressifs et réalistes
-    if (score < 100) return 'E';      // Débutant - très faible
-    if (score < 250) return 'D';      // Occasionnel - faible
-    if (score < 400) return 'C';      // Confirmé - moyen
-    if (score < 550) return 'B';      // Régional - bon
-    if (score < 700) return 'A';      // National - très bon
-    if (score < 800) return 'S';      // Mondial élite - excellent
-    if (score < 900) return 'Nation'; // Top national - exceptionnel
-    return 'World';                   // Record mondial - légendaire
-  }
-
-  // Agrégation par catégorie
-  private aggregateByCategory(scores: { [discipline: string]: number }): {
+export interface GlobalScore {
+  rank: string;
+  globalScore: number;
+  breakdown: {
     force: number;
     endurance: number;
     explosivite: number;
     calisthenics: number;
-  } {
-    const categories = {
+  };
+  reason: string;
+}
+
+export class ScoringEngine {
+  // FONCTION PRINCIPALE POUR CALCULER LE RANG D'UN UTILISATEUR
+  public calculateUserRank(user: any, performances: PerformanceRecord[]): GlobalScore {
+    console.log('🔍 DÉBUT DU CALCUL DE RANG');
+    console.log('Utilisateur:', user);
+    console.log('Performances:', performances);
+
+    if (!user) {
+      console.log('❌ Pas d\'utilisateur');
+      return {
+        rank: 'D',
+        globalScore: 0,
+        breakdown: { force: 0, endurance: 0, explosivite: 0, calisthenics: 0 },
+        reason: 'Utilisateur non connecté'
+      };
+    }
+
+    if (!performances || performances.length === 0) {
+      console.log('❌ Pas de performances');
+      return {
+        rank: 'D',
+        globalScore: 0,
+        breakdown: { force: 0, endurance: 0, explosivite: 0, calisthenics: 0 },
+        reason: 'Aucune performance enregistrée'
+      };
+    }
+
+    const userWeight = user.weight || 75;
+    const userSex = user.sex || 'male';
+    const userSportClass = user.sportClass || 'classique';
+    
+    console.log('📊 Données utilisateur:', { userWeight, userSex, userSportClass, performancesCount: performances.length });
+
+    let totalScore = 0;
+    let performanceCount = 0;
+    let breakdown = {
       force: 0,
       endurance: 0,
       explosivite: 0,
       calisthenics: 0
     };
 
-    // Logique d'agrégation par catégorie
-    // Pour l'instant, moyenne simple - à améliorer avec des pondérations spécifiques
-    Object.entries(scores).forEach(([discipline, score]) => {
-      const disc = this.disciplines.find(d => d.id === discipline);
-      if (disc) {
-        categories[disc.category] += score;
+    performances.forEach((perf) => {
+      if (!perf.discipline || !perf.value || isNaN(perf.value)) {
+        console.log('⚠️ Performance invalide ignorée:', perf);
+        return;
       }
+
+      let score = 0;
+      let category = '';
+
+      switch (perf.discipline) {
+        case 'bench':
+          const benchRefs = getBenchReferences(userWeight, userSex);
+          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${userSex}):`, benchRefs);
+          
+          if (perf.value >= benchRefs.A) {
+            score = 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300;
+          } else {
+            score = (perf.value / benchRefs.A) * 600;
+          }
+          category = 'force';
+          break;
+          
+        case 'squat':
+          const squatRefs = getSquatReferences(userWeight, userSex);
+          console.log(`🏋️ Squat ${perf.value}kg pour ${userWeight}kg (${userSex}):`, squatRefs);
+          
+          if (perf.value >= squatRefs.A) {
+            score = 600 + (perf.value - squatRefs.A) / (squatRefs.S - squatRefs.A) * 300;
+          } else {
+            score = (perf.value / squatRefs.A) * 600;
+          }
+          category = 'force';
+          break;
+          
+        case 'deadlift':
+          const deadliftRefs = getDeadliftReferences(userWeight, userSex);
+          console.log(`⚡ Deadlift ${perf.value}kg pour ${userWeight}kg (${userSex}):`, deadliftRefs);
+          
+          if (perf.value >= deadliftRefs.A) {
+            score = 600 + (perf.value - deadliftRefs.A) / (deadliftRefs.S - deadliftRefs.A) * 300;
+          } else {
+            score = (perf.value / deadliftRefs.A) * 600;
+          }
+          category = 'force';
+          break;
+          
+        case '5k':
+          const runRefs = getRunReferences(userSex);
+          console.log(`🏃 5km ${perf.value}min (${userSex}):`, runRefs);
+          
+          if (perf.value <= runRefs.A) {
+            score = 600 + (runRefs.A - perf.value) / (runRefs.A - runRefs.S) * 300;
+          } else {
+            score = (runRefs.A / perf.value) * 600;
+          }
+          category = 'endurance';
+          break;
+          
+        case 'pullups':
+          // Références pour les tractions
+          const pullupRefs = { A: 15, S: 25, World: 35 }; // reps
+          console.log(`🤸‍♂️ Tractions ${perf.value} reps:`, pullupRefs);
+          
+          if (perf.value >= pullupRefs.A) {
+            score = 600 + (perf.value - pullupRefs.A) / (pullupRefs.S - pullupRefs.A) * 300;
+          } else {
+            score = (perf.value / pullupRefs.A) * 600;
+          }
+          category = 'calisthenics';
+          break;
+          
+        default:
+          console.log('⚠️ Discipline non reconnue:', perf.discipline);
+          return;
+      }
+
+      console.log(`✅ Performance ${perf.discipline}: ${perf.value} → Score: ${score} (catégorie: ${category})`);
+      
+      totalScore += score;
+      performanceCount++;
+      breakdown[category] += score;
     });
 
-    return categories;
-  }
-
-  // Ajustement poids corporel (Wilks/IPF)
-  private applyWeightAdjustment(performance: number, weight: number, sex: 'male' | 'female'): number {
-    // Implémentation simplifiée - à remplacer par la vraie formule Wilks/IPF
-    const wilksCoeff = this.calculateWilksCoefficient(weight, sex);
-    return performance * wilksCoeff;
-  }
-
-  // Ajustement âge (tables Masters)
-  private applyAgeAdjustment(performance: number, age: number): number {
-    const ageCoeff = this.getAgeCoefficient(age);
-    return performance / ageCoeff; // Diviser pour comparer à la "valeur adulte optimale"
-  }
-
-  // Coefficients Wilks/IPF plus réalistes
-  private calculateWilksCoefficient(weight: number, sex: 'male' | 'female'): number {
-    // Coefficients simplifiés mais plus réalistes
-    if (sex === 'male') {
-      if (weight < 60) return 1.2;
-      if (weight < 75) return 1.1;
-      if (weight < 90) return 1.0;
-      if (weight < 105) return 0.95;
-      return 0.9;
-    } else {
-      if (weight < 50) return 1.15;
-      if (weight < 65) return 1.05;
-      if (weight < 80) return 1.0;
-      if (weight < 95) return 0.95;
-      return 0.9;
+    if (performanceCount === 0) {
+      console.log('❌ Aucune performance valide');
+      return {
+        rank: 'D',
+        globalScore: 0,
+        breakdown: { force: 0, endurance: 0, explosivite: 0, calisthenics: 0 },
+        reason: 'Aucune performance valide'
+      };
     }
-  }
 
-  // Coefficients d'âge plus réalistes
-  private getAgeCoefficient(age: number): number {
-    if (age < 20) return 0.95;  // Jeunes adultes
-    if (age < 25) return 1.0;   // Pic de performance
-    if (age < 30) return 0.98;
-    if (age < 35) return 0.95;
-    if (age < 40) return 0.90;
-    if (age < 45) return 0.85;
-    if (age < 50) return 0.80;
-    if (age < 55) return 0.75;
-    if (age < 60) return 0.70;
-    return 0.65;
-  }
-
-  // Vérification si la discipline nécessite un ajustement poids
-  private isWeightAdjustedDiscipline(discipline: string): boolean {
-    const weightAdjustedDisciplines = ['bench', 'squat', 'deadlift', 'powerlifting'];
-    return weightAdjustedDisciplines.includes(discipline.toLowerCase());
-  }
-
-  // Vérification si la discipline nécessite un ajustement âge
-  private isAgeAdjustedDiscipline(discipline: string): boolean {
-    return true; // Toutes les disciplines pour l'instant
-  }
-
-  // Récupération des références pour une discipline avec catégorie de poids
-  private getReferences(discipline: string, sex: 'male' | 'female', weightCategory?: string): StandardReference[] {
-    const disciplineData = STANDARDS_DATA[discipline as keyof typeof STANDARDS_DATA];
-    if (!disciplineData) return [];
-
-    const sexData = disciplineData[sex];
-    if (!sexData) return [];
-
-    // Si pas de catégorie de poids spécifiée, utiliser la première disponible
-    const category = weightCategory || Object.keys(sexData)[0];
-    const categoryData = sexData[category as keyof typeof sexData];
+    const averageScore = totalScore / performanceCount;
     
-    if (!categoryData) return [];
+    // Appliquer les pondérations selon la classe de sport
+    const sportProfile = getSportProfile(userSportClass);
+    const weightedScore = averageScore * sportProfile.force;
 
-    return [
-      { discipline, sex, weightCategory: category, rankLevel: 'A', thresholdValue: categoryData.A.value, source: categoryData.A.source },
-      { discipline, sex, weightCategory: category, rankLevel: 'S', thresholdValue: categoryData.S.value, source: categoryData.S.source },
-      { discipline, sex, weightCategory: category, rankLevel: 'World', thresholdValue: categoryData.World.value, source: categoryData.World.source }
-    ];
-  }
+    console.log('📈 Score final:', { 
+      totalScore, 
+      performanceCount, 
+      averageScore, 
+      weightedScore, 
+      sportProfile,
+      breakdown 
+    });
 
-  // Chargement des standards (à remplacer par de vraies données)
-  private loadStandards(): void {
-    // Données d'exemple - à remplacer par de vraies références IPF/FFA
-    this.standards = [
-      {
-        discipline: 'bench',
-        sex: 'male',
-        weightCategory: '90kg',
-        rankLevel: 'A',
-        thresholdValue: 140,
-        source: 'FFA'
+    const finalRank = this.determineRank(weightedScore);
+    const finalScore = Math.round(weightedScore);
+
+    console.log('🏆 RANG FINAL:', { rank: finalRank, score: finalScore });
+
+    return {
+      rank: finalRank,
+      globalScore: finalScore,
+      breakdown: {
+        force: Math.round(breakdown.force / performanceCount),
+        endurance: Math.round(breakdown.endurance / performanceCount),
+        explosivite: Math.round(breakdown.explosivite / performanceCount),
+        calisthenics: Math.round(breakdown.calisthenics / performanceCount)
       },
-      {
-        discipline: 'bench',
-        sex: 'male',
-        weightCategory: '90kg',
-        rankLevel: 'S',
-        thresholdValue: 180,
-        source: 'IPF'
-      },
-      {
-        discipline: 'bench',
-        sex: 'male',
-        weightCategory: '90kg',
-        rankLevel: 'World',
-        thresholdValue: 230,
-        source: 'IPF'
-      }
-    ];
-  }
-
-  // Chargement des disciplines
-  private loadDisciplines(): void {
-    this.disciplines = [
-      { id: 'bench', name: 'Développé couché', category: 'force', units: 'kg' },
-      { id: 'squat', name: 'Squat', category: 'force', units: 'kg' },
-      { id: 'deadlift', name: 'Soulevé de terre', category: 'force', units: 'kg' },
-      { id: '5k', name: '5km', category: 'endurance', units: 'min', isTimeBased: true },
-      { id: 'pullups', name: 'Tractions', category: 'calisthenics', units: 'reps' }
-    ];
-  }
-
-  // Fonction pour déterminer la catégorie principale selon le sport
-  private getMainCategory(sportClass?: string): keyof typeof categoryScores {
-    const mainCategories = {
-      'crossfit': 'force' as const,
-      'power': 'force' as const,
-      'classique': 'force' as const,
-      'marathon': 'endurance' as const,
-      'calisthenics': 'calisthenics' as const,
-      'yoga': 'calisthenics' as const,
-      'natation': 'endurance' as const,
-      'cyclisme': 'endurance' as const
+      reason: `Basé sur ${performanceCount} performance(s) avec profil ${userSportClass}`
     };
-    
-    return mainCategories[sportClass as keyof typeof mainCategories] || 'force';
   }
-} 
 
-// Fonction pour calculer le rang d'un utilisateur à partir de ses données existantes
-export const calculateUserRank = (userData: any): GlobalScore => {
-  const scoringEngine = new ScoringEngine();
-  
-  // Récupérer les performances de l'utilisateur
-  const performances = userData.performances || [];
-  const userScores: { [discipline: string]: number } = {};
-  
-  // Calculer le score normalisé pour chaque performance
-  performances.forEach((perf: any) => {
-    const normalizedScore = scoringEngine.calculateNormalizedScore(
-      perf.value,
-      perf.discipline,
-      userData.sex,
-      userData.weight,
-      userData.age
-    );
-    
-    // Garder le meilleur score pour chaque discipline
-    if (!userScores[perf.discipline] || normalizedScore > userScores[perf.discipline]) {
-      userScores[perf.discipline] = normalizedScore;
+  // Détermination du rang basé sur le score global
+  private determineRank(score: number): string {
+    if (isNaN(score) || score < 0) {
+      console.log('⚠️ Score invalide:', score);
+      return 'D';
     }
-  });
-  
-  // Déterminer le profil utilisateur
-  const userProfile = getUserProfile(userData.profileType || 'allround');
-  
-  // Calculer le score global
-  return scoringEngine.calculateGlobalScore(userScores, userProfile);
-};
+    
+    if (score < 100) return 'E';
+    if (score < 250) return 'D';
+    if (score < 400) return 'C';
+    if (score < 550) return 'B';
+    if (score < 700) return 'A';
+    if (score < 800) return 'S';
+    if (score < 900) return 'Nation';
+    return 'World';
+  }
+}
 
-// Fonction pour déterminer le profil utilisateur
-const getUserProfile = (profileType: string): UserProfile => {
-  const profiles = {
-    powerlifter: { force: 0.7, endurance: 0.05, explosivite: 0.15, calisthenics: 0.1 },
-    runner: { force: 0.05, endurance: 0.8, explosivite: 0.1, calisthenics: 0.05 },
-    allround: { force: 0.3, endurance: 0.3, explosivite: 0.2, calisthenics: 0.2 },
-    calisthenics: { force: 0.2, endurance: 0.1, explosivite: 0.2, calisthenics: 0.5 }
-  };
-  
-  return profiles[profileType as keyof typeof profiles] || profiles.allround;
-}; 
+// Instance globale du moteur de scoring
+export const scoringEngine = new ScoringEngine(); 

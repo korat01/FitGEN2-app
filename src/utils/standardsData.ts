@@ -249,22 +249,71 @@ export const STANDARDS_DATA = {
   }
 };
 
-// Fonction utilitaire pour déterminer la catégorie de poids
-export const getWeightCategory = (weight: number, sex: 'male' | 'female'): string => {
+// FONCTIONS POUR RÉCUPÉRER LES RÉFÉRENCES SELON LE POIDS ET SEXE
+export const getBenchReferences = (weight: number, sex: 'male' | 'female') => {
+  const weightCategory = getWeightCategory(weight);
+  
+  console.log(`🔍 Bench references pour ${weight}kg (${sex}): catégorie ${weightCategory}`);
+  
   if (sex === 'male') {
-    if (weight <= 66) return '66kg';
-    if (weight <= 74) return '74kg';
-    if (weight <= 83) return '83kg';
-    if (weight <= 93) return '93kg';
-    if (weight <= 105) return '105kg';
-    return '120kg+';
+    const refs = STANDARDS_DATA.bench.male[weightCategory] || STANDARDS_DATA.bench.male['120kg'];
+    console.log('📊 Références bench homme:', refs);
+    return refs;
   } else {
-    if (weight <= 57) return '57kg';
-    if (weight <= 63) return '63kg';
-    if (weight <= 72) return '72kg';
-    if (weight <= 84) return '84kg';
-    return '84kg+';
+    const refs = STANDARDS_DATA.bench.female[weightCategory] || STANDARDS_DATA.bench.female['63kg'];
+    console.log('📊 Références bench femme:', refs);
+    return refs;
   }
+};
+
+export const getSquatReferences = (weight: number, sex: 'male' | 'female') => {
+  const weightCategory = getWeightCategory(weight);
+  
+  console.log(`🔍 Squat references pour ${weight}kg (${sex}): catégorie ${weightCategory}`);
+  
+  if (sex === 'male') {
+    const refs = STANDARDS_DATA.squat.male[weightCategory] || STANDARDS_DATA.squat.male['120kg'];
+    console.log('📊 Références squat homme:', refs);
+    return refs;
+  } else {
+    const refs = STANDARDS_DATA.squat.female[weightCategory] || STANDARDS_DATA.squat.female['63kg'];
+    console.log('📊 Références squat femme:', refs);
+    return refs;
+  }
+};
+
+export const getDeadliftReferences = (weight: number, sex: 'male' | 'female') => {
+  const weightCategory = getWeightCategory(weight);
+  
+  console.log(`🔍 Deadlift references pour ${weight}kg (${sex}): catégorie ${weightCategory}`);
+  
+  if (sex === 'male') {
+    const refs = STANDARDS_DATA.deadlift.male[weightCategory] || STANDARDS_DATA.deadlift.male['120kg'];
+    console.log('📊 Références deadlift homme:', refs);
+    return refs;
+  } else {
+    const refs = STANDARDS_DATA.deadlift.female[weightCategory] || STANDARDS_DATA.deadlift.female['63kg'];
+    console.log('📊 Références deadlift femme:', refs);
+    return refs;
+  }
+};
+
+export const getRunReferences = (sex: 'male' | 'female') => {
+  if (sex === 'male') {
+    return { A: 20, S: 16, World: 12 }; // Temps en minutes pour 5km
+  } else {
+    return { A: 25, S: 20, World: 15 };
+  }
+};
+
+// FONCTION POUR DÉTERMINER LA CATÉGORIE DE POIDS
+export const getWeightCategory = (weight: number): string => {
+  if (weight <= 66) return '66kg';
+  if (weight <= 74) return '74kg';
+  if (weight <= 83) return '83kg';
+  if (weight <= 93) return '93kg';
+  if (weight <= 105) return '105kg';
+  return '120kg';
 };
 
 // Profils utilisateur ajustés selon la classe de sport

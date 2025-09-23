@@ -1,51 +1,125 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import PageLayout from '@/components/PageLayout';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { ThemeProvider } from './lib/theme-provider';
+import { Toaster } from './components/ui/toaster';
+
+// Pages
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Programme from './pages/Programme';
-import Nutrition from './pages/Nutrition';
-import Scan from './pages/Scan';
 import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
-import Login from './pages/Login';
-import AlimentDetail from './pages/AlimentDetail';
-import RecetteDetail from './pages/RecetteDetail';
+import Programme from './pages/Programme';
+import Nutrition from './pages/Nutrition';
+import NotFound from './pages/NotFound';
 
-// Composant pour les routes protégées
+// Composants
+import PageLayout from './components/PageLayout';
+
+// Composant pour protéger les routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { user, isLoading } = useAuth();
   
-  if (!isAuthenticated) {
-    return <Login />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
   }
   
-  return <PageLayout>{children}</PageLayout>;
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return <>{children}</>;
 };
 
-function App() {
+// Composant principal de l'application
+const AppContent: React.FC = () => {
+  const { user } = useAuth();
+  
+  return (
+    <Router>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <Routes>
+          {/* Route publique */}
+          <Route path="/login" element={<Login />} />
+          
+          {/* Routes protégées */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Dashboard />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Dashboard />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/stats" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Stats />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <ProfileSummary />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/programme" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Programme />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/nutrition" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Nutrition />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Route 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        
+        <Toaster />
+      </div>
+    </Router>
+  );
+};
+
+// Composant principal avec les providers
+const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/programme" element={<ProtectedRoute><Programme /></ProtectedRoute>} />
-            <Route path="/nutrition" element={<ProtectedRoute><Nutrition /></ProtectedRoute>} />
-            <Route path="/nutrition/:id" element={<AlimentDetail />} />
-            <Route path="/scan" element={<ProtectedRoute><Scan /></ProtectedRoute>} />
-            <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><ProfileSummary /></ProtectedRoute>} />
-            <Route path="/repas/:id" element={<RecetteDetail />} />
-          </Routes>
-          <Toaster />
-        </div>
-      </Router>
+      <LanguageProvider>
+        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <AppContent />
+        </ThemeProvider>
+      </LanguageProvider>
     </AuthProvider>
   );
-}
+};
 
 export default App;

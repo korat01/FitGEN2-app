@@ -2,157 +2,173 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { ScoringEngine } from '../utils/scoring';
-import { getSportProfile } from '../utils/standardsData';
+import { Progress } from './ui/progress';
+import { Trophy, Target, TrendingUp, Zap, Star, Award, Medal, Crown } from 'lucide-react';
+import { getBenchReferences, getSquatReferences, getDeadliftReferences, getRunReferences, getSportProfile } from '../utils/standardsData';
 
 interface LiveRankCalculatorProps {
   user: any;
-  performances?: any[];
+  performances: any[];
+  onRankUpdate?: (rank: any) => void;
 }
 
-export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({ user, performances = [] }) => {
+export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({ 
+  user, 
+  performances = [], 
+  onRankUpdate 
+}) => {
   const [userRank, setUserRank] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  const calculateRank = async () => {
-    if (!user) return;
+  // FONCTION POUR CALCULER LE RANG EN TEMPS RÉEL
+  const calculateRealRank = (performancesList: any[]) => {
+    if (!user || performancesList.length === 0) {
+      return { rank: 'D', score: 0, reason: 'Aucune performance' };
+    }
+
+    const userWeight = user.weight || 75;
+    const userSex = user.sex || 'male';
+    const userSportClass = user.sportClass || 'classique';
     
-    setLoading(true);
+    let totalScore = 0;
+    let performanceCount = 0;
+    let breakdown = {
+      force: 0,
+      endurance: 0,
+      explosivite: 0,
+      calisthenics: 0
+    };
+
+    performancesList.forEach((perf) => {
+      let score = 0;
+
+      switch (perf.discipline) {
+        case 'bench':
+          const benchRefs = getBenchReferences(userWeight, userSex);
+          if (perf.value >= benchRefs.A) {
+            score = 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300;
+          } else {
+            score = (perf.value / benchRefs.A) * 600;
+          }
+          breakdown.force += score;
+          break;
+          
+        case 'squat':
+          const squatRefs = getSquatReferences(userWeight, userSex);
+          if (perf.value >= squatRefs.A) {
+            score = 600 + (perf.value - squatRefs.A) / (squatRefs.S - squatRefs.A) * 300;
+          } else {
+            score = (perf.value / squatRefs.A) * 600;
+          }
+          breakdown.force += score;
+          break;
+          
+        case 'deadlift':
+          const deadliftRefs = getDeadliftReferences(userWeight, userSex);
+          if (perf.value >= deadliftRefs.A) {
+            score = 600 + (perf.value - deadliftRefs.A) / (deadliftRefs.S - deadliftRefs.A) * 300;
+          } else {
+            score = (perf.value / deadliftRefs.A) * 600;
+          }
+          breakdown.force += score;
+          break;
+          
+        case '5k':
+          const runRefs = getRunReferences(userSex);
+          if (perf.value <= runRefs.A) {
+            score = 600 + (runRefs.A - perf.value) / (runRefs.A - runRefs.S) * 300;
+          } else {
+            score = (runRefs.A / perf.value) * 600;
+          }
+          breakdown.endurance += score;
+          break;
+      }
+
+      totalScore += score;
+      performanceCount++;
+    });
+
+    const averageScore = performanceCount > 0 ? totalScore / performanceCount : 0;
     
-    try {
-      const scoringEngine = new ScoringEngine();
-      
-      // Simuler des performances si aucune n'est fournie
-      const mockPerformances = performances.length > 0 ? performances : [
-        { discipline: 'bench', value: user.weight * 1.2, date: new Date() },
-        { discipline: 'squat', value: user.weight * 1.5, date: new Date() },
-        { discipline: 'deadlift', value: user.weight * 1.8, date: new Date() },
-        { discipline: '5k', value: 25, date: new Date() },
-        { discipline: 'pullups', value: 8, date: new Date() }
-      ];
-      
-      // Calculer les scores normalisés pour chaque performance
-      const userScores: { [discipline: string]: number } = {};
-      
-      mockPerformances.forEach((perf: any) => {
-        const normalizedScore = scoringEngine.calculateNormalizedScore(
-          perf.value,
-          perf.discipline,
-          user.sex || 'male',
-          user.weight || 75,
-          user.age || 28
-        );
-        
-        // Garder le meilleur score pour chaque discipline
-        if (!userScores[perf.discipline] || normalizedScore > userScores[perf.discipline]) {
-          userScores[perf.discipline] = normalizedScore;
-        }
-      });
-      
-      // Créer le profil utilisateur
-      const userProfile = {
-        id: user.id || '1',
-        name: user.name || 'Utilisateur',
-        weights: getSportProfile(user.sportClass || 'classique')
-      };
-      
-      // Calculer le score global
-      const globalScore = scoringEngine.calculateGlobalScore(
-        userScores,
-        userProfile,
-        user.sportClass || 'classique'
-      );
-      
-      setUserRank(globalScore);
-      setLastUpdated(new Date());
-      
-    } catch (error) {
-      console.error('Erreur lors du calcul du rang:', error);
-    } finally {
-      setLoading(false);
+    // Appliquer les pondérations selon la classe de sport
+    const sportProfile = getSportProfile(userSportClass);
+    const weightedScore = averageScore * sportProfile.force;
+
+    return {
+      rank: determineRankFromScore(weightedScore),
+      score: Math.round(weightedScore),
+      reason: `Basé sur ${performanceCount} performance(s) avec profil ${userSportClass}`,
+      breakdown: {
+        force: Math.round(breakdown.force / performanceCount),
+        endurance: Math.round(breakdown.endurance / performanceCount),
+        explosivite: 0,
+        calisthenics: 0
+      }
+    };
+  };
+
+  // FONCTION POUR DÉTERMINER LE RANG SELON LE SCORE
+  const determineRankFromScore = (score: number): string => {
+    if (score < 100) return 'E';
+    if (score < 250) return 'D';
+    if (score < 400) return 'C';
+    if (score < 550) return 'B';
+    if (score < 700) return 'A';
+    if (score < 800) return 'S';
+    if (score < 900) return 'Nation';
+    return 'World';
+  };
+
+  // FONCTION POUR OBTENIR LA COULEUR DU RANG
+  const getRangColor = (rang: string) => {
+    switch (rang) {
+      case 'World': return 'from-yellow-400 to-yellow-600';
+      case 'Nation': return 'from-purple-500 to-purple-700';
+      case 'S': return 'from-purple-600 to-purple-800';
+      case 'A': return 'from-red-500 to-red-700';
+      case 'B': return 'from-blue-500 to-blue-700';
+      case 'C': return 'from-green-500 to-green-700';
+      case 'D': return 'from-yellow-500 to-yellow-700';
+      default: return 'from-gray-500 to-gray-700';
     }
   };
 
+  // FONCTION POUR OBTENIR L'ICÔNE DU RANG
+  const getRangIcon = (rang: string) => {
+    switch (rang) {
+      case 'World': return <Crown className="w-6 h-6" />;
+      case 'Nation': return <Award className="w-6 h-6" />;
+      case 'S': return <Trophy className="w-6 h-6" />;
+      case 'A': return <Medal className="w-6 h-6" />;
+      case 'B': return <Star className="w-6 h-6" />;
+      case 'C': return <Target className="w-6 h-6" />;
+      case 'D': return <Zap className="w-6 h-6" />;
+      default: return <Star className="w-6 h-6" />;
+    }
+  };
+
+  // RECALCULER LE RANG QUAND LES PERFORMANCES CHANGENT
   useEffect(() => {
-    calculateRank();
-  }, [user, performances]);
+    if (performances.length > 0) {
+      setIsCalculating(true);
+      setTimeout(() => {
+        const newRank = calculateRealRank(performances);
+        setUserRank(newRank);
+        if (onRankUpdate) {
+          onRankUpdate(newRank);
+        }
+        setIsCalculating(false);
+      }, 500);
+    }
+  }, [performances, user]);
 
-  const getRankColor = (rank: string) => {
-    const colors = {
-      'E': 'bg-gray-400',
-      'D': 'bg-blue-400',
-      'C': 'bg-green-400',
-      'B': 'bg-yellow-400',
-      'A': 'bg-orange-400',
-      'S': 'bg-red-400',
-      'Nation': 'bg-purple-400',
-      'World': 'bg-gradient-to-r from-yellow-400 to-yellow-600'
-    };
-    return colors[rank as keyof typeof colors] || 'bg-gray-400';
-  };
-
-  const getRankLabel = (rank: string) => {
-    const labels = {
-      'E': 'Débutant',
-      'D': 'Occasionnel',
-      'C': 'Confirmé',
-      'B': 'Régional',
-      'A': 'National',
-      'S': 'Mondial élite',
-      'Nation': 'Top national',
-      'World': 'Record mondial'
-    };
-    return labels[rank as keyof typeof labels] || rank;
-  };
-
-  const getRankDescription = (rank: string) => {
-    const descriptions = {
-      'E': 'Débutant - Commencez votre parcours',
-      'D': 'Occasionnel - Pratique régulière',
-      'C': 'Confirmé - Bon niveau général',
-      'B': 'Régional - Niveau compétitif local',
-      'A': 'National - Niveau compétitif national',
-      'S': 'Mondial élite - Niveau compétitif international',
-      'Nation': 'Top national - Proche des records nationaux',
-      'World': 'Record mondial - Légendaire'
-    };
-    return descriptions[rank as keyof typeof descriptions] || '';
-  };
-
-  const getSportLabel = (sport: string) => {
-    const labels = {
-      'crossfit': 'CrossFit',
-      'power': 'Powerlifting',
-      'classique': 'Musculation',
-      'marathon': 'Marathon',
-      'calisthenics': 'Calisthenics',
-      'yoga': 'Yoga',
-      'natation': 'Natation',
-      'cyclisme': 'Cyclisme'
-    };
-    return labels[sport as keyof typeof labels] || 'Musculation';
-  };
-
-  if (loading) {
+  if (!user) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <div className="mt-2">Calcul de votre rang...</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!userRank) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-gray-500">
-            Impossible de calculer votre rang. Vérifiez vos informations de profil.
+      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+        <CardContent className="p-8 text-center">
+          <div className="text-gray-500">
+            <Star className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <p className="text-lg">Connectez-vous pour voir votre rang</p>
           </div>
         </CardContent>
       </Card>
@@ -160,69 +176,85 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({ user, pe
   }
 
   return (
-    <Card>
+    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Votre rang actuel</span>
-          <div className="flex items-center gap-2">
-            <Badge className={`${getRankColor(userRank.rank)} text-white`}>
-              {userRank.rank} - {getRankLabel(userRank.rank)}
-            </Badge>
-            <Button
-              onClick={calculateRank}
-              size="sm"
-              variant="outline"
-              disabled={loading}
-            >
-              Actualiser
-            </Button>
-          </div>
+        <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+          <Trophy className="w-6 h-6 text-yellow-500" />
+          Calculateur de Rang en Temps Réel
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="text-center space-y-4">
-          <div className="text-4xl font-bold text-primary">
-            {userRank.globalScore}
+      <CardContent className="space-y-6">
+        {isCalculating ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Calcul en cours...</p>
           </div>
-          <div className="text-sm text-muted-foreground">
-            sur 1000 points
+        ) : userRank ? (
+          <>
+            {/* Affichage du rang principal */}
+            <div className="text-center space-y-4">
+              <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r ${getRangColor(userRank.rank)} text-white font-bold text-2xl shadow-lg`}>
+                {getRangIcon(userRank.rank)}
+                <span>Rang {userRank.rank}</span>
+              </div>
+              
+              <div className="text-4xl font-bold text-indigo-600">
+                {userRank.score}/1000
+              </div>
+              <div className="text-lg text-gray-600">Score global</div>
+            </div>
+
+            {/* Barre de progression */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Progression vers le rang supérieur</span>
+                <span>{userRank.score}%</span>
+              </div>
+              <Progress value={userRank.score} className="h-4" />
+            </div>
+
+            {/* Détail des scores */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
+                <div className="text-sm text-gray-600 mb-1">Force</div>
+                <div className="text-2xl font-bold text-red-600">{userRank.breakdown.force}</div>
+              </div>
+              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+                <div className="text-sm text-gray-600 mb-1">Endurance</div>
+                <div className="text-2xl font-bold text-blue-600">{userRank.breakdown.endurance}</div>
+              </div>
+            </div>
+
+            {/* Informations contextuelles */}
+            <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+              <div className="text-sm text-gray-600 mb-1">Calcul basé sur</div>
+              <div className="text-lg font-semibold text-gray-800">{userRank.reason}</div>
+            </div>
+
+            {/* Bouton de recalcul */}
+            <Button
+              onClick={() => {
+                const newRank = calculateRealRank(performances);
+                setUserRank(newRank);
+                if (onRankUpdate) {
+                  onRankUpdate(newRank);
+                }
+              }}
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Recalculer le rang
+            </Button>
+          </>
+        ) : (
+          <div className="text-center py-8">
+            <div className="text-gray-500">
+              <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg">Aucune performance enregistrée</p>
+              <p className="text-sm">Ajoutez vos performances pour calculer votre rang !</p>
+            </div>
           </div>
-          
-          {/* Informations sur le profil */}
-          <div className="text-sm text-muted-foreground">
-            Classe: {getSportLabel(user.sportClass || 'classique')} | 
-            Sexe: {user.sex === 'male' ? 'Homme' : 'Femme'} | 
-            Poids: {user.weight || 75}kg
-          </div>
-          
-          {/* Description du rang */}
-          <div className="text-xs text-muted-foreground">
-            {getRankDescription(userRank.rank)}
-          </div>
-          
-          {/* Breakdown par catégorie */}
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium">Force:</span> {userRank.breakdown.force}/1000
-            </div>
-            <div>
-              <span className="font-medium">Endurance:</span> {userRank.breakdown.endurance}/1000
-            </div>
-            <div>
-              <span className="font-medium">Explosivité:</span> {userRank.breakdown.explosivite}/1000
-            </div>
-            <div>
-              <span className="font-medium">Calisthenics:</span> {userRank.breakdown.calisthenics}/1000
-            </div>
-          </div>
-          
-          {/* Dernière mise à jour */}
-          {lastUpdated && (
-            <div className="text-xs text-muted-foreground">
-              Dernière mise à jour: {lastUpdated.toLocaleTimeString()}
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
     </Card>
   );

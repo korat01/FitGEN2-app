@@ -1,97 +1,274 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
-import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { Dumbbell, Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
 
-const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export const Login: React.FC = () => {
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    weight: 75,
+    age: 28,
+    sex: 'male' as 'male' | 'female',
+    sportClass: 'classique'
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Rediriger si déjà connecté
+  useEffect(() => {
+    if (user) {
+      console.log('✅ Utilisateur déjà connecté, redirection vers le dashboard');
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulation de connexion
-    const userData = {
-      id: '1',
-      nom: 'Alexandre Martin',
-      email: email,
-      isAuthenticated: true
-    };
-    login(userData);
-    // Rediriger vers la page d'accueil après connexion
-    window.location.href = '/';
+    
+    console.log('🚀 DÉBUT DE LA CONNEXION');
+    console.log('Données du formulaire:', formData);
+    
+    if (!formData.name || !formData.email || !formData.password) {
+      alert('❌ Veuillez remplir tous les champs obligatoires');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Créer un utilisateur avec toutes les données nécessaires
+      const userData = {
+        id: Date.now().toString(),
+        name: formData.name,
+        email: formData.email,
+        weight: formData.weight,
+        age: formData.age,
+        sex: formData.sex,
+        sportClass: formData.sportClass,
+        rank: 'D',
+        globalScore: 0
+      };
+      
+      console.log(' Données utilisateur créées:', userData);
+      
+      // Simuler un délai
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Appeler la fonction login
+      console.log('🔐 Appel de la fonction login...');
+      login(userData);
+      
+      console.log('✅ Connexion réussie !');
+      
+      // Rediriger vers le dashboard
+      navigate('/dashboard');
+      
+    } catch (error) {
+      console.error('❌ Erreur lors de la connexion:', error);
+      alert('❌ Erreur lors de la connexion: ' + error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0">
-        <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
-          <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
-            <User className="w-6 h-6" />
-            Connexion FitGEN22
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border-0 shadow-2xl">
+        <CardHeader className="text-center space-y-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto">
+            <Dumbbell className="w-8 h-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Connexion à FitGEN2
           </CardTitle>
-          <p className="text-white/80">Connectez-vous à votre compte</p>
+          <p className="text-gray-600">
+            Accédez à votre tableau de bord personnel
+          </p>
         </CardHeader>
-        <CardContent className="p-8">
-          <form onSubmit={handleLogin} className="space-y-6">
+        
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nom */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email</Label>
+              <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
+                Nom complet *
+              </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
-                  className="pl-10 h-12 text-base"
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Votre nom"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
-            
+
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold text-gray-700">Mot de passe</Label>
+              <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+                Email *
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="votre@email.com"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            {/* Mot de passe */}
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+                Mot de passe *
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                   placeholder="Votre mot de passe"
-                  className="pl-10 pr-10 h-12 text-base"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 text-base font-semibold"
-            >
-              Se connecter
-            </Button>
-            
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Pas encore de compte ? 
-                <button className="text-purple-600 hover:text-purple-700 font-semibold ml-1">
-                  S'inscrire
-                </button>
-              </p>
+
+            {/* Informations personnelles */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Informations personnelles</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Poids */}
+                <div className="space-y-2">
+                  <Label htmlFor="weight" className="text-sm font-semibold text-gray-700">
+                    Poids (kg)
+                  </Label>
+                  <Input
+                    id="weight"
+                    type="number"
+                    value={formData.weight}
+                    onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
+                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="75"
+                    min="30"
+                    max="200"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {/* Âge */}
+                <div className="space-y-2">
+                  <Label htmlFor="age" className="text-sm font-semibold text-gray-700">
+                    Âge
+                  </Label>
+                  <Input
+                    id="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
+                    className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="28"
+                    min="16"
+                    max="100"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              {/* Sexe */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-700">Sexe</Label>
+                <div className="flex gap-3">
+                  <Button
+                    type="button"
+                    variant={formData.sex === 'male' ? 'default' : 'outline'}
+                    onClick={() => setFormData({ ...formData, sex: 'male' })}
+                    className="flex-1 h-12"
+                    disabled={isLoading}
+                  >
+                    Homme
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={formData.sex === 'female' ? 'default' : 'outline'}
+                    onClick={() => setFormData({ ...formData, sex: 'female' })}
+                    className="flex-1 h-12"
+                    disabled={isLoading}
+                  >
+                    Femme
+                  </Button>
+                </div>
+              </div>
+
+              {/* Classe de sport */}
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-700">Type de sport</Label>
+                <select
+                  value={formData.sportClass}
+                  onChange={(e) => setFormData({ ...formData, sportClass: e.target.value })}
+                  className="w-full h-12 px-4 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+                  disabled={isLoading}
+                >
+                  <option value="classique">Classique</option>
+                  <option value="crossfit">CrossFit</option>
+                  <option value="power">Powerlifting</option>
+                  <option value="marathon">Marathon</option>
+                  <option value="calisthenics">Calisthenics</option>
+                </select>
+              </div>
             </div>
+
+            {/* Bouton de connexion */}
+            <Button
+              type="submit"
+              className="w-full h-14 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Connexion en cours...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Dumbbell className="w-5 h-5" />
+                  <span>Se connecter</span>
+                </div>
+              )}
+            </Button>
           </form>
         </CardContent>
       </Card>

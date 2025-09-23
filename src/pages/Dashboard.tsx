@@ -19,6 +19,42 @@ export const Dashboard: React.FC = () => {
   const [performances, setPerformances] = useState<any[]>([]);
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
+  // FONCTION POUR RECALCULER LE RANG
+  const recalculateRank = () => {
+    if (user) {
+      console.log('🔄 RECALCUL FORCÉ DU RANG');
+      const savedPerformances = localStorage.getItem('userPerformances');
+      if (savedPerformances) {
+        const performancesList = JSON.parse(savedPerformances);
+        console.log('📊 Performances pour recalcul:', performancesList);
+        
+        const realRank = scoringEngine.calculateUserRank(user, performancesList);
+        console.log('🏆 Nouveau rang calculé:', realRank);
+        
+        setUserRank(realRank);
+        updateUser({
+          rank: realRank.rank,
+          globalScore: realRank.globalScore
+        });
+        
+        // Mettre à jour les performances
+        setPerformances(performancesList);
+        
+        // Debug info
+        setDebugInfo({
+          userWeight: user.weight,
+          userSex: user.sex,
+          userSportClass: user.sportClass,
+          performancesCount: performancesList.length,
+          performances: performancesList,
+          calculatedRank: realRank
+        });
+        
+        alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
+      }
+    }
+  };
+
   // Charger les performances et calculer le rang
   useEffect(() => {
     if (user) {
@@ -39,6 +75,16 @@ export const Dashboard: React.FC = () => {
           const realRank = scoringEngine.calculateUserRank(user, performancesList);
           console.log('🏆 Rang calculé:', realRank);
           setUserRank(realRank);
+          
+          // Debug info
+          setDebugInfo({
+            userWeight: user.weight,
+            userSex: user.sex,
+            userSportClass: user.sportClass,
+            performancesCount: performancesList.length,
+            performances: performancesList,
+            calculatedRank: realRank
+          });
           
           // Mettre à jour l'utilisateur avec le vrai rang
           if (realRank.rank !== user.rank || realRank.globalScore !== user.globalScore) {
@@ -146,6 +192,13 @@ export const Dashboard: React.FC = () => {
                 </div>
                 
                     <Button
+                      onClick={recalculateRank}
+                      className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+                    >
+                      🔄 Recalculer
+                    </Button>
+                    
+                    <Button
                       onClick={() => window.location.href = '/stats'}
                       className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
                     >
@@ -171,32 +224,23 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* DEBUG INFO - À SUPPRIMER APRÈS CORRECTION */}
-          {debugInfo && (
-            <Card className="bg-red-50 border-2 border-red-200">
-              <CardHeader>
-                <CardTitle className="text-red-800">🐛 DEBUG INFO</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-bold text-red-800">Utilisateur:</h4>
-                    <p>Poids: {debugInfo.userWeight}kg</p>
-                    <p>Sexe: {debugInfo.userSex}</p>
-                    <p>Sport: {debugInfo.userSportClass}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-red-800">Performances:</h4>
-                    <p>Nombre: {debugInfo.performancesCount}</p>
-                    <p>Détail: {JSON.stringify(debugInfo.performances, null, 2)}</p>
-        </div>
-                </div>
-                <div>
-                  <h4 className="font-bold text-red-800">Rang calculé:</h4>
-                  <p>{JSON.stringify(debugInfo.calculatedRank, null, 2)}</p>
-                </div>
-              </CardContent>
-            </Card>
+          {/* DEBUG INFO - Masqué par défaut */}
+          {false && (
+            <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-bold text-yellow-800 mb-2">🐛 DEBUG INFO</h3>
+              <div className="text-sm text-yellow-700 space-y-1">
+                <p><strong>Utilisateur:</strong></p>
+                <p>Poids: {user?.weight || 75}kg</p>
+                <p>Sexe: {user?.sex || 'male'}</p>
+                <p>Sport: {user?.sportClass || 'classique'}</p>
+                <p>Âge: {user?.age || 25} ans</p>
+                <p><strong>Performances:</strong></p>
+                <p>Nombre: {performances.length}</p>
+                <p><strong>Détail:</strong> {JSON.stringify(performances, null, 2)}</p>
+                <p><strong>Rang calculé:</strong></p>
+                <p>{JSON.stringify(userRank, null, 2)}</p>
+              </div>
+            </div>
           )}
 
           {/* Statistiques rapides */}

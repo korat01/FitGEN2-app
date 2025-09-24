@@ -87,124 +87,101 @@ export class ScoringEngine {
 
       switch (perf.discipline) {
         case 'bench':
-          // RÉFÉRENCES AVEC AJUSTEMENT JUNIOR
-          let benchRefs;
-          if (userWeight <= 66) {
-            benchRefs = { A: 100, S: 150, World: 200 };
-          } else if (userWeight <= 74) {
-            benchRefs = { A: 120, S: 180, World: 220 };
-          } else if (userWeight <= 83) {
-            benchRefs = { A: 140, S: 200, World: 250 };
-          } else if (userWeight <= 93) {
-            benchRefs = { A: 160, S: 220, World: 280 };
-          } else if (userWeight <= 105) {
-            benchRefs = { A: 180, S: 240, World: 300 };
-          } else {
-            benchRefs = { A: 200, S: 260, World: 320 };
-          }
+          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
+          let benchRefs = this.getBenchReferences(userWeight, userSex, userSportClass);
           
-          // APPLIQUER LE MULTIPLICATEUR JUNIOR
+          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
           benchRefs.A *= ageMultiplier;
           benchRefs.S *= ageMultiplier;
           benchRefs.World *= ageMultiplier;
           
-          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${ageCategory}):`, benchRefs);
+          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, benchRefs);
           
           if (perf.value >= benchRefs.A) {
             score = 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300;
           } else {
             score = (perf.value / benchRefs.A) * 600;
           }
+          
+          // BONUS POUR PERFORMANCES EXCEPTIONNELLES DANS LES DOMAINES NON-SPÉCIALISÉS
+          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, benchRefs);
+          
           category = 'force';
           break;
           
         case 'squat':
-          // RÉFÉRENCES AVEC AJUSTEMENT JUNIOR
-          let squatRefs;
-          if (userWeight <= 66) {
-            squatRefs = { A: 150, S: 220, World: 280 };
-          } else if (userWeight <= 74) {
-            squatRefs = { A: 180, S: 250, World: 320 };
-          } else if (userWeight <= 83) {
-            squatRefs = { A: 200, S: 280, World: 350 };
-          } else if (userWeight <= 93) {
-            squatRefs = { A: 220, S: 300, World: 380 };
-          } else if (userWeight <= 105) {
-            squatRefs = { A: 240, S: 320, World: 400 };
-          } else {
-            squatRefs = { A: 260, S: 340, World: 420 };
-          }
+          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
+          let squatRefs = this.getSquatReferences(userWeight, userSex, userSportClass);
           
-          // APPLIQUER LE MULTIPLICATEUR JUNIOR
+          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
           squatRefs.A *= ageMultiplier;
           squatRefs.S *= ageMultiplier;
           squatRefs.World *= ageMultiplier;
           
-          console.log(`🏋️ Squat ${perf.value}kg pour ${userWeight}kg (${ageCategory}):`, squatRefs);
+          console.log(`🏋️ Squat ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, squatRefs);
           
           if (perf.value >= squatRefs.A) {
             score = 600 + (perf.value - squatRefs.A) / (squatRefs.S - squatRefs.A) * 300;
           } else {
             score = (perf.value / squatRefs.A) * 600;
           }
+          
+          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, squatRefs);
+          
           category = 'force';
           break;
           
         case 'deadlift':
-          // RÉFÉRENCES AVEC AJUSTEMENT JUNIOR
-          let deadliftRefs;
-          if (userWeight <= 66) {
-            deadliftRefs = { A: 150, S: 220, World: 280 };
-          } else if (userWeight <= 74) {
-            deadliftRefs = { A: 180, S: 250, World: 320 };
-          } else if (userWeight <= 83) {
-            deadliftRefs = { A: 200, S: 280, World: 350 };
-          } else if (userWeight <= 93) {
-            deadliftRefs = { A: 220, S: 300, World: 380 };
-          } else if (userWeight <= 105) {
-            deadliftRefs = { A: 240, S: 320, World: 400 };
-          } else {
-            deadliftRefs = { A: 260, S: 340, World: 420 };
-          }
+          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
+          let deadliftRefs = this.getDeadliftReferences(userWeight, userSex, userSportClass);
           
-          // APPLIQUER LE MULTIPLICATEUR JUNIOR
+          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
           deadliftRefs.A *= ageMultiplier;
           deadliftRefs.S *= ageMultiplier;
           deadliftRefs.World *= ageMultiplier;
           
-          console.log(`⚡ Deadlift ${perf.value}kg pour ${userWeight}kg (${ageCategory}):`, deadliftRefs);
+          console.log(`⚡ Deadlift ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, deadliftRefs);
           
           if (perf.value >= deadliftRefs.A) {
             score = 600 + (perf.value - deadliftRefs.A) / (deadliftRefs.S - deadliftRefs.A) * 300;
           } else {
             score = (perf.value / deadliftRefs.A) * 600;
           }
+          
+          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, deadliftRefs);
+          
           category = 'force';
           break;
           
         case '5k':
-          // RÉFÉRENCES POUR LE 5KM
-          const runRefs = userSex === 'male' ? { A: 20, S: 16, World: 12 } : { A: 25, S: 20, World: 15 };
-          console.log(`🏃 5km ${perf.value}min (${userSex}):`, runRefs);
+          // RÉFÉRENCES POUR LE 5KM AVEC SEXE + CLASSE DE SPORT
+          const runRefs = this.getRunReferences(userSex, userSportClass);
+          console.log(`🏃 5km ${perf.value}min (${userSex}, ${userSportClass}):`, runRefs);
           
           if (perf.value <= runRefs.A) {
             score = 600 + (runRefs.A - perf.value) / (runRefs.A - runRefs.S) * 300;
           } else {
             score = (runRefs.A / perf.value) * 600;
           }
+          
+          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, runRefs);
+          
           category = 'endurance';
           break;
           
         case 'pullups':
-          // RÉFÉRENCES POUR LES TRACTIONS
-          const pullupRefs = { A: 15, S: 25, World: 35 }; // reps
-          console.log(`🤸‍♂️ Tractions ${perf.value} reps:`, pullupRefs);
+          // RÉFÉRENCES POUR LES TRACTIONS AVEC SEXE + CLASSE DE SPORT
+          const pullupRefs = this.getPullupReferences(userSex, userSportClass);
+          console.log(`🤸‍♂️ Tractions ${perf.value} reps (${userSex}, ${userSportClass}):`, pullupRefs);
           
           if (perf.value >= pullupRefs.A) {
             score = 600 + (perf.value - pullupRefs.A) / (pullupRefs.S - pullupRefs.A) * 300;
           } else {
             score = (perf.value / pullupRefs.A) * 600;
           }
+          
+          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, pullupRefs);
+          
           category = 'calisthenics';
           break;
           
@@ -244,6 +221,7 @@ export class ScoringEngine {
       sportProfile,
       ageCategory,
       ageMultiplier,
+      userSex,
       breakdown 
     });
 
@@ -261,7 +239,7 @@ export class ScoringEngine {
         explosivite: Math.round(breakdown.explosivite / performanceCount),
         calisthenics: Math.round(breakdown.calisthenics / performanceCount)
       },
-      reason: `Basé sur ${performanceCount} performance(s) avec profil ${userSportClass} (${ageCategory})`
+      reason: `Basé sur ${performanceCount} performance(s) avec profil ${userSportClass} (${userSex}, ${ageCategory})`
     };
   }
 
@@ -343,6 +321,351 @@ export class ScoringEngine {
     };
     
     return profiles[sportClass] || profiles.classique;
+  }
+
+  // RÉFÉRENCES DÉVELOPPÉ COUCHÉ PAR CLASSE DE SPORT
+  private getBenchReferences(weight: number, sex: string, sportClass: string) {
+    const baseRefs = this.getBaseBenchReferences(weight, sex);
+    
+    // AJUSTEMENTS PAR CLASSE DE SPORT
+    switch (sportClass) {
+      case 'power':
+        // Powerlifting : références standard (facile d'être fort)
+        return baseRefs;
+      case 'streetlifting':
+        // Streetlifting : légèrement plus difficile (moins d'équipement)
+        return {
+          A: baseRefs.A * 0.95,
+          S: baseRefs.S * 0.95,
+          World: baseRefs.World * 0.95
+        };
+      case 'crossfit':
+        // CrossFit : plus difficile (fatigue, technique différente)
+        return {
+          A: baseRefs.A * 0.85,
+          S: baseRefs.S * 0.85,
+          World: baseRefs.World * 0.85
+        };
+      case 'marathon':
+        // Marathon : TRÈS DIFFICILE (pas de spécialisation force)
+        return {
+          A: baseRefs.A * 1.3,  // +30% plus difficile
+          S: baseRefs.S * 1.3,
+          World: baseRefs.World * 1.3
+        };
+      case 'calisthenics':
+        // Calisthenics : difficile (pas d'haltères)
+        return {
+          A: baseRefs.A * 1.25,  // +25% plus difficile
+          S: baseRefs.S * 1.25,
+          World: baseRefs.World * 1.25
+        };
+      case 'sprint':
+        // Sprint : difficile (pas de spécialisation force)
+        return {
+          A: baseRefs.A * 1.2,  // +20% plus difficile
+          S: baseRefs.S * 1.2,
+          World: baseRefs.World * 1.2
+        };
+      default:
+        // Classique : références standard
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES SQUAT PAR CLASSE DE SPORT
+  private getSquatReferences(weight: number, sex: string, sportClass: string) {
+    const baseRefs = this.getBaseSquatReferences(weight, sex);
+    
+    // AJUSTEMENTS PAR CLASSE DE SPORT
+    switch (sportClass) {
+      case 'power':
+        return baseRefs;
+      case 'streetlifting':
+        return {
+          A: baseRefs.A * 0.95,
+          S: baseRefs.S * 0.95,
+          World: baseRefs.World * 0.95
+        };
+      case 'crossfit':
+        return {
+          A: baseRefs.A * 0.85,
+          S: baseRefs.S * 0.85,
+          World: baseRefs.World * 0.85
+        };
+      case 'marathon':
+        return {
+          A: baseRefs.A * 0.7,
+          S: baseRefs.S * 0.7,
+          World: baseRefs.World * 0.7
+        };
+      case 'calisthenics':
+        return {
+          A: baseRefs.A * 0.75,
+          S: baseRefs.S * 0.75,
+          World: baseRefs.World * 0.75
+        };
+      case 'sprint':
+        return {
+          A: baseRefs.A * 0.8,
+          S: baseRefs.S * 0.8,
+          World: baseRefs.World * 0.8
+        };
+      default:
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES SOULEVÉ DE TERRE PAR CLASSE DE SPORT
+  private getDeadliftReferences(weight: number, sex: string, sportClass: string) {
+    const baseRefs = this.getBaseDeadliftReferences(weight, sex);
+    
+    // AJUSTEMENTS PAR CLASSE DE SPORT
+    switch (sportClass) {
+      case 'power':
+        return baseRefs;
+      case 'streetlifting':
+        return {
+          A: baseRefs.A * 0.95,
+          S: baseRefs.S * 0.95,
+          World: baseRefs.World * 0.95
+        };
+      case 'crossfit':
+        return {
+          A: baseRefs.A * 0.85,
+          S: baseRefs.S * 0.85,
+          World: baseRefs.World * 0.85
+        };
+      case 'marathon':
+        return {
+          A: baseRefs.A * 0.7,
+          S: baseRefs.S * 0.7,
+          World: baseRefs.World * 0.7
+        };
+      case 'calisthenics':
+        return {
+          A: baseRefs.A * 0.75,
+          S: baseRefs.S * 0.75,
+          World: baseRefs.World * 0.75
+        };
+      case 'sprint':
+        return {
+          A: baseRefs.A * 0.8,
+          S: baseRefs.S * 0.8,
+          World: baseRefs.World * 0.8
+        };
+      default:
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES 5KM PAR CLASSE DE SPORT
+  private getRunReferences(sex: string, sportClass: string) {
+    const baseRefs = sex === 'male' ? 
+      { A: 20, S: 16, World: 12 } :  // Hommes
+      { A: 25, S: 20, World: 15 };  // Femmes
+    
+    // AJUSTEMENTS PAR CLASSE DE SPORT
+    switch (sportClass) {
+      case 'marathon':
+        // Marathon : FACILE d'être endurant (sa spécialité)
+        return {
+          A: baseRefs.A * 0.7,  // -30% plus facile
+          S: baseRefs.S * 0.7,
+          World: baseRefs.World * 0.7
+        };
+      case 'crossfit':
+        // CrossFit : légèrement plus difficile
+        return {
+          A: baseRefs.A * 1.1,
+          S: baseRefs.S * 1.1,
+          World: baseRefs.World * 1.1
+        };
+      case 'power':
+        // Powerlifting : TRÈS DIFFICILE (pas de spécialisation endurance)
+        return {
+          A: baseRefs.A * 1.3,  // +30% plus difficile
+          S: baseRefs.S * 1.3,
+          World: baseRefs.World * 1.3
+        };
+      case 'streetlifting':
+        // Streetlifting : difficile
+        return {
+          A: baseRefs.A * 1.2,
+          S: baseRefs.S * 1.2,
+          World: baseRefs.World * 1.2
+        };
+      case 'calisthenics':
+        // Calisthenics : modérément difficile
+        return {
+          A: baseRefs.A * 1.15,
+          S: baseRefs.S * 1.15,
+          World: baseRefs.World * 1.15
+        };
+      case 'sprint':
+        // Sprint : très difficile (spécialisation vitesse)
+        return {
+          A: baseRefs.A * 1.4,
+          S: baseRefs.S * 1.4,
+          World: baseRefs.World * 1.4
+        };
+      default:
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES TRACTIONS PAR CLASSE DE SPORT
+  private getPullupReferences(sex: string, sportClass: string) {
+    const baseRefs = sex === 'male' ? 
+      { A: 15, S: 25, World: 35 } :  // Hommes
+      { A: 8, S: 15, World: 25 };   // Femmes
+    
+    // AJUSTEMENTS PAR CLASSE DE SPORT
+    switch (sportClass) {
+      case 'calisthenics':
+        // Calisthenics : facile d'être fort au poids du corps
+        return baseRefs;
+      case 'streetlifting':
+        // Streetlifting : légèrement plus difficile
+        return {
+          A: baseRefs.A * 1.1,
+          S: baseRefs.S * 1.1,
+          World: baseRefs.World * 1.1
+        };
+      case 'crossfit':
+        // CrossFit : modérément difficile
+        return {
+          A: baseRefs.A * 1.15,
+          S: baseRefs.S * 1.15,
+          World: baseRefs.World * 1.15
+        };
+      case 'power':
+        // Powerlifting : difficile (pas de spécialisation calisthenics)
+        return {
+          A: baseRefs.A * 1.3,
+          S: baseRefs.S * 1.3,
+          World: baseRefs.World * 1.3
+        };
+      case 'marathon':
+        // Marathon : difficile
+        return {
+          A: baseRefs.A * 1.25,
+          S: baseRefs.S * 1.25,
+          World: baseRefs.World * 1.25
+        };
+      case 'sprint':
+        // Sprint : difficile
+        return {
+          A: baseRefs.A * 1.2,
+          S: baseRefs.S * 1.2,
+          World: baseRefs.World * 1.2
+        };
+      default:
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES DE BASE POUR LE DÉVELOPPÉ COUCHÉ
+  private getBaseBenchReferences(weight: number, sex: string) {
+    if (sex === 'male') {
+      if (weight <= 66) return { A: 100, S: 150, World: 200 };
+      if (weight <= 74) return { A: 120, S: 180, World: 220 };
+      if (weight <= 83) return { A: 140, S: 200, World: 250 };
+      if (weight <= 93) return { A: 160, S: 220, World: 280 };
+      if (weight <= 105) return { A: 180, S: 240, World: 300 };
+      return { A: 200, S: 260, World: 320 };
+    } else {
+      if (weight <= 52) return { A: 60, S: 90, World: 120 };
+      if (weight <= 57) return { A: 70, S: 105, World: 140 };
+      if (weight <= 63) return { A: 80, S: 120, World: 160 };
+      if (weight <= 72) return { A: 90, S: 135, World: 180 };
+      if (weight <= 84) return { A: 100, S: 150, World: 200 };
+      return { A: 110, S: 165, World: 220 };
+    }
+  }
+
+  // RÉFÉRENCES DE BASE POUR LE SQUAT
+  private getBaseSquatReferences(weight: number, sex: string) {
+    if (sex === 'male') {
+      if (weight <= 66) return { A: 150, S: 220, World: 280 };
+      if (weight <= 74) return { A: 180, S: 250, World: 320 };
+      if (weight <= 83) return { A: 200, S: 280, World: 350 };
+      if (weight <= 93) return { A: 220, S: 300, World: 380 };
+      if (weight <= 105) return { A: 240, S: 320, World: 400 };
+      return { A: 260, S: 340, World: 420 };
+    } else {
+      if (weight <= 52) return { A: 90, S: 130, World: 170 };
+      if (weight <= 57) return { A: 105, S: 150, World: 195 };
+      if (weight <= 63) return { A: 120, S: 170, World: 220 };
+      if (weight <= 72) return { A: 135, S: 190, World: 245 };
+      if (weight <= 84) return { A: 150, S: 210, World: 270 };
+      return { A: 165, S: 230, World: 295 };
+    }
+  }
+
+  // RÉFÉRENCES DE BASE POUR LE SOULEVÉ DE TERRE
+  private getBaseDeadliftReferences(weight: number, sex: string) {
+    if (sex === 'male') {
+      if (weight <= 66) return { A: 150, S: 220, World: 280 };
+      if (weight <= 74) return { A: 180, S: 250, World: 320 };
+      if (weight <= 83) return { A: 200, S: 280, World: 350 };
+      if (weight <= 93) return { A: 220, S: 300, World: 380 };
+      if (weight <= 105) return { A: 240, S: 320, World: 400 };
+      return { A: 260, S: 340, World: 420 };
+    } else {
+      if (weight <= 52) return { A: 90, S: 130, World: 170 };
+      if (weight <= 57) return { A: 105, S: 150, World: 195 };
+      if (weight <= 63) return { A: 120, S: 170, World: 220 };
+      if (weight <= 72) return { A: 135, S: 190, World: 245 };
+      if (weight <= 84) return { A: 150, S: 210, World: 270 };
+      return { A: 165, S: 230, World: 295 };
+    }
+  }
+
+  // NOUVELLE MÉTHODE : BONUS POUR PERFORMANCES EXCEPTIONNELLES DANS LES DOMAINES NON-SPÉCIALISÉS
+  private applyCrossTrainingBonus(score: number, discipline: string, sportClass: string, value: number, refs: any): number {
+    // Définir les domaines de spécialisation par classe de sport
+    const specializations = {
+      'power': ['bench', 'squat', 'deadlift'],
+      'marathon': ['5k'],
+      'calisthenics': ['pullups'],
+      'crossfit': ['bench', 'squat', 'deadlift', '5k', 'pullups'],
+      'streetlifting': ['bench', 'squat', 'deadlift', 'pullups'],
+      'sprint': ['5k'],
+      'classique': []
+    };
+
+    const isSpecialized = specializations[sportClass]?.includes(discipline) || false;
+    
+    if (!isSpecialized) {
+      // BONUS POUR PERFORMANCES EXCEPTIONNELLES DANS LES DOMAINES NON-SPÉCIALISÉS
+      let bonusMultiplier = 1.0;
+      
+      // Calculer le niveau de performance par rapport aux références
+      let performanceLevel = 0;
+      if (discipline === '5k') {
+        // Pour la course, plus c'est rapide, mieux c'est
+        performanceLevel = refs.A / value;
+      } else {
+        // Pour la force, plus c'est lourd, mieux c'est
+        performanceLevel = value / refs.A;
+      }
+      
+      // Appliquer un bonus progressif
+      if (performanceLevel >= 1.5) {
+        bonusMultiplier = 1.5; // +50% de bonus pour performances exceptionnelles
+      } else if (performanceLevel >= 1.3) {
+        bonusMultiplier = 1.3; // +30% de bonus
+      } else if (performanceLevel >= 1.1) {
+        bonusMultiplier = 1.1; // +10% de bonus
+      }
+      
+      console.log(`🎯 Bonus cross-training pour ${discipline} (${sportClass}): ${performanceLevel.toFixed(2)}x → +${((bonusMultiplier - 1) * 100).toFixed(0)}%`);
+      
+      return score * bonusMultiplier;
+    }
+    
+    return score;
   }
 }
 

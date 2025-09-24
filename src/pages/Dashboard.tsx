@@ -218,11 +218,11 @@ export const Dashboard: React.FC = () => {
                 <div className="text-sm">
                     <span className="text-white font-bold text-xl">{userRank?.globalScore || 0}</span> 
                     <span className="text-white/80"> / 1000 points</span>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
           {/* DEBUG INFO - Masqué par défaut */}
           {false && (
@@ -239,8 +239,8 @@ export const Dashboard: React.FC = () => {
                 <p><strong>Détail:</strong> {JSON.stringify(performances, null, 2)}</p>
                 <p><strong>Rang calculé:</strong></p>
                 <p>{JSON.stringify(userRank, null, 2)}</p>
-              </div>
-            </div>
+                </div>
+                </div>
           )}
 
           {/* Statistiques rapides */}

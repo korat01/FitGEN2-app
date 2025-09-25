@@ -13,6 +13,7 @@ import ProfileSummary from './pages/ProfileSummary';
 import Programme from './pages/Programme';
 import Nutrition from './pages/Nutrition';
 import NotFound from './pages/NotFound';
+import BlocsEntrainement from './pages/BlocsEntrainement';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -44,11 +45,11 @@ const AppContent: React.FC = () => {
   const { user } = useAuth();
   
   return (
-    <Router>
+      <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <Routes>
+          <Routes>
           {/* Route publique */}
-          <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
           
           {/* Routes protégées */}
           <Route path="/" element={
@@ -98,14 +99,22 @@ const AppContent: React.FC = () => {
               </PageLayout>
             </ProtectedRoute>
           } />
+
+          <Route path="/blocs-entrainement" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <BlocsEntrainement />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
           
           {/* Route 404 */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+          </Routes>
         
-        <Toaster />
-      </div>
-    </Router>
+          <Toaster />
+        </div>
+      </Router>
   );
 };
 

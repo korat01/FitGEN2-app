@@ -4,16 +4,21 @@ export type ForceFocus = 'squat' | 'deadlift' | 'bench_press';
 
 export interface UserProfile {
   id: string;
-  nom: string;
+  name: string;
   email: string;
+  weight: number;
   age: number;
-  poids: number;
-  taille: number;
-  objectif: string;
-  niveau: string;
-  frequence: number;
-  focus: string[];
-  focusForce: string[];
+  sex: 'male' | 'female';
+  sportClass: 'powerlifter' | 'runner' | 'allround' | 'calisthenics' | 'crossfit' | 'marathon' | 'streetlifting' | 'sprint' | 'classique';
+  phone?: string;
+  location?: string;
+  height?: number;
+  goal?: 'performance' | 'musculation' | 'endurance' | 'sante';
+  generalLevel?: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert';
+  trainingDays?: string[]; // Jours d'entraînement sélectionnés
+  trainingMonths?: number; // Durée d'entraînement en mois
+  [key: `focus_${string}`]: boolean | undefined; // For dynamic focus fields
+  [key: `muscleGroup_${string}`]: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert' | undefined; // For dynamic muscle group levels
   preferences: {
     dureeSeance: number;
     equipement: string[];
@@ -22,9 +27,9 @@ export interface UserProfile {
   createdAt: Date;
   updatedAt: Date;
   // AJOUTER CES CHAMPS
-  sex?: 'male' | 'female';
-  profileType?: 'powerlifter' | 'runner' | 'allround' | 'calisthenics';
-  sportClass?: 'crossfit' | 'power' | 'classique' | 'marathon' | 'calisthenics' | 'yoga' | 'natation' | 'cyclisme';
+  // sex?: 'male' | 'female';
+  // profileType?: 'powerlifter' | 'runner' | 'allround' | 'calisthenics';
+  // sportClass?: 'crossfit' | 'power' | 'classique' | 'marathon' | 'calisthenics' | 'yoga' | 'natation' | 'cyclisme';
 }
 
 export const FOCUS_AREAS: FocusArea[] = [

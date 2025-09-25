@@ -1,1291 +1,2481 @@
-import React, { useState } from 'react';
-import PageLayout from '@/components/PageLayout';
-import StatCard from '@/components/StatCard';
-import ActionButton from '@/components/ActionButton';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Dumbbell, 
-  Search, 
-  Filter, 
-  Plus, 
-  Star, 
   Clock, 
   Target,
+  Flame, 
+  Users, 
+  Activity,
+  Play,
+  Pause,
+  RotateCcw,
+  CheckCircle,
+  Star,
+  Zap,
+  Heart,
   TrendingUp,
-  Zap
+  Search,
+  Filter,
+  List,
+  Grid,
+  Eye,
+  Plus
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
-const BlocsEntrainement = () => {
-  const navigate = useNavigate();
+export const BlocsEntrainement: React.FC = () => {
+  const { user } = useAuth();
+  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // 120 entraînements variés
-  const exerciseBlocks = [
-    // Push Day
+  // Données des exercices
+  const exercices = [
+    // Force/Powerlifting
     {
-      id: 1,
-      name: "Push Day Classique",
-      exercises: 4,
-      duration: "75 min",
-      difficulty: "Intermédiaire",
-      category: "Push",
-      popularity: 95,
-      isPopular: true,
-      description: "Développé couché, dips, élévations latérales, développé incliné"
+      id: 'squat',
+      nom: 'Squat',
+      description: 'Exercice de base pour développer la force des jambes et du dos',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers', 'Dos'],
+      equipement: 'Barre + Rack',
+      image: '🏋️‍♂️',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sous la barre',
+        'Placez la barre sur vos trapèzes',
+        'Descendez en gardant le dos droit',
+        'Remontez en contractant les jambes'
+      ],
+      conseils: 'Gardez les genoux alignés avec les pieds',
+      variations: ['Squat avant', 'Squat bulgare', 'Squat sumo']
     },
     {
-      id: 2,
-      name: "Push Day Intensif",
-      exercises: 6,
-      duration: "90 min",
-      difficulty: "Avancé",
-      category: "Push",
-      popularity: 88,
-      isPopular: true,
-      description: "Développé couché, développé incliné, dips lestés, élévations, pompes"
+      id: 'bench-press',
+      nom: 'Développé Couché',
+      description: 'Exercice roi pour développer la force de la poitrine',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Poitrine', 'Triceps', 'Épaules'],
+      equipement: 'Barre + Banc',
+      image: '💪',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Allongez-vous sur le banc',
+        'Saisissez la barre avec une prise large',
+        'Descendez la barre vers la poitrine',
+        'Poussez vers le haut avec force'
+      ],
+      conseils: 'Gardez les pieds bien ancrés au sol',
+      variations: ['Développé incliné', 'Développé décliné', 'Développé haltères']
     },
     {
-      id: 3,
-      name: "Push Day Débutant",
-      exercises: 3,
-      duration: "45 min",
-      difficulty: "Débutant",
-      category: "Push",
-      popularity: 92,
-      isPopular: true,
-      description: "Développé couché, pompes, élévations latérales"
+      id: 'deadlift',
+      nom: 'Soulevé de Terre',
+      description: 'Exercice complet pour développer la force totale du corps',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Avancé',
+      muscles: ['Dos', 'Fessiers', 'Ischio-jambiers', 'Trapèzes'],
+      equipement: 'Barre',
+      image: '🏋️‍♀️',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous devant la barre',
+        'Saisissez la barre avec une prise mixte',
+        'Gardez le dos droit et les jambes fléchies',
+        'Soulevez en contractant tout le corps'
+      ],
+      conseils: 'Ne jamais arrondir le dos',
+      variations: ['Deadlift sumo', 'Deadlift roumain', 'Deadlift trap bar']
     },
     {
-      id: 4,
-      name: "Push Day Volume",
-      exercises: 8,
-      duration: "105 min",
-      difficulty: "Avancé",
-      category: "Push",
-      popularity: 75,
-      isPopular: false,
-      description: "Séance haute volume pour la prise de masse"
-    },
-
-    // Pull Day
-    {
-      id: 5,
-      name: "Pull Day Classique",
-      exercises: 5,
-      duration: "80 min",
-      difficulty: "Intermédiaire",
-      category: "Pull",
-      popularity: 94,
-      isPopular: true,
-      description: "Tractions, rowing, curl biceps, face pull, shrugs"
-    },
-    {
-      id: 6,
-      name: "Pull Day Intensif",
-      exercises: 7,
-      duration: "95 min",
-      difficulty: "Avancé",
-      category: "Pull",
-      popularity: 87,
-      isPopular: true,
-      description: "Tractions lestées, rowing barre, curl haltères, face pull"
+      id: 'overhead-press',
+      nom: 'Développé Militaire',
+      description: 'Exercice pour développer la force des épaules',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Épaules', 'Triceps', 'Core'],
+      equipement: 'Barre',
+      image: '💪',
+      couleur: 'from-indigo-500 to-blue-500',
+      bgCouleur: 'from-indigo-50 to-blue-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez la barre au niveau des épaules',
+        'Gardez le dos droit',
+        'Poussez la barre vers le haut',
+        'Descendez lentement'
+      ],
+      conseils: 'Gardez le core contracté',
+      variations: ['Développé assis', 'Développé haltères', 'Développé poussée']
     },
     {
-      id: 7,
-      name: "Pull Day Débutant",
-      exercises: 4,
-      duration: "50 min",
-      difficulty: "Débutant",
-      category: "Pull",
-      popularity: 89,
-      isPopular: true,
-      description: "Tractions assistées, rowing machine, curl biceps"
+      id: 'barbell-row',
+      nom: 'Rowing Barre',
+      description: 'Exercice pour développer la force du dos',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Dos', 'Biceps', 'Épaules'],
+      equipement: 'Barre',
+      image: '🏋️‍♂️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Penchez-vous vers l\'avant',
+        'Tirez la barre vers le bas du torse',
+        'Contractez les omoplates',
+        'Descendez lentement'
+      ],
+      conseils: 'Gardez le dos droit',
+      variations: ['Rowing haltères', 'Rowing T-bar', 'Rowing inversé']
     },
     {
-      id: 8,
-      name: "Pull Day Hypertrophie",
-      exercises: 6,
-      duration: "85 min",
-      difficulty: "Intermédiaire",
-      category: "Pull",
-      popularity: 82,
-      isPopular: false,
-      description: "Focus sur l'hypertrophie des muscles du dos"
-    },
-
-    // Leg Day
-    {
-      id: 9,
-      name: "Leg Day Classique",
-      exercises: 6,
-      duration: "90 min",
-      difficulty: "Avancé",
-      category: "Legs",
-      popularity: 96,
-      isPopular: true,
-      description: "Squat, fentes, soulevé de terre, extensions, mollets"
-    },
-    {
-      id: 10,
-      name: "Leg Day Intensif",
-      exercises: 8,
-      duration: "110 min",
-      difficulty: "Avancé",
-      category: "Legs",
-      popularity: 91,
-      isPopular: true,
-      description: "Squat lourd, fentes lestées, soulevé de terre, extensions"
+      id: 'front-squat',
+      nom: 'Squat Avant',
+      description: 'Variation du squat avec la barre devant',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Avancé',
+      muscles: ['Quadriceps', 'Fessiers', 'Core', 'Épaules'],
+      equipement: 'Barre + Rack',
+      image: '🏋️‍♀️',
+      couleur: 'from-orange-500 to-yellow-500',
+      bgCouleur: 'from-orange-50 to-yellow-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Placez la barre sur les épaules avant',
+        'Gardez les coudes hauts',
+        'Descendez en squat',
+        'Remontez en contractant'
+      ],
+      conseils: 'Mobilité des épaules requise',
+      variations: ['Squat avant haltères', 'Squat avant goblet', 'Squat avant kettlebell']
     },
     {
-      id: 11,
-      name: "Leg Day Débutant",
-      exercises: 4,
-      duration: "60 min",
-      difficulty: "Débutant",
-      category: "Legs",
-      popularity: 88,
-      isPopular: true,
-      description: "Squat, fentes, extensions, mollets"
+      id: 'clean-and-jerk',
+      nom: 'Épaulé-Jeté',
+      description: 'Exercice olympique complet',
+      categorie: 'Force',
+      type: 'Olympic',
+      difficulte: 'Expert',
+      muscles: ['Tout le corps'],
+      equipement: 'Barre + Plates',
+      image: '🏋️‍♂️',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la barre au sol',
+        'Tirez la barre vers le haut',
+        'Attrapez la barre sur les épaules',
+        'Poussez vers le haut'
+      ],
+      conseils: 'Technique complexe, apprendre progressivement',
+      variations: ['Power clean', 'Hang clean', 'Clean pull']
     },
     {
-      id: 12,
-      name: "Leg Day Endurance",
-      exercises: 5,
-      duration: "75 min",
-      difficulty: "Intermédiaire",
-      category: "Legs",
-      popularity: 79,
-      isPopular: false,
-      description: "Focus sur l'endurance musculaire"
-    },
-
-    // Full Body
-    {
-      id: 13,
-      name: "Full Body Classique",
-      exercises: 8,
-      duration: "60 min",
-      difficulty: "Débutant",
-      category: "Full Body",
-      popularity: 93,
-      isPopular: true,
-      description: "Squat, développé couché, tractions, fentes, dips"
-    },
-    {
-      id: 14,
-      name: "Full Body Intensif",
-      exercises: 10,
-      duration: "80 min",
-      difficulty: "Intermédiaire",
-      category: "Full Body",
-      popularity: 86,
-      isPopular: true,
-      description: "Séance complète haute intensité"
-    },
-    {
-      id: 15,
-      name: "Full Body Débutant",
-      exercises: 6,
-      duration: "45 min",
-      difficulty: "Débutant",
-      category: "Full Body",
-      popularity: 90,
-      isPopular: true,
-      description: "Séance d'initiation complète"
-    },
-    {
-      id: 16,
-      name: "Full Body Circuit",
-      exercises: 12,
-      duration: "70 min",
-      difficulty: "Intermédiaire",
-      category: "Full Body",
-      popularity: 84,
-      isPopular: false,
-      description: "Entraînement en circuit"
-    },
-
-    // Cardio
-    {
-      id: 17,
-      name: "Cardio HIIT",
-      exercises: 8,
-      duration: "30 min",
-      difficulty: "Intermédiaire",
-      category: "Cardio",
-      popularity: 91,
-      isPopular: true,
-      description: "Entraînement par intervalles haute intensité"
-    },
-    {
-      id: 18,
-      name: "Cardio LISS",
-      exercises: 3,
-      duration: "45 min",
-      difficulty: "Débutant",
-      category: "Cardio",
-      popularity: 78,
-      isPopular: false,
-      description: "Cardio en zone aérobie"
-    },
-    {
-      id: 19,
-      name: "Cardio Tabata",
-      exercises: 4,
-      duration: "20 min",
-      difficulty: "Avancé",
-      category: "Cardio",
-      popularity: 85,
-      isPopular: true,
-      description: "Protocole Tabata 20/10"
+      id: 'snatch',
+      nom: 'Arraché',
+      description: 'Exercice olympique le plus technique',
+      categorie: 'Force',
+      type: 'Olympic',
+      difficulte: 'Expert',
+      muscles: ['Tout le corps'],
+      equipement: 'Barre + Plates',
+      image: '🏋️‍♀️',
+      couleur: 'from-purple-500 to-pink-500',
+      bgCouleur: 'from-purple-50 to-pink-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la barre au sol',
+        'Tirez la barre vers le haut',
+        'Attrapez la barre au-dessus de la tête',
+        'Stabilisez la position'
+      ],
+      conseils: 'Mobilité et technique essentielles',
+      variations: ['Power snatch', 'Hang snatch', 'Snatch pull']
     },
 
-    // Spécialisés
+    // Endurance/Cardio
     {
-      id: 20,
-      name: "Upper Body Focus",
-      exercises: 7,
-      duration: "85 min",
-      difficulty: "Intermédiaire",
-      category: "Upper",
-      popularity: 87,
-      isPopular: true,
-      description: "Focus sur le haut du corps"
+      id: 'course-5k',
+      nom: 'Course 5km',
+      description: 'Course de fond pour développer l\'endurance',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Cœur', 'Poumons'],
+      equipement: 'Chaussures de course',
+      image: '🏃‍♂️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Échauffez-vous 10 minutes',
+        'Maintenez un rythme régulier',
+        'Respirez profondément',
+        'Hydratez-vous régulièrement'
+      ],
+      conseils: 'Écoutez votre corps et ajustez le rythme',
+      variations: ['Course 10km', 'Course 21km', 'Course trail']
     },
     {
-      id: 21,
-      name: "Lower Body Focus",
-      exercises: 6,
-      duration: "80 min",
-      difficulty: "Intermédiaire",
-      category: "Lower",
-      popularity: 83,
-      isPopular: false,
-      description: "Focus sur le bas du corps"
+      id: 'marathon',
+      nom: 'Marathon',
+      description: 'Course de longue distance pour l\'endurance maximale',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Expert',
+      muscles: ['Jambes', 'Cœur', 'Poumons', 'Mental'],
+      equipement: 'Chaussures de course',
+      image: '🏃‍♀️',
+      couleur: 'from-blue-500 to-indigo-500',
+      bgCouleur: 'from-blue-50 to-indigo-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Préparez-vous mentalement',
+        'Maintenez un rythme de croisière',
+        'Gérez votre énergie sur la distance',
+        'Terminez fort'
+      ],
+      conseils: 'Entraînement progressif sur plusieurs mois',
+      variations: ['Semi-marathon', 'Ultra-marathon', 'Marathon trail']
     },
     {
-      id: 22,
-      name: "Core & Abs",
-      exercises: 8,
-      duration: "40 min",
-      difficulty: "Intermédiaire",
-      category: "Core",
-      popularity: 89,
-      isPopular: true,
-      description: "Renforcement de la ceinture abdominale"
+      id: 'sprint-100m',
+      nom: 'Sprint 100m',
+      description: 'Course de vitesse pure',
+      categorie: 'Endurance',
+      type: 'Sprint',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Fessiers', 'Core'],
+      equipement: 'Chaussures de sprint',
+      image: '🏃‍♂️',
+      couleur: 'from-yellow-500 to-orange-500',
+      bgCouleur: 'from-yellow-50 to-orange-50',
+      borderCouleur: 'border-yellow-200/50',
+      icon: <Zap className="w-6 h-6" />,
+      instructions: [
+        'Échauffez-vous intensément',
+        'Position de départ optimale',
+        'Explosez au signal',
+        'Maintenez la vitesse maximale'
+      ],
+      conseils: 'Technique de course essentielle',
+      variations: ['Sprint 200m', 'Sprint 400m', 'Sprint 60m']
     },
     {
-      id: 23,
-      name: "Arms Specialized",
-      exercises: 6,
-      duration: "60 min",
-      difficulty: "Intermédiaire",
-      category: "Arms",
-      popularity: 81,
-      isPopular: false,
-      description: "Spécialisation bras et avant-bras"
+      id: 'natation-libre',
+      nom: 'Natation Libre',
+      description: 'Nage complète pour l\'endurance',
+      categorie: 'Endurance',
+      type: 'Aquatique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Maillot de bain',
+      image: '🏊‍♂️',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Échauffez-vous dans l\'eau',
+        'Maintenez un rythme régulier',
+        'Respirez de manière coordonnée',
+        'Terminez par un retour au calme'
+      ],
+      conseils: 'Technique de respiration importante',
+      variations: ['Crawl', 'Brasse', 'Dos crawlé']
     },
     {
-      id: 24,
-      name: "Back & Biceps",
-      exercises: 8,
-      duration: "90 min",
-      difficulty: "Intermédiaire",
-      category: "Back",
-      popularity: 88,
-      isPopular: true,
-      description: "Focus dos et biceps"
+      id: 'cyclisme',
+      nom: 'Cyclisme',
+      description: 'Sport d\'endurance sur vélo',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Cœur', 'Poumons'],
+      equipement: 'Vélo',
+      image: '🚴‍♂️',
+      couleur: 'from-green-500 to-teal-500',
+      bgCouleur: 'from-green-50 to-teal-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Ajustez la selle à la bonne hauteur',
+        'Maintenez un rythme de pédalage',
+        'Respirez profondément',
+        'Hydratez-vous régulièrement'
+      ],
+      conseils: 'Position sur le vélo importante',
+      variations: ['VTT', 'Route', 'Piste']
     },
     {
-      id: 25,
-      name: "Chest & Triceps",
-      exercises: 7,
-      duration: "85 min",
-      difficulty: "Intermédiaire",
-      category: "Chest",
-      popularity: 86,
-      isPopular: true,
-      description: "Focus pectoraux et triceps"
-    },
-    {
-      id: 26,
-      name: "Shoulders & Traps",
-      exercises: 6,
-      duration: "70 min",
-      difficulty: "Intermédiaire",
-      category: "Shoulders",
-      popularity: 79,
-      isPopular: false,
-      description: "Spécialisation épaules et trapèzes"
-    },
-    {
-      id: 27,
-      name: "Glutes & Hamstrings",
-      exercises: 5,
-      duration: "65 min",
-      difficulty: "Intermédiaire",
-      category: "Glutes",
-      popularity: 84,
-      isPopular: false,
-      description: "Focus fessiers et ischio-jambiers"
-    },
-    {
-      id: 28,
-      name: "Functional Training",
-      exercises: 9,
-      duration: "55 min",
-      difficulty: "Intermédiaire",
-      category: "Functional",
-      popularity: 87,
-      isPopular: true,
-      description: "Mouvements fonctionnels"
-    },
-    {
-      id: 29,
-      name: "Powerlifting",
-      exercises: 4,
-      duration: "90 min",
-      difficulty: "Avancé",
-      category: "Powerlifting",
-      popularity: 82,
-      isPopular: false,
-      description: "Squat, développé couché, soulevé de terre"
-    },
-    {
-      id: 30,
-      name: "Bodyweight Only",
-      exercises: 10,
-      duration: "50 min",
-      difficulty: "Intermédiaire",
-      category: "Bodyweight",
-      popularity: 92,
-      isPopular: true,
-      description: "Entraînement au poids du corps uniquement"
-    },
-
-    // NOUVEAUX ENTRAÎNEMENTS (31-60)
-    
-    // Push Day avancés
-    {
-      id: 31,
-      name: "Push Day Explosif",
-      exercises: 5,
-      duration: "70 min",
-      difficulty: "Avancé",
-      category: "Push",
-      popularity: 83,
-      isPopular: false,
-      description: "Mouvements explosifs pour la puissance"
-    },
-    {
-      id: 32,
-      name: "Push Day Isolé",
-      exercises: 7,
-      duration: "85 min",
-      difficulty: "Intermédiaire",
-      category: "Push",
-      popularity: 76,
-      isPopular: false,
-      description: "Focus sur l'isolation musculaire"
-    },
-    {
-      id: 33,
-      name: "Push Day Superset",
-      exercises: 6,
-      duration: "65 min",
-      difficulty: "Intermédiaire",
-      category: "Push",
-      popularity: 88,
-      isPopular: true,
-      description: "Entraînement en supersets"
+      id: 'rameur',
+      nom: 'Rameur',
+      description: 'Exercice complet sur machine',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Machine rameur',
+      image: '🚣‍♂️',
+      couleur: 'from-blue-500 to-purple-500',
+      bgCouleur: 'from-blue-50 to-purple-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Ajustez la résistance',
+        'Commencez par les jambes',
+        'Tirez avec les bras',
+        'Retournez à la position de départ'
+      ],
+      conseils: 'Séquence jambes-bras-dos importante',
+      variations: ['Rameur court', 'Rameur long', 'Rameur intervalle']
     },
 
-    // Pull Day avancés
+    // Calisthéniques
     {
-      id: 34,
-      name: "Pull Day Explosif",
-      exercises: 6,
-      duration: "75 min",
-      difficulty: "Avancé",
-      category: "Pull",
-      popularity: 81,
-      isPopular: false,
-      description: "Mouvements explosifs pour le dos"
+      id: 'tractions',
+      nom: 'Tractions',
+      description: 'Exercice au poids du corps pour le haut du corps',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Intermédiaire',
+      muscles: ['Dos', 'Biceps', 'Épaules'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♂️',
+      couleur: 'from-orange-500 to-yellow-500',
+      bgCouleur: 'from-orange-50 to-yellow-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Tirez vers le haut jusqu\'au menton',
+        'Descendez lentement',
+        'Répétez le mouvement'
+      ],
+      conseils: 'Gardez le corps droit et stable',
+      variations: ['Tractions larges', 'Tractions serrées', 'Tractions lestées']
     },
     {
-      id: 35,
-      name: "Pull Day Isolé",
-      exercises: 8,
-      duration: "90 min",
-      difficulty: "Intermédiaire",
-      category: "Pull",
-      popularity: 74,
-      isPopular: false,
-      description: "Isolation complète du dos"
+      id: 'dips',
+      nom: 'Dips',
+      description: 'Exercice au poids du corps pour les triceps et épaules',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Intermédiaire',
+      muscles: ['Triceps', 'Épaules', 'Poitrine'],
+      equipement: 'Barres parallèles',
+      image: '🤸‍♀️',
+      couleur: 'from-pink-500 to-rose-500',
+      bgCouleur: 'from-pink-50 to-rose-50',
+      borderCouleur: 'border-pink-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sur les barres',
+        'Descendez lentement',
+        'Poussez vers le haut',
+        'Maintenez la tension'
+      ],
+      conseils: 'Gardez les coudes près du corps',
+      variations: ['Dips inclinés', 'Dips lestés', 'Dips sur banc']
     },
     {
-      id: 36,
-      name: "Pull Day Superset",
-      exercises: 7,
-      duration: "70 min",
-      difficulty: "Intermédiaire",
-      category: "Pull",
-      popularity: 85,
-      isPopular: true,
-      description: "Supersets pour le dos et biceps"
-    },
-
-    // Leg Day avancés
-    {
-      id: 37,
-      name: "Leg Day Explosif",
-      exercises: 7,
-      duration: "85 min",
-      difficulty: "Avancé",
-      category: "Legs",
-      popularity: 86,
-      isPopular: true,
-      description: "Mouvements explosifs pour les jambes"
-    },
-    {
-      id: 38,
-      name: "Leg Day Isolé",
-      exercises: 9,
-      duration: "95 min",
-      difficulty: "Intermédiaire",
-      category: "Legs",
-      popularity: 77,
-      isPopular: false,
-      description: "Isolation complète des jambes"
+      id: 'planche',
+      nom: 'Planche',
+      description: 'Exercice isométrique pour le core',
+      categorie: 'Calisthéniques',
+      type: 'Isométrique',
+      difficulte: 'Débutant',
+      muscles: ['Abdominaux', 'Dos', 'Épaules'],
+      equipement: 'Aucun',
+      image: '🧘‍♂️',
+      couleur: 'from-indigo-500 to-blue-500',
+      bgCouleur: 'from-indigo-50 to-blue-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en appui sur les avant-bras',
+        'Gardez le corps droit',
+        'Contractez les abdominaux',
+        'Maintenez la position'
+      ],
+      conseils: 'Ne pas retenir votre souffle',
+      variations: ['Planche latérale', 'Planche sur les mains', 'Planche dynamique']
     },
     {
-      id: 39,
-      name: "Leg Day Superset",
-      exercises: 8,
-      duration: "80 min",
-      difficulty: "Intermédiaire",
-      category: "Legs",
-      popularity: 89,
-      isPopular: true,
-      description: "Supersets pour les jambes"
-    },
-
-    // Full Body avancés
-    {
-      id: 40,
-      name: "Full Body Explosif",
-      exercises: 9,
-      duration: "65 min",
-      difficulty: "Avancé",
-      category: "Full Body",
-      popularity: 84,
-      isPopular: false,
-      description: "Mouvements explosifs complets"
-    },
-    {
-      id: 41,
-      name: "Full Body Isolé",
-      exercises: 11,
-      duration: "85 min",
-      difficulty: "Intermédiaire",
-      category: "Full Body",
-      popularity: 78,
-      isPopular: false,
-      description: "Isolation complète du corps"
+      id: 'handstand',
+      nom: 'Handstand',
+      description: 'Équilibre sur les mains',
+      categorie: 'Calisthéniques',
+      type: 'Équilibre',
+      difficulte: 'Avancé',
+      muscles: ['Épaules', 'Core', 'Équilibre'],
+      equipement: 'Mur (optionnel)',
+      image: '🤸‍♂️',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Commencez contre un mur',
+        'Placez les mains au sol',
+        'Montez les jambes',
+        'Maintenez l\'équilibre'
+      ],
+      conseils: 'Force des épaules et équilibre requis',
+      variations: ['Handstand contre mur', 'Handstand libre', 'Handstand push-up']
     },
     {
-      id: 42,
-      name: "Full Body Superset",
-      exercises: 10,
-      duration: "75 min",
-      difficulty: "Intermédiaire",
-      category: "Full Body",
-      popularity: 87,
-      isPopular: true,
-      description: "Supersets complets"
-    },
-
-    // Cardio avancés
-    {
-      id: 43,
-      name: "Cardio HIIT Avancé",
-      exercises: 10,
-      duration: "35 min",
-      difficulty: "Avancé",
-      category: "Cardio",
-      popularity: 89,
-      isPopular: true,
-      description: "HIIT haute intensité avancé"
-    },
-    {
-      id: 44,
-      name: "Cardio CrossFit",
-      exercises: 12,
-      duration: "50 min",
-      difficulty: "Avancé",
-      category: "Cardio",
-      popularity: 91,
-      isPopular: true,
-      description: "Entraînement CrossFit style"
+      id: 'muscle-up',
+      nom: 'Muscle-Up',
+      description: 'Transition traction-dips',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Dos', 'Triceps', 'Épaules', 'Core'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♀️',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Commencez en traction',
+        'Tirez vers le haut',
+        'Transition vers les dips',
+        'Terminez en position haute'
+      ],
+      conseils: 'Technique et force combinées',
+      variations: ['Muscle-up assisté', 'Muscle-up lesté', 'Muscle-up sur anneaux']
     },
     {
-      id: 45,
-      name: "Cardio Endurance",
-      exercises: 6,
-      duration: "60 min",
-      difficulty: "Intermédiaire",
-      category: "Cardio",
-      popularity: 82,
-      isPopular: false,
-      description: "Endurance cardiovasculaire"
+      id: 'pompes',
+      nom: 'Pompes',
+      description: 'Exercice de base pour la poitrine',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Débutant',
+      muscles: ['Poitrine', 'Triceps', 'Épaules'],
+      equipement: 'Aucun',
+      image: '💪',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Descendez vers le sol',
+        'Poussez vers le haut',
+        'Répétez le mouvement'
+      ],
+      conseils: 'Gardez le corps droit',
+      variations: ['Pompes inclinées', 'Pompes déclinées', 'Pompes diamant']
     },
     {
-      id: 46,
-      name: "Cardio Sprint",
-      exercises: 8,
-      duration: "25 min",
-      difficulty: "Avancé",
-      category: "Cardio",
-      popularity: 86,
-      isPopular: true,
-      description: "Sprints et intervalles courts"
-    },
-
-    // Spécialisés avancés
-    {
-      id: 47,
-      name: "Upper Body Explosif",
-      exercises: 8,
-      duration: "75 min",
-      difficulty: "Avancé",
-      category: "Upper",
-      popularity: 83,
-      isPopular: false,
-      description: "Haut du corps explosif"
-    },
-    {
-      id: 48,
-      name: "Lower Body Explosif",
-      exercises: 7,
-      duration: "70 min",
-      difficulty: "Avancé",
-      category: "Lower",
-      popularity: 85,
-      isPopular: true,
-      description: "Bas du corps explosif"
+      id: 'squat-saut',
+      nom: 'Squat Sauté',
+      description: 'Squat explosif avec saut',
+      categorie: 'Calisthéniques',
+      type: 'Plyométrique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Fessiers', 'Core'],
+      equipement: 'Aucun',
+      image: '🏃‍♂️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Zap className="w-6 h-6" />,
+      instructions: [
+        'Commencez en position debout',
+        'Descendez en squat',
+        'Explosez vers le haut',
+        'Atterrissez en douceur'
+      ],
+      conseils: 'Contrôlez l\'atterrissage',
+      variations: ['Squat sauté lesté', 'Squat sauté sur box', 'Squat sauté alterné']
     },
     {
-      id: 49,
-      name: "Core & Abs Avancé",
-      exercises: 10,
-      duration: "50 min",
-      difficulty: "Avancé",
-      category: "Core",
-      popularity: 88,
-      isPopular: true,
-      description: "Core avancé et complexe"
-    },
-    {
-      id: 50,
-      name: "Arms Hypertrophie",
-      exercises: 8,
-      duration: "70 min",
-      difficulty: "Intermédiaire",
-      category: "Arms",
-      popularity: 84,
-      isPopular: false,
-      description: "Hypertrophie des bras"
-    },
-    {
-      id: 51,
-      name: "Back Hypertrophie",
-      exercises: 9,
-      duration: "95 min",
-      difficulty: "Intermédiaire",
-      category: "Back",
-      popularity: 87,
-      isPopular: true,
-      description: "Hypertrophie du dos"
-    },
-    {
-      id: 52,
-      name: "Chest Hypertrophie",
-      exercises: 8,
-      duration: "90 min",
-      difficulty: "Intermédiaire",
-      category: "Chest",
-      popularity: 85,
-      isPopular: true,
-      description: "Hypertrophie des pectoraux"
-    },
-    {
-      id: 53,
-      name: "Shoulders Hypertrophie",
-      exercises: 7,
-      duration: "75 min",
-      difficulty: "Intermédiaire",
-      category: "Shoulders",
-      popularity: 82,
-      isPopular: false,
-      description: "Hypertrophie des épaules"
-    },
-    {
-      id: 54,
-      name: "Glutes Hypertrophie",
-      exercises: 6,
-      duration: "70 min",
-      difficulty: "Intermédiaire",
-      category: "Glutes",
-      popularity: 89,
-      isPopular: true,
-      description: "Hypertrophie des fessiers"
-    },
-    {
-      id: 55,
-      name: "Functional Avancé",
-      exercises: 11,
-      duration: "65 min",
-      difficulty: "Avancé",
-      category: "Functional",
-      popularity: 86,
-      isPopular: true,
-      description: "Mouvements fonctionnels avancés"
-    },
-    {
-      id: 56,
-      name: "Powerlifting Hypertrophie",
-      exercises: 6,
-      duration: "100 min",
-      difficulty: "Avancé",
-      category: "Powerlifting",
-      popularity: 88,
-      isPopular: true,
-      description: "Powerlifting pour l'hypertrophie"
-    },
-    {
-      id: 57,
-      name: "Bodyweight Avancé",
-      exercises: 12,
-      duration: "60 min",
-      difficulty: "Avancé",
-      category: "Bodyweight",
-      popularity: 90,
-      isPopular: true,
-      description: "Poids du corps avancé"
-    },
-    {
-      id: 58,
-      name: "Calisthenics",
-      exercises: 9,
-      duration: "55 min",
-      difficulty: "Intermédiaire",
-      category: "Bodyweight",
-      popularity: 87,
-      isPopular: true,
-      description: "Calisthénie et mouvements artistiques"
-    },
-    {
-      id: 59,
-      name: "Mobility & Flexibility",
-      exercises: 15,
-      duration: "45 min",
-      difficulty: "Débutant",
-      category: "Mobility",
-      popularity: 83,
-      isPopular: false,
-      description: "Mobilité et flexibilité"
-    },
-    {
-      id: 60,
-      name: "Recovery & Stretching",
-      exercises: 12,
-      duration: "40 min",
-      difficulty: "Débutant",
-      category: "Recovery",
-      popularity: 85,
-      isPopular: true,
-      description: "Récupération et étirements"
+      id: 'l-sit',
+      nom: 'L-Sit',
+      description: 'Position assise avec les jambes tendues',
+      categorie: 'Calisthéniques',
+      type: 'Isométrique',
+      difficulte: 'Avancé',
+      muscles: ['Core', 'Triceps', 'Épaules'],
+      equipement: 'Barres parallèles',
+      image: '🧘‍♀️',
+      couleur: 'from-indigo-500 to-purple-500',
+      bgCouleur: 'from-indigo-50 to-purple-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sur les barres',
+        'Soulevez les jambes',
+        'Tendez les jambes',
+        'Maintenez la position'
+      ],
+      conseils: 'Force du core et des triceps',
+      variations: ['L-sit assisté', 'L-sit sur sol', 'L-sit dynamique']
     },
 
-    // NOUVEAUX ENTRAÎNEMENTS (61-90)
-    
-    // Entraînements thématiques
+    // Crossfit
     {
-      id: 61,
-      name: "Morning Energizer",
-      exercises: 6,
-      duration: "30 min",
-      difficulty: "Débutant",
-      category: "Morning",
-      popularity: 88,
-      isPopular: true,
-      description: "Séance matinale énergisante"
+      id: 'burpees',
+      nom: 'Burpees',
+      description: 'Exercice complet pour le conditionnement métabolique',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🔥',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez debout',
+        'Descendez en position de pompe',
+        'Faites une pompe',
+        'Remontez et sautez'
+      ],
+      conseils: 'Maintenez un rythme régulier',
+      variations: ['Burpees lestés', 'Burpees avec saut', 'Burpees modifiés']
     },
     {
-      id: 62,
-      name: "Evening Wind Down",
-      exercises: 8,
-      duration: "35 min",
-      difficulty: "Débutant",
-      category: "Evening",
-      popularity: 84,
-      isPopular: false,
-      description: "Séance du soir relaxante"
+      id: 'thruster',
+      nom: 'Thruster',
+      description: 'Exercice combiné squat + développé pour le Crossfit',
+      categorie: 'Crossfit',
+      type: 'Compound',
+      difficulte: 'Avancé',
+      muscles: ['Jambes', 'Épaules', 'Triceps'],
+      equipement: 'Barre + Plates',
+      image: '⚡',
+      couleur: 'from-yellow-500 to-orange-500',
+      bgCouleur: 'from-yellow-50 to-orange-50',
+      borderCouleur: 'border-yellow-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la barre sur les épaules',
+        'Descendez en squat',
+        'Remontez en développant la barre',
+        'Répétez le mouvement'
+      ],
+      conseils: 'Synchronisez le mouvement des jambes et des bras',
+      variations: ['Thruster haltères', 'Thruster kettlebell', 'Thruster dynamique']
     },
     {
-      id: 63,
-      name: "Lunch Break Quickie",
-      exercises: 5,
-      duration: "20 min",
-      difficulty: "Débutant",
-      category: "Quick",
-      popularity: 91,
-      isPopular: true,
-      description: "Séance rapide pause déjeuner"
+      id: 'kettlebell-swing',
+      nom: 'Kettlebell Swing',
+      description: 'Mouvement balistique avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Fessiers', 'Ischio-jambiers', 'Core', 'Épaules'],
+      equipement: 'Kettlebell',
+      image: '🏋️‍♂️',
+      couleur: 'from-orange-500 to-red-500',
+      bgCouleur: 'from-orange-50 to-red-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell à deux mains',
+        'Descendez en position de squat',
+        'Explosez vers le haut',
+        'Balancez la kettlebell'
+      ],
+      conseils: 'Utilisez la puissance des hanches',
+      variations: ['Swing russe', 'Swing américain', 'Swing alterné']
     },
     {
-      id: 64,
-      name: "Weekend Warrior",
-      exercises: 10,
-      duration: "120 min",
-      difficulty: "Avancé",
-      category: "Weekend",
-      popularity: 86,
-      isPopular: true,
-      description: "Séance intensive weekend"
-    },
-
-    // Entraînements par objectifs
-    {
-      id: 65,
-      name: "Fat Burner Extreme",
-      exercises: 12,
-      duration: "45 min",
-      difficulty: "Avancé",
-      category: "Fat Loss",
-      popularity: 93,
-      isPopular: true,
-      description: "Brûleur de graisse extrême"
-    },
-    {
-      id: 66,
-      name: "Muscle Builder",
-      exercises: 9,
-      duration: "90 min",
-      difficulty: "Intermédiaire",
-      category: "Muscle Gain",
-      popularity: 89,
-      isPopular: true,
-      description: "Constructeur de muscle"
+      id: 'box-jump',
+      nom: 'Box Jump',
+      description: 'Saut sur box pour la puissance',
+      categorie: 'Crossfit',
+      type: 'Plyométrique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Fessiers', 'Core'],
+      equipement: 'Box',
+      image: '🏃‍♀️',
+      couleur: 'from-green-500 to-teal-500',
+      bgCouleur: 'from-green-50 to-teal-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous devant la box',
+        'Descendez en position de squat',
+        'Explosez vers le haut',
+        'Atterrissez sur la box'
+      ],
+      conseils: 'Contrôlez l\'atterrissage',
+      variations: ['Box jump lesté', 'Box jump alterné', 'Box jump step-down']
     },
     {
-      id: 67,
-      name: "Strength & Power",
-      exercises: 6,
-      duration: "75 min",
-      difficulty: "Avancé",
-      category: "Strength",
-      popularity: 87,
-      isPopular: true,
-      description: "Force et puissance"
+      id: 'wall-ball',
+      nom: 'Wall Ball',
+      description: 'Lancer de medecine ball contre le mur',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Épaules', 'Core'],
+      equipement: 'Medecine Ball',
+      image: '⚽',
+      couleur: 'from-blue-500 to-indigo-500',
+      bgCouleur: 'from-blue-50 to-indigo-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez le ballon au niveau de la poitrine',
+        'Descendez en squat',
+        'Explosez vers le haut',
+        'Lancez le ballon contre le mur'
+      ],
+      conseils: 'Synchronisez le squat et le lancer',
+      variations: ['Wall ball lesté', 'Wall ball alterné', 'Wall ball dynamique']
     },
     {
-      id: 68,
-      name: "Endurance Builder",
-      exercises: 8,
-      duration: "60 min",
-      difficulty: "Intermédiaire",
-      category: "Endurance",
-      popularity: 82,
-      isPopular: false,
-      description: "Constructeur d'endurance"
+      id: 'double-unders',
+      nom: 'Double Unders',
+      description: 'Corde à sauter avec double rotation',
+      categorie: 'Crossfit',
+      type: 'Cardio',
+      difficulte: 'Avancé',
+      muscles: ['Mollets', 'Épaules', 'Core'],
+      equipement: 'Corde à sauter',
+      image: '🪢',
+      couleur: 'from-purple-500 to-pink-500',
+      bgCouleur: 'from-purple-50 to-pink-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la corde à sauter',
+        'Sautez en synchronisant',
+        'Faites tourner la corde deux fois',
+        'Maintenez le rythme'
+      ],
+      conseils: 'Coordination et timing essentiels',
+      variations: ['Single unders', 'Triple unders', 'Double unders alternés']
     },
     {
-      id: 69,
-      name: "Speed & Agility",
-      exercises: 10,
-      duration: "40 min",
-      difficulty: "Intermédiaire",
-      category: "Speed",
-      popularity: 85,
-      isPopular: true,
-      description: "Vitesse et agilité"
+      id: 'toes-to-bar',
+      nom: 'Toes to Bar',
+      description: 'Toucher la barre avec les pieds',
+      categorie: 'Crossfit',
+      type: 'Bodyweight',
+      difficulte: 'Avancé',
+      muscles: ['Core', 'Épaules', 'Dos'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♂️',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Contractez le core',
+        'Levez les jambes',
+        'Touchez la barre avec les pieds'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Knees to chest', 'Toes to bar lesté', 'Toes to bar alterné']
     },
     {
-      id: 70,
-      name: "Balance & Stability",
-      exercises: 7,
-      duration: "35 min",
-      difficulty: "Débutant",
-      category: "Balance",
-      popularity: 79,
-      isPopular: false,
-      description: "Équilibre et stabilité"
-    },
-
-    // Entraînements par équipement
-    {
-      id: 71,
-      name: "Dumbbells Only",
-      exercises: 8,
-      duration: "65 min",
-      difficulty: "Intermédiaire",
-      category: "Dumbbells",
-      popularity: 88,
-      isPopular: true,
-      description: "Haltères uniquement"
-    },
-    {
-      id: 72,
-      name: "Barbell Focus",
-      exercises: 6,
-      duration: "80 min",
-      difficulty: "Intermédiaire",
-      category: "Barbell",
-      popularity: 86,
-      isPopular: true,
-      description: "Focus barre olympique"
-    },
-    {
-      id: 73,
-      name: "Kettlebell Power",
-      exercises: 9,
-      duration: "50 min",
-      difficulty: "Intermédiaire",
-      category: "Kettlebell",
-      popularity: 84,
-      isPopular: false,
-      description: "Puissance avec kettlebell"
-    },
-    {
-      id: 74,
-      name: "Resistance Bands",
-      exercises: 7,
-      duration: "40 min",
-      difficulty: "Débutant",
-      category: "Bands",
-      popularity: 81,
-      isPopular: false,
-      description: "Élastiques de résistance"
-    },
-    {
-      id: 75,
-      name: "TRX Suspension",
-      exercises: 8,
-      duration: "45 min",
-      difficulty: "Intermédiaire",
-      category: "TRX",
-      popularity: 83,
-      isPopular: false,
-      description: "Entraînement suspension TRX"
-    },
-    {
-      id: 76,
-      name: "Machine Circuit",
-      exercises: 10,
-      duration: "55 min",
-      difficulty: "Débutant",
-      category: "Machines",
-      popularity: 78,
-      isPopular: false,
-      description: "Circuit sur machines"
-    },
-
-    // Entraînements spécialisés
-    {
-      id: 77,
-      name: "Athletic Performance",
-      exercises: 11,
-      duration: "70 min",
-      difficulty: "Avancé",
-      category: "Athletic",
-      popularity: 87,
-      isPopular: true,
-      description: "Performance athlétique"
-    },
-    {
-      id: 78,
-      name: "Rehabilitation",
-      exercises: 6,
-      duration: "35 min",
-      difficulty: "Débutant",
-      category: "Rehab",
-      popularity: 80,
-      isPopular: false,
-      description: "Rééducation et réhabilitation"
-    },
-    {
-      id: 79,
-      name: "Prehab & Injury Prevention",
-      exercises: 8,
-      duration: "40 min",
-      difficulty: "Débutant",
-      category: "Prehab",
-      popularity: 82,
-      isPopular: false,
-      description: "Prévention des blessures"
-    },
-    {
-      id: 80,
-      name: "Posture Correction",
-      exercises: 7,
-      duration: "30 min",
-      difficulty: "Débutant",
-      category: "Posture",
-      popularity: 85,
-      isPopular: true,
-      description: "Correction de la posture"
-    },
-    {
-      id: 81,
-      name: "Breathing & Core",
-      exercises: 9,
-      duration: "35 min",
-      difficulty: "Débutant",
-      category: "Breathing",
-      popularity: 83,
-      isPopular: false,
-      description: "Respiration et core"
-    },
-    {
-      id: 82,
-      name: "Mental Toughness",
-      exercises: 8,
-      duration: "50 min",
-      difficulty: "Avancé",
-      category: "Mental",
-      popularity: 86,
-      isPopular: true,
-      description: "Résistance mentale"
+      id: 'pistol-squat',
+      nom: 'Pistol Squat',
+      description: 'Squat sur une jambe',
+      categorie: 'Crossfit',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Jambes', 'Fessiers', 'Core', 'Équilibre'],
+      equipement: 'Aucun',
+      image: '🤸‍♀️',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez-vous sur une jambe',
+        'Descendez en squat',
+        'Gardez l\'équilibre',
+        'Remontez en contractant'
+      ],
+      conseils: 'Mobilité et force requises',
+      variations: ['Pistol squat assisté', 'Pistol squat lesté', 'Pistol squat sur box']
     },
 
-    // Entraînements créatifs
+    // Nouveaux exercices Force/Powerlifting
     {
-      id: 83,
-      name: "Dance Fitness",
-      exercises: 6,
-      duration: "45 min",
-      difficulty: "Débutant",
-      category: "Dance",
-      popularity: 89,
-      isPopular: true,
-      description: "Fitness dansé"
+      id: 'incline-bench-press',
+      nom: 'Développé Incliné',
+      description: 'Développé couché sur banc incliné pour le haut de poitrine',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Poitrine (haut)', 'Épaules', 'Triceps'],
+      equipement: 'Barre + Banc incliné',
+      image: '💪',
+      couleur: 'from-blue-500 to-indigo-500',
+      bgCouleur: 'from-blue-50 to-indigo-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Réglez le banc à 30-45°',
+        'Allongez-vous sur le banc',
+        'Saisissez la barre avec une prise large',
+        'Descendez vers le haut de la poitrine'
+      ],
+      conseils: 'Contrôlez la descente',
+      variations: ['Développé incliné haltères', 'Développé incliné Smith', 'Développé incliné unilatéral']
     },
     {
-      id: 84,
-      name: "Martial Arts Flow",
-      exercises: 10,
-      duration: "60 min",
-      difficulty: "Intermédiaire",
-      category: "Martial",
-      popularity: 84,
-      isPopular: false,
-      description: "Flow arts martiaux"
+      id: 'decline-bench-press',
+      nom: 'Développé Décliné',
+      description: 'Développé couché sur banc décliné pour le bas de poitrine',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Intermédiaire',
+      muscles: ['Poitrine (bas)', 'Triceps', 'Épaules'],
+      equipement: 'Barre + Banc décliné',
+      image: '💪',
+      couleur: 'from-purple-500 to-pink-500',
+      bgCouleur: 'from-purple-50 to-pink-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Réglez le banc à -15°',
+        'Allongez-vous sur le banc',
+        'Saisissez la barre avec une prise large',
+        'Descendez vers le bas de la poitrine'
+      ],
+      conseils: 'Sécurité importante',
+      variations: ['Développé décliné haltères', 'Développé décliné Smith', 'Développé décliné unilatéral']
     },
     {
-      id: 85,
-      name: "Yoga Strength",
-      exercises: 12,
-      duration: "55 min",
-      difficulty: "Intermédiaire",
-      category: "Yoga",
-      popularity: 87,
-      isPopular: true,
-      description: "Yoga de force"
+      id: 'barbell-curl',
+      nom: 'Curl Barre',
+      description: 'Exercice d\'isolation pour les biceps',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Biceps', 'Avant-bras'],
+      equipement: 'Barre',
+      image: '💪',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez la barre avec une prise serrée',
+        'Gardez les coudes près du corps',
+        'Curl la barre vers le haut',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Curl haltères', 'Curl marteau', 'Curl concentré']
     },
     {
-      id: 86,
-      name: "Pilates Power",
-      exercises: 8,
-      duration: "40 min",
-      difficulty: "Intermédiaire",
-      category: "Pilates",
-      popularity: 85,
-      isPopular: true,
-      description: "Pilates puissant"
+      id: 'tricep-dips',
+      nom: 'Dips Triceps',
+      description: 'Exercice pour les triceps sur banc',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Intermédiaire',
+      muscles: ['Triceps', 'Épaules'],
+      equipement: 'Banc',
+      image: '💪',
+      couleur: 'from-orange-500 to-yellow-500',
+      bgCouleur: 'from-orange-50 to-yellow-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sur le banc',
+        'Descendez lentement',
+        'Poussez vers le haut',
+        'Maintenez la tension'
+      ],
+      conseils: 'Gardez les coudes près du corps',
+      variations: ['Dips lestés', 'Dips sur barres', 'Dips assistés']
     },
     {
-      id: 87,
-      name: "Boxing Workout",
-      exercises: 9,
-      duration: "50 min",
-      difficulty: "Intermédiaire",
-      category: "Boxing",
-      popularity: 88,
-      isPopular: true,
-      description: "Entraînement boxe"
+      id: 'lateral-raise',
+      nom: 'Élévation Latérale',
+      description: 'Exercice d\'isolation pour les épaules',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Épaules (moyen)', 'Trapèzes'],
+      equipement: 'Haltères',
+      image: '💪',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez les haltères à vos côtés',
+        'Levez les bras sur les côtés',
+        'Montez jusqu\'à l\'horizontale',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez la descente',
+      variations: ['Élévation latérale câble', 'Élévation latérale unilatérale', 'Élévation latérale inclinée']
     },
     {
-      id: 88,
-      name: "Swimming Dry Land",
-      exercises: 7,
-      duration: "45 min",
-      difficulty: "Intermédiaire",
-      category: "Swimming",
-      popularity: 81,
-      isPopular: false,
-      description: "Préparation natation à sec"
+      id: 'rear-delt-fly',
+      nom: 'Élévation Postérieure',
+      description: 'Exercice pour les deltoïdes postérieurs',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Épaules (postérieur)', 'Trapèzes'],
+      equipement: 'Haltères',
+      image: '💪',
+      couleur: 'from-indigo-500 to-purple-500',
+      bgCouleur: 'from-indigo-50 to-purple-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Penchez-vous vers l\'avant',
+        'Tenez les haltères',
+        'Écartez les bras vers l\'arrière',
+        'Contractez les omoplates'
+      ],
+      conseils: 'Gardez le dos droit',
+      variations: ['Élévation postérieure câble', 'Élévation postérieure inclinée', 'Élévation postérieure unilatérale']
+    },
+    {
+      id: 'leg-press',
+      nom: 'Presse à Jambes',
+      description: 'Exercice pour les jambes sur machine',
+      categorie: 'Force',
+      type: 'Compound',
+      difficulte: 'Débutant',
+      muscles: ['Quadriceps', 'Fessiers', 'Ischio-jambiers'],
+      equipement: 'Machine presse',
+      image: '🏋️‍♂️',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Asseyez-vous sur la machine',
+        'Placez les pieds sur la plateforme',
+        'Poussez avec les jambes',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Presse à jambes unilatérale', 'Presse à jambes inclinée', 'Presse à jambes lestée']
+    },
+    {
+      id: 'leg-extension',
+      nom: 'Extension de Jambes',
+      description: 'Exercice d\'isolation pour les quadriceps',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Quadriceps'],
+      equipement: 'Machine extension',
+      image: '🏋️‍♀️',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Asseyez-vous sur la machine',
+        'Placez les jambes sous les rouleaux',
+        'Étendez les jambes',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez la descente',
+      variations: ['Extension unilatérale', 'Extension lestée', 'Extension isométrique']
+    },
+    {
+      id: 'leg-curl',
+      nom: 'Curl de Jambes',
+      description: 'Exercice d\'isolation pour les ischio-jambiers',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Ischio-jambiers'],
+      equipement: 'Machine curl',
+      image: '🏋️‍♂️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Allongez-vous sur la machine',
+        'Placez les chevilles sous les rouleaux',
+        'Curl les jambes vers les fessiers',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Curl unilatéral', 'Curl lesté', 'Curl isométrique']
+    },
+    {
+      id: 'calf-raise',
+      nom: 'Mollets',
+      description: 'Exercice pour les mollets',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Mollets'],
+      equipement: 'Machine mollets',
+      image: '🏋️‍♀️',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sur la machine',
+        'Montez sur la pointe des pieds',
+        'Descendez lentement',
+        'Répétez le mouvement'
+      ],
+      conseils: 'Contrôlez la descente',
+      variations: ['Mollets debout', 'Mollets assis', 'Mollets unilatéraux']
     },
 
-    // Entraînements extrêmes
+    // Nouveaux exercices Endurance/Cardio
     {
-      id: 89,
-      name: "Beast Mode",
-      exercises: 15,
-      duration: "90 min",
-      difficulty: "Avancé",
-      category: "Extreme",
-      popularity: 92,
-      isPopular: true,
-      description: "Mode bête - extrême"
+      id: 'hiit-interval',
+      nom: 'HIIT Intervalle',
+      description: 'Entraînement par intervalles à haute intensité',
+      categorie: 'Endurance',
+      type: 'HIIT',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '⚡',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Zap className="w-6 h-6" />,
+      instructions: [
+        'Échauffez-vous 5 minutes',
+        'Alternez 30 sec intense / 30 sec récup',
+        'Maintenez l\'intensité',
+        'Terminez par un retour au calme'
+      ],
+      conseils: 'Intensité maximale pendant les phases actives',
+      variations: ['HIIT 20/10', 'HIIT 45/15', 'HIIT Tabata']
     },
     {
-      id: 90,
-      name: "Iron Will",
-      exercises: 12,
-      duration: "100 min",
-      difficulty: "Avancé",
-      category: "Extreme",
-      popularity: 90,
-      isPopular: true,
-      description: "Volonté de fer - ultime"
+      id: 'elliptical',
+      nom: 'Elliptique',
+      description: 'Exercice cardio sur machine elliptique',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Bras', 'Cœur'],
+      equipement: 'Machine elliptique',
+      image: '🏃‍♂️',
+      couleur: 'from-blue-500 to-indigo-500',
+      bgCouleur: 'from-blue-50 to-indigo-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Montez sur la machine',
+        'Ajustez la résistance',
+        'Maintenez un rythme régulier',
+        'Utilisez les bras et les jambes'
+      ],
+      conseils: 'Posture droite et rythme constant',
+      variations: ['Elliptique incliné', 'Elliptique en arrière', 'Elliptique intervalle']
+    },
+    {
+      id: 'step-mill',
+      nom: 'Step Mill',
+      description: 'Escalier mécanique pour le cardio',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Fessiers', 'Cœur'],
+      equipement: 'Step mill',
+      image: '🏃‍♀️',
+      couleur: 'from-green-500 to-teal-500',
+      bgCouleur: 'from-green-50 to-teal-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Montez sur la machine',
+        'Ajustez la vitesse',
+        'Montez les marches',
+        'Maintenez le rythme'
+      ],
+      conseils: 'Posture droite et pas réguliers',
+      variations: ['Step mill lent', 'Step mill rapide', 'Step mill intervalle']
+    },
+    {
+      id: 'treadmill',
+      nom: 'Tapis de Course',
+      description: 'Course sur tapis roulant',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Cœur', 'Poumons'],
+      equipement: 'Tapis de course',
+      image: '🏃‍♂️',
+      couleur: 'from-purple-500 to-pink-500',
+      bgCouleur: 'from-purple-50 to-pink-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Montez sur le tapis',
+        'Ajustez la vitesse',
+        'Commencez lentement',
+        'Augmentez progressivement'
+      ],
+      conseils: 'Échauffement et hydratation importants',
+      variations: ['Course inclinée', 'Course intervalle', 'Course longue distance']
+    },
+    {
+      id: 'rowing-machine',
+      nom: 'Rameur Machine',
+      description: 'Exercice complet sur machine rameur',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Machine rameur',
+      image: '🚣‍♂️',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Asseyez-vous sur la machine',
+        'Ajustez la résistance',
+        'Commencez par les jambes',
+        'Tirez avec les bras'
+      ],
+      conseils: 'Séquence jambes-bras-dos importante',
+      variations: ['Rameur court', 'Rameur long', 'Rameur intervalle']
+    },
+    {
+      id: 'spin-bike',
+      nom: 'Vélo Spinning',
+      description: 'Cyclisme en salle sur vélo spinning',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Cœur', 'Poumons'],
+      equipement: 'Vélo spinning',
+      image: '🚴‍♀️',
+      couleur: 'from-orange-500 to-red-500',
+      bgCouleur: 'from-orange-50 to-red-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Ajustez la selle et le guidon',
+        'Ajustez la résistance',
+        'Maintenez un rythme de pédalage',
+        'Variez l\'intensité'
+      ],
+      conseils: 'Position et résistance importantes',
+      variations: ['Spinning lent', 'Spinning rapide', 'Spinning intervalle']
+    },
+
+    // Nouveaux exercices Calisthéniques
+    {
+      id: 'pull-ups',
+      nom: 'Tractions Larges',
+      description: 'Tractions avec prise large',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Intermédiaire',
+      muscles: ['Dos', 'Biceps', 'Épaules'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♂️',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Prise large',
+        'Tirez vers le haut',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Tractions serrées', 'Tractions lestées', 'Tractions assistées']
+    },
+    {
+      id: 'chin-ups',
+      nom: 'Tractions Serrées',
+      description: 'Tractions avec prise serrée',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Intermédiaire',
+      muscles: ['Biceps', 'Dos', 'Épaules'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♀️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Prise serrée',
+        'Tirez vers le haut',
+        'Descendez lentement'
+      ],
+      conseils: 'Focus sur les biceps',
+      variations: ['Tractions larges', 'Tractions lestées', 'Tractions assistées']
+    },
+    {
+      id: 'diamond-push-ups',
+      nom: 'Pompes Diamant',
+      description: 'Pompes avec les mains en diamant',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Avancé',
+      muscles: ['Triceps', 'Poitrine', 'Épaules'],
+      equipement: 'Aucun',
+      image: '💪',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Placez les mains en diamant',
+        'Descendez vers le sol',
+        'Poussez vers le haut'
+      ],
+      conseils: 'Focus sur les triceps',
+      variations: ['Pompes inclinées', 'Pompes déclinées', 'Pompes lestées']
+    },
+    {
+      id: 'archer-push-ups',
+      nom: 'Pompes Archer',
+      description: 'Pompes avec déplacement latéral',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Poitrine', 'Triceps', 'Core'],
+      equipement: 'Aucun',
+      image: '🏹',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Déplacez le poids sur un bras',
+        'Descendez latéralement',
+        'Poussez vers le haut'
+      ],
+      conseils: 'Contrôle et équilibre',
+      variations: ['Pompes archer assistées', 'Pompes archer lestées', 'Pompes archer dynamiques']
+    },
+    {
+      id: 'one-arm-push-ups',
+      nom: 'Pompes Unilatérales',
+      description: 'Pompes sur un seul bras',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Poitrine', 'Triceps', 'Core'],
+      equipement: 'Aucun',
+      image: '💪',
+      couleur: 'from-indigo-500 to-purple-500',
+      bgCouleur: 'from-indigo-50 to-purple-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Placez une main au sol',
+        'Descendez vers le sol',
+        'Poussez vers le haut'
+      ],
+      conseils: 'Force et équilibre requis',
+      variations: ['Pompes unilatérales assistées', 'Pompes unilatérales lestées', 'Pompes unilatérales dynamiques']
+    },
+    {
+      id: 'handstand-push-ups',
+      nom: 'Pompes Handstand',
+      description: 'Pompes en position handstand',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Épaules', 'Triceps', 'Core'],
+      equipement: 'Mur (optionnel)',
+      image: '🤸‍♂️',
+      couleur: 'from-yellow-500 to-orange-500',
+      bgCouleur: 'from-yellow-50 to-orange-50',
+      borderCouleur: 'border-yellow-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en handstand',
+        'Descendez vers le sol',
+        'Poussez vers le haut',
+        'Maintenez l\'équilibre'
+      ],
+      conseils: 'Force des épaules et équilibre',
+      variations: ['Pompes handstand contre mur', 'Pompes handstand assistées', 'Pompes handstand lestées']
+    },
+    {
+      id: 'pike-push-ups',
+      nom: 'Pompes Pike',
+      description: 'Pompes en position pike',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Avancé',
+      muscles: ['Épaules', 'Triceps', 'Core'],
+      equipement: 'Aucun',
+      image: '🏔️',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en pike',
+        'Placez les mains au sol',
+        'Descendez vers le sol',
+        'Poussez vers le haut'
+      ],
+      conseils: 'Focus sur les épaules',
+      variations: ['Pompes pike inclinées', 'Pompes pike lestées', 'Pompes pike dynamiques']
+    },
+    {
+      id: 'wall-walk',
+      nom: 'Wall Walk',
+      description: 'Marche sur le mur',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Avancé',
+      muscles: ['Épaules', 'Core', 'Équilibre'],
+      equipement: 'Mur',
+      image: '🤸‍♂️',
+      couleur: 'from-green-500 to-teal-500',
+      bgCouleur: 'from-green-50 to-teal-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Commencez en position de pompe',
+        'Marchez les pieds vers le mur',
+        'Montez les mains',
+        'Terminez en handstand'
+      ],
+      conseils: 'Contrôle et équilibre',
+      variations: ['Wall walk assisté', 'Wall walk lesté', 'Wall walk dynamique']
+    },
+    {
+      id: 'human-flag',
+      nom: 'Human Flag',
+      description: 'Drapeau humain',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Core', 'Épaules', 'Dos'],
+      equipement: 'Poteau',
+      image: '��‍♂️',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Saisissez le poteau',
+        'Levez le corps horizontalement',
+        'Maintenez la position',
+        'Contrôlez la descente'
+      ],
+      conseils: 'Force du core et des épaules',
+      variations: ['Human flag assisté', 'Human flag lesté', 'Human flag dynamique']
+    },
+
+    // Nouveaux exercices Crossfit
+    {
+      id: 'kettlebell-goblet-squat',
+      nom: 'Goblet Squat',
+      description: 'Squat avec kettlebell en goblet',
+      categorie: 'Crossfit',
+      type: 'Compound',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Fessiers', 'Core'],
+      equipement: 'Kettlebell',
+      image: '🏋️‍♂️',
+      couleur: 'from-orange-500 to-yellow-500',
+      bgCouleur: 'from-orange-50 to-yellow-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell en goblet',
+        'Descendez en squat',
+        'Gardez le dos droit',
+        'Remontez en contractant'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Goblet squat lesté', 'Goblet squat dynamique', 'Goblet squat unilatéral']
+    },
+    {
+      id: 'kettlebell-turkish-get-up',
+      nom: 'Turkish Get-Up Kettlebell',
+      description: 'Turkish Get-Up avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Complex',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Kettlebell',
+      image: '🏋️‍♀️',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Allongez-vous avec la kettlebell',
+        'Levez la kettlebell',
+        'Passez par différentes positions',
+        'Terminez debout'
+      ],
+      conseils: 'Mouvement complexe, apprendre progressivement',
+      variations: ['TGU assisté', 'TGU lesté', 'TGU dynamique']
+    },
+    {
+      id: 'kettlebell-snatch',
+      nom: 'Kettlebell Snatch',
+      description: 'Arraché avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Kettlebell',
+      image: '🏋️‍♂️',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la kettlebell au sol',
+        'Tirez la kettlebell vers le haut',
+        'Attrapez la kettlebell au-dessus de la tête',
+        'Stabilisez la position'
+      ],
+      conseils: 'Technique et puissance',
+      variations: ['Snatch assisté', 'Snatch lesté', 'Snatch dynamique']
+    },
+    {
+      id: 'kettlebell-clean',
+      nom: 'Kettlebell Clean',
+      description: 'Épaulé avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Kettlebell',
+      image: '🏋️‍♀️',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la kettlebell au sol',
+        'Tirez la kettlebell vers le haut',
+        'Attrapez la kettlebell sur l\'épaule',
+        'Stabilisez la position'
+      ],
+      conseils: 'Technique et puissance',
+      variations: ['Clean assisté', 'Clean lesté', 'Clean dynamique']
+    },
+    {
+      id: 'kettlebell-farmers-walk',
+      nom: 'Kettlebell Farmers Walk',
+      description: 'Marche avec kettlebells',
+      categorie: 'Crossfit',
+      type: 'Carry',
+      difficulte: 'Intermédiaire',
+      muscles: ['Trapèzes', 'Core', 'Grip'],
+      equipement: 'Kettlebells',
+      image: '🏋️‍♂️',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez les kettlebells à vos côtés',
+        'Gardez le dos droit',
+        'Marchez avec des pas courts',
+        'Maintenez la tension'
+      ],
+      conseils: 'Grip et posture importants',
+      variations: ['Farmers walk lesté', 'Farmers walk alterné', 'Farmers walk sur distance']
+    },
+    {
+      id: 'kettlebell-suitcase-carry',
+      nom: 'Suitcase Carry',
+      description: 'Portage unilatéral avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Carry',
+      difficulte: 'Intermédiaire',
+      muscles: ['Core', 'Trapèzes', 'Grip'],
+      equipement: 'Kettlebell',
+      image: '🎒',
+      couleur: 'from-indigo-500 to-purple-500',
+      bgCouleur: 'from-indigo-50 to-purple-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell d\'un côté',
+        'Gardez le dos droit',
+        'Marchez avec contrôle',
+        'Changez de côté régulièrement'
+      ],
+      conseils: 'Stabilité du core',
+      variations: ['Suitcase carry lesté', 'Suitcase carry alterné', 'Suitcase carry dynamique']
+    },
+    {
+      id: 'kettlebell-windmill',
+      nom: 'Kettlebell Windmill',
+      description: 'Mouvement de moulin avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Core', 'Épaules', 'Hanche'],
+      equipement: 'Kettlebell',
+      image: '🌪️',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell au-dessus de la tête',
+        'Descendez latéralement',
+        'Touchez le sol',
+        'Remontez en contractant'
+      ],
+      conseils: 'Mobilité et contrôle',
+      variations: ['Windmill assisté', 'Windmill lesté', 'Windmill dynamique']
+    },
+    {
+      id: 'kettlebell-figure-8',
+      nom: 'Kettlebell Figure 8',
+      description: 'Mouvement en forme de 8 avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Core', 'Épaules', 'Hanche'],
+      equipement: 'Kettlebell',
+      image: '8️⃣',
+      couleur: 'from-purple-500 to-pink-500',
+      bgCouleur: 'from-purple-50 to-pink-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell à deux mains',
+        'Créez un mouvement en 8',
+        'Maintenez le rythme',
+        'Variez les directions'
+      ],
+      conseils: 'Coordination et rythme',
+      variations: ['Figure 8 assisté', 'Figure 8 lesté', 'Figure 8 dynamique']
+    },
+    {
+      id: 'kettlebell-halo',
+      nom: 'Kettlebell Halo',
+      description: 'Mouvement circulaire avec kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Épaules', 'Core', 'Mobilité'],
+      equipement: 'Kettlebell',
+      image: '🌪️',
+      couleur: 'from-yellow-500 to-orange-500',
+      bgCouleur: 'from-yellow-50 to-orange-50',
+      borderCouleur: 'border-yellow-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell à deux mains',
+        'Créez un mouvement circulaire',
+        'Maintenez le rythme',
+        'Variez les directions'
+      ],
+      conseils: 'Mobilité des épaules',
+      variations: ['Halo assisté', 'Halo lesté', 'Halo dynamique']
+    },
+    {
+      id: 'kettlebell-bottoms-up',
+      nom: 'Kettlebell Bottoms Up',
+      description: 'Kettlebell tenu à l\'envers',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Épaules', 'Core', 'Stabilité'],
+      equipement: 'Kettlebell',
+      image: '��',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Tenez la kettlebell à l\'envers',
+        'Maintenez la stabilité',
+        'Effectuez des mouvements',
+        'Contrôlez la kettlebell'
+      ],
+      conseils: 'Stabilité et contrôle',
+      variations: ['Bottoms up assisté', 'Bottoms up lesté', 'Bottoms up dynamique']
+    },
+
+    // Derniers exercices Force/Powerlifting
+    {
+      id: 'barbell-shrugs',
+      nom: 'Haussements d\'Épaules',
+      description: 'Exercice pour les trapèzes avec barre',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Trapèzes', 'Épaules'],
+      equipement: 'Barre',
+      image: '🏋️‍♂️',
+      couleur: 'from-gray-500 to-slate-500',
+      bgCouleur: 'from-gray-50 to-slate-50',
+      borderCouleur: 'border-gray-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez la barre avec les bras tendus',
+        'Haussez les épaules vers le haut',
+        'Contractez les trapèzes',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Haussements haltères', 'Haussements câble', 'Haussements lestés']
+    },
+    {
+      id: 'face-pulls',
+      nom: 'Face Pulls',
+      description: 'Exercice pour les deltoïdes postérieurs avec câble',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Épaules (postérieur)', 'Trapèzes'],
+      equipement: 'Câble',
+      image: '💪',
+      couleur: 'from-teal-500 to-cyan-500',
+      bgCouleur: 'from-teal-50 to-cyan-50',
+      borderCouleur: 'border-teal-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez la corde à hauteur des yeux',
+        'Tirez vers le visage',
+        'Écartez les bras',
+        'Contractez les omoplates'
+      ],
+      conseils: 'Contrôlez la phase excentrique',
+      variations: ['Face pulls haltères', 'Face pulls bande', 'Face pulls lestés']
+    },
+    {
+      id: 'reverse-flyes',
+      nom: 'Élévations Postérieures',
+      description: 'Exercice pour les deltoïdes postérieurs',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Épaules (postérieur)', 'Trapèzes'],
+      equipement: 'Haltères',
+      image: '💪',
+      couleur: 'from-rose-500 to-pink-500',
+      bgCouleur: 'from-rose-50 to-pink-50',
+      borderCouleur: 'border-rose-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Penchez-vous vers l\'avant',
+        'Tenez les haltères',
+        'Écartez les bras vers l\'arrière',
+        'Contractez les omoplates'
+      ],
+      conseils: 'Gardez le dos droit',
+      variations: ['Élévations câble', 'Élévations inclinées', 'Élévations unilatérales']
+    },
+    {
+      id: 'preacher-curl',
+      nom: 'Curl Prédicateur',
+      description: 'Curl pour les biceps sur banc prédicateur',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Biceps'],
+      equipement: 'Banc prédicateur + Barre',
+      image: '💪',
+      couleur: 'from-emerald-500 to-green-500',
+      bgCouleur: 'from-emerald-50 to-green-50',
+      borderCouleur: 'border-emerald-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Asseyez-vous sur le banc',
+        'Placez les bras sur le support',
+        'Curl la barre vers le haut',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Curl prédicateur haltères', 'Curl prédicateur câble', 'Curl prédicateur lesté']
+    },
+    {
+      id: 'hammer-curl',
+      nom: 'Curl Marteau',
+      description: 'Curl avec prise marteau pour les biceps',
+      categorie: 'Force',
+      type: 'Isolation',
+      difficulte: 'Débutant',
+      muscles: ['Biceps', 'Avant-bras'],
+      equipement: 'Haltères',
+      image: '🔨',
+      couleur: 'from-amber-500 to-yellow-500',
+      bgCouleur: 'from-amber-50 to-yellow-50',
+      borderCouleur: 'border-amber-200/50',
+      icon: <Dumbbell className="w-6 h-6" />,
+      instructions: [
+        'Tenez les haltères avec prise marteau',
+        'Curl vers le haut',
+        'Maintenez la prise',
+        'Descendez lentement'
+      ],
+      conseils: 'Contrôlez le mouvement',
+      variations: ['Curl marteau alterné', 'Curl marteau lesté', 'Curl marteau unilatéral']
+    },
+
+    // Derniers exercices Endurance/Cardio
+    {
+      id: 'jump-rope',
+      nom: 'Corde à Sauter',
+      description: 'Exercice cardio avec corde à sauter',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Mollets', 'Épaules', 'Core'],
+      equipement: 'Corde à sauter',
+      image: '🪢',
+      couleur: 'from-pink-500 to-rose-500',
+      bgCouleur: 'from-pink-50 to-rose-50',
+      borderCouleur: 'border-pink-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Tenez la corde à sauter',
+        'Sautez en synchronisant',
+        'Maintenez le rythme',
+        'Variez les patterns'
+      ],
+      conseils: 'Coordination et rythme',
+      variations: ['Saut simple', 'Saut alterné', 'Saut croisé']
+    },
+    {
+      id: 'mountain-climbers',
+      nom: 'Mountain Climbers',
+      description: 'Exercice cardio au poids du corps',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🏔️',
+      couleur: 'from-slate-500 to-gray-500',
+      bgCouleur: 'from-slate-50 to-gray-50',
+      borderCouleur: 'border-slate-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Alternez les genoux',
+        'Maintenez le rythme',
+        'Gardez le core contracté'
+      ],
+      conseils: 'Rythme et contrôle',
+      variations: ['Mountain climbers lents', 'Mountain climbers rapides', 'Mountain climbers lestés']
+    },
+    {
+      id: 'jumping-jacks',
+      nom: 'Jumping Jacks',
+      description: 'Exercice cardio de base',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🤸‍♂️',
+      couleur: 'from-violet-500 to-purple-500',
+      bgCouleur: 'from-violet-50 to-purple-50',
+      borderCouleur: 'border-violet-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Commencez debout',
+        'Sautez en écartant les jambes',
+        'Levez les bras',
+        'Retournez à la position de départ'
+      ],
+      conseils: 'Rythme et coordination',
+      variations: ['Jumping jacks lents', 'Jumping jacks rapides', 'Jumping jacks lestés']
+    },
+    {
+      id: 'high-knees',
+      nom: 'High Knees',
+      description: 'Course sur place avec genoux hauts',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Core'],
+      equipement: 'Aucun',
+      image: '🏃‍♂️',
+      couleur: 'from-lime-500 to-green-500',
+      bgCouleur: 'from-lime-50 to-green-50',
+      borderCouleur: 'border-lime-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Commencez debout',
+        'Courez sur place',
+        'Levez les genoux haut',
+        'Maintenez le rythme'
+      ],
+      conseils: 'Rythme et contrôle',
+      variations: ['High knees lents', 'High knees rapides', 'High knees lestés']
+    },
+    {
+      id: 'butt-kicks',
+      nom: 'Butt Kicks',
+      description: 'Course sur place en touchant les fessiers',
+      categorie: 'Endurance',
+      type: 'Cardio',
+      difficulte: 'Débutant',
+      muscles: ['Jambes', 'Fessiers'],
+      equipement: 'Aucun',
+      image: '🏃‍♀️',
+      couleur: 'from-orange-500 to-red-500',
+      bgCouleur: 'from-orange-50 to-red-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Activity className="w-6 h-6" />,
+      instructions: [
+        'Commencez debout',
+        'Courez sur place',
+        'Touchez les fessiers',
+        'Maintenez le rythme'
+      ],
+      conseils: 'Rythme et contrôle',
+      variations: ['Butt kicks lents', 'Butt kicks rapides', 'Butt kicks lestés']
+    },
+
+    // Derniers exercices Calisthéniques
+    {
+      id: 'dragon-flag',
+      nom: 'Dragon Flag',
+      description: 'Exercice avancé pour le core',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Core', 'Épaules'],
+      equipement: 'Banc',
+      image: '🐉',
+      couleur: 'from-red-500 to-orange-500',
+      bgCouleur: 'from-red-50 to-orange-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Allongez-vous sur le banc',
+        'Tenez le banc derrière la tête',
+        'Levez le corps',
+        'Maintenez la position'
+      ],
+      conseils: 'Force du core requise',
+      variations: ['Dragon flag assisté', 'Dragon flag lesté', 'Dragon flag dynamique']
+    },
+    {
+      id: 'front-lever',
+      nom: 'Front Lever',
+      description: 'Position horizontale suspendue',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Core', 'Dos', 'Épaules'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♂️',
+      couleur: 'from-blue-500 to-cyan-500',
+      bgCouleur: 'from-blue-50 to-cyan-50',
+      borderCouleur: 'border-blue-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Levez le corps horizontalement',
+        'Maintenez la position',
+        'Contrôlez la descente'
+      ],
+      conseils: 'Force du core et du dos',
+      variations: ['Front lever assisté', 'Front lever lesté', 'Front lever dynamique']
+    },
+    {
+      id: 'back-lever',
+      nom: 'Back Lever',
+      description: 'Position horizontale suspendue sur le dos',
+      categorie: 'Calisthéniques',
+      type: 'Bodyweight',
+      difficulte: 'Expert',
+      muscles: ['Core', 'Dos', 'Épaules'],
+      equipement: 'Barre de traction',
+      image: '🤸‍♀️',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Suspendez-vous à la barre',
+        'Levez le corps horizontalement',
+        'Maintenez la position',
+        'Contrôlez la descente'
+      ],
+      conseils: 'Force du core et du dos',
+      variations: ['Back lever assisté', 'Back lever lesté', 'Back lever dynamique']
+    },
+    {
+      id: 'planche-progression',
+      nom: 'Planche Progression',
+      description: 'Progression de la planche',
+      categorie: 'Calisthéniques',
+      type: 'Isométrique',
+      difficulte: 'Débutant',
+      muscles: ['Core', 'Épaules'],
+      equipement: 'Aucun',
+      image: '‍♂️',
+      couleur: 'from-indigo-500 to-blue-500',
+      bgCouleur: 'from-indigo-50 to-blue-50',
+      borderCouleur: 'border-indigo-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Commencez sur les genoux',
+        'Progressez vers les avant-bras',
+        'Puis sur les mains',
+        'Maintenez chaque position'
+      ],
+      conseils: 'Progression graduelle',
+      variations: ['Planche genoux', 'Planche avant-bras', 'Planche mains']
+    },
+    {
+      id: 'side-plank',
+      nom: 'Planche Latérale',
+      description: 'Planche sur le côté',
+      categorie: 'Calisthéniques',
+      type: 'Isométrique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Core', 'Épaules'],
+      equipement: 'Aucun',
+      image: '🧘‍♀️',
+      couleur: 'from-teal-500 to-cyan-500',
+      bgCouleur: 'from-teal-50 to-cyan-50',
+      borderCouleur: 'border-teal-200/50',
+      icon: <Users className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous sur le côté',
+        'Appuyez-vous sur l\'avant-bras',
+        'Levez les hanches',
+        'Maintenez la position'
+      ],
+      conseils: 'Gardez le corps droit',
+      variations: ['Planche latérale genoux', 'Planche latérale mains', 'Planche latérale lestée']
+    },
+
+    // Derniers exercices Crossfit
+    {
+      id: 'devil-press',
+      nom: 'Devil Press',
+      description: 'Exercice combiné burpee + kettlebell',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Kettlebell',
+      image: '😈',
+      couleur: 'from-red-500 to-pink-500',
+      bgCouleur: 'from-red-50 to-pink-50',
+      borderCouleur: 'border-red-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec la kettlebell',
+        'Faites un burpee',
+        'Saisissez la kettlebell',
+        'Levez-la au-dessus de la tête'
+      ],
+      conseils: 'Intensité et technique',
+      variations: ['Devil press lesté', 'Devil press alterné', 'Devil press dynamique']
+    },
+    {
+      id: 'man-makers',
+      nom: 'Man Makers',
+      description: 'Exercice combiné complexe',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Expert',
+      muscles: ['Tout le corps'],
+      equipement: 'Haltères',
+      image: '🏋️‍♂️',
+      couleur: 'from-orange-500 to-yellow-500',
+      bgCouleur: 'from-orange-50 to-yellow-50',
+      borderCouleur: 'border-orange-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec les haltères',
+        'Faites un burpee',
+        'Faites un rowing',
+        'Terminez par un thruster'
+      ],
+      conseils: 'Technique et endurance',
+      variations: ['Man makers lestés', 'Man makers alternés', 'Man makers dynamiques']
+    },
+    {
+      id: 'devil-press-dumbbell',
+      nom: 'Devil Press Haltères',
+      description: 'Devil Press avec haltères',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Haltères',
+      image: '😈',
+      couleur: 'from-purple-500 to-violet-500',
+      bgCouleur: 'from-purple-50 to-violet-50',
+      borderCouleur: 'border-purple-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez avec les haltères',
+        'Faites un burpee',
+        'Saisissez les haltères',
+        'Levez-les au-dessus de la tête'
+      ],
+      conseils: 'Intensité et technique',
+      variations: ['Devil press haltères lestés', 'Devil press haltères alternés', 'Devil press haltères dynamiques']
+    },
+    {
+      id: 'bear-crawl',
+      nom: 'Bear Crawl',
+      description: 'Marche à quatre pattes',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🐻',
+      couleur: 'from-amber-500 to-orange-500',
+      bgCouleur: 'from-amber-50 to-orange-50',
+      borderCouleur: 'border-amber-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous à quatre pattes',
+        'Gardez les genoux légèrement décollés',
+        'Marchez en avant',
+        'Maintenez la position'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Bear crawl lent', 'Bear crawl rapide', 'Bear crawl lesté']
+    },
+    {
+      id: 'crab-walk',
+      nom: 'Crab Walk',
+      description: 'Marche en position de crabe',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🦀',
+      couleur: 'from-cyan-500 to-blue-500',
+      bgCouleur: 'from-cyan-50 to-blue-50',
+      borderCouleur: 'border-cyan-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en position de crabe',
+        'Marchez en arrière',
+        'Maintenez la position',
+        'Contrôlez le mouvement'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Crab walk lent', 'Crab walk rapide', 'Crab walk lesté']
+    },
+    {
+      id: 'duck-walk',
+      nom: 'Duck Walk',
+      description: 'Marche en position accroupie',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Jambes', 'Fessiers', 'Core'],
+      equipement: 'Aucun',
+      image: '🦆',
+      couleur: 'from-green-500 to-emerald-500',
+      bgCouleur: 'from-green-50 to-emerald-50',
+      borderCouleur: 'border-green-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en position accroupie',
+        'Marchez en avant',
+        'Maintenez la position',
+        'Contrôlez le mouvement'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Duck walk lent', 'Duck walk rapide', 'Duck walk lesté']
+    },
+    {
+      id: 'inchworm',
+      nom: 'Inchworm',
+      description: 'Mouvement de chenille',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Intermédiaire',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🐛',
+      couleur: 'from-lime-500 to-green-500',
+      bgCouleur: 'from-lime-50 to-green-50',
+      borderCouleur: 'border-lime-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Commencez debout',
+        'Penchez-vous vers l\'avant',
+        'Marchez avec les mains',
+        'Revenez à la position de départ'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Inchworm lent', 'Inchworm rapide', 'Inchworm lesté']
+    },
+    {
+      id: 'spiderman-crawl',
+      nom: 'Spider Crawl',
+      description: 'Marche en position de spider',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🕷️',
+      couleur: 'from-slate-500 to-gray-500',
+      bgCouleur: 'from-slate-50 to-gray-50',
+      borderCouleur: 'border-slate-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Marchez avec les mains et les pieds',
+        'Maintenez la position',
+        'Contrôlez le mouvement'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Spider crawl lent', 'Spider crawl rapide', 'Spider crawl lesté']
+    },
+    {
+      id: 'alligator-crawl',
+      nom: 'Alligator Crawl',
+      description: 'Marche en position d\'alligator',
+      categorie: 'Crossfit',
+      type: 'Métabolique',
+      difficulte: 'Avancé',
+      muscles: ['Tout le corps'],
+      equipement: 'Aucun',
+      image: '🐊',
+      couleur: 'from-emerald-500 to-teal-500',
+      bgCouleur: 'from-emerald-50 to-teal-50',
+      borderCouleur: 'border-emerald-200/50',
+      icon: <Flame className="w-6 h-6" />,
+      instructions: [
+        'Positionnez-vous en planche',
+        'Marchez en alternant',
+        'Maintenez la position',
+        'Contrôlez le mouvement'
+      ],
+      conseils: 'Contrôle et coordination',
+      variations: ['Alligator crawl lent', 'Alligator crawl rapide', 'Alligator crawl lesté']
     }
   ];
 
-  const stats = {
-    totalBlocks: exerciseBlocks.length,
-    popularBlocks: exerciseBlocks.filter(block => block.isPopular).length,
-    totalExercises: exerciseBlocks.reduce((sum, block) => sum + block.exercises, 0),
-    averageDuration: Math.round(exerciseBlocks.reduce((sum, block) => sum + parseInt(block.duration), 0) / exerciseBlocks.length)
-  };
-
-  const filters = [
-    { value: 'all', label: 'Tous', icon: Dumbbell },
-    { value: 'popular', label: 'Populaires', icon: Star },
-    { value: 'push', label: 'Push', icon: Target },
-    { value: 'pull', label: 'Pull', icon: Target },
-    { value: 'legs', label: 'Legs', icon: Target },
-    { value: 'full body', label: 'Full Body', icon: Target },
-    { value: 'cardio', label: 'Cardio', icon: Target },
-    { value: 'upper', label: 'Upper', icon: Target },
-    { value: 'lower', label: 'Lower', icon: Target },
-    { value: 'core', label: 'Core', icon: Target },
-    { value: 'arms', label: 'Arms', icon: Target },
-    { value: 'back', label: 'Back', icon: Target },
-    { value: 'chest', label: 'Chest', icon: Target },
-    { value: 'shoulders', label: 'Shoulders', icon: Target },
-    { value: 'glutes', label: 'Glutes', icon: Target },
-    { value: 'functional', label: 'Functional', icon: Target },
-    { value: 'powerlifting', label: 'Powerlifting', icon: Target },
-    { value: 'bodyweight', label: 'Bodyweight', icon: Target },
-    { value: 'mobility', label: 'Mobility', icon: Target },
-    { value: 'recovery', label: 'Recovery', icon: Target },
-    { value: 'morning', label: 'Morning', icon: Target },
-    { value: 'evening', label: 'Evening', icon: Target },
-    { value: 'quick', label: 'Quick', icon: Target },
-    { value: 'weekend', label: 'Weekend', icon: Target },
-    { value: 'fat loss', label: 'Fat Loss', icon: Target },
-    { value: 'muscle gain', label: 'Muscle Gain', icon: Target },
-    { value: 'strength', label: 'Strength', icon: Target },
-    { value: 'endurance', label: 'Endurance', icon: Target },
-    { value: 'speed', label: 'Speed', icon: Target },
-    { value: 'balance', label: 'Balance', icon: Target },
-    { value: 'dumbbells', label: 'Dumbbells', icon: Target },
-    { value: 'barbell', label: 'Barbell', icon: Target },
-    { value: 'kettlebell', label: 'Kettlebell', icon: Target },
-    { value: 'bands', label: 'Bands', icon: Target },
-    { value: 'trx', label: 'TRX', icon: Target },
-    { value: 'machines', label: 'Machines', icon: Target },
-    { value: 'athletic', label: 'Athletic', icon: Target },
-    { value: 'rehab', label: 'Rehab', icon: Target },
-    { value: 'prehab', label: 'Prehab', icon: Target },
-    { value: 'posture', label: 'Posture', icon: Target },
-    { value: 'breathing', label: 'Breathing', icon: Target },
-    { value: 'mental', label: 'Mental', icon: Target },
-    { value: 'dance', label: 'Dance', icon: Target },
-    { value: 'martial', label: 'Martial', icon: Target },
-    { value: 'yoga', label: 'Yoga', icon: Target },
-    { value: 'pilates', label: 'Pilates', icon: Target },
-    { value: 'boxing', label: 'Boxing', icon: Target },
-    { value: 'swimming', label: 'Swimming', icon: Target },
-    { value: 'extreme', label: 'Extreme', icon: Target }
+  const categories = [
+    { value: 'all', label: 'Tous' },
+    { value: 'Force', label: 'Force' },
+    { value: 'Endurance', label: 'Endurance' },
+    { value: 'Calisthéniques', label: 'Calisthéniques' },
+    { value: 'Crossfit', label: 'Crossfit' }
   ];
 
-  const filteredBlocks = exerciseBlocks.filter(block => {
-    const matchesSearch = block.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         block.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || 
-      (selectedFilter === 'popular' && block.isPopular) ||
-      block.category.toLowerCase() === selectedFilter;
-    
-    return matchesSearch && matchesFilter;
+  const filteredExercices = exercices.filter(exercice => {
+    const matchesSearch = exercice.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         exercice.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         exercice.muscles.some(muscle => muscle.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || exercice.categorie === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
+  const getExercicesBySportClass = (sportClass: string) => {
+    switch (sportClass) {
+      case 'power': return exercices.filter(e => e.categorie === 'Force');
+      case 'marathon': return exercices.filter(e => e.categorie === 'Endurance');
+      case 'crossfit': return exercices.filter(e => e.categorie === 'Crossfit');
+      case 'calisthenics': return exercices.filter(e => e.categorie === 'Calisthéniques');
+      default: return exercices;
+    }
+  };
+
   return (
-    <PageLayout
-      title="Blocs d'entraînement"
-      subtitle="Choisissez votre programme d'exercices"
-      icon={<Dumbbell className="h-6 w-6 text-blue-600" />}
-      actions={
-        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
-          <Plus className="h-4 w-4 mr-2" />
-          Nouveau bloc
-        </Button>
-      }
-    >
-          {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          title="Total blocs"
-          value={stats.totalBlocks}
-          icon={Dumbbell}
-          color="blue"
-        />
-        <StatCard
-          title="Populaires"
-          value={stats.popularBlocks}
-          icon={Star}
-          color="orange"
-        />
-        <StatCard
-          title="Exercices"
-          value={stats.totalExercises}
-          icon={Target}
-          color="green"
-        />
-        <StatCard
-          title="Durée moy."
-          value={`${stats.averageDuration} min`}
-          icon={Clock}
-          color="purple"
-        />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          {/* Header Principal */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-8 text-white shadow-2xl">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+            
+            <div className="relative z-10">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                      <Dumbbell className="w-8 h-8" />
+                    </div>
+                    <div>
+                      <h1 className="text-4xl font-bold tracking-tight">
+                        Exercices d'Entraînement
+                      </h1>
+                      <p className="text-white/90 text-lg mt-2">Bibliothèque complète d'exercices</p>
+                    </div>
         </div>
 
-      {/* Recherche et filtres */}
-      <Card className="bg-white border-0 shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-gray-800 text-2xl">
-            <div className="bg-blue-100 rounded-full p-2">
-              <Search className="h-6 w-6 text-blue-600" />
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
+                      <Target className="w-5 h-5" />
+                      <span>{exercices.length} exercices</span>
             </div>
-            Recherche et filtres
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-              <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                    <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
+                      <Star className="w-5 h-5" />
+                      <span>{categories.length - 1} catégories</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:text-right space-y-4">
+                  <div className="text-white/90 font-medium">Exercices recommandés</div>
+                  <div className="text-2xl font-bold text-white">
+                    {getExercicesBySportClass(user?.sportClass || 'classique').length}
+                  </div>
+                  <div className="text-sm text-white/80">
+                    pour {user?.sportClass === 'power' ? 'Powerlifting' : 
+                          user?.sportClass === 'marathon' ? 'Marathon' :
+                          user?.sportClass === 'crossfit' ? 'Crossfit' :
+                          user?.sportClass === 'calisthenics' ? 'Calisthéniques' : 'Votre sport'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Filtres et recherche */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+            <CardContent className="p-6">
+              <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
-                placeholder="Rechercher un bloc d'entraînement..."
+                      placeholder="Rechercher un exercice..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-lg border-2 border-gray-200 focus:border-blue-500 bg-white"
-                />
+                      className="pl-10 h-12 bg-white/80 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl"
+                    />
+                  </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full sm:w-48 h-12 bg-white/80 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-xl">
+                      {categories.map(category => (
+                        <SelectItem 
+                          key={category.value} 
+                          value={category.value}
+                          className="hover:bg-blue-50 focus:bg-blue-50 transition-colors duration-200"
+                        >
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
               </div>
             
-            <div className="flex flex-wrap gap-2">
-              {filters.map((filter) => (
+                <div className="flex items-center gap-2">
                 <Button
-                  key={filter.value}
-                  variant={selectedFilter === filter.value ? "default" : "outline"}
+                    variant={viewMode === 'grid' ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setSelectedFilter(filter.value)}
-                  className={`flex items-center gap-2 ${
-                    selectedFilter === filter.value 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                      : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
-                  }`}
-                >
-                  <filter.icon className="h-4 w-4" />
-                  {filter.label}
+                    onClick={() => setViewMode('grid')}
+                    className="h-10 w-10 p-0 rounded-xl"
+                  >
+                    <Grid className="w-4 h-4" />
                 </Button>
-              ))}
+                  <Button
+                    variant={viewMode === 'list' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setViewMode('list')}
+                    className="h-10 w-10 p-0 rounded-xl"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-      {/* Liste des blocs */}
+          {/* Liste des exercices */}
+          <div className="space-y-6">
+            {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredBlocks.map((block) => (
+                {filteredExercices.map((exercice) => (
             <Card 
-            key={block.id} 
-            className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-            onClick={() => navigate(`/programme/${block.id}`)}
-          >
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <CardTitle className="text-gray-800 text-xl">{block.name}</CardTitle>
-                {block.isPopular && (
-                  <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-                    <Star className="h-3 w-3 mr-1" />
-                    Populaire
-                  </Badge>
-                )}
-                    </div>
-              </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-gray-600 text-sm">{block.description}</p>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Exercices</span>
-                  <span className="font-semibold text-gray-800">{block.exercises}</span>
-                  </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Durée</span>
-                  <span className="font-semibold text-gray-800">{block.duration}</span>
-        </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Difficulté</span>
-                  <Badge 
-                    variant="outline" 
-                    className={`${
-                      block.difficulty === 'Débutant' ? 'border-green-300 text-green-700 bg-green-50' :
-                      block.difficulty === 'Intermédiaire' ? 'border-yellow-300 text-yellow-700 bg-yellow-50' :
-                      'border-red-300 text-red-700 bg-red-50'
-                    }`}
+                    key={exercice.id} 
+                    className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+                    onClick={() => setSelectedExercise(exercice.id)}
                   >
-                    {block.difficulty}
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg bg-gradient-to-r ${exercice.couleur}`}>
+                          {exercice.icon}
+                        </div>
+                        <div className="flex gap-2">
+                          <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                            {exercice.difficulte}
+                  </Badge>
+                          <Badge variant="outline" className="border-blue-200 text-blue-600">
+                            {exercice.type}
                           </Badge>
                     </div>
-
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Popularité</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full"
-                        style={{ width: `${block.popularity}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-600">{block.popularity}%</span>
-                            </div>
+                      </div>
+                      <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                        {exercice.nom}
+                      </CardTitle>
+                      <p className="text-gray-600 text-sm">{exercice.description}</p>
+              </CardHeader>
+            <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Target className="w-4 h-4" />
+                          <span>{exercice.categorie}</span>
+                  </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Users className="w-4 h-4" />
+                          <span>{exercice.muscles.join(', ')}</span>
                         </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Dumbbell className="w-4 h-4" />
+                          <span>{exercice.equipement}</span>
+                        </div>
+        </div>
 
+                      <Button 
+                        className="w-full mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedExercise(exercice.id);
+                        }}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Voir les détails
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredExercices.map((exercice) => (
+                  <Card 
+                    key={exercice.id} 
+                    className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+                    onClick={() => setSelectedExercise(exercice.id)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-6">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gradient-to-r ${exercice.couleur}`}>
+                          {exercice.icon}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4 mb-2">
+                            <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                              {exercice.nom}
+                            </h3>
+                            <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                              {exercice.difficulte}
+                            </Badge>
+                            <Badge variant="outline" className="border-blue-200 text-blue-600">
+                              {exercice.type}
+                          </Badge>
+                    </div>
+                          <p className="text-gray-600 mb-3">{exercice.description}</p>
+                          <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-2">
+                              <Target className="w-4 h-4" />
+                              <span>{exercice.categorie}</span>
+                    </div>
+                            <div className="flex items-center gap-2">
+                              <Users className="w-4 h-4" />
+                              <span>{exercice.muscles.join(', ')}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Dumbbell className="w-4 h-4" />
+                              <span>{exercice.equipement}</span>
+                        </div>
+                          </div>
+                        </div>
                 <Button 
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+                          className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/programme/${block.id}`);
+                            setSelectedExercise(exercice.id);
                   }}
                 >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Commencer
+                          <Eye className="w-4 h-4 mr-2" />
+                          Voir
                     </Button>
                   </div>
                 </CardContent>
               </Card>
         ))}
           </div>
-    </PageLayout>
+            )}
+          </div>
+
+          {/* Modal de détails de l'exercice */}
+          {selectedExercise && (() => {
+            const exercice = exercices.find(e => e.id === selectedExercise);
+            if (!exercice) return null;
+
+            return (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <Card className="w-full max-w-2xl bg-white/95 backdrop-blur-sm border-0 shadow-2xl max-h-[90vh] overflow-y-auto">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white shadow-lg bg-gradient-to-r ${exercice.couleur}`}>
+                          {exercice.icon}
+                        </div>
+                        <div>
+                          <CardTitle className="text-2xl font-bold text-gray-800">{exercice.nom}</CardTitle>
+                          <p className="text-gray-600">{exercice.description}</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedExercise(null)}
+                        className="h-10 w-10 p-0 rounded-xl"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Informations générales */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
+                        <div className="text-sm font-medium text-blue-600 mb-1">Catégorie</div>
+                        <div className="text-lg font-bold text-gray-800">{exercice.categorie}</div>
+                      </div>
+                      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
+                        <div className="text-sm font-medium text-green-600 mb-1">Type</div>
+                        <div className="text-lg font-bold text-gray-800">{exercice.type}</div>
+                      </div>
+                      <div className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-200/50">
+                        <div className="text-sm font-medium text-purple-600 mb-1">Difficulté</div>
+                        <div className="text-lg font-bold text-gray-800">{exercice.difficulte}</div>
+                      </div>
+                      <div className="p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-200/50">
+                        <div className="text-sm font-medium text-orange-600 mb-1">Équipement</div>
+                        <div className="text-lg font-bold text-gray-800">{exercice.equipement}</div>
+                      </div>
+                    </div>
+
+                    {/* Muscles travaillés */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-500" />
+                        Muscles Travaillés
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {exercice.muscles.map((muscle, index) => (
+                          <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-700">
+                            {muscle}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Instructions */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <Target className="w-5 h-5 text-green-500" />
+                        Instructions
+                      </h4>
+                      <ol className="space-y-2">
+                        {exercice.instructions.map((instruction, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm font-bold mt-0.5">
+                              {index + 1}
+                            </div>
+                            <span className="text-gray-700">{instruction}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    {/* Conseils */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <Star className="w-5 h-5 text-yellow-500" />
+                        Conseils
+                      </h4>
+                      <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl border border-yellow-200/50">
+                        <p className="text-gray-700 font-medium">{exercice.conseils}</p>
+                      </div>
+                    </div>
+
+                    {/* Variations */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-purple-500" />
+                        Variations
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {exercice.variations.map((variation, index) => (
+                          <Badge key={index} variant="outline" className="border-purple-200 text-purple-600">
+                            {variation}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
   );
 };
 

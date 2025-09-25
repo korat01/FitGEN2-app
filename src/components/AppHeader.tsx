@@ -46,6 +46,10 @@ const AppHeader: React.FC = () => {
                 <Apple className="w-4 h-4" />
                 Nutrition
               </Link>
+              <Link to="/blocs-entrainement" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
+                <Dumbbell className="w-4 h-4" />
+                Blocs d'Entraînement
+              </Link>
             </nav>
           </div>
 

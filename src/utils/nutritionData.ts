@@ -5,9 +5,9 @@ export interface Aliment {
   categorie: string;
   calories: number;
   proteines: number;
-  glucides: number;
-  lipides: number;
-  fibres: number;
+    glucides: number;
+    lipides: number;
+    fibres: number;
   sodium: number;
   image?: string;
   description?: string;

@@ -141,14 +141,14 @@ export const ProfileSummary: React.FC = () => {
     icon?: React.ReactNode,
     gradient?: string
   ) => {
-    return (
+  return (
       <div className={`p-6 rounded-2xl transition-all duration-300 hover:shadow-lg ${gradient || 'bg-gradient-to-r from-gray-50 to-gray-100'} border border-gray-200/50 hover:border-gray-300/70`}>
         <div className="flex items-center gap-3 mb-3">
           {icon && <div className="text-gray-600">{icon}</div>}
           <div className="text-sm font-medium text-gray-600 uppercase tracking-wide">{label}</div>
-        </div>
+                  </div>
         {isEditing ? (
-          <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
             {type === 'select' && options ? (
               <Select value={tempValue} onValueChange={setTempValue}>
                 <SelectTrigger className="flex-1 h-12 bg-white/80 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
@@ -190,21 +190,21 @@ export const ProfileSummary: React.FC = () => {
             >
               <X className="w-4 h-4" />
             </Button>
-          </div>
+                    </div>
         ) : (
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold text-gray-800">{value}</div>
-            <Button
+                <Button 
               size="sm"
               variant="outline"
               onClick={onEdit}
               className="h-10 w-10 border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 hover:scale-105 rounded-xl"
             >
               <Edit className="w-4 h-4" />
-            </Button>
-          </div>
+                </Button>
+              </div>
         )}
-      </div>
+            </div>
     );
   };
 
@@ -384,7 +384,7 @@ export const ProfileSummary: React.FC = () => {
             <p className="text-gray-500 mt-2">Veuillez vous connecter pour accéder à votre profil.</p>
           </CardContent>
         </Card>
-      </div>
+          </div>
     );
   }
 
@@ -405,19 +405,19 @@ export const ProfileSummary: React.FC = () => {
                     <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
                       <Users className="w-8 h-8" />
                     </div>
-                    <div>
+                  <div>
                       <h1 className="text-4xl font-bold tracking-tight">
                         Profil de {user.name}
                       </h1>
                       <p className="text-white/90 text-lg mt-2">Gérez vos informations personnelles</p>
-                    </div>
+                  </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">
                     <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
                       <Trophy className="w-5 h-5" />
                       <span>Rang {user.rank || "D"}</span>
-                    </div>
+                </div>
                     <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
                       <Flame className="w-5 h-5" />
                       <span>{user.globalScore || 0}/1000</span>
@@ -452,7 +452,7 @@ export const ProfileSummary: React.FC = () => {
             <CardContent>
               <div className="space-y-8">
                 {/* Groupes musculaires */}
-                <div>
+                  <div>
                   <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                     <Dumbbell className="w-5 h-5 text-blue-500" />
                     Groupes Musculaires
@@ -481,14 +481,14 @@ export const ProfileSummary: React.FC = () => {
                                 : 'bg-gray-400 group-hover:bg-gray-500'
                             }`}>
                               {muscle.icon}
-                            </div>
+                  </div>
                   <div>
                               <div className={`font-bold text-lg transition-colors ${
                                 isSelected ? 'text-gray-800' : 'text-gray-600'
                               }`}>
                                 {muscle.name}
-                              </div>
-                            </div>
+                  </div>
+                </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               isSelected 
                                 ? 'bg-green-500 border-green-500' 
@@ -504,7 +504,7 @@ export const ProfileSummary: React.FC = () => {
                 </div>
 
                 {/* Focus spécialisés par classe de sport */}
-                <div>
+                  <div>
                   <h4 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
                     <Star className="w-5 h-5 text-yellow-500" />
                     Focus Spécialisés - {user?.sportClass === 'power' ? 'Powerlifting' : 
@@ -537,7 +537,7 @@ export const ProfileSummary: React.FC = () => {
                                 : 'bg-gray-400 group-hover:bg-gray-500'
                             }`}>
                               <Dumbbell className="w-6 h-6" />
-                            </div>
+                  </div>
                             <div className="flex-1">
                               <h5 className={`font-bold text-lg transition-colors ${
                                 user?.focus_squat ? 'text-gray-800' : 'text-gray-600'
@@ -549,16 +549,16 @@ export const ProfileSummary: React.FC = () => {
                               }`}>
                                 Force des jambes et du dos
                               </p>
-                            </div>
+                  </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_squat 
                                 ? 'bg-green-500 border-green-500' 
                                 : 'border-gray-300 group-hover:border-gray-400'
                             }`}>
                               {user?.focus_squat && <CheckCircle className="w-4 h-4 text-white" />}
-                            </div>
+                </div>
                           </div>
-                        </div>
+          </div>
 
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
@@ -775,9 +775,9 @@ export const ProfileSummary: React.FC = () => {
                     {/* Autres classes de sport... */}
                   </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                    </div>
+                  </CardContent>
+                </Card>
 
           {/* Niveau général */}
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -787,9 +787,9 @@ export const ProfileSummary: React.FC = () => {
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
                 Niveau Général
-              </CardTitle>
+                    </CardTitle>
               <p className="text-gray-600 mt-2">Définissez votre niveau général d'entraînement</p>
-            </CardHeader>
+                  </CardHeader>
             <CardContent>
               <div className="max-w-md">
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -817,9 +817,9 @@ export const ProfileSummary: React.FC = () => {
                 <p className="text-sm text-gray-500 mt-2">
                   Ce niveau sera utilisé pour adapter les programmes d'entraînement
                 </p>
-                  </div>
-            </CardContent>
-          </Card>
+                    </div>
+                  </CardContent>
+                </Card>
 
           {/* Jours d'entraînement */}
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -829,15 +829,15 @@ export const ProfileSummary: React.FC = () => {
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
                 Jours d'Entraînement
-              </CardTitle>
+                  </CardTitle>
               <p className="text-gray-600 mt-2">Sélectionnez les jours où vous voulez vous entraîner</p>
-            </CardHeader>
+                </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="text-lg font-semibold text-gray-800">
                     Jours sélectionnés : {user?.trainingDays?.length || 0}/7
-                  </div>
+                    </div>
                   <Button
                     variant="outline"
                     onClick={() => setIsEditingTrainingDays(true)}
@@ -846,7 +846,7 @@ export const ProfileSummary: React.FC = () => {
                     <Edit className="w-4 h-4 mr-2" />
                     Modifier
                   </Button>
-                </div>
+                    </div>
 
                 {isEditingTrainingDays ? (
                   <div className="space-y-4">
@@ -881,8 +881,8 @@ export const ProfileSummary: React.FC = () => {
                           </div>
                         );
                       })}
-                    </div>
-                    
+                  </div>
+                  
                     <div className="flex gap-3">
                       <Button
                         onClick={saveTrainingDays}
@@ -900,7 +900,7 @@ export const ProfileSummary: React.FC = () => {
                         Annuler
                       </Button>
                     </div>
-                  </div>
+                    </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {daysOfWeek.map((day) => {
@@ -934,9 +934,9 @@ export const ProfileSummary: React.FC = () => {
                     })}
                   </div>
                 )}
-              </div>
-            </CardContent>
-          </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
           {/* Durée d'entraînement */}
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
@@ -946,9 +946,9 @@ export const ProfileSummary: React.FC = () => {
                   <Timer className="w-6 h-6 text-white" />
                 </div>
                 Durée d'Entraînement
-              </CardTitle>
+                  </CardTitle>
               <p className="text-gray-600 mt-2">Combien de mois voulez-vous vous entraîner ?</p>
-            </CardHeader>
+                </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -956,7 +956,7 @@ export const ProfileSummary: React.FC = () => {
                     Durée actuelle : {user?.trainingMonths || 3} mois
                   </div>
                   <Button
-                    variant="outline"
+                        variant="outline" 
                     onClick={() => setIsEditingTrainingTime(true)}
                     className="border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 hover:scale-105 rounded-xl"
                   >
@@ -1074,9 +1074,9 @@ export const ProfileSummary: React.FC = () => {
                     <strong> {user?.trainingDays?.length || 0} jours par semaine</strong>
                   </p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
           {/* Informations du profil */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1086,7 +1086,7 @@ export const ProfileSummary: React.FC = () => {
                 <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
                     <Users className="w-6 h-6 text-white" />
-                  </div>
+            </div>
                   Informations personnelles
                 </CardTitle>
               </CardHeader>
@@ -1187,7 +1187,7 @@ export const ProfileSummary: React.FC = () => {
                 <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
                     <Weight className="w-6 h-6 text-white" />
-                  </div>
+          </div>
                   Informations physiques
                 </CardTitle>
               </CardHeader>
@@ -1293,8 +1293,8 @@ export const ProfileSummary: React.FC = () => {
                     <Trophy className="w-6 h-6 text-white" />
                   </div>
                   Informations sportives
-                </CardTitle>
-              </CardHeader>
+              </CardTitle>
+            </CardHeader>
               <CardContent className="space-y-4">
                 {/* Classe de sport */}
                 {renderEditableField(
@@ -1371,7 +1371,7 @@ export const ProfileSummary: React.FC = () => {
                 <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
                     <Trophy className="w-6 h-6 text-white" />
-          </div>
+                  </div>
                   Statistiques
                     </CardTitle>
                   </CardHeader>
@@ -1383,13 +1383,13 @@ export const ProfileSummary: React.FC = () => {
                       <div className="text-sm font-medium text-blue-600 uppercase tracking-wide">Rang actuel</div>
                     </div>
                     <div className="text-3xl font-bold text-blue-600">{user.rank || "D"}</div>
-                  </div>
-
+                </div>
+                
                   <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50 hover:border-green-300/70 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <Weight className="w-5 h-5 text-green-600" />
                       <div className="text-sm font-medium text-green-600 uppercase tracking-wide">Score global</div>
-                    </div>
+                  </div>
                     <div className="text-3xl font-bold text-green-600">{user.globalScore || 0}</div>
             </div>
 
@@ -1413,12 +1413,12 @@ export const ProfileSummary: React.FC = () => {
                       {user.weight && user.height ? 
                         Math.round((user.weight / Math.pow(user.height / 100, 2)) * 10) / 10 : 'N/A'}
                     </div>
-                  </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -1,19 +1,6 @@
-export type FocusArea = {
-  id: string;
-  nom: string;
-  pourcentage: number;
-  exercices: string[];
-  couleur: string;
-  icone: string;
-};
+export type FocusArea = 'bras' | 'fesses' | 'jambes' | 'dos' | 'pectoraux' | 'epaules' | 'abdos';
 
-export type ForceFocus = {
-  id: string;
-  nom: string;
-  exercice: string;
-  priorite: number;
-  objectif: string;
-};
+export type ForceFocus = 'squat' | 'deadlift' | 'bench_press';
 
 export interface UserProfile {
   id: string;

@@ -57,14 +57,13 @@ export const Programme: React.FC = () => {
       console.log('👤 Profil utilisateur COMPLET:', userProfile);
       
       // Analyser le profil avec des valeurs par défaut
-      const sportClass = userProfile?.sportClass || 'classique';
-      type LevelType = 'debutant' | 'intermediaire' | 'avance' | 'expert';
-      const level: LevelType = 'intermediaire';
-      const weight = userProfile?.weight || 70;
-      const age = userProfile?.age || 25;
-      const sex = userProfile?.sex || 'male';
-      const trainingDays = ['lundi', 'mercredi', 'vendredi'];
-      const trainingMonths = 3;
+      const sportClass = userProfile.sportClass || userProfile.sport || 'classique';
+      const level = userProfile.generalLevel || userProfile.level || 'intermediaire';
+      const weight = userProfile.weight || 70;
+      const age = userProfile.age || 25;
+      const sex = userProfile.sex || 'male';
+      const trainingDays = userProfile.trainingDays || ['lundi', 'mercredi', 'vendredi'];
+      const trainingMonths = userProfile.trainingMonths || userProfile.duration || 3;
       
       // Récupérer les performances utilisateur
       const userPerformances = JSON.parse(localStorage.getItem('userPerformances') || '[]');
@@ -132,8 +131,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Squat 5-3-1',
               day: trainingDays[0],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 90,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 75 : level === 'intermediaire' ? 90 : 105,
               exercises: [
                 {
                   id: 'ex-1',
@@ -215,8 +214,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Bench 5-3-1',
               day: trainingDays[1],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 90,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 75 : level === 'intermediaire' ? 90 : 105,
               exercises: [
                 {
                   id: 'ex-7',
@@ -298,8 +297,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Deadlift 5-3-1',
               day: trainingDays[2],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 90,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 75 : level === 'intermediaire' ? 90 : 105,
               exercises: [
                 {
                   id: 'ex-13',
@@ -389,8 +388,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Squat 5-3-1',
               day: trainingDays[0],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 75,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 60 : level === 'intermediaire' ? 75 : 90,
               exercises: [
                 {
                   id: 'ex-1',
@@ -450,8 +449,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Bench 5-3-1',
               day: trainingDays[1],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 75,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 60 : level === 'intermediaire' ? 75 : 90,
               exercises: [
                 {
                   id: 'ex-5',
@@ -511,8 +510,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Deadlift 5-3-1',
               day: trainingDays[2],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 75,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 60 : level === 'intermediaire' ? 75 : 90,
               exercises: [
                 {
                   id: 'ex-9',
@@ -636,8 +635,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Squat 5-3-1',
               day: trainingDays[0],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 60,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 45 : level === 'intermediaire' ? 60 : 75,
           exercises: [
                 {
                   id: 'ex-1',
@@ -675,8 +674,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Bench 5-3-1',
               day: trainingDays[1],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 60,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 45 : level === 'intermediaire' ? 60 : 75,
           exercises: [
                 {
                   id: 'ex-3',
@@ -714,8 +713,8 @@ export const Programme: React.FC = () => {
               nom: 'Séance Deadlift 5-3-1',
               day: trainingDays[2],
               phase: 'Adaptation',
-              intensity: 'Modérée',
-              duration: 60,
+              intensity: level === 'debutant' ? 'Faible' : level === 'intermediaire' ? 'Modérée' : 'Élevée',
+              duration: level === 'debutant' ? 45 : level === 'intermediaire' ? 60 : 75,
           exercises: [
                 {
                   id: 'ex-5',

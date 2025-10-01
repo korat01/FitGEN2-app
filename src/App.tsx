@@ -13,6 +13,9 @@ import ProfileSummary from './pages/ProfileSummary';
 import Programme from './pages/Programme';
 import BlocsEntrainement from './pages/BlocsEntrainement';
 import NotFound from './pages/NotFound';
+import Nutrition from './pages/Nutrition';
+import AlimentDetail from './pages/AlimentDetail';
+import RepasDetail from './pages/RepasDetail';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -95,6 +98,30 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <PageLayout>
                 <BlocsEntrainement />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/nutrition" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Nutrition />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/aliment/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <AlimentDetail />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/repas/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <RepasDetail />
               </PageLayout>
             </ProtectedRoute>
           } />

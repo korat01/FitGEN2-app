@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAuth } from '../contexts/AuthContext';
-import { User, UserProfile } from '../types/profile';
+import { useAuth, User } from '../contexts/AuthContext';
+import { UserProfile } from '../types/profile';
 import { Save, User as UserIcon, Calendar, Target, Zap } from 'lucide-react';
 
 interface ProfileFormProps {
@@ -25,18 +25,28 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
         name: user.name || '',
         email: user.email || '',
         weight: user.weight || 70,
-        age: user.age || 25,
-        sex: user.sex || 'male',
-        sportClass: user.sportClass || 'Classique',
-        phone: user.phone || '',
-        location: user.location || '',
-        height: user.height || 175,
-        goal: user.goal || '',
-        generalLevel: user.generalLevel || 'Débutant',
-        trainingDays: user.trainingDays || [],
-        trainingMonths: user.trainingMonths || 3,
+        age: typeof user.age === 'number' ? user.age : 25,
+        sex: user.sex === 'male' || user.sex === 'female' ? user.sex : 'male',
+        sportClass: (
+          user.sportClass === 'classique' ||
+          user.sportClass === 'powerlifter' ||
+          user.sportClass === 'runner' ||
+          user.sportClass === 'allround' ||
+          user.sportClass === 'calisthenics' ||
+          user.sportClass === 'crossfit' ||
+          user.sportClass === 'marathon' ||
+          user.sportClass === 'streetlifting' ||
+          user.sportClass === 'sprint'
+        ) ? user.sportClass : 'classique',
+        phone: typeof user.phone === 'string' ? user.phone : '',
+        location: typeof user.location === 'string' ? user.location : '',
+        height: typeof user.height === 'number' ? user.height : 175,
+        goal: (user.goal === 'performance' || user.goal === 'musculation' || user.goal === 'endurance' || user.goal === 'sante') ? user.goal : 'performance',
+        generalLevel: (user.generalLevel === 'Débutant' || user.generalLevel === 'Intermédiaire' || user.generalLevel === 'Avancé' || user.generalLevel === 'Expert') ? user.generalLevel : 'Débutant',
+        trainingDays: Array.isArray(user.trainingDays) ? user.trainingDays : [],
+        trainingMonths: typeof user.trainingMonths === 'number' ? user.trainingMonths : 3,
         // Focus musculaires
-        focus_pectoraux: user.focus_pectoraux || false,
+        focus_pectoraux: 'focus_pectoraux' in user ? (user as any).focus_pectoraux : false,
         focus_dos: user.focus_dos || false,
         focus_bras: user.focus_bras || false,
         focus_epaules: user.focus_epaules || false,
@@ -76,11 +86,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
       if (user) {
         const updatedUser: User = {
           ...user,
-          ...formData,
-          // Mettre à jour le timestamp
-          updatedAt: new Date().toISOString()
+          ...formData
         };
 
+        // Mettre à jour l'utilisateur sans inclure le champ 'updatedAt' qui n'est pas reconnu par le type
         await updateUser(updatedUser);
         console.log('✅ Profil mis à jour:', updatedUser);
         
@@ -261,7 +270,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
 
                 <div className="space-y-2">
                   <Label htmlFor="trainingMonths">Durée d'Entraînement</Label>
-                  <Select value={formData.trainingMonths || 3} onValueChange={(value) => handleInputChange('trainingMonths', parseInt(value))}>
+              <Select
+                    value={formData.trainingMonths?.toString() || '3'}
+                    onValueChange={(value) => handleInputChange('trainingMonths', parseInt(value))}
+              >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionnez la durée" />
                 </SelectTrigger>

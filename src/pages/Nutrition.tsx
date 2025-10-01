@@ -23,7 +23,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import AlimentDetail from './pages/AlimentDetail';
+// import AlimentDetail from './pages/AlimentDetail'; // Correction : ce module n'existe pas ou le chemin est incorrect
 
 const Nutrition = () => {
   const navigate = useNavigate();
@@ -2426,17 +2426,58 @@ const Nutrition = () => {
     }
   };
 
+  // Données simplifiées pour tous les repas
+  const repas = [
+    {
+      id: '1',
+      nom: 'Bowl protéiné aux fruits',
+      type: 'Matin',
+      emoji: '🥣',
+      calories: 450
+    },
+    {
+      id: '2',
+      nom: 'Salade de Quinoa aux Légumes',
+      type: 'Midi',
+      emoji: '🥗',
+      calories: 380
+    },
+    {
+      id: '3',
+      nom: 'Saumon grillé aux légumes',
+      type: 'Soir',
+      emoji: '🐟',
+      calories: 520
+    },
+    {
+      id: '4',
+      nom: 'Omelette aux 3 œufs et fromage',
+      type: 'Matin',
+      emoji: '🍳',
+      calories: 520
+    },
+    {
+      id: '5',
+      nom: 'Poulet rôti aux patates douces',
+      type: 'Midi',
+      emoji: '🍗',
+      calories: 720
+    }
+  ];
+
   return (
     <PageLayout
-      title="Nutrition"
-      subtitle="Gérez votre alimentation et vos apports"
-      icon={<Apple className="h-6 w-6 text-blue-600" />}
-      actions={
-        <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter aliment
-        </Button>
-      }
+      header={{
+        title: "Nutrition",
+        subtitle: "Gérez votre alimentation et vos apports",
+        icon: <Apple className="h-6 w-6 text-blue-600" />,
+        actions: (
+          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter aliment
+          </Button>
+        )
+      }}
     >
       {/* Statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -2464,7 +2505,7 @@ const Nutrition = () => {
           icon={TrendingUp}
           color="purple"
         />
-        </div>
+      </div>
 
       {/* Recherche et filtres */}
       <Card className="bg-white border-0 shadow-lg">

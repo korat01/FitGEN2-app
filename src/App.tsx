@@ -14,6 +14,7 @@ import Programme from './pages/Programme';
 import Nutrition from './pages/Nutrition';
 import NotFound from './pages/NotFound';
 import BlocsEntrainement from './pages/BlocsEntrainement';
+import RepasDetail from './pages/RepasDetail';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -104,6 +105,14 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <PageLayout>
                 <BlocsEntrainement />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/repas/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <RepasDetail />
               </PageLayout>
             </ProtectedRoute>
           } />

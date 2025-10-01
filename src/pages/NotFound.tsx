@@ -40,11 +40,11 @@ export const NotFound: React.FC = () => {
               <Home className="w-4 h-4" />
               Accueil
             </Button>
-          </div>
+      </div>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default NotFound; 
+export default NotFound;

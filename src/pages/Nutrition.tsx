@@ -2576,8 +2576,8 @@ const Nutrition = () => {
             {filteredFoods.map((food) => (
               <Card 
                 key={food.id} 
-                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                onClick={() => navigate(`/nutrition/${food.id}`)}
+                className="bg-card border-0 shadow-card hover:shadow-elegant transition-all duration-300 hover-lift cursor-pointer"
+                onClick={() => navigate(`/aliment/${food.id}`)}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">

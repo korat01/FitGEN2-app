@@ -33,23 +33,20 @@ const AppHeader: React.FC = () => {
             </h1>
             
             {/* Navigation principale - hidden on mobile */}
-            <nav className="hidden lg:flex items-center space-x-1">
-              <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
-                <Home className="w-4 h-4" />
-                Accueil
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link to="/" className="text-foreground/70 hover:text-foreground transition-colors">
+                Dashboard
               </Link>
-              <Link to="/programme" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
-                <Dumbbell className="w-4 h-4" />
+              {/* <Link to="/stats" className="text-foreground/70 hover:text-foreground transition-colors">
+                Stats
+              </Link> */}
+              <Link to="/blocs-entrainement" className="text-foreground/70 hover:text-foreground transition-colors">
+                Exercices
+              </Link>
+              <Link to="/programme" className="text-foreground/70 hover:text-foreground transition-colors">
                 Programme
               </Link>
-              <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
-                <Apple className="w-4 h-4" />
-                Nutrition
-              </Link>
-              <Link to="/blocs-entrainement" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
-                <Dumbbell className="w-4 h-4" />
-                Blocs
-              </Link>
+              {/* Lien Nutrition supprimé */}
             </nav>
           </div>
 

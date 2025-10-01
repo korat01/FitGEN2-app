@@ -11,10 +11,8 @@ import Dashboard from './pages/Dashboard';
 import Stats from './pages/Stats';
 import ProfileSummary from './pages/ProfileSummary';
 import Programme from './pages/Programme';
-import Nutrition from './pages/Nutrition';
-import NotFound from './pages/NotFound';
 import BlocsEntrainement from './pages/BlocsEntrainement';
-import RepasDetail from './pages/RepasDetail';
+import NotFound from './pages/NotFound';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -93,26 +91,10 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/nutrition" element={
-            <ProtectedRoute>
-              <PageLayout>
-                <Nutrition />
-              </PageLayout>
-            </ProtectedRoute>
-          } />
-
           <Route path="/blocs-entrainement" element={
             <ProtectedRoute>
               <PageLayout>
                 <BlocsEntrainement />
-              </PageLayout>
-            </ProtectedRoute>
-          } />
-
-          <Route path="/repas/:id" element={
-            <ProtectedRoute>
-              <PageLayout>
-                <RepasDetail />
               </PageLayout>
             </ProtectedRoute>
           } />

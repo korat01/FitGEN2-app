@@ -197,9 +197,3 @@ export const Developer: React.FC = () => {
     </div>
   );
 };
-```
-
-## **✅ Résumé des pages créées :**
-
-1. **AlimentDetail.tsx** - Page de détail des aliments avec informations nutritionnelles
-2. 

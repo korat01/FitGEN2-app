@@ -23,39 +23,41 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-lg">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border shadow-elegant">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <div className="flex items-center gap-2 md:gap-4">
+            <h1 className="text-xl md:text-2xl font-bold gradient-primary bg-clip-text text-transparent">
               FitGEN22
             </h1>
             
-            {/* Navigation principale */}
-            <nav className="hidden md:flex items-center space-x-1">
-              <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
+            {/* Navigation principale - hidden on mobile */}
+            <nav className="hidden lg:flex items-center space-x-1">
+              <Link to="/" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
                 <Home className="w-4 h-4" />
                 Accueil
               </Link>
-              <Link to="/programme" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
+              <Link to="/programme" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
                 <Dumbbell className="w-4 h-4" />
                 Programme
               </Link>
-              <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
+              <Link to="/nutrition" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
                 <Apple className="w-4 h-4" />
                 Nutrition
               </Link>
-              <Link to="/blocs-entrainement" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-slate-100 transition-colors text-black">
+              <Link to="/blocs-entrainement" className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors text-foreground">
                 <Dumbbell className="w-4 h-4" />
-                Blocs d'Entraînement
+                Blocs
               </Link>
             </nav>
           </div>
 
           {/* Actions utilisateur */}
-          <div className="flex items-center gap-3">
-            <LanguageSwitcher />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden md:block">
+              <LanguageSwitcher />
+            </div>
             <UserDropdown
               userName="Alexandre"
               onProfileClick={handleProfileClick}

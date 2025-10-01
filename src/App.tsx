@@ -9,10 +9,13 @@ import { Toaster } from './components/ui/toaster';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Stats from './pages/Stats';
-import ProfileSummary from './pages/ProfileSummary';
+import Profile from './pages/Profile';
 import Programme from './pages/Programme';
-import BlocsEntrainement from './pages/BlocsEntrainement';
+import Nutrition from './pages/Nutrition';
 import NotFound from './pages/NotFound';
+import BlocsEntrainement from './pages/BlocsEntrainement';
+import RepasDetail from './pages/RepasDetail';
+import { AlimentDetail } from './pages/AlimentDetail';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -78,7 +81,7 @@ const AppContent: React.FC = () => {
           <Route path="/profile" element={
             <ProtectedRoute>
               <PageLayout>
-                <ProfileSummary />
+                <Profile />
               </PageLayout>
             </ProtectedRoute>
           } />
@@ -91,10 +94,34 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
           
+          <Route path="/nutrition" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Nutrition />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
           <Route path="/blocs-entrainement" element={
             <ProtectedRoute>
               <PageLayout>
                 <BlocsEntrainement />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/repas/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <RepasDetail />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/aliment/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <AlimentDetail />
               </PageLayout>
             </ProtectedRoute>
           } />

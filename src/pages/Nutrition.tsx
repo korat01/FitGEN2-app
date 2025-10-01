@@ -2466,21 +2466,27 @@ const Nutrition = () => {
   ];
 
   return (
-    <PageLayout
-      header={{
-        title: "Nutrition",
-        subtitle: "Gérez votre alimentation et vos apports",
-        icon: <Apple className="h-6 w-6 text-blue-600" />,
-        actions: (
-          <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
+    <PageLayout>
+      <div className="container mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+              <Apple className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Nutrition</h1>
+              <p className="text-muted-foreground">Gérez votre alimentation et vos apports</p>
+            </div>
+          </div>
+          <Button className="gradient-primary text-primary-foreground font-semibold shadow-elegant w-full md:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Ajouter aliment
           </Button>
-        )
-      }}
-    >
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        </div>
+
+        {/* Statistiques */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Aliments"
           value={stats.totalFoods}
@@ -2507,34 +2513,34 @@ const Nutrition = () => {
         />
       </div>
 
-      {/* Recherche et filtres */}
-      <Card className="bg-white border-0 shadow-lg">
+        {/* Recherche et filtres */}
+        <Card className="bg-card border-0 shadow-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3 text-gray-800 text-2xl">
-            <div className="bg-blue-100 rounded-full p-2">
-              <Search className="h-6 w-6 text-blue-600" />
+          <CardTitle className="flex items-center gap-3 text-foreground text-xl md:text-2xl">
+            <div className="bg-primary/10 rounded-full p-2">
+              <Search className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
             Recherche et filtres
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Input
-                placeholder="Rechercher un aliment ou un repas..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-lg border-2 border-gray-200 focus:border-blue-500 bg-white"
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-12 text-base md:text-lg border-2 border-input focus:border-primary bg-background"
               />
-              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Onglets */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        {/* Onglets */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="aliments" className="flex items-center gap-2">
             <Apple className="h-4 w-4" />
               Aliments ({filteredFoods.length})
@@ -2763,6 +2769,7 @@ const Nutrition = () => {
               </div>
           </TabsContent>
         </Tabs>
+      </div>
     </PageLayout>
   );
 };

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Apple, Utensils, Clock } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import PageLayout from '@/components/PageLayout';
 
 interface Aliment {
   id: string;
@@ -58,147 +59,148 @@ export const AlimentDetail: React.FC = () => {
 
   if (!aliment) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardContent className="p-8 text-center">
-              <Apple className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-gray-600 mb-4">Aliment non trouvé</h2>
-              <Button onClick={() => navigate('/nutrition')} className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
+      <PageLayout>
+        <div className="container mx-auto max-w-4xl">
+          <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-card">
+            <CardContent className="p-8 text-center">
+              <Apple className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-foreground mb-4">Aliment non trouvé</h2>
+              <Button onClick={() => navigate('/nutrition')} className="gradient-primary text-primary-foreground">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour à la nutrition
-            </Button>
-          </CardContent>
-        </Card>
+                Retour à la nutrition
+              </Button>
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <div className="max-w-4xl mx-auto">
+    <PageLayout>
+      <div className="container mx-auto max-w-4xl space-y-6">
         {/* Header */}
-        <div className="mb-6">
-        <Button
-          onClick={() => navigate('/nutrition')}
-            className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:bg-white/90 mb-4"
-        >
+        <div>
+          <Button
+            onClick={() => navigate('/nutrition')}
+            variant="outline"
+            className="mb-4"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Retour
           </Button>
         </div>
 
         {/* Informations principales */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-6">
+        <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-card">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-              <Apple className="w-8 h-8 text-green-500" />
+            <CardTitle className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
+              <Apple className="w-8 h-8 text-primary" />
               {aliment.nom}
-                  </CardTitle>
-            <p className="text-gray-600 text-lg">{aliment.description}</p>
+            </CardTitle>
+            <p className="text-muted-foreground text-base md:text-lg">{aliment.description}</p>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{aliment.calories}</div>
-                <div className="text-sm text-gray-600">Calories</div>
-                  </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{aliment.proteines}g</div>
-                <div className="text-sm text-gray-600">Protéines</div>
-                </div>
-              <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                <div className="text-2xl font-bold text-yellow-600">{aliment.glucides}g</div>
-                <div className="text-sm text-gray-600">Glucides</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+              <div className="text-center p-3 md:p-4 bg-primary/10 rounded-lg">
+                <div className="text-xl md:text-2xl font-bold text-primary">{aliment.calories}</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Calories</div>
               </div>
-              <div className="text-center p-4 bg-red-50 rounded-lg">
-                <div className="text-2xl font-bold text-red-600">{aliment.lipides}g</div>
-                <div className="text-sm text-gray-600">Lipides</div>
-                </div>
-                </div>
+              <div className="text-center p-3 md:p-4 bg-primary/10 rounded-lg">
+                <div className="text-xl md:text-2xl font-bold text-primary">{aliment.proteines}g</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Protéines</div>
+              </div>
+              <div className="text-center p-3 md:p-4 bg-primary/10 rounded-lg">
+                <div className="text-xl md:text-2xl font-bold text-primary">{aliment.glucides}g</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Glucides</div>
+              </div>
+              <div className="text-center p-3 md:p-4 bg-primary/10 rounded-lg">
+                <div className="text-xl md:text-2xl font-bold text-primary">{aliment.lipides}g</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Lipides</div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Informations nutritionnelles */}
               <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Informations nutritionnelles</h3>
+                <h3 className="text-lg md:text-xl font-bold text-foreground mb-4">Informations nutritionnelles</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Fibres:</span>
-                    <span className="font-semibold">{aliment.fibres}g</span>
-              </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Vitamines:</span>
-                    <div className="flex gap-1">
+                    <span className="text-muted-foreground text-sm md:text-base">Fibres:</span>
+                    <span className="font-semibold text-sm md:text-base">{aliment.fibres}g</span>
+                  </div>
+                  <div className="flex justify-between flex-wrap gap-2">
+                    <span className="text-muted-foreground text-sm md:text-base">Vitamines:</span>
+                    <div className="flex gap-1 flex-wrap">
                       {aliment.vitamines.map((vit, index) => (
                         <Badge key={index} variant="secondary" className="text-xs">{vit}</Badge>
                       ))}
-            </div>
-              </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Minéraux:</span>
-                    <div className="flex gap-1">
+                    </div>
+                  </div>
+                  <div className="flex justify-between flex-wrap gap-2">
+                    <span className="text-muted-foreground text-sm md:text-base">Minéraux:</span>
+                    <div className="flex gap-1 flex-wrap">
                       {aliment.mineraux.map((min, index) => (
                         <Badge key={index} variant="outline" className="text-xs">{min}</Badge>
                       ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-              </div>
-              </div>
-        </div>
 
               {/* Informations pratiques */}
               <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Informations pratiques</h3>
+                <h3 className="text-lg md:text-xl font-bold text-foreground mb-4">Informations pratiques</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Catégorie:</span>
+                    <span className="text-muted-foreground text-sm md:text-base">Catégorie:</span>
                     <Badge variant="secondary">{aliment.categorie}</Badge>
-                </div>
+                  </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Saison:</span>
+                    <span className="text-muted-foreground text-sm md:text-base">Saison:</span>
                     <Badge variant="outline">{aliment.saison}</Badge>
-                </div>
+                  </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Conservation:</span>
-                    <span className="font-semibold">{aliment.conservation}</span>
-                </div>
-                </div>
+                    <span className="text-muted-foreground text-sm md:text-base">Conservation:</span>
+                    <span className="font-semibold text-sm md:text-base">{aliment.conservation}</span>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Préparation et conseils */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-card">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <Utensils className="w-5 h-5 text-orange-500" />
+              <CardTitle className="text-lg md:text-xl font-bold text-foreground flex items-center gap-2">
+                <Utensils className="w-5 h-5 text-primary" />
                 Préparation
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ol className="list-decimal list-inside space-y-2">
                 {aliment.preparation.map((step, index) => (
-                  <li key={index} className="text-gray-700">{step}</li>
+                  <li key={index} className="text-foreground text-sm md:text-base">{step}</li>
                 ))}
               </ol>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader>
-              <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-500" />
+          <Card className="bg-card/80 backdrop-blur-sm border-0 shadow-card">
+            <CardHeader>
+              <CardTitle className="text-lg md:text-xl font-bold text-foreground flex items-center gap-2">
+                <Clock className="w-5 h-5 text-primary" />
                 Conseils
               </CardTitle>
-          </CardHeader>
-          <CardContent>
-              <p className="text-gray-700">{aliment.conseils}</p>
+            </CardHeader>
+            <CardContent>
+              <p className="text-foreground text-sm md:text-base">{aliment.conseils}</p>
             </CardContent>
           </Card>
         </div>
-        </div>
       </div>
+    </PageLayout>
   );
 };

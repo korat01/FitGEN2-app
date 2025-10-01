@@ -9,7 +9,7 @@ import { Toaster } from './components/ui/toaster';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Stats from './pages/Stats';
-import Profile from './pages/Profile';
+import ProfileSummary from './pages/ProfileSummary';
 import Programme from './pages/Programme';
 import Nutrition from './pages/Nutrition';
 import NotFound from './pages/NotFound';
@@ -80,7 +80,7 @@ const AppContent: React.FC = () => {
           <Route path="/profile" element={
             <ProtectedRoute>
               <PageLayout>
-                <Profile />
+                <ProfileSummary />
               </PageLayout>
             </ProtectedRoute>
           } />

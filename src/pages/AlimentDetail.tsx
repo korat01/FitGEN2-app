@@ -1299,6 +1299,1681 @@ const AlimentDetail: React.FC = () => {
         'Manger avec modération',
         'Éviter le lait de coco au lait'
       ]
+    },
+    '47': {
+      id: '47',
+      nom: 'Avocat',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 160,
+      proteines: 2,
+      glucides: 9,
+      lipides: 15,
+      fibres: 7,
+      micronutriments: ['Vitamine K', 'Folates', 'Potassium', 'Vitamine E'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥑',
+      description: 'Fruit crémeux riche en graisses monoinsaturées, excellent pour la santé cardiovasculaire.',
+      avantages: [
+        'Graisses monoinsaturées saines',
+        'Riche en fibres pour la satiété',
+        'Vitamine K pour les os',
+        'Potassium pour la tension artérielle'
+      ],
+      conseils: [
+        'Choisir des avocats mûrs',
+        'Conserver au réfrigérateur',
+        'Ajouter aux salades',
+        'Utiliser en remplacement du beurre'
+      ]
+    },
+    '48': {
+      id: '48',
+      nom: 'Saumon',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 208,
+      proteines: 25,
+      glucides: 0,
+      lipides: 12,
+      fibres: 0,
+      micronutriments: ['Oméga-3', 'B12', 'Sélénium', 'Niacine'],
+      classe: 'Anti-inflammatoire',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson gras riche en oméga-3, excellent pour le cerveau et le cœur.',
+      avantages: [
+        'Oméga-3 pour le cerveau',
+        'Protéines complètes',
+        'Vitamine B12 pour les nerfs',
+        'Sélénium antioxydant'
+      ],
+      conseils: [
+        'Préférer le saumon sauvage',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 2-3 fois par semaine'
+      ]
+    },
+    '49': {
+      id: '49',
+      nom: 'Quinoa',
+      categorie: 'Glucides',
+      ig: 'Bas',
+      calories: 120,
+      proteines: 4.4,
+      glucides: 22,
+      lipides: 1.9,
+      fibres: 2.8,
+      micronutriments: ['Fer', 'Magnésium', 'Lysine', 'Manganèse'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌾',
+      description: 'Pseudo-céréale complète avec tous les acides aminés essentiels.',
+      avantages: [
+        'Protéines complètes végétales',
+        'Sans gluten naturellement',
+        'Riche en fer et magnésium',
+        'Index glycémique bas'
+      ],
+      conseils: [
+        'Rincer avant cuisson',
+        'Cuire dans l\'eau bouillante',
+        'Laisser gonfler 15 minutes',
+        'Utiliser comme base de salades'
+      ]
+    },
+    '50': {
+      id: '50',
+      nom: 'Myrtilles',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 57,
+      proteines: 0.7,
+      glucides: 14,
+      lipides: 0.3,
+      fibres: 2.4,
+      micronutriments: ['Antioxydants', 'Vitamine C', 'Manganèse', 'Vitamine K'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫐',
+      description: 'Petits fruits bleus ultra-riches en antioxydants, excellents pour la mémoire.',
+      avantages: [
+        'Antioxydants puissants',
+        'Protection cognitive',
+        'Anti-inflammatoire naturel',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Choisir des myrtilles fermes',
+        'Conserver au réfrigérateur',
+        'Laver juste avant consommation',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '51': {
+      id: '51',
+      nom: 'Amandes',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 579,
+      proteines: 21,
+      glucides: 22,
+      lipides: 50,
+      fibres: 12,
+      micronutriments: ['Vitamine E', 'Magnésium', 'Calcium', 'Riboflavine'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥜',
+      description: 'Fruit à coque croquant, riche en vitamine E et magnésium.',
+      avantages: [
+        'Vitamine E antioxydante',
+        'Magnésium pour les muscles',
+        'Protéines végétales',
+        'Fibres pour la satiété'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '52': {
+      id: '52',
+      nom: 'Patate douce',
+      categorie: 'Glucides',
+      ig: 'Modéré',
+      calories: 86,
+      proteines: 1.6,
+      glucides: 20,
+      lipides: 0.1,
+      fibres: 3,
+      micronutriments: ['Bêta-carotène', 'Vitamine A', 'Potassium'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍠',
+      description: 'Tubercule riche en bêta-carotène et glucides complexes.',
+      avantages: [
+        'Bêta-carotène antioxydant',
+        'Glucides complexes',
+        'Riche en potassium',
+        'Index glycémique modéré'
+      ],
+      conseils: [
+        'Cuire avec la peau pour garder les nutriments',
+        'Rôtir au four pour plus de saveur',
+        'Conserver dans un endroit frais et sombre',
+        'Éviter le réfrigérateur'
+      ]
+    },
+    '53': {
+      id: '53',
+      nom: 'Thon',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 144,
+      proteines: 30,
+      glucides: 0,
+      lipides: 1,
+      fibres: 0,
+      micronutriments: ['Sélénium', 'B12', 'Niacine'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson maigre en conserve, riche en protéines et pauvre en calories.',
+      avantages: [
+        'Protéines maigres de qualité',
+        'Faible en calories',
+        'Riche en sélénium',
+        'Facile à conserver'
+      ],
+      conseils: [
+        'Choisir au naturel plutôt qu\'à l\'huile',
+        'Égoutter avant utilisation',
+        'Conserver au frais après ouverture',
+        'Utiliser dans les 2 jours après ouverture'
+      ]
+    },
+    '54': {
+      id: '54',
+      nom: 'Chou kale',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 49,
+      proteines: 4.3,
+      glucides: 9,
+      lipides: 0.9,
+      fibres: 3.6,
+      micronutriments: ['Vitamine K', 'Vitamine C', 'Calcium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥬',
+      description: 'Légume vert riche en vitamine K, C, A et calcium, idéal pour la santé.',
+      avantages: [
+        'Vitamine K pour la santé des os',
+        'Vitamine C pour la santé des os',
+        'Vitamine A pour la santé des yeux',
+        'Calcium pour la santé des os'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '55': {
+      id: '55',
+      nom: 'Noix de cajou',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 553,
+      proteines: 18,
+      glucides: 30,
+      lipides: 44,
+      fibres: 3.3,
+      micronutriments: ['Magnésium', 'Zinc', 'Cuivre'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥜',
+      description: 'Noix riche en oméga-3, zinc et cuivre, excellent pour la santé.',
+      avantages: [
+        'Oméga-3 anti-inflammatoires',
+        'Zinc pour la santé des os',
+        'Cuivre pour la formation des globules rouges',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou grillé',
+        'Conserver dans un endroit frais',
+        'Arroser de jus de citron',
+        'Manger avec modération'
+      ]
+    },
+    '56': {
+      id: '56',
+      nom: 'Riz brun',
+      categorie: 'Glucides',
+      ig: 'Modéré',
+      calories: 111,
+      proteines: 2.6,
+      glucides: 23,
+      lipides: 0.9,
+      fibres: 1.8,
+      micronutriments: ['Manganèse', 'Sélénium', 'Magnésium'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍚',
+      description: 'Riz basmati, une variété de riz à grain long originaire d\'Inde, réputé pour son arôme délicat et sa texture légère.',
+      avantages: [
+        'Source d\'énergie durable',
+        'Facile à digérer',
+        'Riche en glucides complexes',
+        'Faible en gras'
+      ],
+      conseils: [
+        'Rincer le riz avant la cuisson',
+        'Cuire dans un volume d\'eau 1,5 fois supérieur',
+        'Laisser reposer 5 minutes après cuisson',
+        'Conserver dans un endroit sec et frais'
+      ]
+    },
+    '57': {
+      id: '57',
+      nom: 'Mangue',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 60,
+      proteines: 0.8,
+      glucides: 15,
+      lipides: 0.4,
+      fibres: 1.6,
+      micronutriments: ['Vitamine C', 'Vitamine A', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥭',
+      description: 'Fruit riche en vitamine C, A et folates, idéal pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'A pour la santé des yeux',
+        'Folates pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '58': {
+      id: '58',
+      nom: 'Graines de chia',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 486,
+      proteines: 17,
+      glucides: 42,
+      lipides: 31,
+      fibres: 34,
+      micronutriments: ['Oméga-3', 'Calcium', 'Fer'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌱',
+      description: 'Petites graines riches en oméga-3 et fibres solubles.',
+      avantages: [
+        'Oméga-3 végétaux',
+        'Fibres solubles',
+        'Calcium végétal',
+        'Gélifiant naturel'
+      ],
+      conseils: [
+        'Tremper 10 minutes avant consommation',
+        'Ajouter aux smoothies',
+        'Conserver dans un endroit sec',
+        'Utiliser comme épaississant'
+      ]
+    },
+    '59': {
+      id: '59',
+      nom: 'Pomme',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 52,
+      proteines: 0.3,
+      glucides: 14,
+      lipides: 0.2,
+      fibres: 2.4,
+      micronutriments: ['Vitamine C', 'Fibres', 'Antioxydants'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍎',
+      description: 'Fruit riche en vitamine C, potassium et fibres, idéal pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Fibres pour la digestion',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru pour les vitamines',
+        'Conserver à température ambiante',
+        'Arroser de jus de citron',
+        'Manger rapidement'
+      ]
+    },
+    '60': {
+      id: '60',
+      nom: 'Lentilles',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 116,
+      proteines: 9,
+      glucides: 20,
+      lipides: 0.4,
+      fibres: 8,
+      micronutriments: ['Fer', 'Folates', 'Magnésium'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫘',
+      description: 'Légumineuse riche en protéines, fer et folates, idéale pour la santé.',
+      avantages: [
+        'Protéines végétales',
+        'Fer pour la formation des globules rouges',
+        'Folates pour la santé des cellules',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Cuire à la vapeur ou à l\'étouffée',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger cru ou légèrement cuit'
+      ]
+    },
+    '61': {
+      id: '61',
+      nom: 'Brocoli',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 34,
+      proteines: 2.8,
+      glucides: 7,
+      lipides: 0.4,
+      fibres: 2.6,
+      micronutriments: ['Vitamine C', 'Vitamine K', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥦',
+      description: 'Légume crucifère riche en vitamines et composés anti-cancer.',
+      avantages: [
+        'Riche en vitamine C et K',
+        'Composés anti-cancer',
+        'Faible en calories',
+        'Riche en fibres'
+      ],
+      conseils: [
+        'Cuire à la vapeur 5-7 minutes',
+        'Ne pas trop cuire pour garder les nutriments',
+        'Conserver au réfrigérateur',
+        'Manger cru ou légèrement cuit'
+      ]
+    },
+    '62': {
+      id: '62',
+      nom: 'Noix de Grenoble',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 654,
+      proteines: 15,
+      glucides: 14,
+      lipides: 65,
+      fibres: 6.7,
+      micronutriments: ['Oméga-3', 'Vitamine E', 'Manganèse'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌰',
+      description: 'Fruit à coque riche en oméga-3 et vitamine E.',
+      avantages: [
+        'Oméga-3 pour le cerveau',
+        'Vitamine E antioxydante',
+        'Magnésium pour les muscles',
+        'Protéines végétales'
+      ],
+      conseils: [
+        'Conserver dans un endroit frais',
+        'Manger avec la peau',
+        'Limiter à une poignée par jour',
+        'Éviter les noix salées'
+      ]
+    },
+    '63': {
+      id: '63',
+      nom: 'Pommes de terre',
+      categorie: 'Glucides',
+      ig: 'Modéré',
+      calories: 77,
+      proteines: 2,
+      glucides: 17,
+      lipides: 0.1,
+      fibres: 2.2,
+      micronutriments: ['Potassium', 'Vitamine C', 'B6'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥔',
+      description: 'Tubercule riche en glucides et potassium, idéal pour la santé.',
+      avantages: [
+        'Glucides complexes',
+        'Riche en potassium',
+        'Vitamine C pour la santé des os',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Cuire avec la peau pour garder les nutriments',
+        'Rôtir au four pour plus de saveur',
+        'Conserver dans un endroit frais',
+        'Éviter le réfrigérateur'
+      ]
+    },
+    '64': {
+      id: '64',
+      nom: 'Épinards',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 23,
+      proteines: 2.9,
+      glucides: 3.6,
+      lipides: 0.4,
+      fibres: 2.2,
+      micronutriments: ['Fer', 'Vitamine K', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥬',
+      description: 'Légume vert riche en fer et folates, excellent pour la santé.',
+      avantages: [
+        'Riche en fer végétal',
+        'Folates pour la division cellulaire',
+        'Vitamine K pour les os',
+        'Lutéine pour les yeux'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec vitamine C pour l\'absorption du fer',
+        'Laver soigneusement',
+        'Conserver au réfrigérateur'
+      ]
+    },
+    '65': {
+      id: '65',
+      nom: 'Champignons',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 22,
+      proteines: 3.1,
+      glucides: 3.3,
+      lipides: 0.3,
+      fibres: 1,
+      micronutriments: ['Sélénium', 'Vitamine D', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍄',
+      description: 'Champignons réputés pour leur richesse en vitamine D et sélénium.',
+      avantages: [
+        'Vitamine D pour les os',
+        'Sélénium pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '66': {
+      id: '66',
+      nom: 'Gingembre',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 80,
+      proteines: 1.8,
+      glucides: 18,
+      lipides: 0.8,
+      fibres: 2,
+      micronutriments: ['Gingérol', 'Potassium', 'Magnésium', 'Vitamine C'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫚',
+      description: 'Racine épicée aux propriétés anti-inflammatoires et digestives puissantes.',
+      avantages: [
+        'Gingérol anti-inflammatoire',
+        'Aide à la digestion',
+        'Réduit les nausées',
+        'Stimule la circulation'
+      ],
+      conseils: [
+        'Utiliser frais de préférence',
+        'Râper finement',
+        'Ajouter aux thés',
+        'Conserver au réfrigérateur'
+      ]
+    },
+    '67': {
+      id: '67',
+      nom: 'Kiwi',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 61,
+      proteines: 1.1,
+      glucides: 15,
+      lipides: 0.5,
+      fibres: 3,
+      micronutriments: ['Vitamine C', 'Vitamine K', 'Potassium', 'Actinidine'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥝',
+      description: 'Fruit exotique vert riche en vitamine C, excellent pour l\'immunité.',
+      avantages: [
+        'Vitamine C pour l\'immunité',
+        'Enzyme actinidine digestive',
+        'Potassium pour les muscles',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Choisir des kiwis fermes',
+        'Conserver au réfrigérateur',
+        'Manger avec la peau si bio',
+        'Ajouter aux salades de fruits'
+      ]
+    },
+    '68': {
+      id: '68',
+      nom: 'Maquereau',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 205,
+      proteines: 19,
+      glucides: 0,
+      lipides: 14,
+      fibres: 0,
+      micronutriments: ['Oméga-3', 'B12', 'Sélénium', 'Niacine'],
+      classe: 'Anti-inflammatoire',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson gras riche en oméga-3, excellent pour le cœur et le cerveau.',
+      avantages: [
+        'Oméga-3 pour le cerveau',
+        'Protéines complètes',
+        'Vitamine B12 pour les nerfs',
+        'Sélénium antioxydant'
+      ],
+      conseils: [
+        'Choisir du maquereau frais',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 2-3 fois par semaine'
+      ]
+    },
+    '69': {
+      id: '69',
+      nom: 'Sarrasin',
+      categorie: 'Glucides',
+      ig: 'Bas',
+      calories: 343,
+      proteines: 13,
+      glucides: 72,
+      lipides: 3.4,
+      fibres: 10,
+      micronutriments: ['Rutine', 'Magnésium', 'Fer', 'Lysine'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌾',
+      description: 'Pseudo-céréale complète riche en rutine, excellente pour la circulation.',
+      avantages: [
+        'Rutine pour la circulation',
+        'Protéines complètes',
+        'Sans gluten naturellement',
+        'Riche en fibres'
+      ],
+      conseils: [
+        'Rincer avant cuisson',
+        'Cuire dans l\'eau bouillante',
+        'Laisser gonfler 15 minutes',
+        'Utiliser comme base de salades'
+      ]
+    },
+    '70': {
+      id: '70',
+      nom: 'Grenade',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 83,
+      proteines: 1.7,
+      glucides: 19,
+      lipides: 1.2,
+      fibres: 4,
+      micronutriments: ['Antioxydants', 'Vitamine C', 'Folates', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍎',
+      description: 'Fruit rouge aux graines juteuses, ultra-riche en antioxydants.',
+      avantages: [
+        'Antioxydants puissants',
+        'Protection cardiovasculaire',
+        'Anti-inflammatoire naturel',
+        'Riche en fibres'
+      ],
+      conseils: [
+        'Choisir des grenades lourdes',
+        'Conserver au réfrigérateur',
+        'Extraire les graines',
+        'Ajouter aux salades'
+      ]
+    },
+    '71': {
+      id: '71',
+      nom: 'Noix de pécan',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 691,
+      proteines: 9,
+      glucides: 14,
+      lipides: 72,
+      fibres: 10,
+      micronutriments: ['Vitamine E', 'Manganèse', 'Zinc', 'Cuivre'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥜',
+      description: 'Fruit à coque crémeux, riche en vitamine E et minéraux.',
+      avantages: [
+        'Vitamine E antioxydante',
+        'Manganèse pour les os',
+        'Zinc pour l\'immunité',
+        'Graisses monoinsaturées'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '72': {
+      id: '72',
+      nom: 'Courgette',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 17,
+      proteines: 1.2,
+      glucides: 3.4,
+      lipides: 0.2,
+      fibres: 1,
+      micronutriments: ['Vitamine C', 'Potassium', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥒',
+      description: 'Légume riche en vitamine C, potassium et folates, idéal pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Folates pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '73': {
+      id: '73',
+      nom: 'Crevettes',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 99,
+      proteines: 24,
+      glucides: 0,
+      lipides: 0.3,
+      fibres: 0,
+      micronutriments: ['Sélénium', 'B12', 'Phosphore'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🦐',
+      description: 'Poisson riche en protéines, sélénium et vitamine B12, idéal pour la santé.',
+      avantages: [
+        'Protéines végétales',
+        'Sélénium pour la santé des os',
+        'Vitamine B12 pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou grillé',
+        'Conserver au réfrigérateur',
+        'Arroser de jus de citron',
+        'Manger avec modération'
+      ]
+    },
+    '74': {
+      id: '74',
+      nom: 'Avoine',
+      categorie: 'Glucides',
+      ig: 'Bas',
+      calories: 389,
+      proteines: 17,
+      glucides: 66,
+      lipides: 7,
+      fibres: 11,
+      micronutriments: ['Bêta-glucane', 'Magnésium', 'Zinc'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌾',
+      description: 'Céréale complète riche en fibres et protéines, idéale pour le petit-déjeuner.',
+      avantages: [
+        'Fibres solubles pour la satiété',
+        'Protéines végétales',
+        'Bêta-glucanes pour le cholestérol',
+        'Énergie durable'
+      ],
+      conseils: [
+        'Cuire dans du lait pour plus de protéines',
+        'Ajouter des fruits frais',
+        'Conserver dans un endroit sec',
+        'Manger chaud ou froid'
+      ]
+    },
+    '75': {
+      id: '75',
+      nom: 'Cantaloup',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 34,
+      proteines: 0.8,
+      glucides: 8,
+      lipides: 0.2,
+      fibres: 0.9,
+      micronutriments: ['Vitamine A', 'Vitamine C', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍈',
+      description: 'Légume riche en vitamine A, C et potassium, idéal pour la santé.',
+      avantages: [
+        'Vitamine A pour la santé des os',
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '76': {
+      id: '76',
+      nom: 'Graines de lin',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 534,
+      proteines: 18,
+      glucides: 29,
+      lipides: 42,
+      fibres: 28,
+      micronutriments: ['Oméga-3', 'Lignanes', 'Magnésium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌱',
+      description: 'Petites graines riches en oméga-3 et fibres solubles.',
+      avantages: [
+        'Oméga-3 végétaux',
+        'Fibres solubles',
+        'Calcium végétal',
+        'Gélifiant naturel'
+      ],
+      conseils: [
+        'Tremper 10 minutes avant consommation',
+        'Ajouter aux smoothies',
+        'Conserver dans un endroit sec',
+        'Utiliser comme épaississant'
+      ]
+    },
+    '77': {
+      id: '77',
+      nom: 'Poivron rouge',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 31,
+      proteines: 1,
+      glucides: 7,
+      lipides: 0.3,
+      fibres: 2.5,
+      micronutriments: ['Vitamine C', 'Bêta-carotène', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫑',
+      description: 'Légume riche en vitamine C, bêta-carotène et folates, idéal pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Bêta-carotène antioxydant',
+        'Folates pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '78': {
+      id: '78',
+      nom: 'Dinde',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 189,
+      proteines: 29,
+      glucides: 0,
+      lipides: 7,
+      fibres: 0,
+      micronutriments: ['Sélénium', 'B3', 'B6'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🦃',
+      description: 'Viande de dinde riche en protéines et sélénium.',
+      avantages: [
+        'Protéines complètes',
+        'Faible en calories',
+        'Riche en sélénium',
+        'Facile à digérer'
+      ],
+      conseils: [
+        'Mariner 30 min avant cuisson',
+        'Cuire à feu moyen',
+        'Vérifier la cuisson',
+        'Laisser reposer'
+      ]
+    },
+    '79': {
+      id: '79',
+      nom: 'Figues',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 74,
+      proteines: 0.8,
+      glucides: 19,
+      lipides: 0.3,
+      fibres: 3,
+      micronutriments: ['Calcium', 'Potassium', 'Fer'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍯',
+      description: 'Fruit riche en calcium, potassium et fer, idéal pour la santé.',
+      avantages: [
+        'Calcium pour les os',
+        'Potassium pour la santé cardiaque',
+        'Fer pour l\'immunité',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '80': {
+      id: '80',
+      nom: 'Graines de tournesol',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 584,
+      proteines: 21,
+      glucides: 20,
+      lipides: 51,
+      fibres: 9,
+      micronutriments: ['Vitamine E', 'Sélénium', 'Magnésium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌻',
+      description: 'Graines de tournesol riche en vitamine E, sélénium et magnésium, idéales pour la santé.',
+      avantages: [
+        'Vitamine E antioxydante',
+        'Sélénium pour la santé des os',
+        'Magnésium pour les muscles',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou grillé',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '81': {
+      id: '81',
+      nom: 'Carotte',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 41,
+      proteines: 0.9,
+      glucides: 10,
+      lipides: 0.2,
+      fibres: 2.8,
+      micronutriments: ['Bêta-carotène', 'Vitamine A', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥕',
+      description: 'Légume riche en bêta-carotène, vitamine A et potassium, idéal pour la santé.',
+      avantages: [
+        'Bêta-carotène antioxydant',
+        'Vitamine A pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '82': {
+      id: '82',
+      nom: 'Morue',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 82,
+      proteines: 18,
+      glucides: 0,
+      lipides: 0.7,
+      fibres: 0,
+      micronutriments: ['Sélénium', 'B12', 'Phosphore'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson maigre en conserve, riche en protéines et pauvre en calories.',
+      avantages: [
+        'Protéines maigres de qualité',
+        'Faible en calories',
+        'Riche en sélénium',
+        'Facile à conserver'
+      ],
+      conseils: [
+        'Choisir au naturel plutôt qu\'à l\'huile',
+        'Égoutter avant utilisation',
+        'Conserver au frais après ouverture',
+        'Utiliser dans les 2 jours après ouverture'
+      ]
+    },
+    '83': {
+      id: '83',
+      nom: 'Concombre',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 16,
+      proteines: 0.7,
+      glucides: 4,
+      lipides: 0.1,
+      fibres: 0.5,
+      micronutriments: ['Vitamine K', 'Potassium', 'Silice'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥒',
+      description: 'Légume riche en vitamine K, potassium et silice, idéal pour la santé.',
+      avantages: [
+        'Vitamine K pour les os',
+        'Potassium pour les muscles',
+        'Silice pour la santé des os',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '84': {
+      id: '84',
+      nom: 'Raisins',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 67,
+      proteines: 0.6,
+      glucides: 17,
+      lipides: 0.4,
+      fibres: 0.9,
+      micronutriments: ['Resvératrol', 'Vitamine K', 'Cuivre'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍇',
+      description: 'Fruit à coque riche en resvératrol, vitamine K et cuivre, idéal pour la santé.',
+      avantages: [
+        'Resvératrol pour l\'anti-inflammatoire',
+        'Vitamine K pour les os',
+        'Cuivre pour l\'immunité',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '85': {
+      id: '85',
+      nom: 'Graines de courge',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 559,
+      proteines: 30,
+      glucides: 11,
+      lipides: 49,
+      fibres: 6,
+      micronutriments: ['Magnésium', 'Zinc', 'Fer'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🎃',
+      description: 'Graines de courge riche en magnésium, zinc et fer, idéales pour la santé.',
+      avantages: [
+        'Magnésium pour les muscles',
+        'Zinc pour l\'immunité',
+        'Fer pour la formation des globules rouges',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou grillé',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '86': {
+      id: '86',
+      nom: 'Ananas',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 50,
+      proteines: 0.5,
+      glucides: 13,
+      lipides: 0.1,
+      fibres: 1.4,
+      micronutriments: ['Bromélaïne', 'Vitamine C', 'Manganèse', 'Cuivre'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍍',
+      description: 'Fruit tropical sucré contenant de la bromélaïne, enzyme digestive.',
+      avantages: [
+        'Bromélaïne digestive',
+        'Vitamine C pour l\'immunité',
+        'Manganèse pour les os',
+        'Anti-inflammatoire naturel'
+      ],
+      conseils: [
+        'Choisir des ananas parfumés',
+        'Conserver au réfrigérateur',
+        'Manger frais de préférence',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '87': {
+      id: '87',
+      nom: 'Papaye',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 43,
+      proteines: 0.5,
+      glucides: 11,
+      lipides: 0.3,
+      fibres: 1.7,
+      micronutriments: ['Papaine', 'Vitamine C', 'Folates', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥭',
+      description: 'Fruit tropical orange riche en papaine, enzyme digestive naturelle.',
+      avantages: [
+        'Papaine pour la digestion',
+        'Vitamine C pour l\'immunité',
+        'Folates pour les cellules',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Choisir des papayes mûres',
+        'Conserver au réfrigérateur',
+        'Manger fraîche de préférence',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '88': {
+      id: '88',
+      nom: 'Hareng',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 158,
+      proteines: 18,
+      glucides: 0,
+      lipides: 9,
+      fibres: 0,
+      micronutriments: ['Oméga-3', 'B12', 'Sélénium', 'Niacine'],
+      classe: 'Anti-inflammatoire',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson gras riche en oméga-3, excellent pour le cerveau et le cœur.',
+      avantages: [
+        'Oméga-3 pour le cerveau',
+        'Protéines complètes',
+        'Vitamine B12 pour les nerfs',
+        'Sélénium antioxydant'
+      ],
+      conseils: [
+        'Choisir du hareng frais',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 2-3 fois par semaine'
+      ]
+    },
+    '89': {
+      id: '89',
+      nom: 'Millet',
+      categorie: 'Glucides',
+      ig: 'Bas',
+      calories: 378,
+      proteines: 11,
+      glucides: 73,
+      lipides: 4.2,
+      fibres: 8.5,
+      micronutriments: ['Magnésium', 'Phosphore', 'Fer', 'B6'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌾',
+      description: 'Céréale ancienne complète, riche en minéraux et sans gluten.',
+      avantages: [
+        'Sans gluten naturellement',
+        'Riche en magnésium',
+        'Protéines végétales',
+        'Fibres pour la satiété'
+      ],
+      conseils: [
+        'Rincer avant cuisson',
+        'Cuire dans l\'eau bouillante',
+        'Laisser gonfler 15 minutes',
+        'Utiliser comme base de salades'
+      ]
+    },
+    '90': {
+      id: '90',
+      nom: 'Cassis',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 63,
+      proteines: 1.4,
+      glucides: 15,
+      lipides: 0.4,
+      fibres: 4.3,
+      micronutriments: ['Antioxydants', 'Vitamine C', 'Anthocyanes', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫐',
+      description: 'Petit fruit noir ultra-riche en antioxydants et vitamine C.',
+      avantages: [
+        'Antioxydants puissants',
+        'Vitamine C pour l\'immunité',
+        'Anthocyanes pour les yeux',
+        'Anti-inflammatoire naturel'
+      ],
+      conseils: [
+        'Choisir des cassis fermes',
+        'Conserver au réfrigérateur',
+        'Laver juste avant consommation',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '91': {
+      id: '91',
+      nom: 'Noix de macadamia',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 718,
+      proteines: 8,
+      glucides: 14,
+      lipides: 76,
+      fibres: 9,
+      micronutriments: ['Vitamine B1', 'Manganèse', 'Cuivre', 'Magnésium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥜',
+      description: 'Fruit à coque crémeux, riche en graisses monoinsaturées.',
+      avantages: [
+        'Graisses monoinsaturées',
+        'Vitamine B1 pour l\'énergie',
+        'Manganèse pour les os',
+        'Cuivre pour l\'immunité'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '92': {
+      id: '92',
+      nom: 'Aubergine',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 25,
+      proteines: 1,
+      glucides: 6,
+      lipides: 0.2,
+      fibres: 3,
+      micronutriments: ['Nasunine', 'Potassium', 'Folates'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍆',
+      description: 'Aubergine riche en minéraux et vitamine C, idéale pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Folates pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '93': {
+      id: '93',
+      nom: 'Sardines',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 208,
+      proteines: 25,
+      glucides: 0,
+      lipides: 11,
+      fibres: 0,
+      micronutriments: ['Oméga-3', 'Calcium', 'B12'],
+      classe: 'Anti-inflammatoire',
+      tags: [],
+      emoji: '🐟',
+      description: 'Poisson gras riche en oméga-3, excellent pour le cerveau et le cœur.',
+      avantages: [
+        'Oméga-3 pour le cerveau',
+        'Protéines complètes',
+        'Vitamine B12 pour les nerfs',
+        'Sélénium antioxydant'
+      ],
+      conseils: [
+        'Choisir du sardines frais',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 2-3 fois par semaine'
+      ]
+    },
+    '94': {
+      id: '94',
+      nom: 'Amarante',
+      categorie: 'Glucides',
+      ig: 'Bas',
+      calories: 371,
+      proteines: 14,
+      glucides: 65,
+      lipides: 7,
+      fibres: 7,
+      micronutriments: ['Lysine', 'Magnésium', 'Fer'],
+      classe: 'Récupération',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌾',
+      description: 'Céréale riche en minéraux et vitamine C, idéale pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Folates pour la santé nerveuse',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '95': {
+      id: '95',
+      nom: 'Mûres',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 43,
+      proteines: 1.4,
+      glucides: 10,
+      lipides: 0.5,
+      fibres: 5.3,
+      micronutriments: ['Antioxydants', 'Vitamine C', 'Manganèse'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🫐',
+      description: 'Petits fruits rouges ultra-riches en antioxydants, excellents pour la mémoire.',
+      avantages: [
+        'Antioxydants puissants',
+        'Protection cognitive',
+        'Anti-inflammatoire naturel',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Choisir des mûres fermes',
+        'Conserver au réfrigérateur',
+        'Laver juste avant consommation',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '96': {
+      id: '96',
+      nom: 'Graines de sésame',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 573,
+      proteines: 18,
+      glucides: 23,
+      lipides: 50,
+      fibres: 12,
+      micronutriments: ['Calcium', 'Fer', 'Magnésium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌱',
+      description: 'Fruit à coque riche en graisses monoinsaturées, idéal pour la santé.',
+      avantages: [
+        'Graisses monoinsaturées',
+        'Vitamine B1 pour l\'énergie',
+        'Manganèse pour les os',
+        'Calcium végétal'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '97': {
+      id: '97',
+      nom: 'Tomate',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 18,
+      proteines: 0.9,
+      glucides: 3.9,
+      lipides: 0.2,
+      fibres: 1.2,
+      micronutriments: ['Lycopène', 'Vitamine C', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍅',
+      description: 'Légume riche en lycopène, vitamine C et potassium, idéal pour la santé.',
+      avantages: [
+        'Lycopène pour la santé des os',
+        'Vitamine C pour la santé des os',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '98': {
+      id: '98',
+      nom: 'Veau',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 172,
+      proteines: 25,
+      glucides: 0,
+      lipides: 7,
+      fibres: 0,
+      micronutriments: ['Fer', 'B12', 'Zinc'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🥩',
+      description: 'Viande de veau riche en protéines et sélénium, idéale pour la santé.',
+      avantages: [
+        'Protéines complètes',
+        'Faible en graisses',
+        'Sélénium antioxydant',
+        'Vitamines B pour l\'énergie'
+      ],
+      conseils: [
+        'Choisir du veau bio',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 3-4 fois par semaine'
+      ]
+    },
+    '99': {
+      id: '99',
+      nom: 'Prunes',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 46,
+      proteines: 0.7,
+      glucides: 11,
+      lipides: 0.3,
+      fibres: 1.4,
+      micronutriments: ['Antioxydants', 'Vitamine K', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍇',
+      description: 'Fruit riche en antioxydants et vitamine K, idéal pour la santé.',
+      avantages: [
+        'Antioxydants puissants',
+        'Vitamine K pour l\'immunité',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '100': {
+      id: '100',
+      nom: 'Noix du Brésil',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 659,
+      proteines: 14,
+      glucides: 12,
+      lipides: 67,
+      fibres: 8,
+      micronutriments: ['Sélénium', 'Magnésium', 'Vitamine E'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥜',
+      description: 'Fruit à coque riche en graisses monoinsaturées, idéal pour la santé.',
+      avantages: [
+        'Graisses monoinsaturées',
+        'Vitamine E antioxydante',
+        'Magnésium pour les os',
+        'Calcium végétal'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '101': {
+      id: '101',
+      nom: 'Radis',
+      categorie: 'Micronutriments',
+      ig: 'Bas',
+      calories: 16,
+      proteines: 0.7,
+      glucides: 3.4,
+      lipides: 0.1,
+      fibres: 1.6,
+      micronutriments: ['Vitamine C', 'Folates', 'Potassium'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥕',
+      description: 'Légume riche en vitamine C, folates et potassium, idéal pour la santé.',
+      avantages: [
+        'Vitamine C pour la santé des os',
+        'Folates pour la santé nerveuse',
+        'Potassium pour la santé cardiaque',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru pour les vitamines',
+        'Conserver à température ambiante',
+        'Arroser de jus de citron',
+        'Manger rapidement'
+      ]
+    },
+    '102': {
+      id: '102',
+      nom: 'Agneau',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 294,
+      proteines: 25,
+      glucides: 0,
+      lipides: 21,
+      fibres: 0,
+      micronutriments: ['Fer', 'B12', 'Zinc'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🥩',
+      description: 'Viande de chevre riche en protéines et sélénium, idéale pour la santé.',
+      avantages: [
+        'Protéines complètes',
+        'Faible en graisses',
+        'Sélénium antioxydant',
+        'Vitamines B pour l\'énergie'
+      ],
+      conseils: [
+        'Choisir du chevre bio',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 3-4 fois par semaine'
+      ]
+    },
+    '103': {
+      id: '103',
+      nom: 'Cerises',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 50,
+      proteines: 1,
+      glucides: 12,
+      lipides: 0.3,
+      fibres: 1.6,
+      micronutriments: ['Antioxydants', 'Vitamine C', 'Mélatonine'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🍒',
+      description: 'Petits fruits rouges ultra-riches en antioxydants, excellents pour la mémoire.',
+      avantages: [
+        'Antioxydants puissants',
+        'Protection cognitive',
+        'Anti-inflammatoire naturel',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Choisir des cerises fermes',
+        'Conserver au réfrigérateur',
+        'Laver juste avant consommation',
+        'Ajouter aux smoothies'
+      ]
+    },
+    '104': {
+      id: '104',
+      nom: 'Graines de chanvre',
+      categorie: 'Lipides',
+      ig: 'Bas',
+      calories: 553,
+      proteines: 31,
+      glucides: 9,
+      lipides: 49,
+      fibres: 4,
+      micronutriments: ['Oméga-3', 'Magnésium', 'Fer'],
+      classe: 'Anti-inflammatoire',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🌱',
+      description: 'Fruit à coque riche en graisses monoinsaturées, idéal pour la santé.',
+      avantages: [
+        'Graisses monoinsaturées',
+        'Vitamine B1 pour l\'énergie',
+        'Manganèse pour les os',
+        'Calcium végétal'
+      ],
+      conseils: [
+        'Choisir non salées',
+        'Conserver dans un endroit frais',
+        'Manger avec modération',
+        'Ajouter aux salades'
+      ]
+    },
+    '105': {
+      id: '105',
+      nom: 'Betterave',
+      categorie: 'Micronutriments',
+      ig: 'Modéré',
+      calories: 43,
+      proteines: 1.6,
+      glucides: 10,
+      lipides: 0.2,
+      fibres: 2.8,
+      micronutriments: ['Nitrates', 'Folates', 'Potassium'],
+      classe: 'Boost performance',
+      tags: ['Vegan', 'Sans gluten'],
+      emoji: '🥕',
+      description: 'Légume riche en nitrates, folates et potassium, idéal pour la santé.',
+      avantages: [
+        'Nitrates pour la santé cardiaque',
+        'Folates pour la santé nerveuse',
+        'Potassium pour les muscles',
+        'Faible en calories'
+      ],
+      conseils: [
+        'Manger cru ou légèrement cuit',
+        'Associer avec des légumes',
+        'Conserver au réfrigérateur',
+        'Manger rapidement'
+      ]
+    },
+    '106': {
+      id: '106',
+      nom: 'Poulet',
+      categorie: 'Protéines',
+      ig: 'Bas',
+      calories: 165,
+      proteines: 31,
+      glucides: 0,
+      lipides: 3.6,
+      fibres: 0,
+      micronutriments: ['Sélénium', 'B3', 'B6', 'Phosphore'],
+      classe: 'Sèche',
+      tags: [],
+      emoji: '🐔',
+      description: 'Viande blanche maigre, excellente source de protéines complètes.',
+      avantages: [
+        'Protéines complètes',
+        'Faible en graisses',
+        'Sélénium antioxydant',
+        'Vitamines B pour l\'énergie'
+      ],
+      conseils: [
+        'Choisir du poulet bio',
+        'Cuire à la vapeur ou grillé',
+        'Éviter la surcuisson',
+        'Consommer 3-4 fois par semaine'
+      ]
     }
   };
 

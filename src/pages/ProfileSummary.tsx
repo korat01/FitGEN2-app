@@ -349,7 +349,7 @@ export const ProfileSummary: React.FC = () => {
           bgColor: 'from-purple-50 to-violet-50',
           priority: 'high',
           reason: 'Powerlifter - Développer la force maximale',
-          icon: <Target className="w-5 h-5" />
+          // Correction : ne pas dupliquer la propriété icon, elle est déjà définie plus haut
         });
       }
     } else if (user?.sportClass === 'marathon') {
@@ -363,7 +363,7 @@ export const ProfileSummary: React.FC = () => {
           bgColor: 'from-blue-50 to-cyan-50',
           priority: 'high',
           reason: 'Marathonien - Améliorer l\'endurance',
-          icon: <TrendingUp className="w-5 h-5" />
+          // Correction : ne pas dupliquer la propriété icon, elle est déjà définie plus haut
         });
       }
     }

@@ -37,9 +37,6 @@ const AppHeader: React.FC = () => {
               <Link to="/" className="text-foreground/70 hover:text-foreground transition-colors">
                 Dashboard
               </Link>
-              <Link to="/nutrition" className="text-foreground/70 hover:text-foreground transition-colors">
-                Nutrition
-              </Link>
               {/* <Link to="/stats" className="text-foreground/70 hover:text-foreground transition-colors">
                 Stats
               </Link> */}

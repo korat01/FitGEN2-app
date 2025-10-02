@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import PageLayout from '@/components/PageLayout';
+import StatCard from '@/components/StatCard';
+import ActionButton from '@/components/ActionButton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,1895 +9,2541 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Apple, 
-  Utensils, 
   Search, 
-  Plus,
-  Heart,
-  Star,
-  Filter,
+  Camera, 
   Target,
-  Zap,
+  Flame,
   Clock,
+  Plus,
+  TrendingUp,
+  Zap,
+  Utensils,
+  Star,
   ChefHat,
   ArrowLeft
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+// import AlimentDetail from './pages/AlimentDetail'; // Correction : ce module n'existe pas ou le chemin est incorrect
 
-const Nutrition: React.FC = () => {
+const Nutrition = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('aliments');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('aliments');
 
-  // Données des aliments - AJOUT DE 10 NOUVEAUX ALIMENTS
-  const aliments = [
+  // Remplacer la section nutritionData par cette version étendue avec tous les aliments
+  const nutritionData = [
     {
-      id: '1',
-      nom: 'Riz basmati',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 130,
-      proteines: 2.7,
-      glucides: 28,
-      lipides: 0.3,
-      fibres: 1,
-      micronutriments: ['Fer', 'Magnésium'],
-      classe: 'Prise de masse',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍚'
+      id: 1,
+      name: "Pomme",
+      emoji: "🍎",
+      calories: 95,
+      protein: 0.5,
+      carbs: 25,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Équilibre",
+      popularity: 95,
+      isPopular: true,
+      description: "Fruit riche en fibres et vitamine C"
     },
     {
-      id: '2',
-      nom: 'Poulet grillé',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 165,
-      proteines: 31,
-      glucides: 0,
-      lipides: 3.6,
-      fibres: 0,
-      micronutriments: ['Fer', 'Zinc', 'B12'],
-      classe: 'Prise de masse',
-      tags: ['Halal'],
-      emoji: '🍗'
+      id: 2,
+      name: "Poulet grillé",
+      emoji: "🍗",
+      calories: 200,
+      protein: 30,
+      carbs: 0,
+      fat: 8,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 92,
+      isPopular: true,
+      description: "Source de protéines maigres"
     },
     {
-      id: '3',
-      nom: 'Brocoli',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 34,
-      proteines: 2.8,
-      glucides: 7,
-      lipides: 0.4,
-      fibres: 2.6,
-      micronutriments: ['Vitamine C', 'K', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥦'
+      id: 3,
+      name: "Riz brun",
+      emoji: "🍚",
+      calories: 220,
+      protein: 5,
+      carbs: 45,
+      fat: 2,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 88,
+      isPopular: true,
+      description: "Glucides complexes à index glycémique bas"
     },
     {
-      id: '4',
-      nom: 'Avocat',
-      categorie: 'Lipides',
-      ig: 'Bas',
+      id: 4,
+      name: "Avocat",
+      emoji: "🥑",
       calories: 160,
-      proteines: 2,
-      glucides: 9,
-      lipides: 15,
-      fibres: 7,
-      micronutriments: ['Potassium', 'Folates', 'K'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥑'
+      protein: 2,
+      carbs: 9,
+      fat: 15,
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 85,
+      isPopular: true,
+      description: "Riche en acides gras monoinsaturés"
     },
     {
-      id: '5',
-      nom: 'Banane',
-      categorie: 'Glucides',
-      ig: 'Élevé',
-      calories: 89,
-      proteines: 1.1,
-      glucides: 23,
-      lipides: 0.3,
-      fibres: 2.6,
-      micronutriments: ['Potassium', 'B6'],
-      classe: 'Boost performance',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍌'
+      id: 5,
+      name: "Brocoli",
+      emoji: "🥦",
+      calories: 55,
+      protein: 4,
+      carbs: 11,
+      fat: 0.6,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 82,
+      isPopular: false,
+      description: "Légume crucifère riche en vitamines"
     },
     {
-      id: '6',
-      nom: 'Saumon',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 208,
-      proteines: 25,
-      glucides: 0,
-      lipides: 12,
-      fibres: 0,
-      micronutriments: ['Oméga-3', 'B12', 'D'],
-      classe: 'Récupération',
-      tags: [],
-      emoji: '🐟'
+      id: 6,
+      name: "Saumon",
+      emoji: "🐟",
+      calories: 250,
+      protein: 25,
+      carbs: 0,
+      fat: 15,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 90,
+      isPopular: true,
+      description: "Poisson riche en oméga-3"
     },
     {
-      id: '7',
-      nom: 'Œufs entiers',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 155,
-      proteines: 13,
-      glucides: 1.1,
-      lipides: 11,
-      fibres: 0,
-      micronutriments: ['B12', 'Choline', 'Sélénium'],
-      classe: 'Prise de masse',
-      tags: [],
-      emoji: '🥚'
+      id: 7,
+      name: "Patate douce",
+      emoji: "🥔",
+      calories: 180,
+      protein: 4,
+      carbs: 41,
+      fat: 0.2,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 87,
+      isPopular: true,
+      description: "Glucides complexes et bêta-carotène"
     },
     {
-      id: '8',
-      nom: 'Patate douce',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 86,
-      proteines: 1.6,
-      glucides: 20,
-      lipides: 0.1,
-      fibres: 3,
-      micronutriments: ['Bêta-carotène', 'Potassium', 'Vitamine C'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍠'
+      id: 8,
+      name: "Amandes",
+      emoji: "🌰",
+      calories: 160,
+      protein: 6,
+      carbs: 6,
+      fat: 14,
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 83,
+      isPopular: false,
+      description: "Noix riches en vitamine E"
     },
     {
-      id: '9',
-      nom: 'Amandes',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 579,
-      proteines: 21,
-      glucides: 22,
-      lipides: 50,
-      fibres: 12,
-      micronutriments: ['Vitamine E', 'Magnésium', 'Manganèse'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌰'
-    },
-    {
-      id: '10',
-      nom: 'Épinards',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
+      id: 9,
+      name: "Épinards",
+      emoji: "🥬",
       calories: 23,
-      proteines: 2.9,
-      glucides: 3.6,
-      lipides: 0.4,
-      fibres: 2.2,
-      micronutriments: ['Fer', 'Folates', 'Vitamine K', 'Lutéine'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥬'
+      protein: 3,
+      carbs: 4,
+      fat: 0.4,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 79,
+      isPopular: false,
+      description: "Légume vert riche en fer et folates"
     },
     {
-      id: '11',
-      nom: 'Thon en conserve',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 116,
-      proteines: 26,
-      glucides: 0,
-      lipides: 0.8,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'B12', 'Niacine'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🐟'
+      id: 10,
+      name: "Œufs",
+      emoji: "🥚",
+      calories: 140,
+      protein: 12,
+      carbs: 1,
+      fat: 10,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 91,
+      isPopular: true,
+      description: "Protéines complètes de haute qualité"
     },
     {
-      id: '12',
-      nom: 'Quinoa',
-      categorie: 'Glucides',
-      ig: 'Bas',
-      calories: 120,
-      proteines: 4.4,
-      glucides: 22,
-      lipides: 1.9,
-      fibres: 2.8,
-      micronutriments: ['Fer', 'Magnésium', 'Phosphore'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌾'
+      id: 11,
+      name: "Banane",
+      emoji: "🍌",
+      calories: 89,
+      protein: 1.1,
+      carbs: 23,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Performance",
+      popularity: 88,
+      isPopular: true,
+      description: "Riche en potassium et énergie"
     },
     {
-      id: '13',
-      nom: 'Myrtilles',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 57,
-      proteines: 0.7,
-      glucides: 14,
-      lipides: 0.3,
-      fibres: 2.4,
-      micronutriments: ['Antioxydants', 'Vitamine C', 'K'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫐'
-    },
-    {
-      id: '14',
-      nom: 'Yaourt grec',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 59,
-      proteines: 10,
-      glucides: 3.6,
-      lipides: 0.4,
-      fibres: 0,
-      micronutriments: ['Probiotiques', 'Calcium', 'B12'],
-      classe: 'Récupération',
-      tags: [],
-      emoji: '🥛'
-    },
-    {
-      id: '15',
-      nom: 'Chocolat noir 85%',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 546,
-      proteines: 7.8,
-      glucides: 46,
-      lipides: 31,
-      fibres: 11,
-      micronutriments: ['Magnésium', 'Fer', 'Antioxydants'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan'],
-      emoji: '🍫'
-    },
-    {
-      id: '16',
-      nom: 'Graines de chia',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 486,
-      proteines: 17,
-      glucides: 42,
-      lipides: 31,
-      fibres: 34,
-      micronutriments: ['Oméga-3', 'Calcium', 'Magnésium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌱'
-    },
-    {
-      id: '17',
-      nom: 'Flocons d\'avoine',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 389,
-      proteines: 17,
-      glucides: 66,
-      lipides: 7,
-      fibres: 11,
-      micronutriments: ['Magnésium', 'Zinc', 'Fer', 'B1'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌾'
-    },
-    {
-      id: '18',
-      nom: 'Fromage blanc',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 72,
-      proteines: 12,
-      glucides: 4,
-      lipides: 0.2,
-      fibres: 0,
-      micronutriments: ['Calcium', 'B12', 'Phosphore'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🧀'
-    },
-    {
-      id: '19',
-      nom: 'Lentilles',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 116,
-      proteines: 9,
-      glucides: 20,
-      lipides: 0.4,
-      fibres: 8,
-      micronutriments: ['Fer', 'Folates', 'Magnésium'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫘'
-    },
-    {
-      id: '20',
-      nom: 'Pomme',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 52,
-      proteines: 0.3,
-      glucides: 14,
-      lipides: 0.2,
-      fibres: 2.4,
-      micronutriments: ['Vitamine C', 'K', 'Potassium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍎'
-    },
-    {
-      id: '21',
-      nom: 'Noix de cajou',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 553,
-      proteines: 18,
-      glucides: 30,
-      lipides: 44,
-      fibres: 3,
-      micronutriments: ['Magnésium', 'Zinc', 'Cuivre'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥜'
-    },
-    {
-      id: '22',
-      nom: 'Poivron rouge',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 31,
-      proteines: 1,
-      glucides: 7,
-      lipides: 0.3,
-      fibres: 2.5,
-      micronutriments: ['Vitamine C', 'A', 'B6'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫑'
-    },
-    {
-      id: '23',
-      nom: 'Crevettes',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 99,
-      proteines: 24,
-      glucides: 0,
-      lipides: 0.3,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'Iode', 'B12'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🦐'
-    },
-    {
-      id: '24',
-      nom: 'Mangue',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 60,
-      proteines: 0.8,
-      glucides: 15,
-      lipides: 0.4,
-      fibres: 1.6,
-      micronutriments: ['Vitamine C', 'A', 'Folates'],
-      classe: 'Boost performance',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥭'
-    },
-    {
-      id: '25',
-      nom: 'Huile de coco',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 862,
-      proteines: 0,
-      glucides: 0,
-      lipides: 100,
-      fibres: 0,
-      micronutriments: ['Acides gras saturés'],
-      classe: 'Boost performance',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥥'
-    },
-    {
-      id: '26',
-      nom: 'Chou kale',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 49,
-      proteines: 4.3,
-      glucides: 9,
-      lipides: 0.9,
-      fibres: 3.6,
-      micronutriments: ['Vitamine K', 'C', 'A', 'Calcium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥬'
-    },
-    {
-      id: '27',
-      nom: 'Haricots verts',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 31,
-      proteines: 1.8,
-      glucides: 7,
-      lipides: 0.1,
-      fibres: 2.7,
-      micronutriments: ['Vitamine K', 'C', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫛'
-    },
-    {
-      id: '28',
-      nom: 'Noix de Grenoble',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 654,
-      proteines: 15,
-      glucides: 14,
-      lipides: 65,
-      fibres: 6.7,
-      micronutriments: ['Oméga-3', 'Vitamine E', 'Magnésium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌰'
-    },
-    {
-      id: '29',
-      nom: 'Dinde',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 189,
-      proteines: 29,
-      glucides: 0,
-      lipides: 7,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'B3', 'B6'],
-      classe: 'Sèche',
-      tags: ['Halal'],
-      emoji: '🦃'
-    },
-    {
-      id: '30',
-      nom: 'Pomme de terre',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 77,
-      proteines: 2,
-      glucides: 17,
-      lipides: 0.1,
-      fibres: 2.2,
-      micronutriments: ['Potassium', 'Vitamine C', 'B6'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥔'
-    },
-    {
-      id: '31',
-      nom: 'Kiwi',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 41,
-      proteines: 0.8,
-      glucides: 10,
-      lipides: 0.4,
-      fibres: 2.1,
-      micronutriments: ['Vitamine C', 'K', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥝'
-    },
-    {
-      id: '32',
-      nom: 'Café',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 2,
-      proteines: 0.3,
-      glucides: 0,
-      lipides: 0,
-      fibres: 0,
-      micronutriments: ['Caféine', 'Antioxydants'],
-      classe: 'Boost performance',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '☕'
-    },
-    {
-      id: '33',
-      nom: 'Thé vert',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 1,
-      proteines: 0.2,
-      glucides: 0,
-      lipides: 0,
-      fibres: 0,
-      micronutriments: ['Catéchines', 'L-théanine', 'Antioxydants'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍵'
-    },
-    {
-      id: '34',
-      nom: 'Miel',
-      categorie: 'Glucides',
-      ig: 'Élevé',
-      calories: 304,
-      proteines: 0.3,
-      glucides: 82,
-      lipides: 0,
-      fibres: 0.2,
-      micronutriments: ['Antioxydants', 'Enzymes'],
-      classe: 'Boost performance',
-      tags: ['Vegan'],
-      emoji: '🍯'
-    },
-    {
-      id: '35',
-      nom: 'Gingembre',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 80,
-      proteines: 1.8,
-      glucides: 18,
-      lipides: 0.8,
-      fibres: 2,
-      micronutriments: ['Gingérol', 'Antioxydants'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫚'
-    },
-    {
-      id: '36',
-      nom: 'Ail',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 149,
-      proteines: 6.4,
-      glucides: 33,
-      lipides: 0.5,
-      fibres: 2.1,
-      micronutriments: ['Allicine', 'Sélénium', 'Vitamine C'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🧄'
-    },
-    {
-      id: '37',
-      nom: 'Céleri',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
+      id: 12,
+      name: "Concombre",
+      emoji: "🥒",
       calories: 16,
-      proteines: 0.7,
-      glucides: 3,
-      lipides: 0.2,
-      fibres: 1.6,
-      micronutriments: ['Vitamine K', 'Potassium', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥬'
+      protein: 0.7,
+      carbs: 4,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 75,
+      isPopular: false,
+      description: "Légume hydratant et peu calorique"
     },
     {
-      id: '38',
-      nom: 'Pistaches',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 560,
-      proteines: 20,
-      glucides: 28,
-      lipides: 45,
-      fibres: 10,
-      micronutriments: ['Vitamine B6', 'Thiamine', 'Phosphore'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥜'
+      id: 13,
+      name: "Thon",
+      emoji: "��",
+      calories: 116,
+      protein: 26,
+      carbs: 0,
+      fat: 0.8,
+      category: "Protéines",
+      goal: "Perte de poids",
+      popularity: 86,
+      isPopular: true,
+      description: "Poisson maigre riche en protéines"
     },
     {
-      id: '39',
-      nom: 'Cabillaud',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 82,
-      proteines: 18,
-      glucides: 0,
-      lipides: 0.7,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'B12', 'Phosphore'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🐟'
+      id: 14,
+      name: "Quinoa",
+      emoji: "🌾",
+      calories: 120,
+      protein: 4.4,
+      carbs: 22,
+      fat: 1.9,
+      category: "Glucides",
+      goal: "Équilibre",
+      popularity: 84,
+      isPopular: true,
+      description: "Céréale complète avec protéines complètes"
     },
     {
-      id: '40',
-      nom: 'Pâtes complètes',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 124,
-      proteines: 5,
-      glucides: 25,
-      lipides: 1.1,
-      fibres: 3.2,
-      micronutriments: ['Fer', 'Magnésium', 'B1'],
-      classe: 'Récupération',
-      tags: ['Vegan'],
-      emoji: '🍝'
+      id: 15,
+      name: "Myrtilles",
+      emoji: "🫐",
+      calories: 57,
+      protein: 0.7,
+      carbs: 14,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 89,
+      isPopular: true,
+      description: "Antioxydants puissants et vitamine C"
     },
     {
-      id: '41',
-      nom: 'Framboises',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 52,
-      proteines: 1.2,
-      glucides: 12,
-      lipides: 0.7,
-      fibres: 6.5,
-      micronutriments: ['Vitamine C', 'Manganèse', 'Antioxydants'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫐'
-    },
-    {
-      id: '42',
-      nom: 'Cumin',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 375,
-      proteines: 18,
-      glucides: 44,
-      lipides: 22,
-      fibres: 11,
-      micronutriments: ['Fer', 'Magnésium', 'Calcium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌿'
-    },
-    {
-      id: '43',
-      nom: 'Tofu',
-      categorie: 'Protéines',
-      ig: 'Bas',
+      id: 16,
+      name: "Tofu",
+      emoji: "🥜",
       calories: 76,
-      proteines: 8,
-      glucides: 1.9,
-      lipides: 4.8,
-      fibres: 0.3,
-      micronutriments: ['Calcium', 'Fer', 'Isoflavones'],
-      classe: 'Équilibre',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🧀'
+      protein: 8,
+      carbs: 1.9,
+      fat: 4.8,
+      category: "Protéines",
+      goal: "Équilibre",
+      popularity: 78,
+      isPopular: false,
+      description: "Protéines végétales et isoflavones"
     },
     {
-      id: '44',
-      nom: 'Oranges',
-      categorie: 'Micronutriments',
-      ig: 'Modéré',
+      id: 17,
+      name: "Carottes",
+      emoji: "🥕",
+      calories: 41,
+      protein: 0.9,
+      carbs: 10,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Équilibre",
+      popularity: 81,
+      isPopular: true,
+      description: "Riches en bêta-carotène et vitamine A"
+    },
+    {
+      id: 18,
+      name: "Noix",
+      emoji: "🌰",
+      calories: 200,
+      protein: 4.3,
+      carbs: 3.9,
+      fat: 20,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 87,
+      isPopular: true,
+      description: "Oméga-3 et vitamine E"
+    },
+    {
+      id: 19,
+      name: "Yaourt grec",
+      emoji: "🥛",
+      calories: 59,
+      protein: 10,
+      carbs: 3.6,
+      fat: 0.4,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 85,
+      isPopular: true,
+      description: "Probiotiques et protéines"
+    },
+    {
+      id: 20,
+      name: "Tomates",
+      emoji: "🍅",
+      calories: 18,
+      protein: 0.9,
+      carbs: 3.9,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 80,
+      isPopular: false,
+      description: "Lycopène et vitamine C"
+    },
+    {
+      id: 21,
+      name: "Framboises",
+      emoji: "🫐",
+      calories: 52,
+      protein: 1.2,
+      carbs: 12,
+      fat: 0.7,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 83,
+      isPopular: false,
+      description: "Antioxydants et fibres"
+    },
+    {
+      id: 22,
+      name: "Graines de chia",
+      emoji: "🌱",
+      calories: 486,
+      protein: 17,
+      carbs: 42,
+      fat: 31,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 88,
+      isPopular: true,
+      description: "Oméga-3 et fibres solubles"
+    },
+    // NOUVEAUX ALIMENTS
+    {
+      id: 23,
+      name: "Chou-fleur",
+      emoji: "��",
+      calories: 25,
+      protein: 2,
+      carbs: 5,
+      fat: 0.3,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 78,
+      isPopular: false,
+      description: "Légume crucifère riche en vitamines et minéraux"
+    },
+    {
+      id: 24,
+      name: "Pomme de terre",
+      emoji: "��",
+      calories: 77,
+      protein: 2,
+      carbs: 17,
+      fat: 0.1,
+      category: "Glucides",
+      goal: "Équilibre",
+      popularity: 89,
+      isPopular: true,
+      description: "Tubercule riche en glucides complexes et potassium"
+    },
+    {
+      id: 25,
+      name: "Épinards",
+      emoji: "��",
+      calories: 23,
+      protein: 3,
+      carbs: 4,
+      fat: 0.4,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 79,
+      isPopular: false,
+      description: "Légume vert riche en fer et folates"
+    },
+    {
+      id: 26,
+      name: "Poulet",
+      emoji: "��",
+      calories: 165,
+      protein: 31,
+      carbs: 0,
+      fat: 3.6,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 94,
+      isPopular: true,
+      description: "Viande maigre riche en protéines complètes"
+    },
+    {
+      id: 27,
+      name: "Saumon",
+      emoji: "��",
+      calories: 208,
+      protein: 25,
+      carbs: 0,
+      fat: 12,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 91,
+      isPopular: true,
+      description: "Poisson gras riche en oméga-3 et protéines"
+    },
+    {
+      id: 28,
+      name: "Riz blanc",
+      emoji: "��",
+      calories: 130,
+      protein: 2.7,
+      carbs: 28,
+      fat: 0.3,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 85,
+      isPopular: true,
+      description: "Céréale raffinée riche en glucides simples"
+    },
+    {
+      id: 29,
+      name: "Pâtes",
+      emoji: "��",
+      calories: 131,
+      protein: 5,
+      carbs: 25,
+      fat: 1.1,
+      category: "Glucides",
+      goal: "Prise de masse",
+      popularity: 87,
+      isPopular: true,
+      description: "Pâtes alimentaires riches en glucides complexes"
+    },
+    {
+      id: 30,
+      name: "Pain complet",
+      emoji: "��",
+      calories: 247,
+      protein: 13,
+      carbs: 41,
+      fat: 4.2,
+      category: "Glucides",
+      goal: "Équilibre",
+      popularity: 82,
+      isPopular: true,
+      description: "Pain à base de farine complète riche en fibres"
+    },
+    {
+      id: 31,
+      name: "Fromage",
+      emoji: "��",
+      calories: 113,
+      protein: 7,
+      carbs: 1,
+      fat: 9,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 88,
+      isPopular: true,
+      description: "Produit laitier riche en protéines et calcium"
+    },
+    {
+      id: 32,
+      name: "Lait",
+      emoji: "��",
+      calories: 42,
+      protein: 3.4,
+      carbs: 5,
+      fat: 1,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 84,
+      isPopular: true,
+      description: "Boisson lactée riche en protéines et calcium"
+    },
+    {
+      id: 33,
+      name: "Yaourt",
+      emoji: "��",
+      calories: 59,
+      protein: 10,
+      carbs: 3.6,
+      fat: 0.4,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 85,
+      isPopular: true,
+      description: "Produit laitier fermenté riche en probiotiques"
+    },
+    {
+      id: 34,
+      name: "Beurre",
+      emoji: "��",
+      calories: 717,
+      protein: 0.9,
+      carbs: 0.1,
+      fat: 81,
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 76,
+      isPopular: false,
+      description: "Matière grasse laitière riche en acides gras saturés"
+    },
+    {
+      id: 35,
+      name: "Huile d'olive",
+      emoji: "��",
+      calories: 884,
+      protein: 0,
+      carbs: 0,
+      fat: 100,
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 89,
+      isPopular: true,
+      description: "Huile végétale riche en acides gras monoinsaturés"
+    },
+    {
+      id: 36,
+      name: "Noix",
+      emoji: "��",
+      calories: 654,
+      protein: 15,
+      carbs: 14,
+      fat: 65,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 87,
+      isPopular: true,
+      description: "Fruit à coque riche en oméga-3 et vitamine E"
+    },
+    {
+      id: 37,
+      name: "Amandes",
+      emoji: "��",
+      calories: 579,
+      protein: 21,
+      carbs: 22,
+      fat: 50,
+      category: "Lipides",
+      goal: "Équilibre",
+      popularity: 83,
+      isPopular: false,
+      description: "Fruit à coque riche en vitamine E et magnésium"
+    },
+    {
+      id: 38,
+      name: "Chocolat noir",
+      emoji: "��",
+      calories: 546,
+      protein: 7.8,
+      carbs: 46,
+      fat: 31,
+      category: "Lipides",
+      goal: "Performance",
+      popularity: 92,
+      isPopular: true,
+      description: "Confiserie riche en antioxydants et magnésium"
+    },
+    {
+      id: 39,
+      name: "Miel",
+      emoji: "��",
+      calories: 304,
+      protein: 0.3,
+      carbs: 82,
+      fat: 0,
+      category: "Édulcorants",
+      goal: "Performance",
+      popularity: 86,
+      isPopular: true,
+      description: "Édulcorant naturel riche en antioxydants"
+    },
+    {
+      id: 40,
+      name: "Sucre",
+      emoji: "��",
+      calories: 387,
+      protein: 0,
+      carbs: 100,
+      fat: 0,
+      category: "Édulcorants",
+      goal: "Performance",
+      popularity: 79,
+      isPopular: false,
+      description: "Édulcorant raffiné riche en glucides simples"
+    },
+    {
+      id: 41,
+      name: "Sel",
+      emoji: "��",
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      category: "Épices",
+      goal: "Équilibre",
+      popularity: 95,
+      isPopular: true,
+      description: "Condiment essentiel riche en sodium"
+    },
+    {
+      id: 42,
+      name: "Poivre",
+      emoji: "��️",
+      calories: 251,
+      protein: 10,
+      carbs: 64,
+      fat: 3.3,
+      category: "Épices",
+      goal: "Équilibre",
+      popularity: 88,
+      isPopular: true,
+      description: "Épice riche en antioxydants et propriétés anti-inflammatoires"
+    },
+    {
+      id: 43,
+      name: "Oranges",
+      emoji: "��",
       calories: 47,
-      proteines: 0.9,
-      glucides: 12,
-      lipides: 0.1,
-      fibres: 2.4,
-      micronutriments: ['Vitamine C', 'Folates', 'Potassium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍊'
+      protein: 0.9,
+      carbs: 12,
+      fat: 0.1,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 87,
+      isPopular: true,
+      description: "Fruit riche en vitamine C et antioxydants"
     },
     {
-      id: '45',
-      nom: 'Curcuma',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 354,
-      proteines: 8,
-      glucides: 65,
-      lipides: 10,
-      fibres: 21,
-      micronutriments: ['Curcumine', 'Fer', 'Manganèse'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🟡'
+      id: 44,
+      name: "Fraises",
+      emoji: "��",
+      calories: 32,
+      protein: 0.7,
+      carbs: 8,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 89,
+      isPopular: true,
+      description: "Fruit rouge riche en vitamine C et fibres"
     },
     {
-      id: '46',
-      nom: 'Lait de coco',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 230,
-      proteines: 2.3,
-      glucides: 6,
-      lipides: 24,
-      fibres: 2.2,
-      micronutriments: ['Manganèse', 'Cuivre', 'Sélénium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥥'
+      id: 45,
+      name: "Poires",
+      emoji: "",
+      calories: 57,
+      protein: 0.4,
+      carbs: 15,
+      fat: 0.1,
+      category: "Fruits",
+      goal: "Équilibre",
+      popularity: 81,
+      isPopular: false,
+      description: "Fruit riche en fibres et vitamine K"
+    },
+    {
+      id: 46,
+      name: "Raisins",
+      emoji: "",
+      calories: 62,
+      protein: 0.6,
+      carbs: 16,
+      fat: 0.2,
+      category: "Fruits",
+      goal: "Performance",
+      popularity: 84,
+      isPopular: true,
+      description: "Fruit riche en antioxydants et énergie rapide"
+    },
+    {
+      id: 47,
+      name: "Ananas",
+      emoji: "",
+      calories: 50,
+      protein: 0.5,
+      carbs: 13,
+      fat: 0.1,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 86,
+      isPopular: true,
+      description: "Fruit tropical riche en bromélaïne et vitamine C"
+    },
+    {
+      id: 48,
+      name: "Mangue",
+      emoji: "",
+      calories: 60,
+      protein: 0.8,
+      carbs: 15,
+      fat: 0.4,
+      category: "Fruits",
+      goal: "Performance",
+      popularity: 88,
+      isPopular: true,
+      description: "Fruit tropical riche en vitamine A et C"
+    },
+    {
+      id: 49,
+      name: "Papaye",
+      emoji: "",
+      calories: 43,
+      protein: 0.5,
+      carbs: 11,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 79,
+      isPopular: false,
+      description: "Fruit tropical riche en papaïne et vitamine C"
+    },
+    {
+      id: 50,
+      name: "Grenade",
+      emoji: "",
+      calories: 83,
+      protein: 1.7,
+      carbs: 19,
+      fat: 1.2,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 85,
+      isPopular: true,
+      description: "Fruit riche en antioxydants et vitamine K"
+    },
+    {
+      id: 51,
+      name: "Kiwi",
+      emoji: "",
+      calories: 41,
+      protein: 0.8,
+      carbs: 10,
+      fat: 0.4,
+      category: "Fruits",
+      goal: "Récupération",
+      popularity: 82,
+      isPopular: true,
+      description: "Fruit riche en vitamine C et fibres"
+    },
+    {
+      id: 52,
+      name: "Pêche",
+      emoji: "",
+      calories: 39,
+      protein: 0.9,
+      carbs: 10,
+      fat: 0.3,
+      category: "Fruits",
+      goal: "Équilibre",
+      popularity: 78,
+      isPopular: false,
+      description: "Fruit d'été riche en vitamine A et C"
+    },
+    {
+      id: 53,
+      name: "Bœuf",
+      emoji: "��",
+      calories: 250,
+      protein: 26,
+      carbs: 0,
+      fat: 17,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 91,
+      isPopular: true,
+      description: "Viande rouge riche en protéines et fer"
+    },
+    {
+      id: 54,
+      name: "Porc",
+      emoji: "��",
+      calories: 242,
+      protein: 27,
+      carbs: 0,
+      fat: 14,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 87,
+      isPopular: true,
+      description: "Viande riche en protéines et vitamines B"
+    },
+    {
+      id: 55,
+      name: "Agneau",
+      emoji: "��",
+      calories: 294,
+      protein: 25,
+      carbs: 0,
+      fat: 21,
+      category: "Protéines",
+      goal: "Prise de masse",
+      popularity: 83,
+      isPopular: false,
+      description: "Viande rouge riche en protéines et zinc"
+    },
+    {
+      id: 56,
+      name: "Dinde",
+      emoji: "��",
+      calories: 189,
+      protein: 29,
+      carbs: 0,
+      fat: 7,
+      category: "Protéines",
+      goal: "Perte de poids",
+      popularity: 89,
+      isPopular: true,
+      description: "Viande maigre riche en protéines et sélénium"
+    },
+    {
+      id: 57,
+      name: "Crevettes",
+      emoji: "��",
+      calories: 99,
+      protein: 24,
+      carbs: 0,
+      fat: 0.3,
+      category: "Protéines",
+      goal: "Perte de poids",
+      popularity: 88,
+      isPopular: true,
+      description: "Fruits de mer riches en protéines et iode"
+    },
+    {
+      id: 58,
+      name: "Crabes",
+      emoji: "��",
+      calories: 97,
+      protein: 20,
+      carbs: 0,
+      fat: 1.5,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 85,
+      isPopular: true,
+      description: "Fruits de mer riches en protéines et zinc"
+    },
+    {
+      id: 59,
+      name: "Moules",
+      emoji: "��",
+      calories: 86,
+      protein: 12,
+      carbs: 4,
+      fat: 2.2,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 81,
+      isPopular: false,
+      description: "Fruits de mer riches en protéines et vitamine B12"
+    },
+    {
+      id: 60,
+      name: "Huîtres",
+      emoji: "��",
+      calories: 68,
+      protein: 7,
+      carbs: 4,
+      fat: 2.5,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 84,
+      isPopular: true,
+      description: "Fruits de mer riches en zinc et vitamine B12"
+    },
+    {
+      id: 61,
+      name: "Calmars",
+      emoji: "��",
+      calories: 92,
+      protein: 16,
+      carbs: 3,
+      fat: 1.4,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 79,
+      isPopular: false,
+      description: "Fruits de mer riches en protéines et sélénium"
+    },
+    {
+      id: 62,
+      name: "Homard",
+      emoji: "��",
+      calories: 89,
+      protein: 19,
+      carbs: 0,
+      fat: 0.9,
+      category: "Protéines",
+      goal: "Récupération",
+      popularity: 86,
+      isPopular: true,
+      description: "Fruits de mer riches en protéines et phosphore"
+    },
+    {
+      id: 63,
+      name: "Céleri",
+      emoji: "��",
+      calories: 16,
+      protein: 0.7,
+      carbs: 3,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 72,
+      isPopular: false,
+      description: "Légume vert riche en fibres et très peu calorique"
+    },
+    {
+      id: 64,
+      name: "Chou",
+      emoji: "��",
+      calories: 25,
+      protein: 1.3,
+      carbs: 6,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 74,
+      isPopular: false,
+      description: "Légume crucifère riche en vitamine C et K"
+    },
+    {
+      id: 65,
+      name: "Chou de Bruxelles",
+      emoji: "��",
+      calories: 43,
+      protein: 3.4,
+      carbs: 9,
+      fat: 0.3,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 68,
+      isPopular: false,
+      description: "Légume crucifère riche en vitamine C et folates"
+    },
+    {
+      id: 66,
+      name: "Radis",
+      emoji: "��",
+      calories: 16,
+      protein: 0.7,
+      carbs: 3.4,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 71,
+      isPopular: false,
+      description: "Légume racine croquant et peu calorique"
+    },
+    {
+      id: 67,
+      name: "Navet",
+      emoji: "��",
+      calories: 28,
+      protein: 0.9,
+      carbs: 6.4,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 69,
+      isPopular: false,
+      description: "Légume racine riche en vitamine C et fibres"
+    },
+    {
+      id: 68,
+      name: "Betterave",
+      emoji: "",
+      calories: 43,
+      protein: 1.6,
+      carbs: 10,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Performance",
+      popularity: 76,
+      isPopular: false,
+      description: "Légume racine riche en nitrates et antioxydants"
+    },
+    {
+      id: 69,
+      name: "Aubergine",
+      emoji: "��",
+      calories: 25,
+      protein: 1,
+      carbs: 6,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 73,
+      isPopular: false,
+      description: "Légume riche en fibres et antioxydants"
+    },
+    {
+      id: 70,
+      name: "Poivron",
+      emoji: "��️",
+      calories: 31,
+      protein: 1,
+      carbs: 7,
+      fat: 0.3,
+      category: "Légumes",
+      goal: "Équilibre",
+      popularity: 78,
+      isPopular: false,
+      description: "Légume riche en vitamine C et caroténoïdes"
+    },
+    {
+      id: 71,
+      name: "Piment",
+      emoji: "��️",
+      calories: 40,
+      protein: 1.9,
+      carbs: 9,
+      fat: 0.4,
+      category: "Légumes",
+      goal: "Performance",
+      popularity: 75,
+      isPopular: false,
+      description: "Légume épicé riche en capsaïcine et vitamine C"
+    },
+    {
+      id: 72,
+      name: "Asperge",
+      emoji: "��",
+      calories: 20,
+      protein: 2.2,
+      carbs: 4,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 77,
+      isPopular: false,
+      description: "Légume vert riche en folates et vitamine K"
+    },
+    {
+      id: 73,
+      name: "Artichaut",
+      emoji: "",
+      calories: 47,
+      protein: 3.3,
+      carbs: 11,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Équilibre",
+      popularity: 70,
+      isPopular: false,
+      description: "Légume riche en fibres et antioxydants"
+    },
+    {
+      id: 74,
+      name: "Fenouil",
+      emoji: "��",
+      calories: 31,
+      protein: 1.2,
+      carbs: 7,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 66,
+      isPopular: false,
+      description: "Légume aromatique riche en fibres et vitamine C"
+    },
+    {
+      id: 75,
+      name: "Endive",
+      emoji: "��",
+      calories: 17,
+      protein: 1.3,
+      carbs: 4,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 64,
+      isPopular: false,
+      description: "Légume feuille croquant et peu calorique"
+    },
+    {
+      id: 76,
+      name: "Laitue",
+      emoji: "��",
+      calories: 15,
+      protein: 1.4,
+      carbs: 3,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 80,
+      isPopular: false,
+      description: "Légume feuille riche en vitamine K et folates"
+    },
+    {
+      id: 77,
+      name: "Mâche",
+      emoji: "��",
+      calories: 14,
+      protein: 2,
+      carbs: 2,
+      fat: 0.4,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 62,
+      isPopular: false,
+      description: "Salade verte riche en vitamine C et fer"
+    },
+    {
+      id: 78,
+      name: "Roquette",
+      emoji: "��",
+      calories: 25,
+      protein: 2.6,
+      carbs: 4,
+      fat: 0.7,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 68,
+      isPopular: false,
+      description: "Salade épicée riche en vitamine K et folates"
+    },
+    {
+      id: 79,
+      name: "Cresson",
+      emoji: "��",
+      calories: 11,
+      protein: 2.3,
+      carbs: 1.3,
+      fat: 0.1,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 60,
+      isPopular: false,
+      description: "Salade verte riche en vitamine C et calcium"
+    },
+    {
+      id: 80,
+      name: "Chicorée",
+      emoji: "��",
+      calories: 23,
+      protein: 1.7,
+      carbs: 5,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 58,
+      isPopular: false,
+      description: "Légume feuille riche en fibres et vitamine K"
+    },
+    {
+      id: 81,
+      name: "Bette",
+      emoji: "��",
+      calories: 19,
+      protein: 1.8,
+      carbs: 4,
+      fat: 0.2,
+      category: "Légumes",
+      goal: "Perte de poids",
+      popularity: 55,
+      isPopular: false,
+      description: "Légume feuille riche en vitamine K et magnésium"
+    },
+    {
+      id: 82,
+      name: "Pissenlit",
+      emoji: "��",
+      calories: 45,
+      protein: 2.7,
+      carbs: 9,
+      fat: 0.7,
+      category: "Légumes",
+      goal: "Équilibre",
+      popularity: 52,
+      isPopular: false,
+      description: "Légume sauvage riche en vitamine A et potassium"
     }
   ];
 
-  // Données des repas - AJOUT DE 10 NOUVEAUX REPAS
+  // Remplacer la section repasData par cette version étendue avec tous les repas
+  const repasData = [
+    {
+      id: 1,
+      name: "Bowl protéiné aux fruits",
+      emoji: "🥣",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 650,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 35,
+      carbs: 65,
+      fat: 18,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 2,
+      name: "Omelette aux 3 œufs et fromage",
+      emoji: "🍳",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 520,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 42,
+      carbs: 8,
+      fat: 35,
+      fiber: 2,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 3,
+      name: "Poulet rôti aux patates douces",
+      emoji: "🍗",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 720,
+      prepTime: 45,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 55,
+      carbs: 75,
+      fat: 18,
+      fiber: 10,
+      servings: 2,
+      isPopular: true
+    },
+    {
+      id: 4,
+      name: "Saumon aux légumes vapeur",
+      emoji: "🐟",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 380,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 35,
+      carbs: 25,
+      fat: 18,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 5,
+      name: "Smoothie récupération",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Récupération",
+      calories: 250,
+      prepTime: 5,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 20,
+      carbs: 35,
+      fat: 8,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 6,
+      name: "Bowl d'énergie pré-entraînement",
+      emoji: "⚡",
+      category: "Pre-workout",
+      goal: "Performance",
+      calories: 320,
+      prepTime: 10,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 55,
+      fat: 8,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 7,
+      name: "Salade de thon aux légumes",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 280,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 32,
+      carbs: 20,
+      fat: 8,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 8,
+      name: "Pancakes protéinés",
+      emoji: "🥞",
+      category: "Petit-déjeuner",
+      goal: "Prise de masse",
+      calories: 580,
+      prepTime: 20,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 38,
+      carbs: 45,
+      fat: 22,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 9,
+      name: "Bowl de quinoa aux légumes",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 420,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 18,
+      carbs: 55,
+      fat: 12,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 10,
+      name: "Smoothie vert détox",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Perte de poids",
+      calories: 150,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 4,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 11,
+      name: "Burger de bœuf aux patates douces",
+      emoji: "🍔",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 850,
+      prepTime: 35,
+      difficulty: "Moyen",
+      rating: 4.8,
+      protein: 45,
+      carbs: 65,
+      fat: 35,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 12,
+      name: "Poisson blanc aux herbes",
+      emoji: "🐟",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 220,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 35,
+      carbs: 15,
+      fat: 5,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 13,
+      name: "Energy balls aux dattes",
+      emoji: "🥧",
+      category: "Collation",
+      goal: "Performance",
+      calories: 180,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 6,
+      carbs: 25,
+      fat: 8,
+      fiber: 4,
+      servings: 4,
+      isPopular: true
+    },
+    {
+      id: 14,
+      name: "Pâtes complètes au thon",
+      emoji: "🍝",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 480,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 30,
+      carbs: 65,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 15,
+      name: "Toast à l'avocat et œufs",
+      emoji: "🥑",
+      category: "Petit-déjeuner",
+      goal: "Performance",
+      calories: 380,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 20,
+      carbs: 25,
+      fat: 25,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 16,
+      name: "Soupe de légumes minceur",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 5,
+      fiber: 12,
+      servings: 2,
+      isPopular: false
+    },
+    {
+      id: 17,
+      name: "Bowl de riz au poulet teriyaki",
+      emoji: "🍱",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 750,
+      prepTime: 30,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 55,
+      carbs: 85,
+      fat: 18,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 18,
+      name: "Smoothie chocolat-banane",
+      emoji: "🥤",
+      category: "Post-workout",
+      goal: "Récupération",
+      calories: 350,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 25,
+      carbs: 45,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    // NOUVEAUX REPAS
+    {
+      id: 19,
+      name: "Salade de quinoa aux légumes",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 380,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 16,
+      carbs: 45,
+      fat: 14,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 20,
+      name: "Smoothie vert détox",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Perte de poids",
+      calories: 150,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 4,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 21,
+      name: "Burger de bœuf aux patates douces",
+      emoji: "🍔",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 850,
+      prepTime: 35,
+      difficulty: "Moyen",
+      rating: 4.8,
+      protein: 45,
+      carbs: 65,
+      fat: 35,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 22,
+      name: "Poisson blanc aux herbes",
+      emoji: "🐟",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 220,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 35,
+      carbs: 15,
+      fat: 5,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 23,
+      name: "Energy balls aux dattes",
+      emoji: "🥧",
+      category: "Collation",
+      goal: "Performance",
+      calories: 180,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 6,
+      carbs: 25,
+      fat: 8,
+      fiber: 4,
+      servings: 4,
+      isPopular: true
+    },
+    {
+      id: 24,
+      name: "Pâtes complètes au thon",
+      emoji: "🍝",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 480,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 30,
+      carbs: 65,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 25,
+      name: "Toast à l'avocat et œufs",
+      emoji: "🥑",
+      category: "Petit-déjeuner",
+      goal: "Performance",
+      calories: 380,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 20,
+      carbs: 25,
+      fat: 25,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 26,
+      name: "Soupe de légumes minceur",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 8,
+      carbs: 25,
+      fat: 5,
+      fiber: 12,
+      servings: 2,
+      isPopular: false
+    },
+    {
+      id: 27,
+      name: "Bowl de riz au poulet teriyaki",
+      emoji: "🍱",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 750,
+      prepTime: 30,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 55,
+      carbs: 85,
+      fat: 18,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 28,
+      name: "Smoothie chocolat-banane",
+      emoji: "🥤",
+      category: "Post-workout",
+      goal: "Récupération",
+      calories: 350,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 25,
+      carbs: 45,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 29,
+      name: "Wrap protéiné aux légumes",
+      emoji: "🌯",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 420,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 28,
+      carbs: 35,
+      fat: 18,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 30,
+      name: "Bowl de légumes rôtis",
+      emoji: "🥗",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 280,
+      prepTime: 35,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 12,
+      carbs: 45,
+      fat: 8,
+      fiber: 12,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 31,
+      name: "Smoothie tropical",
+      emoji: "🥤",
+      category: "Collation",
+      goal: "Performance",
+      calories: 220,
+      prepTime: 8,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 35,
+      fat: 6,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 32,
+      name: "Pizza protéinée",
+      emoji: "🍕",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 680,
+      prepTime: 25,
+      difficulty: "Moyen",
+      rating: 4.7,
+      protein: 42,
+      carbs: 55,
+      fat: 28,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 33,
+      name: "Salade de fruits frais",
+      emoji: "🥗",
+      category: "Collation",
+      goal: "Récupération",
+      calories: 120,
+      prepTime: 10,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 2,
+      carbs: 28,
+      fat: 0.5,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 34,
+      name: "Risotto aux champignons",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Équilibre",
+      calories: 450,
+      prepTime: 40,
+      difficulty: "Moyen",
+      rating: 4.5,
+      protein: 18,
+      carbs: 65,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 35,
+      name: "Granola maison",
+      emoji: "🥣",
+      category: "Petit-déjeuner",
+      goal: "Performance",
+      calories: 380,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 12,
+      carbs: 45,
+      fat: 18,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 36,
+      name: "Curry de légumes",
+      emoji: "🍛",
+      category: "Dîner",
+      goal: "Équilibre",
+      calories: 320,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 55,
+      fat: 8,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 37,
+      name: "Muffins protéinés",
+      emoji: "🧁",
+      category: "Collation",
+      goal: "Prise de masse",
+      calories: 280,
+      prepTime: 25,
+      difficulty: "Moyen",
+      rating: 4.5,
+      protein: 22,
+      carbs: 25,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 38,
+      name: "Tacos aux légumes",
+      emoji: "🌮",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 380,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 18,
+      carbs: 45,
+      fat: 15,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 39,
+      name: "Lasagnes végétariennes",
+      emoji: "🍝",
+      category: "Dîner",
+      goal: "Équilibre",
+      calories: 520,
+      prepTime: 45,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 25,
+      carbs: 65,
+      fat: 18,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 40,
+      name: "Couscous aux légumes",
+      emoji: "🍚",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 380,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 55,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 41,
+      name: "Ratatouille",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 40,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 8,
+      carbs: 25,
+      fat: 6,
+      fiber: 10,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 42,
+      name: "Boulettes de viande",
+      emoji: "🥩",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 450,
+      prepTime: 30,
+      difficulty: "Moyen",
+      rating: 4.5,
+      protein: 35,
+      carbs: 25,
+      fat: 22,
+      fiber: 4,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 43,
+      name: "Gratin de légumes",
+      emoji: "🍲",
+      category: "Dîner",
+      goal: "Équilibre",
+      calories: 320,
+      prepTime: 35,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 18,
+      carbs: 35,
+      fat: 15,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 44,
+      name: "Spaghettis bolognaise",
+      emoji: "🍝",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 580,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 32,
+      carbs: 65,
+      fat: 18,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 45,
+      name: "Chili con carne",
+      emoji: "🍲",
+      category: "Déjeuner",
+      goal: "Prise de masse",
+      calories: 420,
+      prepTime: 35,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 28,
+      carbs: 45,
+      fat: 15,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 46,
+      name: "Paella aux fruits de mer",
+      emoji: "🍚",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 480,
+      prepTime: 40,
+      difficulty: "Moyen",
+      rating: 4.7,
+      protein: 35,
+      carbs: 55,
+      fat: 12,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 47,
+      name: "Ceviche de poisson",
+      emoji: "🐟",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 220,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 32,
+      carbs: 15,
+      fat: 5,
+      fiber: 4,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 48,
+      name: "Tartare de saumon",
+      emoji: "🐟",
+      category: "Déjeuner",
+      goal: "Récupération",
+      calories: 280,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.6,
+      protein: 25,
+      carbs: 8,
+      fat: 18,
+      fiber: 2,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 49,
+      name: "Salade niçoise",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 320,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 22,
+      carbs: 25,
+      fat: 15,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 50,
+      name: "Gazpacho andalou",
+      emoji: "🍲",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 120,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 4,
+      carbs: 20,
+      fat: 3,
+      fiber: 4,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 51,
+      name: "Taboulé libanais",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 280,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 8,
+      carbs: 45,
+      fat: 8,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 52,
+      name: "Falafels aux légumes",
+      emoji: "🥙",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 380,
+      prepTime: 30,
+      difficulty: "Moyen",
+      rating: 4.6,
+      protein: 18,
+      carbs: 45,
+      fat: 15,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 53,
+      name: "Buddha bowl",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 420,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 20,
+      carbs: 55,
+      fat: 12,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 54,
+      name: "Ceviche de crevettes",
+      emoji: "🦐",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 25,
+      carbs: 12,
+      fat: 4,
+      fiber: 3,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 55,
+      name: "Poké bowl au saumon",
+      emoji: "",
+      category: "Déjeuner",
+      goal: "Récupération",
+      calories: 450,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.7,
+      protein: 35,
+      carbs: 35,
+      fat: 18,
+      fiber: 6,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 56,
+      name: "Bowl de légumes grillés",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 250,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 12,
+      carbs: 35,
+      fat: 8,
+      fiber: 10,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 57,
+      name: "Salade de quinoa aux fruits",
+      emoji: "",
+      category: "Collation",
+      goal: "Performance",
+      calories: 280,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 12,
+      carbs: 45,
+      fat: 8,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 58,
+      name: "Wrap aux légumes grillés",
+      emoji: "🌯",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 350,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 15,
+      carbs: 40,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 59,
+      name: "Soupe de lentilles",
+      emoji: "🍲",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 280,
+      prepTime: 35,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 18,
+      carbs: 45,
+      fat: 6,
+      fiber: 15,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 60,
+      name: "Salade de chou",
+      emoji: "🥗",
+      category: "Collation",
+      goal: "Perte de poids",
+      calories: 120,
+      prepTime: 10,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 3,
+      carbs: 20,
+      fat: 3,
+      fiber: 4,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 61,
+      name: "Bowl de légumes vapeur",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.1,
+      protein: 8,
+      carbs: 25,
+      fat: 5,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 62,
+      name: "Salade de betteraves",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Performance",
+      calories: 220,
+      prepTime: 20,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 8,
+      carbs: 35,
+      fat: 6,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 63,
+      name: "Bowl de légumes crus",
+      emoji: "🥗",
+      category: "Collation",
+      goal: "Perte de poids",
+      calories: 150,
+      prepTime: 10,
+      difficulty: "Facile",
+      rating: 4.0,
+      protein: 6,
+      carbs: 25,
+      fat: 4,
+      fiber: 8,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 64,
+      name: "Salade de fenouil",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 180,
+      prepTime: 15,
+      difficulty: "Facile",
+      rating: 4.2,
+      protein: 6,
+      carbs: 25,
+      fat: 6,
+      fiber: 6,
+      servings: 1,
+      isPopular: false
+    },
+    {
+      id: 65,
+      name: "Bowl de légumes colorés",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 280,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 12,
+      carbs: 35,
+      fat: 10,
+      fiber: 10,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 66,
+      name: "Salade de roquette",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Perte de poids",
+      calories: 160,
+      prepTime: 12,
+      difficulty: "Facile",
+      rating: 4.3,
+      protein: 8,
+      carbs: 15,
+      fat: 8,
+      fiber: 4,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 67,
+      name: "Bowl de légumes d'hiver",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 320,
+      prepTime: 30,
+      difficulty: "Facile",
+      rating: 4.4,
+      protein: 15,
+      carbs: 45,
+      fat: 10,
+      fiber: 12,
+      servings: 1,
+      isPopular: true
+    },
+    {
+      id: 68,
+      name: "Salade de légumes grillés",
+      emoji: "🥗",
+      category: "Déjeuner",
+      goal: "Équilibre",
+      calories: 250,
+      prepTime: 25,
+      difficulty: "Facile",
+      rating: 4.5,
+      protein: 10,
+      carbs: 30,
+      fat: 12,
+      fiber: 8,
+      servings: 1,
+      isPopular: true
+    }
+  ];
+
+  const stats = {
+    totalFoods: nutritionData.length,
+    totalRepas: repasData.length,
+    popularFoods: nutritionData.filter(food => food.isPopular).length,
+    popularRepas: repasData.filter(repas => repas.isPopular).length,
+    totalCalories: nutritionData.reduce((sum, food) => sum + food.calories, 0),
+    averageCalories: Math.round(nutritionData.reduce((sum, food) => sum + food.calories, 0) / nutritionData.length)
+  };
+
+  // Mettre à jour les filtres pour inclure les nouvelles catégories
+  const filters = [
+    { value: 'all', label: 'Tous', icon: Apple },
+    { value: 'popular', label: 'Populaires', icon: Target },
+    { value: 'fruits', label: 'Fruits', icon: Apple },
+    { value: 'protéines', label: 'Protéines', icon: Target },
+    { value: 'glucides', label: 'Glucides', icon: Target },
+    { value: 'lipides', label: 'Lipides', icon: Target },
+    { value: 'légumes', label: 'Légumes', icon: Apple },
+    { value: 'édulcorants', label: 'Édulcorants', icon: Apple },
+    { value: 'épices', label: 'Épices', icon: Apple }
+  ];
+
+  const repasFilters = [
+    { value: 'all', label: 'Tous', icon: Utensils },
+    { value: 'popular', label: 'Populaires', icon: Star },
+    { value: 'petit-déjeuner', label: 'Petit-déjeuner', icon: Utensils },
+    { value: 'déjeuner', label: 'Déjeuner', icon: Utensils },
+    { value: 'dîner', label: 'Dîner', icon: Utensils },
+    { value: 'collation', label: 'Collation', icon: Utensils },
+    { value: 'pre-workout', label: 'Pre-workout', icon: Zap },
+    { value: 'post-workout', label: 'Post-workout', icon: Zap }
+  ];
+
+  const goalFilters = [
+    { value: 'all', label: 'Tous objectifs', icon: Target },
+    { value: 'prise-de-masse', label: 'Prise de masse', icon: Target },
+    { value: 'perte-de-poids', label: 'Perte de poids', icon: Target },
+    { value: 'récupération', label: 'Récupération', icon: Target },
+    { value: 'performance', label: 'Performance', icon: Target },
+    { value: 'équilibre', label: 'Équilibre', icon: Target }
+  ];
+
+  const filteredFoods = nutritionData.filter(food => {
+    const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         food.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'popular' && food.isPopular) ||
+      food.category.toLowerCase() === selectedFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const filteredRepas = repasData.filter(repas => {
+    const matchesSearch = repas.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'popular' && repas.isPopular) ||
+      repas.category.toLowerCase() === selectedFilter;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Facile': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Moyen': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'Difficile': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getGoalColor = (goal: string) => {
+    switch (goal) {
+      case 'Prise de masse': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Perte de poids': return 'bg-red-100 text-red-800 border-red-200';
+      case 'Récupération': return 'bg-green-100 text-green-800 border-green-200';
+      case 'Performance': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'Équilibre': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Données simplifiées pour tous les repas
   const repas = [
     {
       id: '1',
-      nom: 'Bowl Poulet Riz Légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Poulet grillé', quantite: '150g' },
-        { nom: 'Riz basmati', quantite: '200g' },
-        { nom: 'Brocolis vapeur', quantite: '100g' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 550,
-      proteines: 42,
-      glucides: 60,
-      lipides: 15,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Cuire le riz basmati',
-        'Griller le poulet avec épices',
-        'Cuire les brocolis à la vapeur',
-        'Assaisonner avec huile d\'olive'
-      ],
-      emoji: '🍲'
+      nom: 'Bowl protéiné aux fruits',
+      type: 'Matin',
+      emoji: '🥣',
+      calories: 450
     },
     {
       id: '2',
-      nom: 'Smoothie Protéiné',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Protéine en poudre', quantite: '30g' },
-        { nom: 'Lait d\'amande', quantite: '250ml' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 35,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Mixer tous les ingrédients',
-        'Ajouter des glaçons',
-        'Servir immédiatement'
-      ],
-      emoji: '🥤'
+      nom: 'Salade de Quinoa aux Légumes',
+      type: 'Midi',
+      emoji: '🥗',
+      calories: 380
     },
     {
       id: '3',
-      nom: 'Salade de Saumon',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Saumon grillé', quantite: '150g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Salade verte', quantite: '100g' },
-        { nom: 'Tomates cerises', quantite: '50g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 15,
-      lipides: 25,
-      objectif: 'Sèche',
-      etapes: [
-        'Griller le saumon',
-        'Préparer la salade verte',
-        'Ajouter avocat et tomates',
-        'Arroser de vinaigrette légère'
-      ],
-      emoji: '🥗'
+      nom: 'Saumon grillé aux légumes',
+      type: 'Soir',
+      emoji: '🐟',
+      calories: 520
     },
     {
       id: '4',
-      nom: 'Omelette aux épinards',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs entiers', quantite: '3 unités' },
-        { nom: 'Épinards frais', quantite: '50g' },
-        { nom: 'Fromage râpé', quantite: '20g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 320,
-      proteines: 25,
-      glucides: 8,
-      lipides: 22,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Battre les œufs avec sel et poivre',
-        'Faire revenir les épinards dans l\'huile',
-        'Verser les œufs battus',
-        'Ajouter le fromage râpé',
-        'Plier l\'omelette en deux'
-      ],
-      emoji: '🍳'
+      nom: 'Omelette aux 3 œufs et fromage',
+      type: 'Matin',
+      emoji: '🍳',
+      calories: 520
     },
     {
       id: '5',
-      nom: 'Bowl de quinoa aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Quinoa', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Carottes', quantite: '80g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 18,
-      glucides: 65,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire le quinoa dans de l\'eau salée',
-        'Cuire les brocolis et carottes à la vapeur',
-        'Couper l\'avocat en dés',
-        'Mélanger tous les ingrédients',
-        'Saupoudrer de graines de chia'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '6',
-      nom: 'Smoothie protéiné aux myrtilles',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Myrtilles', quantite: '100g' },
-        { nom: 'Yaourt grec', quantite: '200g' },
-        { nom: 'Protéine vanille', quantite: '30g' },
-        { nom: 'Amandes', quantite: '15g' },
-        { nom: 'Lait d\'amande', quantite: '200ml' }
-      ],
-      calories: 380,
-      proteines: 42,
-      glucides: 28,
-      lipides: 12,
-      objectif: 'Récupération',
-      etapes: [
-        'Mixer les myrtilles avec le lait',
-        'Ajouter le yaourt grec',
-        'Incorporer la protéine en poudre',
-        'Mixer jusqu\'à obtenir une texture lisse',
-        'Saupoudrer d\'amandes concassées'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '7',
-      nom: 'Salade de thon aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Thon en conserve', quantite: '150g' },
-        { nom: 'Tomates cerises', quantite: '100g' },
-        { nom: 'Concombre', quantite: '80g' },
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Vinaigrette légère', quantite: '15g' }
-      ],
-      calories: 280,
-      proteines: 35,
-      glucides: 12,
-      lipides: 8,
-      objectif: 'Sèche',
-      etapes: [
-        'Égoutter le thon en conserve',
-        'Couper les tomates en deux',
-        'Émincer le concombre',
-        'Mélanger tous les légumes',
-        'Arroser de vinaigrette légère'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '8',
-      nom: 'Patates douces rôties au poulet',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Patates douces', quantite: '200g' },
-        { nom: 'Poulet', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Huile d\'olive', quantite: '10g' },
-        { nom: 'Herbes de Provence', quantite: '5g' }
-      ],
-      calories: 480,
-      proteines: 38,
-      glucides: 45,
-      lipides: 16,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper les patates douces en dés',
-        'Assaisonner le poulet avec les herbes',
-        'Enfourner 25 minutes',
-        'Ajouter les brocolis les 10 dernières minutes'
-      ],
-      emoji: '🍗'
-    },
-    {
-      id: '9',
-      nom: 'Pancakes protéinés',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs', quantite: '2 unités' },
-        { nom: 'Protéine vanille', quantite: '30g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '100g' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 450,
-      proteines: 35,
-      glucides: 35,
-      lipides: 18,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Écraser la banane',
-        'Mélanger avec les œufs et yaourt',
-        'Ajouter la protéine en poudre',
-        'Incorporer les graines de chia',
-        'Cuire à la poêle 3-4 min par côté'
-      ],
-      emoji: '🥞'
-    },
-    {
-      id: '10',
-      nom: 'Bowl d\'énergie pré-entraînement',
-      categorie: 'Pre-workout',
-      ingredients: [
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Myrtilles', quantite: '50g' },
-        { nom: 'Amandes', quantite: '20g' },
-        { nom: 'Chocolat noir 85%', quantite: '15g' },
-        { nom: 'Lait d\'amande', quantite: '100ml' }
-      ],
-      calories: 320,
-      proteines: 8,
-      glucides: 45,
-      lipides: 14,
-      objectif: 'Boost performance',
-      etapes: [
-        'Couper la banane en rondelles',
-        'Mélanger avec les myrtilles',
-        'Ajouter les amandes concassées',
-        'Râper le chocolat noir',
-        'Arroser de lait d\'amande'
-      ],
-      emoji: '⚡'
-    },
-    {
-      id: '11',
-      nom: 'Wrap protéiné aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Tortilla complète', quantite: '1 unité' },
-        { nom: 'Poulet grillé', quantite: '120g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Épinards', quantite: '30g' },
-        { nom: 'Tomates', quantite: '50g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 35,
-      lipides: 18,
-      objectif: 'Équilibre',
-      etapes: [
-        'Chauffer la tortilla',
-        'Étaler l\'avocat écrasé',
-        'Ajouter le poulet en lamelles',
-        'Garnir avec épinards et tomates',
-        'Rouler et couper en deux'
-      ],
-      emoji: '🌯'
-    },
-    {
-      id: '12',
-      nom: 'Soupe de légumes minceur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Brocolis', quantite: '150g' },
-        { nom: 'Épinards', quantite: '100g' },
-        { nom: 'Carottes', quantite: '100g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Bouillon de légumes', quantite: '300ml' }
-      ],
-      calories: 120,
-      proteines: 8,
-      glucides: 20,
-      lipides: 2,
-      objectif: 'Sèche',
-      etapes: [
-        'Couper tous les légumes en dés',
-        'Faire revenir dans une casserole',
-        'Ajouter le bouillon de légumes',
-        'Laisser mijoter 20 minutes',
-        'Mixer jusqu\'à obtenir une texture lisse'
-      ],
-      emoji: '🍲'
-    },
-    {
-      id: '13',
-      nom: 'Energy balls aux amandes',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Amandes', quantite: '50g' },
-        { nom: 'Dattes', quantite: '80g' },
-        { nom: 'Graines de chia', quantite: '15g' },
-        { nom: 'Chocolat noir 85%', quantite: '20g' },
-        { nom: 'Cacao en poudre', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 8,
-      glucides: 35,
-      lipides: 14,
-      objectif: 'Performance',
-      etapes: [
-        'Mixer les amandes et dattes',
-        'Ajouter les graines de chia',
-        'Incorporer le chocolat râpé',
-        'Former des boules avec les mains',
-        'Rouler dans le cacao en poudre'
-      ],
-      emoji: '🥧'
-    },
-    {
-      id: '14',
-      nom: 'Porridge protéiné',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Flocons d\'avoine', quantite: '50g' },
-        { nom: 'Protéine vanille', quantite: '25g' },
-        { nom: 'Banane', quantite: '1/2 unité' },
-        { nom: 'Amandes', quantite: '10g' },
-        { nom: 'Lait d\'amande', quantite: '200ml' }
-      ],
-      calories: 380,
-      proteines: 32,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Faire chauffer le lait d\'amande',
-        'Ajouter les flocons d\'avoine',
-        'Cuire 5 minutes en remuant',
-        'Incorporer la protéine en poudre',
-        'Garnir de banane et amandes'
-      ],
-      emoji: '🥣'
-    },
-    {
-      id: '15',
-      nom: 'Salade de lentilles',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Lentilles', quantite: '150g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Concombre', quantite: '80g' },
-        { nom: 'Poivron rouge', quantite: '50g' },
-        { nom: 'Vinaigrette', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 18,
-      glucides: 55,
-      lipides: 6,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire les lentilles dans l\'eau salée',
-        'Couper tous les légumes en dés',
-        'Mélanger les lentilles refroidies',
-        'Ajouter les légumes',
-        'Arroser de vinaigrette'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '16',
-      nom: 'Fromage blanc aux fruits',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Fromage blanc', quantite: '200g' },
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Mangue', quantite: '50g' },
-        { nom: 'Noix de cajou', quantite: '15g' },
-        { nom: 'Miel', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 25,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Couper la pomme et la mangue en dés',
-        'Mélanger avec le fromage blanc',
-        'Ajouter le miel',
-        'Saupoudrer de noix de cajou',
-        'Servir frais'
-      ],
-      emoji: '🍯'
-    },
-    {
-      id: '17',
-      nom: 'Crevettes aux légumes sautés',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Crevettes', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Poivron rouge', quantite: '80g' },
-        { nom: 'Chou kale', quantite: '50g' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 35,
-      glucides: 15,
-      lipides: 12,
-      objectif: 'Sèche',
-      etapes: [
-        'Décortiquer les crevettes',
-        'Couper les légumes en morceaux',
-        'Faire chauffer l\'huile de coco',
-        'Sauter les crevettes 3 minutes',
-        'Ajouter les légumes et cuire 5 min'
-      ],
-      emoji: '🍤'
-    },
-    {
-      id: '18',
-      nom: 'Smoothie tropical',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Mangue', quantite: '100g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '150g' },
-        { nom: 'Lait de coco', quantite: '100ml' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 350,
-      proteines: 18,
-      glucides: 55,
-      lipides: 12,
-      objectif: 'Récupération',
-      etapes: [
-        'Couper la mangue et banane',
-        'Ajouter tous les ingrédients',
-        'Mixer jusqu\'à texture lisse',
-        'Ajouter des glaçons',
-        'Servir immédiatement'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '19',
-      nom: 'Bowl de légumes rôtis',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Patates douces', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Poivron rouge', quantite: '80g' },
-        { nom: 'Chou kale', quantite: '50g' },
-        { nom: 'Huile d\'olive', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 12,
-      glucides: 55,
-      lipides: 10,
-      objectif: 'Équilibre',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper tous les légumes',
-        'Mélanger avec l\'huile d\'olive',
-        'Enfourner 25 minutes',
-        'Servir chaud'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '20',
-      nom: 'Omelette aux légumes',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs', quantite: '3 unités' },
-        { nom: 'Poivron rouge', quantite: '50g' },
-        { nom: 'Chou kale', quantite: '30g' },
-        { nom: 'Fromage râpé', quantite: '20g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 12,
-      lipides: 26,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Couper les légumes finement',
-        'Battre les œufs',
-        'Faire revenir les légumes',
-        'Verser les œufs battus',
-        'Ajouter le fromage et plier'
-      ],
-      emoji: '🍳'
-    },
-    {
-      id: '21',
-      nom: 'Salade de fruits énergétique',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Mangue', quantite: '80g' },
-        { nom: 'Banane', quantite: '1/2 unité' },
-        { nom: 'Myrtilles', quantite: '50g' },
-        { nom: 'Noix de cajou', quantite: '15g' }
-      ],
-      calories: 220,
-      proteines: 4,
-      glucides: 45,
-      lipides: 6,
-      objectif: 'Performance',
-      etapes: [
-        'Couper tous les fruits en dés',
-        'Mélanger dans un bol',
-        'Ajouter les myrtilles',
-        'Saupoudrer de noix de cajou',
-        'Servir frais'
-      ],
-      emoji: '🍓'
-    },
-    {
-      id: '22',
-      nom: 'Curry de lentilles',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Lentilles', quantite: '200g' },
-        { nom: 'Tomates', quantite: '150g' },
-        { nom: 'Oignons', quantite: '50g' },
-        { nom: 'Épices curry', quantite: '10g' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 25,
-      glucides: 70,
-      lipides: 8,
-      objectif: 'Équilibre',
-      etapes: [
-        'Faire revenir les oignons',
-        'Ajouter les épices curry',
-        'Incorporer les tomates',
-        'Ajouter les lentilles et eau',
-        'Laisser mijoter 30 minutes'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '23',
-      nom: 'Granola maison',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Flocons d\'avoine', quantite: '100g' },
-        { nom: 'Amandes', quantite: '30g' },
-        { nom: 'Noix de cajou', quantite: '20g' },
-        { nom: 'Graines de chia', quantite: '15g' },
-        { nom: 'Huile de coco', quantite: '20g' }
-      ],
-      calories: 580,
-      proteines: 18,
-      glucides: 65,
-      lipides: 28,
-      objectif: 'Performance',
-      etapes: [
-        'Mélanger tous les ingrédients',
-        'Ajouter l\'huile de coco fondue',
-        'Étaler sur une plaque',
-        'Enfourner 20 min à 180°C',
-        'Laisser refroidir avant de servir'
-      ],
-      emoji: '🥣'
-    },
-    {
-      id: '24',
-      nom: 'Haricots verts vapeur au saumon',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Saumon', quantite: '150g' },
-        { nom: 'Haricots verts', quantite: '200g' },
-        { nom: 'Pomme de terre', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 450,
-      proteines: 35,
-      glucides: 35,
-      lipides: 20,
-      objectif: 'Récupération',
-      etapes: [
-        'Cuire les pommes de terre à l\'eau',
-        'Cuire les haricots verts à la vapeur',
-        'Griller le saumon avec l\'ail',
-        'Assaisonner avec huile d\'olive',
-        'Servir chaud'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '25',
-      nom: 'Salade de dinde aux noix',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Dinde', quantite: '120g' },
-        { nom: 'Salade verte', quantite: '100g' },
-        { nom: 'Noix de Grenoble', quantite: '20g' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Vinaigrette', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 28,
-      glucides: 15,
-      lipides: 18,
-      objectif: 'Sèche',
-      etapes: [
-        'Griller la dinde et la découper',
-        'Préparer la salade verte',
-        'Couper le kiwi en rondelles',
-        'Mélanger tous les ingrédients',
-        'Arroser de vinaigrette'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '26',
-      nom: 'Smoothie vert détox',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Gingembre', quantite: '5g' },
-        { nom: 'Miel', quantite: '10g' },
-        { nom: 'Eau de coco', quantite: '200ml' }
-      ],
-      calories: 120,
-      proteines: 3,
-      glucides: 25,
-      lipides: 2,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Laver les épinards',
-        'Éplucher et couper le kiwi',
-        'Râper le gingembre',
-        'Mixer tous les ingrédients',
-        'Filtrer et servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '27',
-      nom: 'Curry de légumes aux épices',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '150g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Ail', quantite: '3 gousses' },
-        { nom: 'Épices curry', quantite: '15g' }
-      ],
-      calories: 280,
-      proteines: 8,
-      glucides: 55,
-      lipides: 4,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper les légumes en morceaux',
-        'Faire revenir l\'ail et les épices',
-        'Ajouter les légumes',
-        'Laisser mijoter 25 minutes',
-        'Servir avec du riz'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '28',
-      nom: 'Toast à l\'avocat et œuf',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Pain complet', quantite: '2 tranches' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Œuf', quantite: '1 unité' },
-        { nom: 'Gingembre', quantite: '3g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 18,
-      glucides: 35,
-      lipides: 22,
-      objectif: 'Performance',
-      etapes: [
-        'Griller le pain complet',
-        'Écraser l\'avocat avec le gingembre',
-        'Cuire l\'œuf au plat',
-        'Étaler l\'avocat sur le pain',
-        'Ajouter l\'œuf et servir'
-      ],
-      emoji: '🥑'
-    },
-    {
-      id: '29',
-      nom: 'Thé vert aux fruits',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Thé vert', quantite: '250ml' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Miel', quantite: '5g' },
-        { nom: 'Gingembre', quantite: '2g' },
-        { nom: 'Citron', quantite: '1/2 unité' }
-      ],
-      calories: 80,
-      proteines: 1,
-      glucides: 18,
-      lipides: 0.5,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Infuser le thé vert 3 minutes',
-        'Couper le kiwi en dés',
-        'Ajouter le gingembre râpé',
-        'Mélanger avec le miel',
-        'Ajouter le citron et servir'
-      ],
-      emoji: '🍵'
-    },
-    {
-      id: '30',
-      nom: 'Bowl de légumes rôtis aux herbes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Ail', quantite: '4 gousses' },
-        { nom: 'Herbes de Provence', quantite: '10g' },
-        { nom: 'Huile d\'olive', quantite: '15g' }
-      ],
-      calories: 350,
-      proteines: 8,
-      glucides: 55,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper les légumes en morceaux',
-        'Mélanger avec l\'ail et les herbes',
-        'Arroser d\'huile d\'olive',
-        'Enfourner 30 minutes'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '31',
-      nom: 'Café protéiné',
-      categorie: 'Pre-workout',
-      ingredients: [
-        { nom: 'Café', quantite: '200ml' },
-        { nom: 'Protéine vanille', quantite: '20g' },
-        { nom: 'Miel', quantite: '10g' },
-        { nom: 'Lait d\'amande', quantite: '50ml' },
-        { nom: 'Cannelle', quantite: '2g' }
-      ],
-      calories: 150,
-      proteines: 18,
-      glucides: 15,
-      lipides: 2,
-      objectif: 'Boost performance',
-      etapes: [
-        'Préparer le café',
-        'Ajouter la protéine en poudre',
-        'Mélanger avec le miel',
-        'Ajouter le lait d\'amande',
-        'Saupoudrer de cannelle'
-      ],
-      emoji: '☕'
-    },
-    {
-      id: '32',
-      nom: 'Salade de fruits aux noix',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Kiwi', quantite: '2 unités' },
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Noix de Grenoble', quantite: '25g' },
-        { nom: 'Miel', quantite: '8g' },
-        { nom: 'Gingembre', quantite: '3g' }
-      ],
-      calories: 280,
-      proteines: 6,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Performance',
-      etapes: [
-        'Couper tous les fruits en dés',
-        'Concasser les noix',
-        'Mélanger avec le miel',
-        'Ajouter le gingembre râpé',
-        'Servir frais'
-      ],
-      emoji: '🍓'
-    },
-    {
-      id: '33',
-      nom: 'Dinde aux légumes vapeur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Dinde', quantite: '150g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Pommes de terre', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Herbes', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 35,
-      glucides: 35,
-      lipides: 12,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner la dinde avec l\'ail',
-        'Cuire les légumes à la vapeur',
-        'Griller la dinde 8-10 minutes',
-        'Ajouter les herbes fraîches',
-        'Servir chaud'
-      ],
-      emoji: '🦃'
-    },
-    {
-      id: '34',
-      nom: 'Soupe de céleri détox',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Céleri', quantite: '200g' },
-        { nom: 'Pommes de terre', quantite: '100g' },
-        { nom: 'Oignons', quantite: '50g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Bouillon de légumes', quantite: '300ml' }
-      ],
-      calories: 180,
-      proteines: 6,
-      glucides: 35,
-      lipides: 2,
-      objectif: 'Sèche',
-      etapes: [
-        'Couper tous les légumes en dés',
-        'Faire revenir l\'oignon et l\'ail',
-        'Ajouter les légumes et le bouillon',
-        'Laisser mijoter 20 minutes',
-        'Mixer et servir chaud'
-      ],
-      emoji: '🍲'
-    },
-    {
-      id: '35',
-      nom: 'Cabillaud aux pistaches',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Cabillaud', quantite: '150g' },
-        { nom: 'Pistaches', quantite: '25g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Citron', quantite: '1/2 unité' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 32,
-      glucides: 12,
-      lipides: 18,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner le cabillaud',
-        'Cuire à la vapeur 8 minutes',
-        'Faire griller les pistaches',
-        'Cuire les haricots verts',
-        'Servir avec citron et huile'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '36',
-      nom: 'Pâtes complètes au tofu',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Pâtes complètes', quantite: '100g' },
-        { nom: 'Tofu', quantite: '100g' },
-        { nom: 'Tomates', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Basilic', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 22,
-      glucides: 65,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire les pâtes al dente',
-        'Faire revenir le tofu',
-        'Ajouter tomates et ail',
-        'Mélanger avec les pâtes',
-        'Garnir de basilic frais'
-      ],
-      emoji: '🍝'
-    },
-    {
-      id: '37',
-      nom: 'Smoothie aux framboises',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Framboises', quantite: '100g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '150g' },
-        { nom: 'Lait de coco', quantite: '100ml' },
-        { nom: 'Miel', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 18,
-      glucides: 45,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Laver les framboises',
-        'Éplucher la banane',
-        'Mixer tous les ingrédients',
-        'Ajouter le miel',
-        'Servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '38',
-      nom: 'Curry de légumes au curcuma',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Tofu', quantite: '80g' },
-        { nom: 'Curcuma', quantite: '5g' },
-        { nom: 'Lait de coco', quantite: '100ml' }
-      ],
-      calories: 350,
-      proteines: 15,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Couper les légumes en morceaux',
-        'Faire revenir avec le curcuma',
-        'Ajouter le lait de coco',
-        'Incorporer le tofu',
-        'Laisser mijoter 20 minutes'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '39',
-      nom: 'Salade d\'oranges aux pistaches',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Oranges', quantite: '2 unités' },
-        { nom: 'Pistaches', quantite: '20g' },
-        { nom: 'Menthe', quantite: '5g' },
-        { nom: 'Miel', quantite: '8g' },
-        { nom: 'Cumin', quantite: '2g' }
-      ],
-      calories: 220,
-      proteines: 6,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Éplucher et couper les oranges',
-        'Concasser les pistaches',
-        'Mélanger avec le miel',
-        'Ajouter la menthe et cumin',
-        'Servir frais'
-      ],
-      emoji: '🍊'
-    },
-    {
-      id: '40',
-      nom: 'Bowl de légumes aux épices',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Céleri', quantite: '100g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Tofu', quantite: '80g' },
-        { nom: 'Cumin', quantite: '5g' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 18,
-      glucides: 25,
-      lipides: 14,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper tous les légumes',
-        'Faire revenir avec cumin',
-        'Ajouter le tofu en dés',
-        'Assaisonner avec huile',
-        'Servir chaud'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '41',
-      nom: 'Cabillaud aux légumes vapeur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Cabillaud', quantite: '150g' },
-        { nom: 'Céleri', quantite: '80g' },
-        { nom: 'Haricots verts', quantite: '80g' },
-        { nom: 'Citron', quantite: '1 unité' },
-        { nom: 'Herbes', quantite: '5g' }
-      ],
-      calories: 250,
-      proteines: 28,
-      glucides: 15,
-      lipides: 8,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner le cabillaud',
-        'Cuire les légumes à la vapeur',
-        'Griller le poisson 8 minutes',
-        'Arroser de citron',
-        'Garnir d\'herbes fraîches'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '42',
-      nom: 'Smoothie vert aux épices',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Céleri', quantite: '50g' },
-        { nom: 'Curcuma', quantite: '3g' },
-        { nom: 'Gingembre', quantite: '5g' },
-        { nom: 'Lait de coco', quantite: '150ml' }
-      ],
-      calories: 150,
-      proteines: 4,
-      glucides: 12,
-      lipides: 10,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Laver les légumes verts',
-        'Ajouter les épices',
-        'Mixer avec le lait de coco',
-        'Filtrer si nécessaire',
-        'Servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '43',
-      nom: 'Tofu aux légumes sautés',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Tofu', quantite: '120g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Céleri', quantite: '80g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 20,
-      glucides: 18,
-      lipides: 18,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper le tofu en dés',
-        'Faire revenir dans l\'huile',
-        'Ajouter les légumes',
-        'Assaisonner avec ail',
-        'Servir chaud'
-      ],
-      emoji: '🧀'
+      nom: 'Poulet rôti aux patates douces',
+      type: 'Midi',
+      emoji: '🍗',
+      calories: 720
     }
   ];
-
-  // Filtres pour aliments
-  const alimentFilters = [
-    { value: 'all', label: 'Tous', icon: Apple },
-    { value: 'protéines', label: 'Protéines', icon: Target },
-    { value: 'glucides', label: 'Glucides', icon: Zap },
-    { value: 'lipides', label: 'Lipides', icon: Target },
-    { value: 'micronutriments', label: 'Micronutriments', icon: Star }
-  ];
-
-  // Filtres pour repas
-  const repasFilters = [
-    { value: 'all', label: 'Tous', icon: Utensils },
-    { value: 'petit-déjeuner', label: 'Petit-déjeuner', icon: Clock },
-    { value: 'déjeuner', label: 'Déjeuner', icon: ChefHat },
-    { value: 'dîner', label: 'Dîner', icon: Utensils },
-    { value: 'post-training', label: 'Post-training', icon: Zap }
-  ];
-
-  // Filtrer les aliments
-  const filteredAliments = aliments.filter(aliment => {
-    const matchesSearch = aliment.nom.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || aliment.categorie.toLowerCase() === selectedFilter;
-    return matchesSearch && matchesFilter;
-  });
-
-  // Filtrer les repas
-  const filteredRepas = repas.filter(repas => {
-    const matchesSearch = repas.nom.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || repas.categorie.toLowerCase() === selectedFilter;
-    return matchesSearch && matchesFilter;
-  });
-
-  // Toggle favori
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) 
-        ? prev.filter(fav => fav !== id)
-        : [...prev, id]
-    );
-  };
-
-  // Couleur pour l'index glycémique
-  const getIGColor = (ig: string) => {
-    switch (ig) {
-      case 'Bas': return 'bg-green-100 text-green-800';
-      case 'Modéré': return 'bg-yellow-100 text-yellow-800';
-      case 'Élevé': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Couleur pour la classe nutritionnelle
-  const getClasseColor = (classe: string) => {
-    switch (classe) {
-      case 'Prise de masse': return 'bg-blue-100 text-blue-800';
-      case 'Sèche': return 'bg-red-100 text-red-800';
-      case 'Récupération': return 'bg-green-100 text-green-800';
-      case 'Anti-inflammatoire': return 'bg-purple-100 text-purple-800';
-      case 'Boost performance': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
-            <Apple className="h-6 w-6 text-white" />
+    <PageLayout>
+      <div className="container mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+              <Apple className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">Nutrition</h1>
+              <p className="text-muted-foreground">Gérez votre alimentation et vos apports</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Nutrition</h1>
-            <p className="text-gray-600">Gérez votre alimentation et vos apports</p>
-          </div>
-        </div>
-        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
-          <Plus className="h-4 w-4 mr-2" />
-          Créer un repas
-        </Button>
+          <Button className="gradient-primary text-primary-foreground font-semibold shadow-elegant w-full md:w-auto">
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter aliment
+          </Button>
         </div>
 
-      {/* Recherche */}
-      <Card className="bg-white border-0 shadow-lg">
-        <CardContent className="p-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <Input
-                placeholder="Rechercher un aliment ou un repas..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 text-lg border-2 border-gray-200 focus:border-green-500 bg-white"
+        {/* Statistiques */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard
+          title="Aliments"
+          value={stats.totalFoods}
+          icon={Apple}
+          color="blue"
+        />
+        <StatCard
+          title="Repas"
+          value={stats.totalRepas}
+          icon={Utensils}
+          color="green"
+        />
+        <StatCard
+          title="Populaires"
+          value={stats.popularFoods + stats.popularRepas}
+          icon={Target}
+          color="orange"
+        />
+        <StatCard
+          title="Moyenne"
+          value={`${stats.averageCalories} cal`}
+          icon={TrendingUp}
+          color="purple"
+        />
+      </div>
+
+        {/* Recherche et filtres */}
+        <Card className="bg-card border-0 shadow-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-3 text-foreground text-xl md:text-2xl">
+            <div className="bg-primary/10 rounded-full p-2">
+              <Search className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+            </div>
+            Recherche et filtres
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 h-12 text-base md:text-lg border-2 border-input focus:border-primary bg-background"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Onglets */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        {/* Onglets */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="aliments" className="flex items-center gap-2">
             <Apple className="h-4 w-4" />
-            Aliments ({filteredAliments.length})
+              Aliments ({filteredFoods.length})
             </TabsTrigger>
           <TabsTrigger value="repas" className="flex items-center gap-2">
             <Utensils className="h-4 w-4" />
@@ -1904,9 +2553,8 @@ const Nutrition: React.FC = () => {
 
         {/* Onglet Aliments */}
         <TabsContent value="aliments" className="space-y-6">
-          {/* Filtres */}
           <div className="flex flex-wrap gap-2">
-            {alimentFilters.map((filter) => (
+            {filters.map((filter) => (
               <Button
                 key={filter.value}
                 variant={selectedFilter === filter.value ? "default" : "outline"}
@@ -1914,7 +2562,7 @@ const Nutrition: React.FC = () => {
                 onClick={() => setSelectedFilter(filter.value)}
                 className={`flex items-center gap-2 ${
                   selectedFilter === filter.value 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                     : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
                 }`}
               >
@@ -1924,98 +2572,87 @@ const Nutrition: React.FC = () => {
             ))}
                         </div>
 
-          {/* Liste des aliments */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAliments.map((aliment) => (
+            {filteredFoods.map((food) => (
               <Card 
-                key={aliment.id} 
-                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => navigate(`/aliment/${aliment.id}`)}
+                key={food.id} 
+                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                onClick={() => navigate(`/nutrition/${food.id}`)}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div className="text-4xl mb-2">{aliment.emoji}</div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleFavorite(aliment.id)}
-                      className={`p-2 ${
-                        favorites.includes(aliment.id) 
-                          ? 'text-red-500' 
-                          : 'text-gray-400 hover:text-red-500'
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 ${favorites.includes(aliment.id) ? 'fill-current' : ''}`} />
-                    </Button>
-                  </div>
-                  <CardTitle className="text-gray-800 text-xl">{aliment.nom}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
-                      {aliment.categorie}
+                    <div className="text-4xl mb-2">{food.emoji}</div>
+                    {food.isPopular && (
+                      <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                        <Target className="h-3 w-3 mr-1" />
+                        Populaire
                       </Badge>
-                    <Badge className={getIGColor(aliment.ig)}>
-                      IG {aliment.ig}
-                    </Badge>
+                    )}
                       </div>
+                  <CardTitle className="text-gray-800 text-xl">{food.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Valeurs nutritionnelles */}
+                    <p className="text-gray-600 text-sm">{food.description}</p>
+                    
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{aliment.calories}</div>
+                        <div className="text-2xl font-bold text-gray-800">{food.calories}</div>
                         <div className="text-sm text-gray-600">Calories</div>
                         </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{aliment.proteines}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{food.protein}g</div>
                         <div className="text-sm text-gray-600">Protéines</div>
                         </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{aliment.glucides}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{food.carbs}g</div>
                         <div className="text-sm text-gray-600">Glucides</div>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{aliment.lipides}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{food.fat}g</div>
                         <div className="text-sm text-gray-600">Lipides</div>
                       </div>
                     </div>
                     
-                    {/* Classe nutritionnelle */}
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Classe</span>
-                      <Badge className={getClasseColor(aliment.classe)}>
-                        {aliment.classe}
+                      <span className="text-gray-600">Catégorie</span>
+                      <Badge 
+                        variant="outline" 
+                        className="border-blue-300 text-blue-700 bg-blue-50"
+                      >
+                        {food.category}
                         </Badge>
                     </div>
                     
-                    {/* Tags */}
-                    {aliment.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {aliment.tags.map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs text-gray-600">
-                            {tag}
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Objectif</span>
+                      <Badge className={getGoalColor(food.goal)}>
+                        {food.goal}
                         </Badge>
-                        ))}
                       </div>
-                    )}
 
-                    {/* Micronutriments */}
-                    {aliment.micronutriments.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-1">Micronutriments :</p>
-                        <div className="flex flex-wrap gap-1">
-                          {aliment.micronutriments.map((nutrient, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {nutrient}
-                            </Badge>
-                          ))}
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Popularité</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-orange-400 to-orange-600 h-2 rounded-full"
+                            style={{ width: `${food.popularity}%` }}
+                          ></div>
                         </div>
+                        <span className="text-sm font-medium text-gray-600">{food.popularity}%</span>
                         </div>
-                    )}
+                      </div>
 
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ajouter à un repas
+                    <Button 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/nutrition/${food.id}`);
+                      }}
+                    >
+                      <Zap className="h-4 w-4 mr-2" />
+                      Ajouter
                         </Button>
                       </div>
                     </CardContent>
@@ -2026,7 +2663,6 @@ const Nutrition: React.FC = () => {
 
         {/* Onglet Repas */}
         <TabsContent value="repas" className="space-y-6">
-          {/* Filtres */}
           <div className="flex flex-wrap gap-2">
             {repasFilters.map((filter) => (
               <Button
@@ -2036,7 +2672,7 @@ const Nutrition: React.FC = () => {
                 onClick={() => setSelectedFilter(filter.value)}
                 className={`flex items-center gap-2 ${
                   selectedFilter === filter.value 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                     : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
                 }`}
               >
@@ -2046,77 +2682,85 @@ const Nutrition: React.FC = () => {
             ))}
           </div>
 
-          {/* Liste des repas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRepas.map((repas) => (
               <Card 
                 key={repas.id} 
-                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                 onClick={() => navigate(`/repas/${repas.id}`)}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="text-4xl mb-2">{repas.emoji}</div>
-                    <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">
-                      {repas.categorie}
-                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      <span className="text-sm font-semibold text-gray-700">{repas.rating}</span>
                     </div>
-                  <CardTitle className="text-gray-800 text-xl">{repas.nom}</CardTitle>
-                  <Badge className={getClasseColor(repas.objectif)}>
-                    {repas.objectif}
-                  </Badge>
+                  </div>
+                  <CardTitle className="text-gray-800 text-xl">{repas.name}</CardTitle>
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex items-center gap-1">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                      {repas.calories} cal
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-blue-500" />
+                      {repas.prepTime} min
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ChefHat className="h-4 w-4 text-purple-500" />
+                      {repas.servings} portion{repas.servings > 1 ? 's' : ''}
+                        </div>
+                      </div>
                     </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Valeurs nutritionnelles */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge className={getDifficultyColor(repas.difficulty)}>
+                        {repas.difficulty}
+                        </Badge>
+                      <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
+                        {repas.category}
+                        </Badge>
+                      <Badge className={getGoalColor(repas.goal)}>
+                        {repas.goal}
+                      </Badge>
+                      {repas.isPopular && (
+                        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+                          <Star className="h-3 w-3 mr-1" />
+                          Populaire
+                        </Badge>
+                      )}
+                      </div>
+
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{repas.calories}</div>
-                        <div className="text-sm text-gray-600">Calories</div>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{repas.proteines}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{repas.protein}g</div>
                         <div className="text-sm text-gray-600">Protéines</div>
                         </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{repas.glucides}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{repas.carbs}g</div>
                         <div className="text-sm text-gray-600">Glucides</div>
                         </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <div className="text-2xl font-bold text-gray-800">{repas.lipides}g</div>
+                        <div className="text-2xl font-bold text-gray-800">{repas.fat}g</div>
                         <div className="text-sm text-gray-600">Lipides</div>
                         </div>
-                    </div>
-
-                    {/* Ingrédients */}
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Ingrédients :</p>
-                      <div className="space-y-1">
-                        {repas.ingredients.map((ingredient, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span className="text-gray-600">{ingredient.nom}</span>
-                            <span className="font-medium text-gray-800">{ingredient.quantite}</span>
-                          </div>
-                        ))}
+                      <div className="text-center p-3 bg-gray-50 rounded-lg">
+                        <div className="text-2xl font-bold text-gray-800">{repas.fiber}g</div>
+                        <div className="text-sm text-gray-600">Fibres</div>
                         </div>
                       </div>
 
-                    {/* Étapes */}
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">Préparation :</p>
-                      <ol className="text-sm text-gray-600 space-y-1">
-                        {repas.etapes.map((etape, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-green-600 font-bold">{index + 1}.</span>
-                            <span>{etape}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ajouter au planning
+                    <Button 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/repas/${repas.id}`);
+                      }}
+                    >
+                      <ChefHat className="h-4 w-4 mr-2" />
+                      Voir la recette
                         </Button>
                       </div>
                     </CardContent>
@@ -2125,7 +2769,8 @@ const Nutrition: React.FC = () => {
               </div>
           </TabsContent>
         </Tabs>
-    </div>
+      </div>
+    </PageLayout>
   );
 };
 

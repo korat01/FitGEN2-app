@@ -132,7 +132,7 @@ export const Login: React.FC = () => {
         userFinal.hasOwnProperty('globalScore')
       ) {
         // Vérification supplémentaire : s'assurer que tous les champs obligatoires du type User sont bien présents
-        login(userFinal as User); // Correction du cast pour éviter l'erreur de type
+        login(userFinal as import('../contexts/AuthContext').User); // Correction du cast pour éviter l'erreur de type
         console.log('✅ Connexion réussie !');
         navigate('/dashboard');
       } else {

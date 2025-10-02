@@ -23,12 +23,12 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border shadow-elegant">
-      <div className="container mx-auto px-4 py-3">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-b border-border shadow-elegant safe-area-pt">
+      <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2 md:gap-4">
-            <h1 className="text-xl md:text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+            <h1 className="text-lg md:text-2xl font-bold gradient-primary bg-clip-text text-transparent">
               FitGEN22
             </h1>
             
@@ -40,21 +40,17 @@ const AppHeader: React.FC = () => {
               <Link to="/nutrition" className="text-foreground/70 hover:text-foreground transition-colors">
                 Nutrition
               </Link>
-              {/* <Link to="/stats" className="text-foreground/70 hover:text-foreground transition-colors">
-                Stats
-              </Link> */}
               <Link to="/blocs-entrainement" className="text-foreground/70 hover:text-foreground transition-colors">
                 Exercices
               </Link>
               <Link to="/programme" className="text-foreground/70 hover:text-foreground transition-colors">
                 Programme
               </Link>
-              {/* Lien Nutrition supprimé */}
             </nav>
           </div>
 
           {/* Actions utilisateur */}
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3">
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>

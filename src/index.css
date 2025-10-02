@@ -67,6 +67,27 @@ All colors MUST be HSL.
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
   }
+  
+  /* iOS Safe Area Support */
+  .safe-area-pt {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-px {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* Mobile touch optimization */
+  @media (hover: none) {
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
 }
 
 @layer components {

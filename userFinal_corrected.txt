@@ -1,0 +1,20 @@
+﻿      // Correction : ajout des champs manquants pour correspondre au type User
+      const userFinal = {
+        ...userComplet,
+        focus_abdominaux: false,
+        focus_calisthenics: false,
+        focus_jambes: false,
+        focus_bras: false,
+        location: '',
+        duration: 0,
+        level: '',
+        sport: '',
+        sexe: '',
+        birthday: '',
+        taille: 0,
+        poids: 0,
+        email: formData.email,
+        name: formData.name,
+        uid: '', // à compléter si besoin
+        // Ajoutez ici d'autres champs requis par le type User si nécessaire
+      };

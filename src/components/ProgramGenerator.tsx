@@ -10,6 +10,8 @@ import {
   RefreshCw,
   Settings
 } from 'lucide-react';
+import { genererProgrammeAdapte } from '../utils/programmeGeneratorV2';
+import { generateSprintProgram } from '../utils/sprintProgramGenerator';
 
 interface ProgramGeneratorProps {
   selectedDays: string[];

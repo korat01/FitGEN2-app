@@ -948,82 +948,924 @@ export const applyProgression = (exercise: Exercise, phase: string, level: strin
 };
 
 // Fonction principale de génération de programme - AMÉLIORÉE
-export const generateProgramme = async (user: UserProfile): Promise<Programme> => {
-  console.log('🚀 Début de la génération du programme pour:', user);
+export const generateProgramme = (user: UserProfile): Programme => {
+  console.log('=== GENERATE PROGRAMME ===');
+  console.log('User sportClass:', user.sportClass);
   
-  const analysis = analyzeProfile(user);
-  console.log('📊 Analyse du profil:', analysis);
-  console.log('📅 Jours d\'entraînement sélectionnés:', analysis.trainingDays);
-  console.log('🏋️ Classe de sport:', analysis.sportClass);
+  if (user.sportClass === 'sprint') {
+    console.log('✅ Génération programme sprint');
+    return generateSprintProgramme(user);
+  } else if (user.sportClass === 'power') {
+    console.log('✅ Génération programme powerlifting');
+    return generatePowerliftingProgramme(user);
+  } else if (user.sportClass === 'streetlifting' || user.sportClass === 'street') {
+    console.log('✅ Génération programme street lifting');
+    return generateStreetLiftingProgramme(user);
+  } else if (user.sportClass === 'calisthenics') {
+    console.log('✅ Génération programme calisthenics');
+    return generateCalisthenicsProgramme(user);
+  } else if (user.sportClass === 'marathon') {
+    console.log('✅ Génération programme marathon');
+    return generateMarathonProgramme(user);
+  } else if (user.sportClass === 'classique') {
+    console.log('✅ Génération programme musculation classique');
+    return generateMusculationClassiqueProgramme(user);
+  } else if (user.sportClass === 'crossfit') {
+    console.log('✅ Génération programme crossfit');
+    return generateCrossfitProgramme(user);
+  } else {
+    console.log('❌ Classe non supportée:', user.sportClass);
+    return generateDefaultProgramme(user);
+  }
+};
 
-  // Filtrer les exercices selon le profil
-  let availableExercises = [...exercicesDatabase];
-  availableExercises = filterBySportClass(availableExercises, analysis.sportClass);
-  availableExercises = adaptToLevel(availableExercises, analysis.level);
+// Nouvelle fonction pour le sprint
+function generateSprintProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE SPRINT PROGRAMME ===');
+  console.log('User:', user);
   
-  // NOUVELLE LOGIQUE : Répartition intelligente selon les focus
-  availableExercises = distributeExercisesByFocus(availableExercises, analysis.focus);
-
-  console.log('🏋️ Exercices disponibles après filtrage:', availableExercises.length);
-
-  const sessions: Session[] = [];
-  const phases = {
-    adaptation: [] as Session[],
-    progression: [] as Session[],
-    specialisation: [] as Session[]
-  };
-
-  // CORRECTION : Générer UNE SEULE session par jour, pas plusieurs
-  const phasesList = ['adaptation', 'progression', 'specialisation'];
-
-  phasesList.forEach((phase, phaseIndex) => {
-    analysis.trainingDays.forEach((day, dayIndex) => {
-      // Créer UNE session par jour pour cette phase
-      const sessionId = `session_${phase}_${day}`;
-      const exercises = selectExercisesForDay(day, analysis.focus, analysis.sportClass, analysis.level, phase);
-      const sessionName = generateSessionName(exercises, analysis.sportClass, day);
-      
-      const session: Session = {
-        id: sessionId,
-        nom: sessionName,
-        day,
-        exercises,
-        duration: calculateSessionDuration(exercises, analysis.level),
-        intensity: calculateIntensity(phase, analysis.level),
-        phase: phase as 'Adaptation' | 'Progression' | 'Spécialisation',
-        focus: analysis.focus,
-        notes: generatePersonalizedNotes(analysis, phase),
-        equipment: getRequiredEquipment(exercises)
-      };
-
+  const sessions = [];
+  const seancesParSemaine = 4;
+  const duree = 4;
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createSprintSession(semaine, jour, user);
       sessions.push(session);
-      phases[phase as keyof typeof phases].push(session);
-    });
-  });
-
-  console.log(`📊 Sessions générées: ${sessions.length} (${analysis.trainingDays.length} jours × 3 phases)`);
-  console.log(` Sessions par jour: ${sessions.length / analysis.trainingDays.length}`);
-
+      console.log(`Session créée: ${semaine}-${jour}`);
+    }
+  }
+  
   const programme: Programme = {
-    id: `programme_${user.id || Date.now()}`,
-    nom: `Programme ${analysis.sportClass} - ${analysis.level}`,
-    description: `Programme personnalisé de ${analysis.duration} mois pour ${analysis.sportClass} (${analysis.trainingDays.join(', ')})`,
-    duree: analysis.duration,
+    id: Date.now().toString(),
+    nom: `Programme Sprint - ${user.niveau || 'intermediaire'}`,
+    description: 'Programme d\'entraînement sprint avec progression sur 4 semaines',
+    duree,
     sessions,
-    phases,
+    phases: {
+      adaptation: [],
+      progression: [],
+      specialisation: []
+    },
     progression: {
       totalSessions: sessions.length,
-      sessionsParSemaine: analysis.trainingDays.length,
+      sessionsParSemaine: seancesParSemaine,
       dureeMoyenne: sessions.reduce((acc, s) => acc + s.duration, 0) / sessions.length
     }
   };
-
-  console.log('✅ Programme généré:', programme);
-  console.log(`📅 Sessions générées pour les jours: ${analysis.trainingDays.join(', ')}`);
-  console.log(`🏋️ Classe de sport appliquée: ${analysis.sportClass}`);
+  
+  console.log('Programme sprint final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
   
   return programme;
-};
+}
+
+function createSprintSession(semaine: number, jour: number, user: UserProfile) {
+  const estDeload = semaine === 4;
+  
+  let exercices = [];
+  
+  if (jour === 1) {
+    // Séance vitesse max
+    exercices = [
+      { nom: 'Sprints 30m', series: estDeload ? 4 : 6, reps: 1, poids: 0, repos: 120 },
+      { nom: 'Sprints 60m', series: estDeload ? 3 : 4, reps: 1, poids: 0, repos: 180 },
+      { nom: 'Box jumps', series: estDeload ? 3 : 4, reps: 8, poids: 0, repos: 90 }
+    ];
+  } else if (jour === 2) {
+    // Séance force
+    exercices = [
+      { nom: 'Back Squat', series: estDeload ? 3 : 5, reps: 5, poids: user.weight * 0.8, repos: 180 },
+      { nom: 'Power Clean', series: estDeload ? 3 : 4, reps: 3, poids: user.weight * 0.6, repos: 180 },
+      { nom: 'Hip Thrust', series: estDeload ? 3 : 4, reps: 8, poids: user.weight * 0.5, repos: 90 }
+    ];
+  } else if (jour === 3) {
+    // Séance endurance vitesse
+    exercices = [
+      { nom: 'Sprints 150m', series: estDeload ? 4 : 6, reps: 1, poids: 0, repos: 180 },
+      { nom: 'Sprints 400m', series: estDeload ? 2 : 4, reps: 1, poids: 0, repos: 300 },
+      { nom: 'Bounding', series: estDeload ? 3 : 4, reps: 20, poids: 0, repos: 90 }
+    ];
+  } else {
+    // Séance technique/accessoires
+    exercices = [
+      { nom: 'Drills A/B/C', series: 3, reps: 10, poids: 0, repos: 60 },
+      { nom: 'Core anti-rotation', series: 3, reps: 12, poids: 0, repos: 60 },
+      { nom: 'Nordic hamstring', series: 3, reps: 8, poids: 0, repos: 90 }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour}`,
+    exercises: exercices.map(ex => ({
+      ...ex,
+      progression: {
+        sets: 1,
+        reps: ex.reps,
+        poids: ex.poids,
+        repos: ex.repos
+      }
+    })),
+    duration: exercices.length * 15,
+    intensity: 'Élevée', // Sprint est généralement plus intense
+    phase: 'Progression', // Sprint est généralement dans la phase de progression
+    focus: [], // Sprint n'a pas de focus spécifique
+    notes: estDeload ? 'Semaine de récupération' : '',
+    equipment: []
+  };
+}
+
+// Nouvelle fonction pour le Street Lifting
+function generateStreetLiftingProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE STREET LIFTING PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = 4;
+  const duree = 4;
+  
+  // Calcul des charges maximales basées sur le poids du corps
+  const ratioMax = {
+    debutant: 0.5,   // 50% PDC en charge externe
+    intermediaire: 1.0,
+    avance: 1.5
+  };
+  
+  const niveau = user.niveau || 'intermediaire';
+  const poidsCorps = user.weight || 70;
+  const ratio = ratioMax[niveau as keyof typeof ratioMax] || 1.0;
+  
+  const maxPullUp = poidsCorps + poidsCorps * ratio;
+  const maxDip = poidsCorps + poidsCorps * (ratio + 0.2);
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createStreetLiftingSession(semaine, jour, user, maxPullUp, maxDip);
+      sessions.push(session);
+      console.log(`Session Street Lifting créée: ${semaine}-${jour}`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme Street Lifting - ${niveau}`,
+    description: 'Programme d\'entraînement Street Lifting avec progression lestée sur 4 semaines',
+    duree,
+    seancesParSemaine,
+    sessions,
+    dateCreation: new Date().toISOString(),
+    utilisateurId: user.id
+  };
+  
+  console.log('Programme Street Lifting final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createStreetLiftingSession(semaine: number, jour: number, user: UserProfile, maxPullUp: number, maxDip: number) {
+  const estDeload = semaine === 4;
+  
+  let exercices = [];
+  
+  if (jour % 2 === 1) {
+    // Jour Tirage (Pull-Ups + Accessoires)
+    const chargePullUp = Math.round((0.7 + 0.05 * semaine) * maxPullUp);
+    
+    exercices = [
+      { 
+        nom: 'Pull-Ups lestés', 
+        series: estDeload ? 3 : 5, 
+        reps: estDeload ? 5 : (semaine === 3 ? 3 : 5), 
+        poids: chargePullUp, 
+        repos: 180 
+      },
+      { 
+        nom: 'Front Lever Pulls', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 8 : (semaine === 3 ? 6 : 8), 
+        poids: 0, 
+        repos: 120 
+      },
+      { 
+        nom: 'Face Pulls élastique', 
+        series: 3, 
+        reps: 15, 
+        poids: 0, 
+        repos: 90 
+      },
+      { 
+        nom: 'Biceps Curls barre', 
+        series: 3, 
+        reps: 12, 
+        poids: Math.round(user.weight * 0.3), 
+        repos: 90 
+      }
+    ];
+  } else {
+    // Jour Poussée (Dips + Accessoires)
+    const chargeDip = Math.round((0.7 + 0.05 * semaine) * maxDip);
+    
+    exercices = [
+      { 
+        nom: 'Dips lestés', 
+        series: estDeload ? 3 : 5, 
+        reps: estDeload ? 5 : (semaine === 3 ? 3 : 5), 
+        poids: chargeDip, 
+        repos: 180 
+      },
+      { 
+        nom: 'Handstand Push-Ups', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 6 : (semaine === 3 ? 4 : 6), 
+        poids: 0, 
+        repos: 120 
+      },
+      { 
+        nom: 'Extensions triceps', 
+        series: 3, 
+        reps: 12, 
+        poids: Math.round(user.weight * 0.2), 
+        repos: 90 
+      },
+      { 
+        nom: 'Gainage lesté', 
+        series: 3, 
+        reps: 30, 
+        poids: Math.round(user.weight * 0.1), 
+        repos: 60 
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour} (${jour % 2 === 1 ? 'Tirage' : 'Poussée'})`,
+    exercices,
+    duree: exercices.length * 15,
+    notes: estDeload ? 'Semaine de récupération' : `Charge max Pull-Up: ${Math.round(maxPullUp)}kg, Dip: ${Math.round(maxDip)}kg`
+  };
+}
+
+// Nouvelle fonction pour le Calisthenics
+function generateCalisthenicsProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE CALISTHENICS PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = 4;
+  const duree = 4;
+  
+  // Progressions de base par niveau
+  const progressions = {
+    debutant: { 
+      pushUp: "Push-Ups", 
+      pullUp: "Australian Pull-Ups",
+      dips: "Dips assistés",
+      skill: "Plank Hold"
+    },
+    intermediaire: { 
+      pushUp: "Diamond Push-Ups", 
+      pullUp: "Pull-Ups stricts",
+      dips: "Dips stricts",
+      skill: "Handstand Hold"
+    },
+    avance: { 
+      pushUp: "Pseudo Planche Push-Ups", 
+      pullUp: "Archer Pull-Ups",
+      dips: "Dips lestés",
+      skill: "Front Lever Progression"
+    },
+    expert: { 
+      pushUp: "One Arm Push-Ups", 
+      pullUp: "One Arm Pull-Ups",
+      dips: "Dips lestés lourds",
+      skill: "Planche Lean"
+    }
+  };
+  
+  const niveau = user.niveau || 'intermediaire';
+  const progression = progressions[niveau as keyof typeof progressions] || progressions.intermediaire;
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createCalisthenicsSession(semaine, jour, user, progression, niveau);
+      sessions.push(session);
+      console.log(`Session Calisthenics créée: ${semaine}-${jour}`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme Calisthenics - ${niveau}`,
+    description: 'Programme d\'entraînement Calisthenics avec progression par niveaux sur 4 semaines',
+    duree,
+    seancesParSemaine,
+    sessions,
+    dateCreation: new Date().toISOString(),
+    utilisateurId: user.id
+  };
+  
+  console.log('Programme Calisthenics final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createCalisthenicsSession(semaine: number, jour: number, user: UserProfile, progression: any, niveau: string) {
+  const estDeload = semaine === 4;
+  
+  let exercices = [];
+  
+  if (jour % 2 === 1) {
+    // Push Focus
+    const repsPush = Math.max(3, Math.floor((8 + semaine) * (estDeload ? 0.7 : 1)));
+    const repsDips = Math.max(3, Math.floor((10 + semaine) * (estDeload ? 0.7 : 1)));
+    const tempsSkill = Math.max(5, Math.floor((20 + semaine * 5) * (estDeload ? 0.7 : 1)));
+    
+    exercices = [
+      { 
+        nom: progression.pushUp, 
+        series: estDeload ? 3 : 4, 
+        reps: repsPush, 
+        poids: 0, 
+        repos: 90 
+      },
+      { 
+        nom: progression.dips, 
+        series: estDeload ? 3 : 4, 
+        reps: repsDips, 
+        poids: 0, 
+        repos: 90 
+      },
+      { 
+        nom: progression.skill, 
+        series: estDeload ? 2 : 3, 
+        reps: tempsSkill, 
+        poids: 0, 
+        repos: 60 
+      },
+      { 
+        nom: 'Leg Raises', 
+        series: 3, 
+        reps: Math.max(5, Math.floor((12 + semaine) * (estDeload ? 0.7 : 1))), 
+        poids: 0, 
+        repos: 60 
+      }
+    ];
+  } else {
+    // Pull Focus
+    const repsPull = Math.max(3, Math.floor((6 + semaine) * (estDeload ? 0.7 : 1)));
+    const repsLeg = Math.max(5, Math.floor((12 + semaine) * (estDeload ? 0.7 : 1)));
+    const tempsSkill = Math.max(5, Math.floor((10 + semaine * 5) * (estDeload ? 0.7 : 1)));
+    
+    exercices = [
+      { 
+        nom: progression.pullUp, 
+        series: estDeload ? 3 : 4, 
+        reps: repsPull, 
+        poids: 0, 
+        repos: 120 
+      },
+      { 
+        nom: 'Leg Raises', 
+        series: estDeload ? 3 : 4, 
+        reps: repsLeg, 
+        poids: 0, 
+        repos: 60 
+      },
+      { 
+        nom: progression.skill, 
+        series: estDeload ? 2 : 3, 
+        reps: tempsSkill, 
+        poids: 0, 
+        repos: 90 
+      },
+      { 
+        nom: 'Hollow Body', 
+        series: 3, 
+        reps: Math.max(10, Math.floor((15 + semaine) * (estDeload ? 0.7 : 1))), 
+        poids: 0, 
+        repos: 60 
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour} (${jour % 2 === 1 ? 'Push' : 'Pull'})`,
+    exercices,
+    duree: exercices.length * 12,
+    notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
+  };
+}
+
+// Nouvelle fonction pour le Marathon
+function generateMarathonProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE MARATHON PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = 4;
+  const duree = 4;
+  
+  // VMA par défaut si non spécifiée
+  const vma = user.vma || 15; // km/h
+  const objectif = user.objectif || '10k';
+  const niveau = user.niveau || 'intermediaire';
+  
+  // Allures en fonction de la VMA
+  const allure = {
+    endurance: vma * 0.6,
+    seuil: vma * 0.85,
+    fractionne: vma * 1.0,
+    marathon: vma * 0.75
+  };
+  
+  console.log('VMA:', vma, 'km/h');
+  console.log('Allures:', allure);
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createMarathonSession(semaine, jour, user, allure, objectif, niveau);
+      sessions.push(session);
+      console.log(`Session Marathon créée: ${semaine}-${jour}`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme Marathon - ${objectif} (${niveau})`,
+    description: `Programme d'entraînement marathon pour objectif ${objectif} avec VMA ${vma} km/h`,
+    duree,
+    seancesParSemaine,
+    sessions,
+    dateCreation: new Date().toISOString(),
+    utilisateurId: user.id
+  };
+  
+  console.log('Programme Marathon final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createMarathonSession(semaine: number, jour: number, user: UserProfile, allure: any, objectif: string, niveau: string) {
+  const estDeload = semaine === 4;
+  
+  let exercices = [];
+  
+  if (jour === 1) {
+    // Endurance fondamentale
+    const duree = estDeload ? 30 : (45 + semaine * 5);
+    exercices = [
+      { 
+        nom: 'Footing endurance', 
+        series: 1, 
+        reps: duree, 
+        poids: 0, 
+        repos: 0,
+        details: `Footing ${duree}min à ${allure.endurance.toFixed(1)} km/h (zone 2)`
+      },
+      { 
+        nom: 'Étirements', 
+        series: 1, 
+        reps: 10, 
+        poids: 0, 
+        repos: 0,
+        details: 'Étirements post-course 10min'
+      }
+    ];
+  } else if (jour === 2) {
+    // Fractionné
+    const repetitions = estDeload ? 4 : (6 + semaine);
+    const distance = objectif === 'marathon' ? 1000 : 400;
+    exercices = [
+      { 
+        nom: 'Fractionné', 
+        series: repetitions, 
+        reps: distance, 
+        poids: 0, 
+        repos: 60,
+        details: `${repetitions}x${distance}m à ${allure.fractionne.toFixed(1)} km/h (R=1min)`
+      },
+      { 
+        nom: 'Récupération active', 
+        series: 1, 
+        reps: 10, 
+        poids: 0, 
+        repos: 0,
+        details: 'Footing récupération 10min'
+      }
+    ];
+  } else if (jour === 3) {
+    // Seuil
+    const repetitions = estDeload ? 2 : 3;
+    const duree = estDeload ? 8 : (10 + semaine);
+    exercices = [
+      { 
+        nom: 'Seuil', 
+        series: repetitions, 
+        reps: duree, 
+        poids: 0, 
+        repos: 120,
+        details: `${repetitions}x${duree}min à ${allure.seuil.toFixed(1)} km/h (R=2min)`
+      },
+      { 
+        nom: 'Retour au calme', 
+        series: 1, 
+        reps: 15, 
+        poids: 0, 
+        repos: 0,
+        details: 'Footing retour au calme 15min'
+      }
+    ];
+  } else {
+    // Sortie longue
+    const distance = estDeload ? 8 : (12 + semaine * 2);
+    const distanceMarathon = estDeload ? 2 : (3 + semaine);
+    exercices = [
+      { 
+        nom: 'Sortie longue', 
+        series: 1, 
+        reps: distance, 
+        poids: 0, 
+        repos: 0,
+        details: `Sortie ${distance}km dont ${distanceMarathon}km à ${allure.marathon.toFixed(1)} km/h`
+      },
+      { 
+        nom: 'Renforcement', 
+        series: 3, 
+        reps: 20, 
+        poids: 0, 
+        repos: 60,
+        details: 'Squats, fentes, gainage'
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour}`,
+    exercices,
+    duree: exercices[0].reps + exercices[1].reps,
+    notes: estDeload ? 'Semaine de récupération' : `VMA: ${allure.fractionne.toFixed(1)} km/h`
+  };
+}
+
+// Nouvelle fonction pour la Musculation Classique
+function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE MUSCULATION CLASSIQUE PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = user.seancesParSemaine || 4;
+  const duree = 6; // 6 semaines
+  
+  // Volume ajusté selon le niveau
+  const volume = {
+    debutant: { series: 3, reps: [8, 10] },
+    intermediaire: { series: 4, reps: [8, 12] },
+    avance: { series: 5, reps: [6, 12] }
+  };
+  
+  const niveau = user.niveau || 'intermediaire';
+  const volumeConfig = volume[niveau as keyof typeof volume] || volume.intermediaire;
+  
+  console.log('Niveau:', niveau);
+  console.log('Volume:', volumeConfig);
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createMusculationClassiqueSession(semaine, jour, user, volumeConfig, niveau);
+      sessions.push(session);
+      console.log(`Session Musculation Classique créée: ${semaine}-${jour}`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme Musculation Classique - ${niveau}`,
+    description: `Programme d'hypertrophie Push/Pull/Legs avec progression sur ${duree} semaines`,
+    duree,
+    seancesParSemaine,
+    sessions,
+    dateCreation: new Date().toISOString(),
+    utilisateurId: user.id
+  };
+  
+  console.log('Programme Musculation Classique final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createMusculationClassiqueSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string) {
+  const estDeload = semaine === 6;
+  
+  let exercices = [];
+  let typeSession = '';
+  
+  // Détermine le type de session selon le jour
+  if (jour % 3 === 1) {
+    typeSession = 'Push';
+    exercices = [
+      { 
+        nom: 'Développé couché barre', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.8), 
+        repos: 120 
+      },
+      { 
+        nom: 'Développé incliné haltères', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.6), 
+        repos: 90 
+      },
+      { 
+        nom: 'Développé militaire', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.5), 
+        repos: 90 
+      },
+      { 
+        nom: 'Dips lestés', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.3), 
+        repos: 90 
+      }
+    ];
+  } else if (jour % 3 === 2) {
+    typeSession = 'Pull';
+    exercices = [
+      { 
+        nom: 'Tractions pronation', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: 0, 
+        repos: 120 
+      },
+      { 
+        nom: 'Rowing barre', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.7), 
+        repos: 90 
+      },
+      { 
+        nom: 'Tirage poulie basse', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.6), 
+        repos: 90 
+      },
+      { 
+        nom: 'Curl biceps barre', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.3), 
+        repos: 60 
+      }
+    ];
+  } else {
+    typeSession = 'Legs';
+    exercices = [
+      { 
+        nom: 'Back Squat', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 1.2), 
+        repos: 120 
+      },
+      { 
+        nom: 'Soulevé de terre jambes tendues', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.9), 
+        repos: 120 
+      },
+      { 
+        nom: 'Fentes marchées', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.4), 
+        repos: 90 
+      },
+      { 
+        nom: 'Mollets debout', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
+        poids: Math.round(user.weight * 0.6), 
+        repos: 60 
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour} (${typeSession})`,
+    exercices,
+    duree: exercices.length * 15,
+    notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
+  };
+}
+
+// Nouvelle fonction pour le CrossFit
+function generateCrossfitProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE CROSSFIT PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = user.seancesParSemaine || 5;
+  const duree = 6; // 6 semaines
+  
+  // Volume force selon le niveau
+  const volumeForce = {
+    debutant: { series: 3, reps: [8, 10] },
+    intermediaire: { series: 4, reps: [5, 8] },
+    avance: { series: 5, reps: [3, 6] }
+  };
+  
+  const niveau = user.niveau || 'intermediaire';
+  const volumeConfig = volumeForce[niveau as keyof typeof volumeForce] || volumeForce.intermediaire;
+  
+  console.log('Niveau:', niveau);
+  console.log('Volume:', volumeConfig);
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 1; jour <= seancesParSemaine; jour++) {
+      const session = createCrossfitSession(semaine, jour, user, volumeConfig, niveau);
+      sessions.push(session);
+      console.log(`Session CrossFit créée: ${semaine}-${jour}`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme CrossFit - ${niveau}`,
+    description: `Programme CrossFit avec cycles force, WOD et MetCon sur ${duree} semaines`,
+    duree,
+    seancesParSemaine,
+    sessions,
+    dateCreation: new Date().toISOString(),
+    utilisateurId: user.id
+  };
+  
+  console.log('Programme CrossFit final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createCrossfitSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string) {
+  const estDeload = semaine === 6;
+  
+  let exercices = [];
+  let typeSession = '';
+  
+  if (jour === 1) {
+    // Force Lower Body
+    typeSession = 'Force Lower Body';
+    exercices = [
+      { 
+        nom: 'Back Squat', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: estDeload ? Math.max(5, volumeConfig.reps[0] + 2) : volumeConfig.reps[0], 
+        poids: Math.round(user.weight * 1.2), 
+        repos: 180 
+      },
+      { 
+        nom: 'Deadlift', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: estDeload ? Math.max(5, volumeConfig.reps[0] + 2) : volumeConfig.reps[0], 
+        poids: Math.round(user.weight * 1.3), 
+        repos: 180 
+      },
+      { 
+        nom: 'Front Squat', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 8 : 6, 
+        poids: Math.round(user.weight * 0.9), 
+        repos: 120 
+      }
+    ];
+  } else if (jour === 2) {
+    // WOD Court
+    typeSession = 'WOD Court';
+    exercices = [
+      { 
+        nom: 'Fran', 
+        series: 1, 
+        reps: 1, 
+        poids: 0, 
+        repos: 0,
+        details: '21-15-9 Thrusters + Pull-ups (For Time)'
+      },
+      { 
+        nom: 'Grace', 
+        series: 1, 
+        reps: 1, 
+        poids: 0, 
+        repos: 0,
+        details: '30 Clean & Jerk for time'
+      }
+    ];
+  } else if (jour === 3) {
+    // Haltéro + Metcon
+    typeSession = 'Haltéro + Metcon';
+    exercices = [
+      { 
+        nom: 'Snatch', 
+        series: estDeload ? 4 : 6, 
+        reps: estDeload ? 3 : 2, 
+        poids: Math.round(user.weight * 0.6), 
+        repos: 120 
+      },
+      { 
+        nom: 'Clean & Jerk', 
+        series: estDeload ? 4 : 6, 
+        reps: estDeload ? 3 : 2, 
+        poids: Math.round(user.weight * 0.7), 
+        repos: 120 
+      },
+      { 
+        nom: 'Metcon', 
+        series: 1, 
+        reps: 1, 
+        poids: 0, 
+        repos: 0,
+        details: '10 min AMRAP: 10 Toes-to-Bar, 15 Wall Balls, 20 Double Unders'
+      }
+    ];
+  } else if (jour === 4) {
+    // WOD Long
+    typeSession = 'WOD Long';
+    exercices = [
+      { 
+        nom: 'Cindy', 
+        series: 1, 
+        reps: 1, 
+        poids: 0, 
+        repos: 0,
+        details: '20 min AMRAP: 5 Pull-ups / 10 Push-ups / 15 Air Squats'
+      },
+      { 
+        nom: 'Murph', 
+        series: 1, 
+        reps: 1, 
+        poids: 0, 
+        repos: 0,
+        details: '1 mile run, 100 pull-ups, 200 push-ups, 300 squats, 1 mile run'
+      }
+    ];
+  } else {
+    // Force Haut + Gym
+    typeSession = 'Force Haut + Gym';
+    exercices = [
+      { 
+        nom: 'Push Press', 
+        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
+        reps: estDeload ? Math.max(5, volumeConfig.reps[0] + 2) : volumeConfig.reps[0], 
+        poids: Math.round(user.weight * 0.7), 
+        repos: 120 
+      },
+      { 
+        nom: 'Handstand Push-ups', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 5 : 8, 
+        poids: 0, 
+        repos: 90 
+      },
+      { 
+        nom: 'Muscle-ups', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 3 : 5, 
+        poids: 0, 
+        repos: 120 
+      },
+      { 
+        nom: 'Toes-to-bar', 
+        series: 3, 
+        reps: estDeload ? 8 : 12, 
+        poids: 0, 
+        repos: 60 
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - Jour ${jour} (${typeSession})`,
+    exercices,
+    duree: exercices.length * 20,
+    notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
+  };
+}
 
 // Fonctions utilitaires
 const calculateSessionDuration = (exercises: Exercise[], level: string): number => {
@@ -1086,5 +1928,6 @@ export default {
   generatePanashBrutusProgram,
   generateCrossfitProgram,
   generateMarathonProgram,
-  generateCalisthenicsProgram
+  generateCalisthenicsProgram,
+  generateMusculationClassiqueProgramme
 };

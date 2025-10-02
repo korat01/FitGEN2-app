@@ -25,28 +25,12 @@ export interface UserProfile {
   email: string;
   weight: number;
   age: number;
-  sex: 'male' | 'female';
-  sportClass: 'powerlifter' | 'runner' | 'allround' | 'calisthenics' | 'crossfit' | 'marathon' | 'streetlifting' | 'sprint' | 'classique';
-  phone?: string;
-  location?: string;
-  height?: number;
-  goal?: 'performance' | 'musculation' | 'endurance' | 'sante';
-  generalLevel?: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert';
-  trainingDays?: string[]; // Jours d'entraînement sélectionnés
-  trainingMonths?: number; // Durée d'entraînement en mois
-  [key: `focus_${string}`]: boolean | undefined; // For dynamic focus fields
-  [key: `muscleGroup_${string}`]: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert' | undefined; // For dynamic muscle group levels
-  preferences: {
-    dureeSeance: number;
-    equipement: string[];
-    restrictions: string[];
-  };
-  createdAt: Date;
-  updatedAt: Date;
-  // AJOUTER CES CHAMPS
-  // sex?: 'male' | 'female';
-  // profileType?: 'powerlifter' | 'runner' | 'allround' | 'calisthenics';
-  // sportClass?: 'crossfit' | 'power' | 'classique' | 'marathon' | 'calisthenics' | 'yoga' | 'natation' | 'cyclisme';
+  sportClass: 'classique' | 'crossfit' | 'power' | 'marathon' | 'calisthenics' | 'sprint' | 'streetlifting';
+  niveau?: 'debutant' | 'intermediaire' | 'avance' | 'expert';
+  objectif?: '10k' | 'semi' | 'marathon';
+  vma?: number; // vitesse maximale aérobie en km/h
+  seancesParSemaine?: number;
+  // ... autres propriétés
 }
 
 export const FOCUS_AREAS: FocusArea[] = [

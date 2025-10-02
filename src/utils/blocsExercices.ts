@@ -552,3 +552,204 @@ export const tousBlocs: BlocExercice[] = [
     description: "Mains sur les barres parallèles, flexion/extension des bras"
   }
 ];
+
+export const sprintExercises = {
+  technique: [
+    "Drills A/B/C (montées de genoux, foulées bondissantes)",
+    "Sprints départ accroupi",
+    "Accélérations progressives (20-40m)"
+  ],
+  sprintCourt: [
+    "Sprints 30m",
+    "Sprints 60m",
+    "Sprints 80m"
+  ],
+  sprintMoyen: [
+    "Sprints 100m",
+    "Sprints 150m",
+    "Sprints 200m",
+    "Sprints 400m"
+  ],
+  plyometrie: [
+    "Box jumps",
+    "Bounding (foulées bondissantes longues)",
+    "Sauts en longueur sans élan",
+    "Drop jumps"
+  ],
+  force: [
+    "Back Squat",
+    "Power Clean",
+    "Deadlift explosif",
+    "Hip Thrust"
+  ],
+  renfo: [
+    "Core anti-rotation (Pallof press)",
+    "Gainage dynamique",
+    "Nordic hamstring",
+    "Glute bridge"
+  ]
+};
+
+export const streetLiftingExercises = {
+  basiques: [
+    "Pull-Ups lestés",
+    "Dips lestés",
+    "Squats lestés",
+    "Muscle-Ups"
+  ],
+  force: [
+    "Front Lever Pulls",
+    "Planche Lean",
+    "Handstand Push-Ups",
+    "One Arm Pull-Up Progressions"
+  ],
+  hypertrophie: [
+    "Pull-Ups stricts (sans lest)",
+    "Dips stricts",
+    "Pistol Squats",
+    "Push-Ups lestés"
+  ],
+  assistance: [
+    "Face Pulls élastique",
+    "Biceps Curls barre/élastique",
+    "Extensions triceps",
+    "Gainage lesté"
+  ],
+  explosivite: [
+    "Muscle-Up explosif",
+    "Clapping Pull-Ups",
+    "Jump Squats lestés",
+    "Bar Dips explosifs"
+  ]
+};
+
+export const calisthenicsExercises = {
+  basiques: [
+    "Push-Ups",
+    "Pull-Ups",
+    "Dips",
+    "Squats au poids du corps",
+    "Leg Raises"
+  ],
+  force: [
+    "One Arm Push-Ups",
+    "Archer Pull-Ups",
+    "Pseudo Planche Push-Ups",
+    "Handstand Push-Ups"
+  ],
+  skills: [
+    "Front Lever Progression",
+    "Back Lever Progression",
+    "Planche Lean",
+    "Dragon Flag",
+    "Handstand Hold"
+  ],
+  endurance: [
+    "Max Pull-Ups",
+    "Max Push-Ups",
+    "Max Dips",
+    "Max Squats"
+  ],
+  explosivite: [
+    "Clapping Push-Ups",
+    "Muscle-Up (sans lest)",
+    "Explosive Pull-Ups",
+    "Jump Squats"
+  ],
+  gainage: [
+    "Plank Hold",
+    "Hollow Body",
+    "Arch Hold",
+    "L-Sit"
+  ]
+};
+
+export const marathonSessions = {
+  endurance_fondamentale: [
+    "Footing 60-75% FCmax (zone 2)",
+    "Sortie continue 40-90min"
+  ],
+  seuil: [
+    "4x10min à allure seuil (85-90% VMA)",
+    "3x15min allure semi-marathon"
+  ],
+  fractionne: [
+    "10x400m à 100-105% VMA",
+    "6x1000m à 95-100% VMA",
+    "30/30 (10 à 15 min)"
+  ],
+  sortie_longue: [
+    "18-30 km progressif",
+    "Sortie avec finish allure marathon",
+    "Sortie vallonnée (travail musculaire)"
+  ],
+  renforcement: [
+    "Gainage 3x1min",
+    "Squats au poids du corps 3x20",
+    "Fentes marchées 3x15 par jambe",
+    "Mollets 3x25"
+  ]
+};
+
+export const musculationClassiqueExercises = {
+  push: [
+    "Développé couché barre",
+    "Développé incliné haltères",
+    "Développé militaire",
+    "Dips lestés",
+    "Écartés poulie"
+  ],
+  pull: [
+    "Tractions pronation",
+    "Rowing barre",
+    "Tirage poulie basse",
+    "Face Pulls",
+    "Curl biceps barre"
+  ],
+  legs: [
+    "Back Squat",
+    "Presse à cuisses",
+    "Soulevé de terre jambes tendues",
+    "Fentes marchées",
+    "Mollets debout"
+  ],
+  core: [
+    "Crunch lesté",
+    "Leg Raises",
+    "Planche lestée",
+    "Ab Wheel Rollout"
+  ]
+};
+
+export const crossfitExercises = {
+  haltéro: [
+    "Back Squat",
+    "Front Squat",
+    "Deadlift",
+    "Clean & Jerk",
+    "Snatch",
+    "Push Press"
+  ],
+  gym: [
+    "Pull-ups (strict/kipping/butterfly)",
+    "Muscle-ups",
+    "Handstand Push-ups",
+    "Toes-to-bar",
+    "Pistol Squats",
+    "Burpees"
+  ],
+  cardio: [
+    "Row 500m",
+    "Assault Bike 1 min max",
+    "Double Unders",
+    "Run 400m",
+    "SkiErg 500m"
+  ],
+  metcon: [
+    "Fran (21-15-9 Thrusters / Pull-ups)",
+    "Cindy (20 min AMRAP : 5 Pull-ups / 10 Push-ups / 15 Air Squats)",
+    "Murph (1 mile run, 100 pull-ups, 200 push-ups, 300 squats, 1 mile run)",
+    "Grace (30 Clean & Jerk for time)",
+    "Helen (3 rounds: 400m run, 21 kettlebell swings, 12 pull-ups)"
+  ]
+};

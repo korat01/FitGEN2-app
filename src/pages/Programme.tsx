@@ -20,6 +20,7 @@ import {
   Timer,
   Eye
 } from 'lucide-react';
+import { generateProgramme } from '../utils/programmeGenerator';
 
 export const Programme: React.FC = () => {
   const { user } = useAuth();
@@ -39,6 +40,14 @@ export const Programme: React.FC = () => {
       }
     }
   }, []);
+
+  // Ajoutez ce debug au début du composant
+  useEffect(() => {
+    console.log('=== DEBUG COMPOSANT PROGRAMME ===');
+    console.log('User sportClass:', user.sportClass);
+    console.log('Type:', typeof user.sportClass);
+    console.log('Égalité avec "sprint":', user.sportClass === 'sprint');
+  }, [user]);
 
   // Fonction pour générer un programme personnalisé selon le profil
   const handleGenerateProgramme = () => {
@@ -895,6 +904,13 @@ export const Programme: React.FC = () => {
 
   const calendar = generateCalendar();
 
+  const formatNumber = (value: number | undefined | null): string => {
+    if (value === undefined || value === null || isNaN(value)) {
+      return '0';
+    }
+    return value.toString();
+  };
+
     return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -1061,7 +1077,7 @@ export const Programme: React.FC = () => {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="text-center p-2 bg-gray-50 rounded">
                                     <p className="text-sm text-gray-600">Séries</p>
-                                    <p className="font-bold text-gray-800">{exercise.progression.sets}</p>
+                                    <p className="font-bold text-gray-800">{formatNumber(exercise.progression.sets)}</p>
                   </div>
                                   <div className="text-center p-2 bg-gray-50 rounded">
                                     <p className="text-sm text-gray-600">Reps</p>
@@ -1069,7 +1085,7 @@ export const Programme: React.FC = () => {
                 </div>
                                   <div className="text-center p-2 bg-gray-50 rounded">
                                     <p className="text-sm text-gray-600">Poids</p>
-                                    <p className="font-bold text-gray-800">{exercise.progression.poids}</p>
+                                    <p className="font-bold text-gray-800">{formatNumber(exercise.progression.poids)}</p>
               </div>
                                   <div className="text-center p-2 bg-gray-50 rounded">
                                     <p className="text-sm text-gray-600">Repos</p>
@@ -1219,7 +1235,7 @@ export const Programme: React.FC = () => {
                             <div className="flex items-center gap-3">
                               <Timer className="w-6 h-6 text-green-200" />
                               <div>
-                                <p className="text-xl font-bold">{Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length)}</p>
+                                <p className="text-xl font-bold">{Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0}</p>
                                 <p className="text-sm text-green-200">Min/Session</p>
                   </div>
                     </div>

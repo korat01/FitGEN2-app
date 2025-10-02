@@ -56,3 +56,25 @@ export interface Contraintes {
   limitations?: string;
   équipement: string[];
 }
+
+export interface Exercice {
+  nom: string;
+  type: 'force' | 'hypertrophie' | 'endurance' | 'skill' | 'mixte';
+  groupeMusculaire: string;
+  difficulte: 'debutant' | 'intermediaire' | 'avance' | 'expert';
+  series?: number;
+  repetitions?: number;
+  poids?: number;
+  repos?: number; // en secondes
+}
+
+export interface Programme {
+  id: string;
+  nom: string;
+  description: string;
+  duree: number;
+  seancesParSemaine: number;
+  sessions: any[]; // ou Seance[]
+  dateCreation: string;
+  utilisateurId: string;
+}

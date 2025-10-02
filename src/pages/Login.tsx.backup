@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,10 +22,10 @@ export const Login: React.FC = () => {
     sportClass: 'classique'
   });
 
-  // Rediriger si dÃ©jÃ  connectÃ©
+  // Rediriger si déjà connecté
   useEffect(() => {
     if (user) {
-      console.log('âœ… Utilisateur dÃ©jÃ  connectÃ©, redirection vers le dashboard');
+      console.log('✅ Utilisateur déjà connecté, redirection vers le dashboard');
       navigate('/dashboard');
     }
   }, [user, navigate]);
@@ -33,18 +33,18 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('ðŸš€ DÃ‰BUT DE LA CONNEXION');
-    console.log('DonnÃ©es du formulaire:', formData);
+    console.log('🚀 DÉBUT DE LA CONNEXION');
+    console.log('Données du formulaire:', formData);
     
     if (!formData.name || !formData.email || !formData.password) {
-      alert('âŒ Veuillez remplir tous les champs obligatoires');
+      alert('❌ Veuillez remplir tous les champs obligatoires');
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // CrÃ©er un utilisateur avec toutes les donnÃ©es nÃ©cessaires
+      // Créer un utilisateur avec toutes les données nécessaires
       const userData = {
         id: Date.now().toString(),
         name: formData.name,
@@ -57,15 +57,15 @@ export const Login: React.FC = () => {
         globalScore: 0
       };
       
-      console.log(' DonnÃ©es utilisateur crÃ©Ã©es:', userData);
+      console.log(' Données utilisateur créées:', userData);
       
-      // Simuler un dÃ©lai
+      // Simuler un délai
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Appeler la fonction login
-      console.log('ðŸ” Appel de la fonction login...');
+      console.log('🔐 Appel de la fonction login...');
 
-      // ComplÃ©ter les champs manquants pour correspondre au type User
+      // Compléter les champs manquants pour correspondre au type User
       const userComplet = {
         ...userData,
         focus_trapezes: false,
@@ -109,10 +109,6 @@ export const Login: React.FC = () => {
       const userFinal = {
         ...userComplet,
         focus_abdominaux: false,
-        focus_calisthenics: false,
-        focus_jambes: false,
-        focus_bras: false,
-        location: '',
         duration: 0,
         level: '',
         sport: '',
@@ -122,12 +118,12 @@ export const Login: React.FC = () => {
         poids: 0,
         email: formData.email,
         name: formData.name,
-        uid: '', // Ã  complÃ©ter si besoin
-        // Ajoutez ici d'autres champs requis par le type User si nÃ©cessaire
+        uid: '', // à compléter si besoin
+        // Ajoutez ici d'autres champs requis par le type User si nécessaire
       };
 
       // Correction : ajout des champs manquants pour correspondre au type User
-      // Veillez Ã  ce que tous les champs requis par le type User soient prÃ©sents dans userFinal
+      // Veillez à ce que tous les champs requis par le type User soient présents dans userFinal
       if (
         userFinal.hasOwnProperty('focus_calisthenics') &&
         userFinal.hasOwnProperty('focus_jambes') &&
@@ -135,17 +131,17 @@ export const Login: React.FC = () => {
         userFinal.hasOwnProperty('location') &&
         userFinal.hasOwnProperty('globalScore')
       ) {
-        // VÃ©rification supplÃ©mentaire : s'assurer que tous les champs obligatoires du type User sont bien prÃ©sents
-        login(userFinal as import('../contexts/AuthContext').User); // Correction du cast pour Ã©viter l'erreur de type
-        console.log('âœ… Connexion rÃ©ussie !');
+        // Vérification supplémentaire : s'assurer que tous les champs obligatoires du type User sont bien présents
+        login(userFinal as import('../contexts/AuthContext').User); // Correction du cast pour éviter l'erreur de type
+        console.log('✅ Connexion réussie !');
         navigate('/dashboard');
       } else {
         alert("Certains champs obligatoires du type User sont manquants dans userFinal.");
         return;
       }
     } catch (error) {
-      console.error('âŒ Erreur lors de la connexion:', error);
-      alert('âŒ Erreur lors de la connexion: ' + error);
+      console.error('❌ Erreur lors de la connexion:', error);
+      alert('❌ Erreur lors de la connexion: ' + error);
     } finally {
       setIsLoading(false);
     }
@@ -159,10 +155,10 @@ export const Login: React.FC = () => {
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-800">
-            Connexion Ã  FitGEN2
+            Connexion à FitGEN2
           </CardTitle>
           <p className="text-gray-600">
-            AccÃ©dez Ã  votre tableau de bord personnel
+            Accédez à votre tableau de bord personnel
           </p>
         </CardHeader>
         
@@ -260,10 +256,10 @@ export const Login: React.FC = () => {
                   />
                 </div>
 
-                {/* Ã‚ge */}
+                {/* Âge */}
                 <div className="space-y-2">
                   <Label htmlFor="age" className="text-sm font-semibold text-gray-700">
-                    Ã‚ge
+                    Âge
                   </Label>
                   <Input
                     id="age"

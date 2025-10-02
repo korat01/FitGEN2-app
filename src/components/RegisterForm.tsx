@@ -4,6 +4,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, User, Lock, Mail } from 'lucide-react';
+import { calculateAge } from '../utils/dateUtils';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -22,7 +23,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
     weight: 75,
     age: 28,
     sex: 'male' as 'male' | 'female',
-    sportClass: 'classique'
+    sportClass: 'classique',
+    birthDate: '',
+    vma: 15, // VMA par défaut
+    objectif: '10k', // Objectif par défaut
+    niveau: 'intermediaire' // Niveau par défaut
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +56,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
         sex: formData.sex,
         sportClass: formData.sportClass,
         rank: 'D', // Rang par défaut
-        globalScore: 0 // Score par défaut
+        globalScore: 0, // Score par défaut
+        vma: formData.vma, // Ajout de la VMA
+        objectif: formData.objectif, // Ajout de l'objectif
+        niveau: formData.niveau // Ajout du niveau
       };
       
       console.log('Tentative d\'inscription avec:', userData);
@@ -191,21 +199,29 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
           {/* Âge */}
           <div className="space-y-2">
-            <Label htmlFor="age" className="text-sm font-semibold text-gray-700">
-              Âge
+            <Label htmlFor="birthDate" className="text-sm font-medium">
+              Date de naissance
             </Label>
             <Input
-              id="age"
-              type="number"
-              value={formData.age}
-              onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
-              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="28"
-              min="16"
-              max="100"
-              required
-              disabled={isLoading}
+              type="date"
+              id="birthDate"
+              name="birthDate"
+              value={formData.birthDate || ''}
+              onChange={(e) => {
+                const newBirthDate = e.target.value;
+                setFormData(prev => ({
+                  ...prev,
+                  birthDate: newBirthDate,
+                  age: newBirthDate ? calculateAge(newBirthDate) : null
+                }));
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {formData.age && (
+              <p className="text-sm text-gray-600">
+                Âge calculé : {formData.age} ans
+              </p>
+            )}
           </div>
         </div>
 
@@ -248,9 +264,47 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             <option value="power">Powerlifting</option>
             <option value="marathon">Marathon</option>
             <option value="calisthenics">Calisthenics</option>
+            <option value="sprint">Sprint</option>
+            <option value="streetlifting">Street Lifting</option>
           </select>
         </div>
       </div>
+
+      {/* Ajoutez les champs pour le marathon */}
+      {formData.sportClass === 'marathon' && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="vma" className="text-sm font-semibold text-gray-700">
+              VMA (km/h)
+            </Label>
+            <Input
+              id="vma"
+              type="number"
+              value={formData.vma || 15}
+              onChange={(e) => setFormData({ ...formData, vma: Number(e.target.value) })}
+              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="15"
+              min="10"
+              max="25"
+              disabled={isLoading}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-sm font-semibold text-gray-700">Objectif</Label>
+            <select
+              value={formData.objectif || '10k'}
+              onChange={(e) => setFormData({ ...formData, objectif: e.target.value })}
+              className="w-full h-12 px-4 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+              disabled={isLoading}
+            >
+              <option value="10k">10 km</option>
+              <option value="semi">Semi-marathon</option>
+              <option value="marathon">Marathon</option>
+            </select>
+          </div>
+        </div>
+      )}
 
       {/* Boutons */}
       <div className="flex gap-3">

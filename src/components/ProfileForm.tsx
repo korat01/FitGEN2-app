@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth, User } from '../contexts/AuthContext';
 import { UserProfile } from '../types/profile';
 import { Save, User as UserIcon, Calendar, Target, Zap } from 'lucide-react';
+import { calculateAge } from '../utils/dateUtils';
 
 interface ProfileFormProps {
   onClose?: () => void;
@@ -192,15 +193,30 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
           </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="age">Âge</Label>
-              <Input
-                id="age"
-                type="number"
-                    value={formData.age || ''}
-                    onChange={(e) => handleInputChange('age', parseInt(e.target.value) || 25)}
-                    placeholder="25"
-              />
-            </div>
+                  <label htmlFor="birthDate" className="text-sm font-medium">
+                    Date de naissance
+                  </label>
+                  <input
+                    type="date"
+                    id="birthDate"
+                    name="birthDate"
+                    value={formData.birthDate || ''}
+                    onChange={(e) => {
+                      const newBirthDate = e.target.value;
+                      setFormData(prev => ({
+                        ...prev,
+                        birthDate: newBirthDate,
+                        age: newBirthDate ? calculateAge(newBirthDate) : null
+                      }));
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  {formData.age && (
+                    <p className="text-sm text-gray-600">
+                      Âge calculé : {formData.age} ans
+                    </p>
+                  )}
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="sex">Sexe</Label>

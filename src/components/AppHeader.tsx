@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { BarChart3, Home, Dumbbell, Apple, Calendar, Scan, User, Globe } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
+import { useAuth } from '../contexts/AuthContext';
 
 const AppHeader: React.FC = () => {
   const location = useLocation();
+  const { user } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -55,7 +57,7 @@ const AppHeader: React.FC = () => {
               <LanguageSwitcher />
             </div>
             <UserDropdown
-              userName="Alexandre"
+              userName={user?.name || user?.firstName || 'Utilisateur'}
               onProfileClick={handleProfileClick}
               onSettingsClick={handleSettingsClick}
               onProClick={handleProClick}

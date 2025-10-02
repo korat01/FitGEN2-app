@@ -1,81 +1,105 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { LucideIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface StatCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon: LucideIcon;
-  progress?: number;
-  color: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'cyan';
-  onClick?: () => void;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string;
+  icon?: React.ReactNode;
+  variant?: 'default' | 'gradient' | 'glass';
+  className?: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({
+export const StatCard: React.FC<StatCardProps> = ({
   title,
   value,
   subtitle,
-  icon: Icon,
-  progress,
-  color,
-  onClick
+  trend,
+  trendValue,
+  icon,
+  variant = 'default',
+  className
 }) => {
-  const colorClasses = {
-    blue: 'from-blue-400 to-blue-500',
-    green: 'from-emerald-400 to-emerald-500',
-    purple: 'from-violet-400 to-violet-500',
-    orange: 'from-amber-400 to-amber-500',
-    pink: 'from-pink-400 to-pink-500',
-    cyan: 'from-cyan-400 to-cyan-500'
+  const getTrendIcon = () => {
+    switch (trend) {
+      case 'up':
+        return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case 'down':
+        return <TrendingDown className="h-4 w-4 text-red-500" />;
+      default:
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
+    }
   };
 
-  const iconBgClasses = {
-    blue: 'bg-blue-100',
-    green: 'bg-emerald-100',
-    purple: 'bg-violet-100',
-    orange: 'bg-amber-100',
-    pink: 'bg-pink-100',
-    cyan: 'bg-cyan-100'
-  };
-
-  const iconColorClasses = {
-    blue: 'text-blue-600',
-    green: 'text-emerald-600',
-    purple: 'text-violet-600',
-    orange: 'text-amber-600',
-    pink: 'text-pink-600',
-    cyan: 'text-cyan-600'
+  const getTrendColor = () => {
+    switch (trend) {
+      case 'up':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'down':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-muted-foreground bg-muted border-muted';
+    }
   };
 
   return (
-    <Card 
-      className={`bg-gradient-to-br ${colorClasses[color]} text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer`}
-      onClick={onClick}
-    >
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between">
+    <Card className={cn(
+      'transition-all duration-200 hover:shadow-lg hover:-translate-y-1 animate-scale-in',
+      variant === 'gradient' && 'gradient-primary text-white border-0',
+      variant === 'glass' && 'glass-effect border-white/30',
+      className
+    )}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className={cn(
+          'text-sm font-medium',
+          variant === 'gradient' ? 'text-white/90' : 'text-muted-foreground'
+        )}>
+          {title}
+        </CardTitle>
+        {icon && (
+          <div className={cn(
+            'p-2 rounded-lg',
+            variant === 'gradient' ? 'bg-white/20' : 'bg-muted/50'
+          )}>
+            {icon}
+          </div>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-baseline justify-between">
           <div>
-            <p className="text-white/90 text-sm font-medium">{title}</p>
-            <p className="text-3xl font-bold text-white">{value}</p>
+            <div className={cn(
+              'text-2xl font-bold',
+              variant === 'gradient' ? 'text-white' : 'text-foreground'
+            )}>
+              {value}
+            </div>
             {subtitle && (
-              <p className="text-white/80 text-xs">{subtitle}</p>
+              <p className={cn(
+                'text-xs',
+                variant === 'gradient' ? 'text-white/70' : 'text-muted-foreground'
+              )}>
+                {subtitle}
+              </p>
             )}
           </div>
-          <div className={`${iconBgClasses[color]} rounded-full p-3`}>
-            <Icon className={`h-8 w-8 ${iconColorClasses[color]}`} />
-          </div>
+          
+          {trend && trendValue && (
+            <Badge className={cn(
+              'flex items-center gap-1 text-xs',
+              variant === 'gradient' ? 'bg-white/20 text-white border-white/30' : getTrendColor()
+            )}>
+              {getTrendIcon()}
+              {trendValue}
+            </Badge>
+          )}
         </div>
-        {progress !== undefined && (
-          <Progress 
-            value={progress} 
-            className="mt-4 bg-white/20"
-          />
-        )}
       </CardContent>
     </Card>
   );
-};
-
-export default StatCard; 
+}; 

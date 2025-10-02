@@ -671,3 +671,13 @@ export class ScoringEngine {
 
 // Instance globale du moteur de scoring
 export const scoringEngine = new ScoringEngine(); 
+
+// Examinons les rangs définis dans le système de scoring
+
+// Affichage des rangs existants pour référence
+console.log('Rangs définis dans le système:', {
+  // Ici je vais voir quels rangs sont déjà définis
+  rangs: [
+    // Les rangs actuels du système
+  ]
+}); 

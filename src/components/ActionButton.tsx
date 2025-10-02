@@ -1,42 +1,74 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { LucideIcon } from 'lucide-react';
+import { Button } from './ui/button';
+import { cn } from '../lib/utils';
+import { Loader2 } from 'lucide-react';
 
-interface ActionButtonProps {
-  name: string;
-  icon: LucideIcon;
-  color: 'blue' | 'green' | 'purple' | 'orange' | 'pink' | 'cyan';
-  onClick: () => void;
-  disabled?: boolean;
+interface ActionButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'gradient' | 'glass' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({
-  name,
-  icon: Icon,
-  color,
-  onClick,
-  disabled = false
+export const ActionButton: React.FC<ActionButtonProps> = ({
+  variant = 'default',
+  size = 'md',
+  loading = false,
+  icon,
+  children,
+  className,
+  disabled,
+  ...props
 }) => {
-  const colorClasses = {
-    blue: 'text-blue-600 bg-blue-50 hover:bg-blue-100 border-blue-200 hover:border-blue-300',
-    green: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border-emerald-200 hover:border-emerald-300',
-    purple: 'text-violet-600 bg-violet-50 hover:bg-violet-100 border-violet-200 hover:border-violet-300',
-    orange: 'text-amber-600 bg-amber-50 hover:bg-amber-100 border-amber-200 hover:border-amber-300',
-    pink: 'text-pink-600 bg-pink-50 hover:bg-pink-100 border-pink-200 hover:border-pink-300',
-    cyan: 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100 border-cyan-200 hover:border-cyan-300'
+  const getVariantClasses = () => {
+    switch (variant) {
+      case 'gradient':
+        return 'gradient-primary text-white border-0 hover:shadow-lg hover:scale-105 transition-all duration-200';
+      case 'glass':
+        return 'glass-effect border-white/30 hover:bg-white/20 transition-all duration-200';
+      case 'outline':
+        return 'border-2 border-primary/20 hover:border-primary/40 bg-transparent hover:bg-primary/5 transition-all duration-200';
+      default:
+        return '';
+    }
+  };
+
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'sm':
+        return 'h-8 px-3 text-sm';
+      case 'lg':
+        return 'h-12 px-8 text-lg';
+      default:
+        return 'h-10 px-6';
+    }
   };
 
   return (
     <Button
-      variant="outline"
-      className={`h-28 flex flex-col items-center justify-center gap-3 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-2 ${colorClasses[color]} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-      onClick={onClick}
-      disabled={disabled}
+      className={cn(
+        'relative overflow-hidden group',
+        getVariantClasses(),
+        getSizeClasses(),
+        loading && 'cursor-not-allowed opacity-70',
+        className
+      )}
+      disabled={disabled || loading}
+      {...props}
     >
-      <Icon className="h-8 w-8" />
-      <span className="text-sm font-semibold">{name}</span>
+      {loading && (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      )}
+      {!loading && icon && (
+        <span className="mr-2 transition-transform group-hover:scale-110">
+          {icon}
+        </span>
+      )}
+      <span className="relative z-10">{children}</span>
+      
+      {/* Effet de survol */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
     </Button>
   );
-};
-
-export default ActionButton; 
+}; 

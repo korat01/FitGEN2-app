@@ -5,13 +5,40 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Clock, Users, ChefHat, Plus, Heart, Star } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+interface RepasDetaille {
+  id: string;
+  nom: string;
+  categorie: string;
+  ingredients: Array<{
+    nom: string;
+    quantite: string;
+    calories: number;
+    proteines: number;
+    glucides: number;
+    lipides: number;
+  }>;
+  calories: number;
+  proteines: number;
+  glucides: number;
+  lipides: number;
+  fibres?: number;
+  objectif: string;
+  emoji: string;
+  tempsPreparation?: string;
+  portions?: number;
+  difficulte?: string;
+  description?: string;
+  etapes?: string[];
+  conseils?: string[];
+}
+
 const RepasDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Base de données complète des repas
-  const repasDatabase = {
+  const repasDatabase: Record<string, RepasDetaille> = {
     '1': {
       id: '1',
       nom: 'Bowl Poulet Riz Légumes',
@@ -1179,7 +1206,7 @@ const RepasDetail: React.FC = () => {
           <div className="text-4xl">{repas.emoji}</div>
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{repas.nom}</h1>
-            <p className="text-gray-600">{repas.description}</p>
+            <p className="text-gray-600">{repas.description || ''}</p>
           </div>
         </div>
         <Button

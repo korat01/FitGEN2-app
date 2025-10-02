@@ -2,38 +2,7 @@
 import { scoringEngine } from '../utils/scoring';
 
 export interface User {
-  focus_trapezes: any;
-  focus_avant_bras: any;
-  focus_mollets: any;
-  focus_ischio_jambiers: any;
-  focus_abdominaux: any;
-  focus_biceps: any;
-  focus_quadriceps: any;
-  focus_pectoraux: any;
-  duration: number;
-  level: string;
-  sport: string;
-  focus_calisthenics: boolean;
-  focus_explosivite: boolean;
-  focus_fessiers: boolean;
-  focus_jambes: boolean;
-  focus_abdos: boolean;
-  focus_epaules: boolean;
-  focus_bras: boolean;
-  focus_dos: boolean;
-  phone: string;
-  location: string;
-  height: number;
-  goal: string;
-  trainingDays: any[];
-  trainingMonths: number;
-  focus_squat: any;
-  focus_bench: any;
-  focus_deadlift: any;
-  focus_endurance: any;
-  focus_vo2max: any;
-  focus_economie: any;
-  generalLevel: string;
+  // Champs essentiels (requis)
   id: string;
   name: string;
   email: string;
@@ -43,6 +12,40 @@ export interface User {
   sportClass: string;
   rank?: string;
   globalScore?: number;
+  
+  // Champs optionnels
+  focus_trapezes?: any;
+  focus_avant_bras?: any;
+  focus_mollets?: any;
+  focus_ischio_jambiers?: any;
+  focus_abdominaux?: any;
+  focus_biceps?: any;
+  focus_quadriceps?: any;
+  focus_pectoraux?: any;
+  duration?: number;
+  level?: string;
+  sport?: string;
+  focus_calisthenics?: boolean;
+  focus_explosivite?: boolean;
+  focus_fessiers?: boolean;
+  focus_jambes?: boolean;
+  focus_abdos?: boolean;
+  focus_epaules?: boolean;
+  focus_bras?: boolean;
+  focus_dos?: boolean;
+  phone?: string;
+  location?: string;
+  height?: number;
+  goal?: string;
+  trainingDays?: any[];
+  trainingMonths?: number;
+  focus_squat?: any;
+  focus_bench?: any;
+  focus_deadlift?: any;
+  focus_endurance?: any;
+  focus_vo2max?: any;
+  focus_economie?: any;
+  generalLevel?: string;
 }
 
 interface AuthContextType {

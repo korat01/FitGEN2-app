@@ -16,25 +16,20 @@ const MobileNavigation: React.FC = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-t border-border shadow-elegant">
-      <div className="safe-area-pb flex items-center justify-around h-16">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-border shadow-lg">
+      <div className="flex items-center justify-around py-2">
         {navItems.map(({ path, icon: Icon, label }) => (
           <Link
             key={path}
             to={path}
-            className={`flex flex-col items-center justify-center gap-0.5 px-3 py-2 transition-all duration-200 active:scale-95 ${
+            className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
               isActive(path)
                 ? 'text-primary'
                 : 'text-muted-foreground'
             }`}
           >
-            <div className={`relative ${isActive(path) ? 'scale-110' : ''} transition-transform`}>
-              <Icon className="w-6 h-6" />
-              {isActive(path) && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
-              )}
-            </div>
-            <span className="text-[10px] font-medium mt-0.5">{label}</span>
+            <Icon className={`w-6 h-6 ${isActive(path) ? 'scale-110' : ''}`} />
+            <span className="text-xs font-medium">{label}</span>
           </Link>
         ))}
       </div>

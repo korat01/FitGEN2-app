@@ -1179,7 +1179,7 @@ const RepasDetail: React.FC = () => {
           <div className="text-4xl">{repas.emoji}</div>
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{repas.nom}</h1>
-            <p className="text-gray-600">{repas.description}</p>
+            <p className="text-gray-600">{'description' in repas ? repas.description : ''}</p>
           </div>
         </div>
         <Button
@@ -1226,7 +1226,7 @@ const RepasDetail: React.FC = () => {
                 </div>
               </div>
               <div className="mt-4 text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-xl font-bold text-gray-800">{repas.fibres}g</div>
+                <div className="text-xl font-bold text-gray-800">{'fibres' in repas ? repas.fibres : 0}g</div>
                 <div className="text-sm text-gray-600">Fibres</div>
               </div>
             </CardContent>
@@ -1304,7 +1304,7 @@ const RepasDetail: React.FC = () => {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {repas.conseils.map((conseil, index) => (
+                {('conseils' in repas ? repas.conseils : []).map((conseil: string, index: number) => (
                   <li key={index} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                     <span className="text-gray-700">{conseil}</span>
@@ -1337,8 +1337,8 @@ const RepasDetail: React.FC = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Difficulté</span>
-                <Badge className={getDifficultyColor(repas.difficulte)}>
-                  {repas.difficulte}
+                <Badge className={getDifficultyColor('difficulte' in repas ? repas.difficulte : 'Facile')}>
+                  {'difficulte' in repas ? repas.difficulte : 'Facile'}
                 </Badge>
               </div>
             </CardContent>
@@ -1353,15 +1353,15 @@ const RepasDetail: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-blue-600" />
                 <div>
-                  <div className="font-semibold text-gray-800">{repas.tempsPreparation}</div>
+                  <div className="font-semibold text-gray-800">{'tempsPreparation' in repas ? repas.tempsPreparation : '30 min'}</div>
                   <div className="text-sm text-gray-600">Temps de préparation</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Users className="h-5 w-5 text-green-600" />
                 <div>
-                  <div className="font-semibold text-gray-800">{repas.portions}</div>
-                  <div className="text-sm text-gray-600">Portion{repas.portions > 1 ? 's' : ''}</div>
+                  <div className="font-semibold text-gray-800">{'portions' in repas ? repas.portions : 1}</div>
+                  <div className="text-sm text-gray-600">Portion{('portions' in repas && repas.portions > 1) ? 's' : ''}</div>
                 </div>
               </div>
             </CardContent>

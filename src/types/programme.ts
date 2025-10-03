@@ -68,13 +68,31 @@ export interface Exercice {
   repos?: number; // en secondes
 }
 
+export interface Seance {
+  id: string;
+  nom: string;
+  exercices: Exercice[];
+  duree: number;
+  notes?: string;
+}
+
 export interface Programme {
   id: string;
   nom: string;
   description: string;
   duree: number;
-  seancesParSemaine: number;
-  sessions: any[]; // ou Seance[]
-  dateCreation: string;
-  utilisateurId: string;
+  seancesParSemaine?: number;
+  sessions?: any[];
+  seances?: Seance[];
+  phases?: {
+    adaptation: any[];
+    progression: any[];
+    specialisation: any[];
+  };
+  progression?: {
+    totalSessions: number;
+    sessionsParSemaine: number;
+    dureeMoyenne: number;
+  };
+  dateCreation?: string;
 }

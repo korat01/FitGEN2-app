@@ -1,9 +1,9 @@
 import { UserProfile } from '../types/profile';
-import { Programme, Seance, Exercice } from '../types/programme';
+import { Programme, Exercice, Seance } from '../types/programme';
 
 interface SprintConfig {
-  niveau: 'debutant' | 'intermediaire' | 'avance';
-  objectif: 'vitesseMax' | 'enduranceVitesse';
+    niveau: 'debutant' | 'intermediaire' | 'avance' | 'expert';
+    objectif: 'vitesseMax' | 'enduranceVitesse' | '10k' | 'marathon' | 'semi';
   seancesParSemaine: number;
 }
 
@@ -33,10 +33,9 @@ export function generateSprintProgram(user: UserProfile): Programme {
     nom: `Sprint - ${config.objectif}`,
     description: `Programme sprint adapté pour ${config.niveau}`,
     duree: 4,
-    seancesParSemaine: config.seancesParSemaine,
-    seances,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    sessions: seances as any[],
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: seances.length, sessionsParSemaine: config.seancesParSemaine, dureeMoyenne: 60 }
   };
 
   console.log('Programme final:', programme);

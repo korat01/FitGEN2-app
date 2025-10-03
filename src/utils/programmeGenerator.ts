@@ -573,7 +573,7 @@ export const analyzeProfile = (user: UserProfile): ProfileAnalysis => {
   });
 
   return {
-    sportClass: user.sportClass || 'Classique',
+    sportClass: user.sportClass || 'classique',
     level: user.generalLevel || 'Débutant',
     trainingDays: user.trainingDays || ['lundi', 'mercredi', 'vendredi'],
     duration: user.trainingMonths || 3,
@@ -955,19 +955,19 @@ export const generateProgramme = (user: UserProfile): Programme => {
   if (user.sportClass === 'sprint') {
     console.log('✅ Génération programme sprint');
     return generateSprintProgramme(user);
-  } else if (user.sportClass === 'power') {
+  } else if (user.sportClass === 'power' || user.sportClass === 'powerlifter') {
     console.log('✅ Génération programme powerlifting');
-    return generatePowerliftingProgramme(user);
-  } else if (user.sportClass === 'streetlifting' || user.sportClass === 'street') {
+    return generateStreetLiftingProgramme(user); // Utiliser la fonction existante
+  } else if (user.sportClass === 'streetlifting') {
     console.log('✅ Génération programme street lifting');
     return generateStreetLiftingProgramme(user);
   } else if (user.sportClass === 'calisthenics') {
     console.log('✅ Génération programme calisthenics');
     return generateCalisthenicsProgramme(user);
-  } else if (user.sportClass === 'marathon') {
+  } else if (user.sportClass === 'marathon' || user.sportClass === 'runner') {
     console.log('✅ Génération programme marathon');
     return generateMarathonProgramme(user);
-  } else if (user.sportClass === 'classique') {
+  } else if (user.sportClass === 'classique' || user.sportClass === 'allround') {
     console.log('✅ Génération programme musculation classique');
     return generateMusculationClassiqueProgramme(user);
   } else if (user.sportClass === 'crossfit') {
@@ -975,7 +975,7 @@ export const generateProgramme = (user: UserProfile): Programme => {
     return generateCrossfitProgramme(user);
   } else {
     console.log('❌ Classe non supportée:', user.sportClass);
-    return generateDefaultProgramme(user);
+    return generateMusculationClassiqueProgramme(user); // Par défaut
   }
 };
 
@@ -1112,10 +1112,9 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
     nom: `Programme Street Lifting - ${niveau}`,
     description: 'Programme d\'entraînement Street Lifting avec progression lestée sur 4 semaines',
     duree,
-    seancesParSemaine,
     sessions,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 75 }
   };
   
   console.log('Programme Street Lifting final:', programme);
@@ -1261,10 +1260,9 @@ function generateCalisthenicsProgramme(user: UserProfile): Programme {
     nom: `Programme Calisthenics - ${niveau}`,
     description: 'Programme d\'entraînement Calisthenics avec progression par niveaux sur 4 semaines',
     duree,
-    seancesParSemaine,
     sessions,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 60 }
   };
   
   console.log('Programme Calisthenics final:', programme);
@@ -1399,10 +1397,9 @@ function generateMarathonProgramme(user: UserProfile): Programme {
     nom: `Programme Marathon - ${objectif} (${niveau})`,
     description: `Programme d'entraînement marathon pour objectif ${objectif} avec VMA ${vma} km/h`,
     duree,
-    seancesParSemaine,
     sessions,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 90 }
   };
   
   console.log('Programme Marathon final:', programme);
@@ -1549,10 +1546,9 @@ function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
     nom: `Programme Musculation Classique - ${niveau}`,
     description: `Programme d'hypertrophie Push/Pull/Legs avec progression sur ${duree} semaines`,
     duree,
-    seancesParSemaine,
     sessions,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 75 }
   };
   
   console.log('Programme Musculation Classique final:', programme);
@@ -1710,10 +1706,9 @@ function generateCrossfitProgramme(user: UserProfile): Programme {
     nom: `Programme CrossFit - ${niveau}`,
     description: `Programme CrossFit avec cycles force, WOD et MetCon sur ${duree} semaines`,
     duree,
-    seancesParSemaine,
     sessions,
-    dateCreation: new Date().toISOString(),
-    utilisateurId: user.id
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 60 }
   };
   
   console.log('Programme CrossFit final:', programme);

@@ -1,6 +1,5 @@
 import { UserProfile } from '../types/profile';
-import { Programme, Seance, Exercice } from '../types/programme';
-import { blocsExercices } from './blocsExercices';
+import { Programme, Exercice } from '../types/programme';
 
 interface ProgrammeConfig {
   sportClass: string;
@@ -35,9 +34,10 @@ export class ProgrammeGeneratorV2 {
 
   private determinerNiveau(user: UserProfile): 'debutant' | 'intermediaire' | 'avance' | 'expert' {
     // Logique basée sur le score global ou l'expérience
-    if (user.globalScore < 100) return 'debutant';
-    if (user.globalScore < 300) return 'intermediaire';
-    if (user.globalScore < 500) return 'avance';
+    const score = user.globalScore || 0;
+    if (score < 100) return 'debutant';
+    if (score < 300) return 'intermediaire';
+    if (score < 500) return 'avance';
     return 'expert';
   }
 
@@ -51,9 +51,8 @@ export class ProgrammeGeneratorV2 {
       description: `Programme adapté pour ${this.config.sportClass}`,
       duree: this.config.dureeCycle,
       seancesParSemaine: this.config.seancesParSemaine,
-      seances,
-      dateCreation: new Date().toISOString(),
-      utilisateurId: this.user.id
+      sessions: seances as any[],
+      dateCreation: new Date().toISOString()
     };
   }
 
@@ -186,8 +185,8 @@ export class ProgrammeGeneratorV2 {
     ];
   }
 
-  private genererSeances(exercices: Exercice[]): Seance[] {
-    const seances: Seance[] = [];
+  private genererSeances(exercices: Exercice[]): any[] {
+    const seances: any[] = [];
     const exercicesParSeance = this.getExercicesParSeance();
     
     for (let semaine = 1; semaine <= this.config.dureeCycle; semaine++) {
@@ -210,7 +209,7 @@ export class ProgrammeGeneratorV2 {
     }
   }
 
-  private creerSeance(semaine: number, jour: number, exercices: Exercice[], nbExercices: number): Seance {
+  private creerSeance(semaine: number, jour: number, exercices: Exercice[], nbExercices: number): any {
     const exercicesSeance = this.selectionnerExercices(exercices, nbExercices, jour);
     const estDeload = semaine === this.config.dureeCycle; // Dernière semaine = deload
     

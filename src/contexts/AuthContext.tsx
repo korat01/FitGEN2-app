@@ -4,6 +4,7 @@ import { scoringEngine } from '../utils/scoring';
 export interface User {
   id: string;
   name: string;
+  firstName?: string;
   email: string;
   weight: number;
   age: number;
@@ -35,6 +36,7 @@ export interface User {
   phone?: string;
   location?: string;
   height?: number;
+  birthDate?: string;
   goal?: string;
   trainingDays?: any[];
   trainingMonths?: number;

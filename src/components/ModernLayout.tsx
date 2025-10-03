@@ -1,11 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from './Navigation';
-import { MobileNavigation } from './MobileNavigation';
-import { UserDropdown } from './UserDropdown';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import MobileNavigation from './MobileNavigation';
+import UserDropdown from './UserDropdown';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useAuth } from '../contexts/AuthContext';
-import { useMobile } from '../hooks/use-mobile';
+import { useIsMobile } from '../hooks/use-mobile';
 import { Bell, Search, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -13,7 +13,7 @@ import { Badge } from './ui/badge';
 
 export const ModernLayout: React.FC = () => {
   const { user } = useAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
@@ -72,7 +72,12 @@ export const ModernLayout: React.FC = () => {
             
             <LanguageSwitcher />
             
-            {user && <UserDropdown />}
+            {user && <UserDropdown 
+              userName={user.name || user.firstName || 'Utilisateur'}
+              onProfileClick={() => window.location.href = '/profile'}
+              onSettingsClick={() => window.location.href = '/settings'}
+              onProClick={() => window.location.href = '/pro'}
+            />}
           </div>
         </div>
       </header>

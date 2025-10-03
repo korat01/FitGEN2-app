@@ -1,24 +1,34 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { ThemeProvider } from './lib/theme-provider';
 import { Toaster } from './components/ui/toaster';
 
-// Pages
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Stats from './pages/Stats';
-import ProfileSummary from './pages/ProfileSummary';
-import Programme from './pages/Programme';
-import BlocsEntrainement from './pages/BlocsEntrainement';
-import NotFound from './pages/NotFound';
-import Nutrition from './pages/Nutrition';
-import AlimentDetail from './pages/AlimentDetail';
-import RepasDetail from './pages/RepasDetail';
-
 // Composants
 import PageLayout from './components/PageLayout';
+
+// Lazy loading des pages
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Stats = lazy(() => import('./pages/Stats'));
+const ProfileSummary = lazy(() => import('./pages/ProfileSummary'));
+const Programme = lazy(() => import('./pages/Programme'));
+const BlocsEntrainement = lazy(() => import('./pages/BlocsEntrainement'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Nutrition = lazy(() => import('./pages/Nutrition'));
+const AlimentDetail = lazy(() => import('./pages/AlimentDetail'));
+const RepasDetail = lazy(() => import('./pages/RepasDetail'));
+
+// Composant de chargement
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-lg text-gray-600">Chargement...</p>
+    </div>
+  </div>
+);
 
 // Composant pour protéger les routes
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,6 +59,7 @@ const AppContent: React.FC = () => {
   return (
       <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <Suspense fallback={<LoadingSpinner />}>
           <Routes>
           {/* Route publique */}
             <Route path="/login" element={<Login />} />
@@ -129,6 +140,7 @@ const AppContent: React.FC = () => {
           {/* Route 404 */}
           <Route path="*" element={<NotFound />} />
           </Routes>
+        </Suspense>
         
           <Toaster />
         </div>

@@ -20,6 +20,7 @@ import {
   Timer,
   Eye
 } from 'lucide-react';
+// Import direct du générateur (pas de lazy loading pour les fonctions utilitaires)
 import { generateProgramme } from '../utils/programmeGenerator';
 
 export const Programme: React.FC = () => {
@@ -84,7 +85,7 @@ export const Programme: React.FC = () => {
             notes: session.notes || '',
             equipment: session.equipment || []
           })),
-          userProfile: {
+        userProfile: {
             sportClass: user.sportClass,
             level: (user as any).niveau || (user as any).generalLevel || 'intermediaire',
             weight: user.weight || 70,
@@ -99,8 +100,8 @@ export const Programme: React.FC = () => {
         
         localStorage.setItem('userProgramme', JSON.stringify(adaptedProgramme));
         setProgramme(adaptedProgramme);
-        setIsGenerating(false);
-        
+      setIsGenerating(false);
+      
         alert(`🎉 Programme ${user.sportClass} généré avec succès ! ${adaptedProgramme.sessions.length} séances créées.`);
       } catch (error) {
         console.error('❌ Erreur lors de la génération:', error);

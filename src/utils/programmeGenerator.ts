@@ -985,14 +985,15 @@ function generateSprintProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = 4;
+  const seancesParSemaine = user.trainingDays?.length || 4;
   const duree = 4;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi', 'dimanche'];
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createSprintSession(semaine, jour, user);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createSprintSession(semaine, jour + 1, user, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session créée: ${semaine}-${jour}`);
+      console.log(`Session créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
   
@@ -1020,7 +1021,7 @@ function generateSprintProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createSprintSession(semaine: number, jour: number, user: UserProfile) {
+function createSprintSession(semaine: number, jour: number, user: UserProfile, dayName?: string) {
   const estDeload = semaine === 4;
   
   let exercices = [];
@@ -1057,7 +1058,8 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile) {
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`}`,
+    day: dayName || `Jour ${jour}`,
     exercises: exercices.map(ex => ({
       ...ex,
       progression: {
@@ -1082,8 +1084,9 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = 4;
+  const seancesParSemaine = user.trainingDays?.length || 4;
   const duree = 4;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi', 'dimanche'];
   
   // Calcul des charges maximales basées sur le poids du corps
   const ratioMax = {
@@ -1100,10 +1103,10 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
   const maxDip = poidsCorps + poidsCorps * (ratio + 0.2);
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createStreetLiftingSession(semaine, jour, user, maxPullUp, maxDip);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createStreetLiftingSession(semaine, jour + 1, user, maxPullUp, maxDip, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session Street Lifting créée: ${semaine}-${jour}`);
+      console.log(`Session Street Lifting créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
   
@@ -1123,7 +1126,7 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createStreetLiftingSession(semaine: number, jour: number, user: UserProfile, maxPullUp: number, maxDip: number) {
+function createStreetLiftingSession(semaine: number, jour: number, user: UserProfile, maxPullUp: number, maxDip: number, dayName?: string) {
   const estDeload = semaine === 4;
   
   let exercices = [];
@@ -1200,7 +1203,8 @@ function createStreetLiftingSession(semaine: number, jour: number, user: UserPro
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour} (${jour % 2 === 1 ? 'Tirage' : 'Poussée'})`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (${jour % 2 === 1 ? 'Tirage' : 'Poussée'})`,
+    day: dayName || `Jour ${jour}`,
     exercices,
     duree: exercices.length * 15,
     notes: estDeload ? 'Semaine de récupération' : `Charge max Pull-Up: ${Math.round(maxPullUp)}kg, Dip: ${Math.round(maxDip)}kg`
@@ -1213,8 +1217,9 @@ function generateCalisthenicsProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = 4;
+  const seancesParSemaine = user.trainingDays?.length || 4;
   const duree = 4;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi', 'dimanche'];
   
   // Progressions de base par niveau
   const progressions = {
@@ -1248,13 +1253,13 @@ function generateCalisthenicsProgramme(user: UserProfile): Programme {
   const progression = progressions[niveau as keyof typeof progressions] || progressions.intermediaire;
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createCalisthenicsSession(semaine, jour, user, progression, niveau);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createCalisthenicsSession(semaine, jour + 1, user, progression, niveau, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session Calisthenics créée: ${semaine}-${jour}`);
+      console.log(`Session Calisthenics créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
-  
+
   const programme: Programme = {
     id: Date.now().toString(),
     nom: `Programme Calisthenics - ${niveau}`,
@@ -1271,7 +1276,7 @@ function generateCalisthenicsProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createCalisthenicsSession(semaine: number, jour: number, user: UserProfile, progression: any, niveau: string) {
+function createCalisthenicsSession(semaine: number, jour: number, user: UserProfile, progression: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 4;
   
   let exercices = [];
@@ -1352,7 +1357,8 @@ function createCalisthenicsSession(semaine: number, jour: number, user: UserProf
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour} (${jour % 2 === 1 ? 'Push' : 'Pull'})`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (${jour % 2 === 1 ? 'Push' : 'Pull'})`,
+    day: dayName || `Jour ${jour}`,
     exercices,
     duree: exercices.length * 12,
     notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
@@ -1365,8 +1371,9 @@ function generateMarathonProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = 4;
+  const seancesParSemaine = user.trainingDays?.length || 4;
   const duree = 4;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi', 'dimanche'];
   
   // VMA par défaut si non spécifiée
   const vma = user.vma || 15; // km/h
@@ -1385,10 +1392,10 @@ function generateMarathonProgramme(user: UserProfile): Programme {
   console.log('Allures:', allure);
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createMarathonSession(semaine, jour, user, allure, objectif, niveau);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createMarathonSession(semaine, jour + 1, user, allure, objectif, niveau, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session Marathon créée: ${semaine}-${jour}`);
+      console.log(`Session Marathon créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
   
@@ -1408,7 +1415,7 @@ function generateMarathonProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createMarathonSession(semaine: number, jour: number, user: UserProfile, allure: any, objectif: string, niveau: string) {
+function createMarathonSession(semaine: number, jour: number, user: UserProfile, allure: any, objectif: string, niveau: string, dayName?: string) {
   const estDeload = semaine === 4;
   
   let exercices = [];
@@ -1504,7 +1511,8 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`}`,
+    day: dayName || `Jour ${jour}`,
     exercices,
     duree: exercices[0].reps + exercices[1].reps,
     notes: estDeload ? 'Semaine de récupération' : `VMA: ${allure.fractionne.toFixed(1)} km/h`
@@ -1517,8 +1525,9 @@ function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = user.seancesParSemaine || 4;
+  const seancesParSemaine = user.trainingDays?.length || user.seancesParSemaine || 4;
   const duree = 6; // 6 semaines
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi', 'dimanche'];
   
   // Volume ajusté selon le niveau
   const volume = {
@@ -1534,10 +1543,10 @@ function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
   console.log('Volume:', volumeConfig);
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createMusculationClassiqueSession(semaine, jour, user, volumeConfig, niveau);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createMusculationClassiqueSession(semaine, jour + 1, user, volumeConfig, niveau, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session Musculation Classique créée: ${semaine}-${jour}`);
+      console.log(`Session Musculation Classique créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
   
@@ -1557,7 +1566,7 @@ function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createMusculationClassiqueSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string) {
+function createMusculationClassiqueSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 6;
   
   let exercices = [];
@@ -1664,7 +1673,8 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour} (${typeSession})`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (${typeSession})`,
+    day: dayName || `Jour ${jour}`,
     exercices,
     duree: exercices.length * 15,
     notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
@@ -1677,8 +1687,9 @@ function generateCrossfitProgramme(user: UserProfile): Programme {
   console.log('User:', user);
   
   const sessions = [];
-  const seancesParSemaine = user.seancesParSemaine || 5;
-  const duree = 6; // 6 semaines
+  const seancesParSemaine = user.trainingDays?.length || user.seancesParSemaine || 5;
+  const duree = 6;
+  const trainingDays = user.trainingDays || ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']; // 6 semaines
   
   // Volume force selon le niveau
   const volumeForce = {
@@ -1694,10 +1705,10 @@ function generateCrossfitProgramme(user: UserProfile): Programme {
   console.log('Volume:', volumeConfig);
   
   for (let semaine = 1; semaine <= duree; semaine++) {
-    for (let jour = 1; jour <= seancesParSemaine; jour++) {
-      const session = createCrossfitSession(semaine, jour, user, volumeConfig, niveau);
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      const session = createCrossfitSession(semaine, jour + 1, user, volumeConfig, niveau, trainingDays[jour]);
       sessions.push(session);
-      console.log(`Session CrossFit créée: ${semaine}-${jour}`);
+      console.log(`Session CrossFit créée: ${semaine}-${jour + 1} (${trainingDays[jour]})`);
     }
   }
   
@@ -1717,7 +1728,7 @@ function generateCrossfitProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-function createCrossfitSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string) {
+function createCrossfitSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 6;
   
   let exercices = [];
@@ -1855,7 +1866,8 @@ function createCrossfitSession(semaine: number, jour: number, user: UserProfile,
   
   return {
     id: `${semaine}-${jour}`,
-    nom: `Semaine ${semaine} - Jour ${jour} (${typeSession})`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (${typeSession})`,
+    day: dayName || `Jour ${jour}`,
     exercices,
     duree: exercices.length * 20,
     notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`

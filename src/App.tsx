@@ -7,6 +7,7 @@ import { Toaster } from './components/ui/toaster';
 
 // Composants
 import PageLayout from './components/PageLayout';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 // Lazy loading des pages
 const Login = lazy(() => import('./pages/Login'));
@@ -143,6 +144,7 @@ const AppContent: React.FC = () => {
         </Suspense>
         
           <Toaster />
+          <PWAInstallPrompt />
         </div>
       </Router>
   );

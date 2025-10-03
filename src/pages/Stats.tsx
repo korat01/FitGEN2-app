@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Dumbbell, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Medal, Crown } from 'lucide-react';
+import { Trophy, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Dumbbell, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Medal, Crown, TrendingDown, ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from 'recharts';
 import PageLayout from '@/components/PageLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { scoringEngine } from '../utils/scoring';
@@ -13,6 +14,11 @@ export const Stats: React.FC = () => {
   const { user, updateUser } = useAuth();
   const [performances, setPerformances] = useState<any[]>([]);
   const [userRank, setUserRank] = useState<any>(null);
+  const [globalRanking, setGlobalRanking] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<'global' | 'sport' | 'weight' | 'age' | 'friends'>('global');
+  const [friends, setFriends] = useState<any[]>([]);
+  const [showAddFriendModal, setShowAddFriendModal] = useState(false);
+  const [searchFriend, setSearchFriend] = useState('');
   
   // ÉTAT POUR LE FORMULAIRE DE PERFORMANCE
   const [performance, setPerformance] = useState({
@@ -45,8 +51,59 @@ export const Stats: React.FC = () => {
           globalScore: realRank.globalScore
         });
       }
+      
+      // Charger le classement global
+      loadGlobalRanking();
     }
   }, [user, updateUser]);
+
+  // Fonction pour charger le classement global
+  const loadGlobalRanking = () => {
+    const mockRanking = [
+      { id: '1', name: 'Alexandre', rank: 'S', globalScore: 950, sportClass: 'power', performances: 15, trend: 'up', weight: 85, age: 28, friends: ['2', '3'], lastActivity: '2h ago', streak: 12 },
+      { id: '2', name: 'Marie', rank: 'A', globalScore: 850, sportClass: 'marathon', performances: 12, trend: 'up', weight: 60, age: 25, friends: ['1', '4'], lastActivity: '1h ago', streak: 8 },
+      { id: '3', name: 'Thomas', rank: 'A', globalScore: 820, sportClass: 'crossfit', performances: 18, trend: 'down', weight: 75, age: 30, friends: ['1', '5'], lastActivity: '3h ago', streak: 5 },
+      { id: '4', name: 'Sarah', rank: 'B', globalScore: 750, sportClass: 'calisthenics', performances: 10, trend: 'up', weight: 55, age: 22, friends: ['2', '6'], lastActivity: '4h ago', streak: 15 },
+      { id: '5', name: 'Lucas', rank: 'B', globalScore: 720, sportClass: 'sprint', performances: 8, trend: 'stable', weight: 70, age: 26, friends: ['3', '7'], lastActivity: '5h ago', streak: 3 },
+      { id: '6', name: 'Emma', rank: 'C', globalScore: 650, sportClass: 'classique', performances: 6, trend: 'up', weight: 58, age: 24, friends: ['4', '8'], lastActivity: '6h ago', streak: 7 },
+      { id: '7', name: 'Pierre', rank: 'C', globalScore: 620, sportClass: 'streetlifting', performances: 9, trend: 'down', weight: 80, age: 32, friends: ['5', '9'], lastActivity: '1d ago', streak: 2 },
+      { id: '8', name: 'Sophie', rank: 'D', globalScore: 580, sportClass: 'marathon', performances: 5, trend: 'stable', weight: 52, age: 20, friends: ['6', '10'], lastActivity: '2d ago', streak: 1 },
+      { id: '9', name: 'Marc', rank: 'B', globalScore: 700, sportClass: 'power', performances: 11, trend: 'up', weight: 90, age: 35, friends: ['7', '11'], lastActivity: '3h ago', streak: 9 },
+      { id: '10', name: 'Julie', rank: 'C', globalScore: 600, sportClass: 'calisthenics', performances: 7, trend: 'stable', weight: 50, age: 19, friends: ['8', '12'], lastActivity: '4h ago', streak: 4 },
+      { id: '11', name: 'Antoine', rank: 'A', globalScore: 800, sportClass: 'crossfit', performances: 14, trend: 'up', weight: 78, age: 29, friends: ['9', '13'], lastActivity: '1h ago', streak: 11 },
+      { id: '12', name: 'Camille', rank: 'B', globalScore: 680, sportClass: 'sprint', performances: 9, trend: 'down', weight: 65, age: 27, friends: ['10', '14'], lastActivity: '5h ago', streak: 6 },
+    ];
+    
+    // Ajouter l'utilisateur actuel s'il n'est pas dans la liste
+    if (user && !mockRanking.find(u => u.id === user.id)) {
+      mockRanking.push({
+        id: user.id,
+        name: user.name || 'Vous',
+        rank: userRank?.rank || 'D',
+        globalScore: userRank?.globalScore || 0,
+        sportClass: user.sportClass || 'classique',
+        performances: performances.length,
+        trend: 'stable',
+        weight: user.weight || 70,
+        age: user.age || 25,
+        friends: [],
+        lastActivity: 'Maintenant',
+        streak: 1
+      });
+    }
+    
+    // Trier par score décroissant
+    mockRanking.sort((a, b) => b.globalScore - a.globalScore);
+    setGlobalRanking(mockRanking);
+    
+    // Charger les amis de l'utilisateur
+    if (user) {
+      const userFriends = mockRanking.filter(athlete => 
+        athlete.friends.includes(user.id) || athlete.id === user.id
+      );
+      setFriends(userFriends);
+    }
+  };
 
   // FONCTION POUR AJOUTER UNE PERFORMANCE
   const handleAddPerformance = () => {
@@ -75,6 +132,9 @@ export const Stats: React.FC = () => {
         });
         
         console.log('✅ Stats: Nouveau rang calculé:', realRank);
+        
+        // Recharger le classement global
+        loadGlobalRanking();
       }
       
       // Reset form
@@ -99,6 +159,9 @@ export const Stats: React.FC = () => {
         rank: realRank.rank,
         globalScore: realRank.globalScore
       });
+      
+      // Recharger le classement global
+      loadGlobalRanking();
     }
   };
 
@@ -122,6 +185,160 @@ export const Stats: React.FC = () => {
       case 'D': return '🥉';
       default: return '⭐';
     }
+  };
+
+  const getSportIcon = (sportClass: string) => {
+    switch (sportClass) {
+      case 'power': return '💪';
+      case 'marathon': return '🏃';
+      case 'crossfit': return '🔥';
+      case 'calisthenics': return '🤸';
+      case 'sprint': return '⚡';
+      case 'classique': return '🏋️';
+      case 'streetlifting': return '🏗️';
+      default: return '🏃';
+    }
+  };
+
+  // Fonctions pour filtrer les classements
+  const getFilteredRanking = () => {
+    switch (selectedCategory) {
+      case 'sport':
+        return globalRanking.filter(athlete => athlete.sportClass === user?.sportClass);
+      case 'weight':
+        if (!user?.weight) return globalRanking;
+        const weightRange = 10; // ±10kg
+        return globalRanking.filter(athlete => 
+          Math.abs(athlete.weight - user.weight) <= weightRange
+        );
+      case 'age':
+        if (!user?.age) return globalRanking;
+        const ageRange = 5; // ±5 ans
+        return globalRanking.filter(athlete => 
+          Math.abs(athlete.age - user.age) <= ageRange
+        );
+      case 'friends':
+        return friends;
+      default:
+        return globalRanking;
+    }
+  };
+
+  const getCategoryTitle = () => {
+    switch (selectedCategory) {
+      case 'sport':
+        return `Classement ${user?.sportClass || 'Sport'}`;
+      case 'weight':
+        return `Classement Poids (±10kg)`;
+      case 'age':
+        return `Classement Âge (±5ans)`;
+      case 'friends':
+        return 'Classement Amis';
+      default:
+        return 'Classement Global';
+    }
+  };
+
+  const getCategoryDescription = () => {
+    switch (selectedCategory) {
+      case 'sport':
+        return `Athlètes pratiquant le même sport que vous`;
+      case 'weight':
+        return `Athlètes avec un poids similaire (±10kg)`;
+      case 'age':
+        return `Athlètes du même âge (±5ans)`;
+      case 'friends':
+        return `Vos amis et vous-même`;
+      default:
+        return `Tous les athlètes de la plateforme`;
+    }
+  };
+
+  const handleAddFriend = (friendId: string) => {
+    const friend = globalRanking.find(a => a.id === friendId);
+    if (friend && !friends.find(f => f.id === friendId)) {
+      setFriends([...friends, friend]);
+      alert(`Vous avez ajouté ${friend.name} comme ami !`);
+    }
+  };
+
+  const handleRemoveFriend = (friendId: string) => {
+    setFriends(friends.filter(f => f.id !== friendId));
+    alert('Ami supprimé de votre liste');
+  };
+
+  // Fonctions pour préparer les données des graphiques
+  const prepareChartData = () => {
+    if (performances.length === 0) return [];
+
+    // Grouper les performances par discipline
+    const groupedData: { [key: string]: any[] } = {};
+    performances.forEach(perf => {
+      if (!groupedData[perf.discipline]) {
+        groupedData[perf.discipline] = [];
+      }
+      groupedData[perf.discipline].push({
+        date: new Date(perf.date).toLocaleDateString('fr-FR'),
+        value: perf.value,
+        timestamp: new Date(perf.date).getTime()
+      });
+    });
+
+    // Trier par date pour chaque discipline
+    Object.keys(groupedData).forEach(discipline => {
+      groupedData[discipline].sort((a, b) => a.timestamp - b.timestamp);
+    });
+
+    return groupedData;
+  };
+
+  const getChartDataForDiscipline = (discipline: string) => {
+    const chartData = prepareChartData();
+    return chartData[discipline] || [];
+  };
+
+  const getAllChartData = () => {
+    const chartData = prepareChartData();
+    const allDates = new Set<string>();
+    
+    // Collecter toutes les dates
+    Object.values(chartData).forEach(data => {
+      data.forEach(item => allDates.add(item.date));
+    });
+
+    // Créer un dataset combiné
+    const combinedData = Array.from(allDates).map(date => {
+      const dataPoint: any = { date };
+      Object.keys(chartData).forEach(discipline => {
+        const disciplineData = chartData[discipline].find(item => item.date === date);
+        dataPoint[discipline] = disciplineData ? disciplineData.value : null;
+      });
+      return dataPoint;
+    });
+
+    return combinedData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  };
+
+  const getDisciplineColor = (discipline: string) => {
+    const colors: { [key: string]: string } = {
+      'bench': '#ef4444', // Rouge
+      'squat': '#3b82f6', // Bleu
+      'deadlift': '#10b981', // Vert
+      '5k': '#8b5cf6', // Violet
+      'pullups': '#f59e0b', // Orange
+    };
+    return colors[discipline] || '#6b7280';
+  };
+
+  const getDisciplineName = (discipline: string) => {
+    const names: { [key: string]: string } = {
+      'bench': 'Développé couché',
+      'squat': 'Squat',
+      'deadlift': 'Soulevé de terre',
+      '5k': '5km',
+      'pullups': 'Tractions',
+    };
+    return names[discipline] || discipline;
   };
 
   return (
@@ -194,7 +411,7 @@ export const Stats: React.FC = () => {
 
             {/* Navigation Moderne */}
         <Tabs defaultValue="overview" className="space-y-8">
-              <TabsList className="grid w-full grid-cols-6 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-white/20">
+              <TabsList className="grid w-full grid-cols-7 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-lg border border-white/20">
                 <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white font-semibold rounded-xl transition-all duration-300">
               <Dumbbell className="w-4 h-4 mr-2" />
               Accueil
@@ -214,6 +431,10 @@ export const Stats: React.FC = () => {
                 <TabsTrigger value="goals" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white font-semibold rounded-xl transition-all duration-300">
               <Target className="w-4 h-4 mr-2" />
               Objectifs
+            </TabsTrigger>
+                <TabsTrigger value="ranking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white font-semibold rounded-xl transition-all duration-300">
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Classement
             </TabsTrigger>
                 <TabsTrigger value="profile" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white font-semibold rounded-xl transition-all duration-300">
                   <Users className="w-4 h-4 mr-2" />
@@ -565,57 +786,228 @@ export const Stats: React.FC = () => {
             </div>
           </TabsContent>
 
-              {/* Progression */}
-              <TabsContent value="progress" className="space-y-6">
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                  Évolution de vos performances
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                      {performances
-                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                        .slice(0, 10)
-                        .map((perf, index) => (
-                          <div key={perf.id} className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300">
-                      <div className="flex items-center justify-between mb-4">
-                              <h4 className="text-lg font-bold text-gray-800">
-                                {new Date(perf.date).toLocaleDateString()}
-                              </h4>
-                              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                                Performance
-                        </Badge>
-                      </div>
-                      
-                            <div className="text-center p-4 bg-white rounded-xl shadow-sm">
-                              <div className="text-3xl font-bold text-indigo-600 mb-2">
-                                {perf.value} {perf.discipline === '5k' ? 'min' : perf.discipline === 'pullups' ? 'reps' : 'kg'}
-                        </div>
-                              <div className="text-lg font-semibold text-gray-800">
-                                {perf.discipline === 'bench' ? '💪 Développé couché' :
-                                 perf.discipline === 'squat' ? '🏋️ Squat' :
-                                 perf.discipline === 'deadlift' ? '⚡ Soulevé de terre' :
-                                 perf.discipline === '5k' ? '🏃 5km' :
-                                 perf.discipline === 'pullups' ? '🤸‍♂️ Tractions' : perf.discipline}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                      
-                      {performances.length === 0 && (
-                        <div className="text-center text-gray-500 py-8">
-                          <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                          <p className="text-lg">Aucune performance enregistrée</p>
-                          <p className="text-sm">Ajoutez vos performances pour voir votre historique !</p>
-                        </div>
-                      )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+               {/* Progression */}
+               <TabsContent value="progress" className="space-y-8">
+                 {/* Graphique global de toutes les performances */}
+                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                   <CardHeader>
+                     <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                       <TrendingUp className="w-6 h-6 text-green-600" />
+                       Évolution globale de vos performances
+                     </CardTitle>
+                     <p className="text-gray-600">Progression de toutes vos disciplines dans le temps</p>
+                   </CardHeader>
+                   <CardContent>
+                     {performances.length > 0 ? (
+                       <div className="h-80 w-full">
+                         <ResponsiveContainer width="100%" height="100%">
+                           <LineChart data={getAllChartData()}>
+                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                             <XAxis 
+                               dataKey="date" 
+                               stroke="#6b7280"
+                               fontSize={12}
+                               tick={{ fill: '#6b7280' }}
+                             />
+                             <YAxis 
+                               stroke="#6b7280"
+                               fontSize={12}
+                               tick={{ fill: '#6b7280' }}
+                             />
+                             <Tooltip 
+                               contentStyle={{
+                                 backgroundColor: 'white',
+                                 border: '1px solid #e5e7eb',
+                                 borderRadius: '8px',
+                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                               }}
+                             />
+                             <Legend />
+                             {Object.keys(prepareChartData()).map(discipline => (
+                               <Line
+                                 key={discipline}
+                                 type="monotone"
+                                 dataKey={discipline}
+                                 stroke={getDisciplineColor(discipline)}
+                                 strokeWidth={3}
+                                 dot={{ fill: getDisciplineColor(discipline), strokeWidth: 2, r: 4 }}
+                                 activeDot={{ r: 6, stroke: getDisciplineColor(discipline), strokeWidth: 2 }}
+                                 name={getDisciplineName(discipline)}
+                               />
+                             ))}
+                           </LineChart>
+                         </ResponsiveContainer>
+                       </div>
+                     ) : (
+                       <div className="text-center text-gray-500 py-8">
+                         <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                         <p className="text-lg">Aucune performance enregistrée</p>
+                         <p className="text-sm">Ajoutez vos performances pour voir vos graphiques !</p>
+                       </div>
+                     )}
+                   </CardContent>
+                 </Card>
+
+                 {/* Graphiques individuels par discipline */}
+                 {Object.keys(prepareChartData()).map(discipline => {
+                   const disciplineData = getChartDataForDiscipline(discipline);
+                   const latestValue = disciplineData[disciplineData.length - 1]?.value;
+                   const firstValue = disciplineData[0]?.value;
+                   const improvement = latestValue && firstValue ? ((latestValue - firstValue) / firstValue * 100).toFixed(1) : 0;
+                   
+                   return (
+                     <Card key={discipline} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                       <CardHeader>
+                         <div className="flex items-center justify-between">
+                           <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                             <div 
+                               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
+                               style={{ backgroundColor: getDisciplineColor(discipline) }}
+                             >
+                               {discipline === 'bench' ? '💪' :
+                                discipline === 'squat' ? '🏋️' :
+                                discipline === 'deadlift' ? '⚡' :
+                                discipline === '5k' ? '🏃' :
+                                discipline === 'pullups' ? '🤸‍♂️' : '📊'}
+                             </div>
+                             {getDisciplineName(discipline)}
+                           </CardTitle>
+                           <div className="text-right">
+                             <div className="text-2xl font-bold" style={{ color: getDisciplineColor(discipline) }}>
+                               {latestValue} {discipline === '5k' ? 'min' : discipline === 'pullups' ? 'reps' : 'kg'}
+                             </div>
+                             <div className="text-sm text-gray-600">
+                               {improvement > 0 ? '+' : ''}{improvement}% d'amélioration
+                             </div>
+                           </div>
+                         </div>
+                       </CardHeader>
+                       <CardContent>
+                         <div className="h-64 w-full">
+                           <ResponsiveContainer width="100%" height="100%">
+                             <AreaChart data={disciplineData}>
+                               <defs>
+                                 <linearGradient id={`gradient-${discipline}`} x1="0" y1="0" x2="0" y2="1">
+                                   <stop offset="5%" stopColor={getDisciplineColor(discipline)} stopOpacity={0.3}/>
+                                   <stop offset="95%" stopColor={getDisciplineColor(discipline)} stopOpacity={0.05}/>
+                                 </linearGradient>
+                               </defs>
+                               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                               <XAxis 
+                                 dataKey="date" 
+                                 stroke="#6b7280"
+                                 fontSize={12}
+                                 tick={{ fill: '#6b7280' }}
+                               />
+                               <YAxis 
+                                 stroke="#6b7280"
+                                 fontSize={12}
+                                 tick={{ fill: '#6b7280' }}
+                               />
+                               <Tooltip 
+                                 contentStyle={{
+                                   backgroundColor: 'white',
+                                   border: '1px solid #e5e7eb',
+                                   borderRadius: '8px',
+                                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                                 }}
+                                 formatter={(value: any) => [
+                                   `${value} ${discipline === '5k' ? 'min' : discipline === 'pullups' ? 'reps' : 'kg'}`,
+                                   getDisciplineName(discipline)
+                                 ]}
+                               />
+                               <Area
+                                 type="monotone"
+                                 dataKey="value"
+                                 stroke={getDisciplineColor(discipline)}
+                                 strokeWidth={3}
+                                 fill={`url(#gradient-${discipline})`}
+                                 dot={{ fill: getDisciplineColor(discipline), strokeWidth: 2, r: 4 }}
+                                 activeDot={{ r: 6, stroke: getDisciplineColor(discipline), strokeWidth: 2 }}
+                               />
+                             </AreaChart>
+                           </ResponsiveContainer>
+                         </div>
+                         
+                         {/* Statistiques de la discipline */}
+                         <div className="grid grid-cols-3 gap-4 mt-6">
+                           <div className="text-center p-4 bg-gray-50 rounded-xl">
+                             <div className="text-lg font-bold text-gray-800">{disciplineData.length}</div>
+                             <div className="text-sm text-gray-600">Performances</div>
+                           </div>
+                           <div className="text-center p-4 bg-gray-50 rounded-xl">
+                             <div className="text-lg font-bold text-gray-800">
+                               {Math.max(...disciplineData.map(d => d.value))} {discipline === '5k' ? 'min' : discipline === 'pullups' ? 'reps' : 'kg'}
+                             </div>
+                             <div className="text-sm text-gray-600">Record</div>
+                           </div>
+                           <div className="text-center p-4 bg-gray-50 rounded-xl">
+                             <div className="text-lg font-bold text-gray-800">
+                               {disciplineData.length > 1 ? 
+                                 ((Math.max(...disciplineData.map(d => d.value)) - Math.min(...disciplineData.map(d => d.value))) / Math.min(...disciplineData.map(d => d.value)) * 100).toFixed(1) + '%' 
+                                 : '0%'
+                               }
+                             </div>
+                             <div className="text-sm text-gray-600">Progression</div>
+                           </div>
+                         </div>
+                       </CardContent>
+                     </Card>
+                   );
+                 })}
+
+                 {/* Graphique en barres des records */}
+                 {performances.length > 0 && (
+                   <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                     <CardHeader>
+                       <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                         <Trophy className="w-6 h-6 text-yellow-600" />
+                         Comparaison des records par discipline
+                       </CardTitle>
+                     </CardHeader>
+                     <CardContent>
+                       <div className="h-64 w-full">
+                         <ResponsiveContainer width="100%" height="100%">
+                           <BarChart data={Object.keys(prepareChartData()).map(discipline => {
+                             const disciplineData = getChartDataForDiscipline(discipline);
+                             return {
+                               discipline: getDisciplineName(discipline),
+                               record: Math.max(...disciplineData.map(d => d.value)),
+                               color: getDisciplineColor(discipline)
+                             };
+                           })}>
+                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                             <XAxis 
+                               dataKey="discipline" 
+                               stroke="#6b7280"
+                               fontSize={12}
+                               tick={{ fill: '#6b7280' }}
+                             />
+                             <YAxis 
+                               stroke="#6b7280"
+                               fontSize={12}
+                               tick={{ fill: '#6b7280' }}
+                             />
+                             <Tooltip 
+                               contentStyle={{
+                                 backgroundColor: 'white',
+                                 border: '1px solid #e5e7eb',
+                                 borderRadius: '8px',
+                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                               }}
+                             />
+                             <Bar 
+                               dataKey="record" 
+                               fill="#3b82f6"
+                               radius={[4, 4, 0, 0]}
+                             />
+                           </BarChart>
+                         </ResponsiveContainer>
+                       </div>
+                     </CardContent>
+                   </Card>
+                 )}
+               </TabsContent>
 
           {/* Objectifs */}
               <TabsContent value="goals" className="space-y-6">
@@ -646,6 +1038,383 @@ export const Stats: React.FC = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+               {/* Classement Global */}
+               <TabsContent value="ranking" className="space-y-8">
+                 {/* Filtres de catégorie */}
+                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                   <CardHeader>
+                     <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                       <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                         <Target className="w-5 h-5 text-white" />
+                       </div>
+                       Filtrer le classement
+                     </CardTitle>
+                   </CardHeader>
+                   <CardContent>
+                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                       <Button
+                         variant={selectedCategory === 'global' ? 'default' : 'outline'}
+                         onClick={() => setSelectedCategory('global')}
+                         className={`${selectedCategory === 'global' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : ''} font-semibold`}
+                       >
+                         🌍 Global
+                       </Button>
+                       <Button
+                         variant={selectedCategory === 'sport' ? 'default' : 'outline'}
+                         onClick={() => setSelectedCategory('sport')}
+                         className={`${selectedCategory === 'sport' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : ''} font-semibold`}
+                       >
+                         {getSportIcon(user?.sportClass || 'classique')} Sport
+                       </Button>
+                       <Button
+                         variant={selectedCategory === 'weight' ? 'default' : 'outline'}
+                         onClick={() => setSelectedCategory('weight')}
+                         className={`${selectedCategory === 'weight' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : ''} font-semibold`}
+                       >
+                         ⚖️ Poids
+                       </Button>
+                       <Button
+                         variant={selectedCategory === 'age' ? 'default' : 'outline'}
+                         onClick={() => setSelectedCategory('age')}
+                         className={`${selectedCategory === 'age' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : ''} font-semibold`}
+                       >
+                         🎂 Âge
+                       </Button>
+                       <Button
+                         variant={selectedCategory === 'friends' ? 'default' : 'outline'}
+                         onClick={() => setSelectedCategory('friends')}
+                         className={`${selectedCategory === 'friends' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : ''} font-semibold`}
+                       >
+                         👥 Amis
+                       </Button>
+                     </div>
+                   </CardContent>
+                 </Card>
+
+                 {/* Header du classement */}
+                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                   <CardHeader>
+                     <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                       <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
+                         <Trophy className="w-6 h-6 text-white" />
+                       </div>
+                       {getCategoryTitle()}
+                     </CardTitle>
+                     <p className="text-gray-600">{getCategoryDescription()}</p>
+                   </CardHeader>
+                   <CardContent>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                       <div className="text-center p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
+                         <div className="text-3xl font-bold text-yellow-600 mb-2">
+                           {getFilteredRanking().findIndex(u => u.id === user?.id) + 1 || 'N/A'}
+                         </div>
+                         <div className="text-lg font-semibold text-gray-800">Votre position</div>
+                         <div className="text-sm text-gray-600">sur {getFilteredRanking().length} athlètes</div>
+                       </div>
+                       <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
+                         <div className="text-3xl font-bold text-blue-600 mb-2">
+                           {userRank?.globalScore || 0}
+                         </div>
+                         <div className="text-lg font-semibold text-gray-800">Votre score</div>
+                         <div className="text-sm text-gray-600">sur 1000 points</div>
+                       </div>
+                       <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
+                         <div className="text-3xl font-bold text-green-600 mb-2">
+                           {performances.length}
+                         </div>
+                         <div className="text-lg font-semibold text-gray-800">Performances</div>
+                         <div className="text-sm text-gray-600">enregistrées</div>
+                       </div>
+                     </div>
+                   </CardContent>
+                </Card>
+
+                 {/* Liste du classement */}
+                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                   <CardHeader>
+                     <CardTitle className="text-xl font-bold flex items-center gap-2">
+                       <Medal className="w-5 h-5 text-yellow-500" />
+                       Top Athlètes ({getFilteredRanking().length})
+                     </CardTitle>
+                   </CardHeader>
+                   <CardContent>
+                     <div className="space-y-4">
+                       {getFilteredRanking().map((athlete, index) => {
+                        const isCurrentUser = athlete.id === user?.id;
+                        const getPositionIcon = (position: number) => {
+                          switch (position) {
+                            case 1: return '🥇';
+                            case 2: return '🥈';
+                            case 3: return '🥉';
+                            default: return `${position}`;
+                          }
+                        };
+
+                        const getTrendIcon = (trend: string) => {
+                          switch (trend) {
+                            case 'up': return <ArrowUp className="w-4 h-4 text-green-500" />;
+                            case 'down': return <ArrowDown className="w-4 h-4 text-red-500" />;
+                            default: return <Minus className="w-4 h-4 text-gray-500" />;
+                          }
+                        };
+
+                        return (
+                          <div 
+                            key={athlete.id} 
+                            className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
+                              isCurrentUser 
+                                ? 'bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-lg' 
+                                : 'bg-gradient-to-r from-gray-50 to-gray-100 hover:shadow-md'
+                            }`}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-lg">
+                                {getPositionIcon(index + 1)}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`font-bold text-lg ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                                    {athlete.name}
+                                  </span>
+                                  {isCurrentUser && <Badge className="bg-blue-500 text-white">Vous</Badge>}
+                                </div>
+                                 <div className="flex items-center gap-2 text-sm text-gray-600">
+                                   <span>{getSportIcon(athlete.sportClass)}</span>
+                                   <span className="capitalize">{athlete.sportClass}</span>
+                                   <span>•</span>
+                                   <span>{athlete.performances} performances</span>
+                                   <span>•</span>
+                                   <span>{athlete.weight}kg</span>
+                                   <span>•</span>
+                                   <span>{athlete.age}ans</span>
+                                   <span>•</span>
+                                   <span className="text-orange-600 font-semibold">🔥{athlete.streak}</span>
+                                 </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                <div className={`font-bold text-xl ${isCurrentUser ? 'text-blue-600' : 'text-gray-800'}`}>
+                                  {athlete.globalScore}
+                                </div>
+                                <div className="text-sm text-gray-600">points</div>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r ${getRangColor(athlete.rank)} text-white font-semibold text-sm`}>
+                                  <span>{getRangIcon(athlete.rank)}</span>
+                                  <span>{athlete.rank}</span>
+                                </div>
+                                {getTrendIcon(athlete.trend)}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Statistiques du classement */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-purple-500" />
+                        Répartition par rang
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                         {['S', 'A', 'B', 'C', 'D'].map(rank => {
+                           const count = getFilteredRanking().filter(a => a.rank === rank).length;
+                           const percentage = getFilteredRanking().length > 0 ? Math.round((count / getFilteredRanking().length) * 100) : 0;
+                          
+                          return (
+                            <div key={rank} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{getRangIcon(rank)}</span>
+                                <span className="font-semibold text-gray-800">Rang {rank}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className={`h-2 rounded-full bg-gradient-to-r ${getRangColor(rank)}`}
+                                    style={{ width: `${percentage}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm font-semibold text-gray-600 w-8">{count}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-green-500" />
+                        Répartition par sport
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                         {['power', 'marathon', 'crossfit', 'calisthenics', 'sprint', 'classique', 'streetlifting'].map(sport => {
+                           const count = getFilteredRanking().filter(a => a.sportClass === sport).length;
+                           const percentage = getFilteredRanking().length > 0 ? Math.round((count / getFilteredRanking().length) * 100) : 0;
+                          const sportNames: { [key: string]: string } = {
+                            'power': 'Powerlifting',
+                            'marathon': 'Marathon',
+                            'crossfit': 'CrossFit',
+                            'calisthenics': 'Calisthénics',
+                            'sprint': 'Sprint',
+                            'classique': 'Musculation',
+                            'streetlifting': 'Street Lifting'
+                          };
+                          
+                          return (
+                            <div key={sport} className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg">{getSportIcon(sport)}</span>
+                                <span className="font-semibold text-gray-800">{sportNames[sport]}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                                    style={{ width: `${percentage}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm font-semibold text-gray-600 w-8">{count}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Gestion des amis */}
+                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                        <Users className="w-5 h-5 text-white" />
+                      </div>
+                      Gérer vos amis
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-gray-600">
+                        Ajoutez des amis pour comparer vos performances et vous motiver mutuellement !
+                      </p>
+                      
+                      {/* Bouton pour ajouter des amis */}
+                      <Button
+                        onClick={() => setShowAddFriendModal(true)}
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Ajouter des amis
+                      </Button>
+
+                      {/* Liste des amis actuels */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-gray-800">Vos amis ({friends.length - 1})</h4>
+                        {friends.filter(f => f.id !== user?.id).map(friend => (
+                          <div key={friend.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                {friend.name.charAt(0)}
+                              </div>
+                              <div>
+                                <div className="font-semibold text-gray-800">{friend.name}</div>
+                                <div className="text-sm text-gray-600">
+                                  {getSportIcon(friend.sportClass)} {friend.sportClass} • {friend.weight}kg • {friend.age}ans
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-red-600 hover:bg-red-50"
+                              onClick={() => handleRemoveFriend(friend.id)}
+                            >
+                              Supprimer
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Modal pour ajouter des amis */}
+                {showAddFriendModal && (
+                  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <Card className="w-full max-w-md bg-white">
+                      <CardHeader>
+                        <CardTitle className="flex items-center justify-between">
+                          <span>Ajouter des amis</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowAddFriendModal(false)}
+                          >
+                            ✕
+                          </Button>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <input
+                            type="text"
+                            placeholder="Rechercher un athlète..."
+                            value={searchFriend}
+                            onChange={(e) => setSearchFriend(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="max-h-60 overflow-y-auto space-y-2">
+                          {globalRanking
+                            .filter(athlete => 
+                              athlete.id !== user?.id && 
+                              !friends.find(f => f.id === athlete.id) &&
+                              athlete.name.toLowerCase().includes(searchFriend.toLowerCase())
+                            )
+                            .slice(0, 10)
+                            .map(athlete => (
+                              <div key={athlete.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                                    {athlete.name.charAt(0)}
+                                  </div>
+                                  <span className="font-medium">{athlete.name}</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  className="bg-green-500 hover:bg-green-600 text-white"
+                                  onClick={() => {
+                                    handleAddFriend(athlete.id);
+                                    setShowAddFriendModal(false);
+                                  }}
+                                >
+                                  + Ajouter
+                                </Button>
+                              </div>
+                            ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </TabsContent>
 
               {/* Profil */}
               <TabsContent value="profile" className="space-y-6">
@@ -686,11 +1455,11 @@ export const Stats: React.FC = () => {
                           <div className="text-lg font-semibold text-gray-800">{userRank?.rank || "D"}</div>
                         </div>
                       </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

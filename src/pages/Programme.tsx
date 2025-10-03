@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../contexts/AuthContext';
+import { useMobileDetection } from '../hooks/useMobileDetection';
 import { 
   Dumbbell, 
   Play, 
@@ -25,6 +26,7 @@ import { generateProgramme } from '../utils/programmeGenerator';
 
 export const Programme: React.FC = () => {
   const { user } = useAuth();
+  const { isMobile } = useMobileDetection();
   const [programme, setProgramme] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTab, setCurrentTab] = useState<'today' | 'weekly' | 'planning'>('today');
@@ -285,7 +287,7 @@ export const Programme: React.FC = () => {
         {/* Programme Généré */}
         {programme && (
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm">
+            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} bg-white/80 backdrop-blur-sm`}>
               <TabsTrigger value="today" className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Aujourd'hui
@@ -360,7 +362,7 @@ export const Programme: React.FC = () => {
                             </CardHeader>
                             <CardContent>
                               <div className="space-y-3">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
                                   <div className="text-center p-2 bg-gray-50 rounded">
                                     <p className="text-sm text-gray-600">Séries</p>
                                     <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
@@ -424,7 +426,7 @@ export const Programme: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-4`}>
                     {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map(day => {
                       const daySession = programme.sessions.find((s: any) => s.day === day);
                       return (

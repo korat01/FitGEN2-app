@@ -1,6 +1,13 @@
 import { UserProfile } from '../types/profile';
 
 // Types pour le générateur de programme
+export interface ProgressionConfig {
+  type: 'weight' | 'reps' | 'both';
+  weeklyIncrease: number; // Pourcentage d'augmentation par semaine
+  maxIncrease: number; // Augmentation maximale par semaine
+  deloadWeek: boolean; // Réduction lors des semaines de deload
+}
+
 export interface Exercise {
   id: string;
   nom: string;
@@ -51,6 +58,93 @@ export interface Programme {
     dureeMoyenne: number;
   };
 }
+
+// Fonctions de progression automatique
+export const calculateProgressiveLoad = (
+  baseWeight: number,
+  semaine: number,
+  config: ProgressionConfig,
+  isDeload: boolean = false
+): { weight: number; reps: string; sets: number } => {
+  let finalWeight = baseWeight;
+  let reps = '8'; // Valeur par défaut
+  let sets = 3; // Valeur par défaut
+
+  if (isDeload && config.deloadWeek) {
+    // Semaine de deload : réduction de 20%
+    finalWeight = Math.round(baseWeight * 0.8);
+    reps = '6';
+    sets = 2;
+  } else {
+    // Progression normale
+    const weeklyIncrease = config.weeklyIncrease / 100; // Convertir en décimal
+    const maxIncrease = config.maxIncrease / 100;
+    
+    // Calculer l'augmentation totale sur les semaines
+    const totalIncrease = Math.min(weeklyIncrease * (semaine - 1), maxIncrease);
+    finalWeight = Math.round(baseWeight * (1 + totalIncrease));
+    
+    // Ajuster les reps selon le type de progression
+    if (config.type === 'reps' || config.type === 'both') {
+      const baseReps = 8;
+      const repIncrease = Math.floor((semaine - 1) * 0.5); // +0.5 reps par semaine
+      reps = (baseReps + repIncrease).toString();
+    }
+    
+    if (config.type === 'both') {
+      // Progression mixte : augmenter les sets aussi
+      sets = Math.min(3 + Math.floor((semaine - 1) / 2), 5);
+    }
+  }
+
+  return { weight: finalWeight, reps, sets };
+};
+
+// Configuration de progression par type d'exercice
+export const getProgressionConfig = (exerciseName: string): ProgressionConfig => {
+  const name = exerciseName.toLowerCase();
+  
+  // Exercices de force pure (augmentation de charge prioritaire)
+  if (name.includes('squat') || name.includes('deadlift') || name.includes('bench') || 
+      name.includes('développé') || name.includes('soulevé')) {
+    return {
+      type: 'weight',
+      weeklyIncrease: 5, // 5% par semaine
+      maxIncrease: 20, // Maximum 20% d'augmentation
+      deloadWeek: true
+    };
+  }
+  
+  // Exercices d'assistance (progression mixte)
+  if (name.includes('row') || name.includes('tirage') || name.includes('curl') || 
+      name.includes('extension') || name.includes('dips') || name.includes('traction')) {
+    return {
+      type: 'both',
+      weeklyIncrease: 3, // 3% par semaine
+      maxIncrease: 15, // Maximum 15% d'augmentation
+      deloadWeek: true
+    };
+  }
+  
+  // Exercices d'isolation (augmentation de reps prioritaire)
+  if (name.includes('biceps') || name.includes('triceps') || name.includes('mollet') || 
+      name.includes('lateral') || name.includes('rear')) {
+    return {
+      type: 'reps',
+      weeklyIncrease: 2, // 2% par semaine
+      maxIncrease: 10, // Maximum 10% d'augmentation
+      deloadWeek: true
+    };
+  }
+  
+  // Configuration par défaut
+  return {
+    type: 'both',
+    weeklyIncrease: 3,
+    maxIncrease: 15,
+    deloadWeek: true
+  };
+};
 
 export interface ProfileAnalysis {
   sportClass: string;
@@ -1029,30 +1123,56 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
   if (jour === 1) {
     // Séance vitesse max
     exercices = [
-      { nom: 'Sprints 30m', series: estDeload ? 4 : 6, reps: 1, poids: 0, repos: 120 },
-      { nom: 'Sprints 60m', series: estDeload ? 3 : 4, reps: 1, poids: 0, repos: 180 },
-      { nom: 'Box jumps', series: estDeload ? 3 : 4, reps: 8, poids: 0, repos: 90 }
+      { nom: 'Sprints 30m', sets: estDeload ? 4 : 6, reps: '1', weight: 0, rest: '2min' },
+      { nom: 'Sprints 60m', sets: estDeload ? 3 : 4, reps: '1', weight: 0, rest: '3min' },
+      { nom: 'Box jumps', sets: estDeload ? 3 : 4, reps: '8', weight: 0, rest: '90sec' }
     ];
   } else if (jour === 2) {
-    // Séance force
+    // Séance force avec progression automatique
+    const squatConfig = getProgressionConfig('Back Squat');
+    const cleanConfig = getProgressionConfig('Power Clean');
+    const thrustConfig = getProgressionConfig('Hip Thrust');
+    
+    const squatProg = calculateProgressiveLoad(user.weight * 0.8, semaine, squatConfig, estDeload);
+    const cleanProg = calculateProgressiveLoad(user.weight * 0.6, semaine, cleanConfig, estDeload);
+    const thrustProg = calculateProgressiveLoad(user.weight * 0.5, semaine, thrustConfig, estDeload);
+    
     exercices = [
-      { nom: 'Back Squat', series: estDeload ? 3 : 5, reps: 5, poids: user.weight * 0.8, repos: 180 },
-      { nom: 'Power Clean', series: estDeload ? 3 : 4, reps: 3, poids: user.weight * 0.6, repos: 180 },
-      { nom: 'Hip Thrust', series: estDeload ? 3 : 4, reps: 8, poids: user.weight * 0.5, repos: 90 }
+      { 
+        nom: 'Back Squat', 
+        sets: squatProg.sets, 
+        reps: squatProg.reps, 
+        weight: squatProg.weight, 
+        rest: '3min' 
+      },
+      { 
+        nom: 'Power Clean', 
+        sets: cleanProg.sets, 
+        reps: cleanProg.reps, 
+        weight: cleanProg.weight, 
+        rest: '3min' 
+      },
+      { 
+        nom: 'Hip Thrust', 
+        sets: thrustProg.sets, 
+        reps: thrustProg.reps, 
+        weight: thrustProg.weight, 
+        rest: '90sec' 
+      }
     ];
   } else if (jour === 3) {
     // Séance endurance vitesse
     exercices = [
-      { nom: 'Sprints 150m', series: estDeload ? 4 : 6, reps: 1, poids: 0, repos: 180 },
-      { nom: 'Sprints 400m', series: estDeload ? 2 : 4, reps: 1, poids: 0, repos: 300 },
-      { nom: 'Bounding', series: estDeload ? 3 : 4, reps: 20, poids: 0, repos: 90 }
+      { nom: 'Sprints 150m', sets: estDeload ? 4 : 6, reps: '1', weight: 0, rest: '3min' },
+      { nom: 'Sprints 400m', sets: estDeload ? 2 : 4, reps: '1', weight: 0, rest: '5min' },
+      { nom: 'Bounding', sets: estDeload ? 3 : 4, reps: '20m', weight: 0, rest: '90sec' }
     ];
   } else {
     // Séance technique/accessoires
     exercices = [
-      { nom: 'Drills A/B/C', series: 3, reps: 10, poids: 0, repos: 60 },
-      { nom: 'Core anti-rotation', series: 3, reps: 12, poids: 0, repos: 60 },
-      { nom: 'Nordic hamstring', series: 3, reps: 8, poids: 0, repos: 90 }
+      { nom: 'Drills A/B/C', sets: 3, reps: '10', weight: 0, rest: '60sec' },
+      { nom: 'Core anti-rotation', sets: 3, reps: '12', weight: 0, rest: '60sec' },
+      { nom: 'Nordic hamstring', sets: 3, reps: '8', weight: 0, rest: '90sec' }
     ];
   }
   
@@ -1063,10 +1183,10 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
     exercises: exercices.map(ex => ({
       ...ex,
       progression: {
-        sets: 1,
+        sets: ex.sets,
         reps: ex.reps,
-        poids: ex.poids,
-        repos: ex.repos
+        poids: ex.weight,
+        repos: ex.rest
       }
     })),
     duration: exercices.length * 15,
@@ -1426,18 +1546,18 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     exercices = [
       { 
         nom: 'Footing endurance', 
-        series: 1, 
-        reps: duree, 
-        poids: 0, 
-        repos: 0,
+        sets: 1, 
+        reps: `${duree}min`, 
+        weight: 0, 
+        rest: '0',
         details: `Footing ${duree}min à ${allure.endurance.toFixed(1)} km/h (zone 2)`
       },
       { 
         nom: 'Étirements', 
-        series: 1, 
-        reps: 10, 
-        poids: 0, 
-        repos: 0,
+        sets: 1, 
+        reps: '10min', 
+        weight: 0, 
+        rest: '0',
         details: 'Étirements post-course 10min'
       }
     ];
@@ -1448,18 +1568,18 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     exercices = [
       { 
         nom: 'Fractionné', 
-        series: repetitions, 
-        reps: distance, 
-        poids: 0, 
-        repos: 60,
+        sets: repetitions, 
+        reps: `${distance}m`, 
+        weight: 0, 
+        rest: '1min',
         details: `${repetitions}x${distance}m à ${allure.fractionne.toFixed(1)} km/h (R=1min)`
       },
       { 
         nom: 'Récupération active', 
-        series: 1, 
-        reps: 10, 
-        poids: 0, 
-        repos: 0,
+        sets: 1, 
+        reps: '10min', 
+        weight: 0, 
+        rest: '0',
         details: 'Footing récupération 10min'
       }
     ];
@@ -1470,18 +1590,18 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     exercices = [
       { 
         nom: 'Seuil', 
-        series: repetitions, 
-        reps: duree, 
-        poids: 0, 
-        repos: 120,
+        sets: repetitions, 
+        reps: `${duree}min`, 
+        weight: 0, 
+        rest: '2min',
         details: `${repetitions}x${duree}min à ${allure.seuil.toFixed(1)} km/h (R=2min)`
       },
       { 
         nom: 'Retour au calme', 
-        series: 1, 
-        reps: 15, 
-        poids: 0, 
-        repos: 0,
+        sets: 1, 
+        reps: '15min', 
+        weight: 0, 
+        rest: '0',
         details: 'Footing retour au calme 15min'
       }
     ];
@@ -1492,18 +1612,18 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     exercices = [
       { 
         nom: 'Sortie longue', 
-        series: 1, 
-        reps: distance, 
-        poids: 0, 
-        repos: 0,
+        sets: 1, 
+        reps: `${distance}km`, 
+        weight: 0, 
+        rest: '0',
         details: `Sortie ${distance}km dont ${distanceMarathon}km à ${allure.marathon.toFixed(1)} km/h`
       },
       { 
         nom: 'Renforcement', 
-        series: 3, 
-        reps: 20, 
-        poids: 0, 
-        repos: 60,
+        sets: 3, 
+        reps: '20', 
+        weight: 0, 
+        rest: '60sec',
         details: 'Squats, fentes, gainage'
       }
     ];
@@ -1513,9 +1633,24 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     id: `${semaine}-${jour}`,
     nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`}`,
     day: dayName || `Jour ${jour}`,
-    exercices,
-    duree: exercices[0].reps + exercices[1].reps,
-    notes: estDeload ? 'Semaine de récupération' : `VMA: ${allure.fractionne.toFixed(1)} km/h`
+    exercises: exercices.map(ex => ({
+      ...ex,
+      progression: {
+        sets: ex.sets,
+        reps: ex.reps,
+        poids: ex.weight,
+        repos: ex.rest
+      }
+    })),
+    duration: exercices.reduce((acc, ex) => {
+      const duration = ex.sets * (typeof ex.reps === 'string' ? parseInt(ex.reps) || 1 : ex.reps) * 2;
+      return acc + duration;
+    }, 0),
+    intensity: 'Modérée',
+    phase: semaine <= 2 ? 'Adaptation' : semaine <= 4 ? 'Progression' : 'Spécialisation',
+    focus: ['Endurance', 'Cardio'],
+    notes: estDeload ? 'Semaine de récupération' : `VMA: ${allure.fractionne.toFixed(1)} km/h`,
+    equipment: []
   };
 }
 
@@ -1575,98 +1710,137 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
   // Détermine le type de session selon le jour
   if (jour % 3 === 1) {
     typeSession = 'Push';
+    
+    // Configuration de progression pour chaque exercice
+    const benchConfig = getProgressionConfig('Développé couché barre');
+    const inclineConfig = getProgressionConfig('Développé incliné haltères');
+    const militaryConfig = getProgressionConfig('Développé militaire');
+    const dipsConfig = getProgressionConfig('Dips lestés');
+    
+    // Calcul de la progression pour chaque exercice
+    const benchProg = calculateProgressiveLoad(user.weight * 0.8, semaine, benchConfig, estDeload);
+    const inclineProg = calculateProgressiveLoad(user.weight * 0.6, semaine, inclineConfig, estDeload);
+    const militaryProg = calculateProgressiveLoad(user.weight * 0.5, semaine, militaryConfig, estDeload);
+    const dipsProg = calculateProgressiveLoad(user.weight * 0.3, semaine, dipsConfig, estDeload);
+    
     exercices = [
       { 
         nom: 'Développé couché barre', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.8), 
-        repos: 120 
+        sets: benchProg.sets, 
+        reps: benchProg.reps, 
+        weight: benchProg.weight, 
+        rest: '2min' 
       },
       { 
         nom: 'Développé incliné haltères', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
-        repos: 90 
+        sets: inclineProg.sets, 
+        reps: inclineProg.reps, 
+        weight: inclineProg.weight, 
+        rest: '90sec' 
       },
       { 
         nom: 'Développé militaire', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.5), 
-        repos: 90 
+        sets: militaryProg.sets, 
+        reps: militaryProg.reps, 
+        weight: militaryProg.weight, 
+        rest: '90sec' 
       },
       { 
         nom: 'Dips lestés', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.3), 
-        repos: 90 
+        sets: dipsProg.sets, 
+        reps: dipsProg.reps, 
+        weight: dipsProg.weight, 
+        rest: '90sec' 
       }
     ];
   } else if (jour % 3 === 2) {
     typeSession = 'Pull';
+    
+    // Configuration de progression pour chaque exercice
+    const pullupConfig = getProgressionConfig('Tractions pronation');
+    const rowConfig = getProgressionConfig('Rowing barre');
+    const pulldownConfig = getProgressionConfig('Tirage poulie basse');
+    const curlConfig = getProgressionConfig('Curl biceps barre');
+    
+    // Calcul de la progression pour chaque exercice
+    const pullupProg = calculateProgressiveLoad(user.weight * 0.5, semaine, pullupConfig, estDeload);
+    const rowProg = calculateProgressiveLoad(user.weight * 0.7, semaine, rowConfig, estDeload);
+    const pulldownProg = calculateProgressiveLoad(user.weight * 0.6, semaine, pulldownConfig, estDeload);
+    const curlProg = calculateProgressiveLoad(user.weight * 0.3, semaine, curlConfig, estDeload);
+    
     exercices = [
       { 
         nom: 'Tractions pronation', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: 0, 
-        repos: 120 
+        sets: pullupProg.sets, 
+        reps: pullupProg.reps, 
+        weight: pullupProg.weight, 
+        rest: '2min' 
       },
       { 
         nom: 'Rowing barre', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.7), 
-        repos: 90 
+        sets: rowProg.sets, 
+        reps: rowProg.reps, 
+        weight: rowProg.weight, 
+        rest: '90sec' 
       },
       { 
         nom: 'Tirage poulie basse', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
-        repos: 90 
+        sets: pulldownProg.sets, 
+        reps: pulldownProg.reps, 
+        weight: pulldownProg.weight, 
+        rest: '90sec' 
       },
       { 
         nom: 'Curl biceps barre', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.3), 
-        repos: 60 
+        sets: curlProg.sets, 
+        reps: curlProg.reps, 
+        weight: curlProg.weight, 
+        rest: '60sec' 
       }
     ];
   } else {
     typeSession = 'Legs';
+    
+    // Configuration de progression pour chaque exercice
+    const squatConfig = getProgressionConfig('Back Squat');
+    const deadliftConfig = getProgressionConfig('Soulevé de terre jambes tendues');
+    const lungeConfig = getProgressionConfig('Fentes marchées');
+    const calfConfig = getProgressionConfig('Mollets debout');
+    
+    // Calcul de la progression pour chaque exercice
+    const squatProg = calculateProgressiveLoad(user.weight * 1.2, semaine, squatConfig, estDeload);
+    const deadliftProg = calculateProgressiveLoad(user.weight * 0.9, semaine, deadliftConfig, estDeload);
+    const lungeProg = calculateProgressiveLoad(user.weight * 0.4, semaine, lungeConfig, estDeload);
+    const calfProg = calculateProgressiveLoad(user.weight * 0.6, semaine, calfConfig, estDeload);
+    
     exercices = [
       { 
         nom: 'Back Squat', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 1.2), 
-        repos: 120 
+        sets: squatProg.sets, 
+        reps: squatProg.reps, 
+        weight: squatProg.weight, 
+        rest: '2min' 
       },
       { 
         nom: 'Soulevé de terre jambes tendues', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.9), 
-        repos: 120 
+        sets: deadliftProg.sets, 
+        reps: deadliftProg.reps, 
+        weight: deadliftProg.weight, 
+        rest: '2min' 
       },
       { 
         nom: 'Fentes marchées', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.4), 
-        repos: 90 
+        sets: lungeProg.sets, 
+        reps: lungeProg.reps, 
+        weight: lungeProg.weight, 
+        rest: '90sec' 
       },
       { 
         nom: 'Mollets debout', 
-        series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
-        repos: 60 
+        sets: calfProg.sets, 
+        reps: calfProg.reps, 
+        weight: calfProg.weight, 
+        rest: '60sec' 
       }
     ];
   }
@@ -1675,9 +1849,22 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
     id: `${semaine}-${jour}`,
     nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (${typeSession})`,
     day: dayName || `Jour ${jour}`,
-    exercices,
-    duree: exercices.length * 15,
-    notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`
+    exercises: exercices.map(ex => ({
+      ...ex,
+      progression: {
+        sets: ex.sets,
+        reps: ex.reps,
+        poids: ex.weight,
+        repos: ex.rest
+      }
+    })),
+    duration: exercices.reduce((acc, ex) => acc + (ex.sets * 15), 0),
+    intensity: 'Modérée',
+    phase: semaine <= 2 ? 'Adaptation' : semaine <= 4 ? 'Progression' : 'Spécialisation',
+    focus: typeSession === 'Push' ? ['Pectoraux', 'Épaules', 'Triceps'] : 
+           typeSession === 'Pull' ? ['Dos', 'Biceps'] : ['Jambes', 'Fessiers'],
+    notes: estDeload ? 'Semaine de récupération' : `Niveau: ${niveau}`,
+    equipment: []
   };
 }
 

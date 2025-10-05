@@ -2,6 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ExerciseProvider } from './contexts/ExerciseContext';
+import { QuestProvider } from './contexts/QuestContext';
 import { ThemeProvider } from './lib/theme-provider';
 import { Toaster } from './components/ui/toaster';
 
@@ -20,6 +22,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const Nutrition = lazy(() => import('./pages/Nutrition'));
 const AlimentDetail = lazy(() => import('./pages/AlimentDetail'));
 const RepasDetail = lazy(() => import('./pages/RepasDetail'));
+const DailyQuests = lazy(() => import('./components/DailyQuests'));
 
 // Composant de chargement
 const LoadingSpinner = () => (
@@ -137,6 +140,14 @@ const AppContent: React.FC = () => {
               </PageLayout>
             </ProtectedRoute>
           } />
+
+          <Route path="/quetes" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <DailyQuests />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
           
           {/* Route 404 */}
           <Route path="*" element={<NotFound />} />
@@ -155,9 +166,13 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <AppContent />
-        </ThemeProvider>
+        <QuestProvider>
+          <ExerciseProvider>
+            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+              <AppContent />
+            </ThemeProvider>
+          </ExerciseProvider>
+        </QuestProvider>
       </LanguageProvider>
     </AuthProvider>
   );

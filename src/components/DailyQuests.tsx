@@ -1,146 +1,276 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Target, Clock, CheckCircle, Zap } from 'lucide-react';
-import { DailyQuest } from '@/types/stats';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { Progress } from './ui/progress';
+import { Button } from './ui/button';
+import { useQuests } from '../contexts/QuestContext';
+import { 
+  Target, 
+  Zap, 
+  Clock, 
+  Trophy, 
+  Star, 
+  CheckCircle, 
+  Calendar,
+  Award,
+  TrendingUp,
+  Flame,
+  Dumbbell,
+  Timer
+} from 'lucide-react';
 
-interface DailyQuestCardProps {
-  quest: DailyQuest;
-  onComplete: (questId: string) => void;
+interface QuestCardProps {
+  quest: any;
+  onComplete?: (questId: string) => void;
 }
 
-const DailyQuestCard: React.FC<DailyQuestCardProps> = ({ quest, onComplete }) => {
-  const [timeLeft, setTimeLeft] = useState<string>('');
+const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
+  const { completeQuest } = useQuests();
   
-  useEffect(() => {
-    const updateTimer = () => {
-      const now = new Date();
-      const resetTime = new Date(quest.resetTime);
-      const diff = resetTime.getTime() - now.getTime();
-      
-      if (diff > 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        setTimeLeft(`${hours}h ${minutes}m`);
-      } else {
-        setTimeLeft('Reset imminent');
-      }
-    };
+  const progressPercentage = (quest.current / quest.target) * 100;
+  const isCompleted = quest.current >= quest.target;
+  
+  const getQuestIcon = (type: string) => {
+    switch (type) {
+      case 'exercise': return <Dumbbell className="w-5 h-5" />;
+      case 'xp': return <Star className="w-5 h-5" />;
+      case 'session': return <Target className="w-5 h-5" />;
+      case 'streak': return <Flame className="w-5 h-5" />;
+      case 'time': return <Timer className="w-5 h-5" />;
+      case 'weight': return <Trophy className="w-5 h-5" />;
+      default: return <Target className="w-5 h-5" />;
+    }
+  };
 
-    updateTimer();
-    const interval = setInterval(updateTimer, 60000); // Mise à jour chaque minute
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return 'bg-green-100 text-green-800 border-green-300';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'hard': return 'bg-red-100 text-red-800 border-red-300';
+      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, [quest.resetTime]);
+  const getDifficultyText = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy': return 'Facile';
+      case 'medium': return 'Moyen';
+      case 'hard': return 'Difficile';
+      default: return 'Normal';
+    }
+  };
 
-  const progressPercentage = (quest.progress / quest.maxProgress) * 100;
-  const isCompleted = quest.completed || quest.progress >= quest.maxProgress;
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'workout': return 'from-blue-500 to-indigo-500';
-      case 'nutrition': return 'from-green-500 to-emerald-500';
-      case 'activity': return 'from-purple-500 to-pink-500';
-      case 'social': return 'from-orange-500 to-red-500';
-      default: return 'from-gray-500 to-gray-600';
+  const handleComplete = () => {
+    if (isCompleted && !quest.completed) {
+      completeQuest(quest.id);
+      onComplete?.(quest.id);
     }
   };
 
   return (
-    <Card className={`bg-white/80 backdrop-blur-sm border-0 shadow-xl transition-all duration-300 ${
-      isCompleted ? 'ring-2 ring-green-500 bg-green-50/50' : 'hover:shadow-2xl'
+    <Card className={`transition-all duration-200 hover:shadow-lg ${
+      isCompleted ? 'bg-green-50 border-green-200' : 'bg-white'
     }`}>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 bg-gradient-to-r ${getCategoryColor(quest.category)} rounded-xl flex items-center justify-center`}>
-              <span className="text-white text-lg">{quest.icon}</span>
+            <div className={`p-2 rounded-lg ${
+              isCompleted ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+            }`}>
+              {getQuestIcon(quest.type)}
             </div>
             <div>
-              <h3 className="text-lg font-semibold">{quest.title}</h3>
-              <p className="text-sm text-gray-600">{quest.description}</p>
+              <CardTitle className="text-lg font-semibold text-gray-800">
+                {quest.title}
+              </CardTitle>
+              <p className="text-sm text-gray-600 mt-1">
+                {quest.description}
+              </p>
             </div>
           </div>
-          
-          <div className="text-right">
-            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
-              <Zap className="w-3 h-3 mr-1" />
-              +{quest.xpReward} XP
+          <div className="flex flex-col items-end gap-2">
+            <Badge className={getDifficultyColor(quest.difficulty)}>
+              {getDifficultyText(quest.difficulty)}
             </Badge>
+            {isCompleted && !quest.completed && (
+              <Button
+                size="sm"
+                onClick={handleComplete}
+                className="bg-green-500 hover:bg-green-600 text-white"
+              >
+                <CheckCircle className="w-4 h-4 mr-1" />
+                Récupérer
+              </Button>
+            )}
           </div>
-        </CardTitle>
+        </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="pt-0">
         {/* Barre de progression */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>Progression</span>
-            <span>{quest.progress} / {quest.maxProgress}</span>
-          </div>
-          <Progress 
-            value={progressPercentage} 
-            className={`h-3 ${isCompleted ? 'bg-green-200' : ''}`}
-          />
-        </div>
-
-        {/* Timer de reset */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="w-4 h-4" />
-            <span>Reset dans {timeLeft}</span>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">Progression</span>
+            <span className="font-semibold text-gray-800">
+              {quest.current} / {quest.target}
+            </span>
           </div>
           
-          {isCompleted ? (
-            <Badge className="bg-green-100 text-green-800 border-green-200">
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Terminé
-            </Badge>
-          ) : (
-            <Button 
-              size="sm" 
-              onClick={() => onComplete(quest.id)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
-            >
-              <Target className="w-4 h-4 mr-2" />
-              Valider
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-interface DailyQuestsProps {
-  quests: DailyQuest[];
-  onQuestComplete: (questId: string) => void;
-}
-
-export const DailyQuests: React.FC<DailyQuestsProps> = ({ quests, onQuestComplete }) => {
-  return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-8">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-2xl">
-          <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
-            <Target className="w-6 h-6 text-white" />
+          <Progress 
+            value={progressPercentage} 
+            className="h-2"
+          />
+          
+          {/* Récompense */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm font-medium text-gray-700">
+                +{quest.reward.xp} XP
+              </span>
+              {quest.reward.badge && (
+                <Badge variant="outline" className="text-xs">
+                  <Award className="w-3 h-3 mr-1" />
+                  Badge
+                </Badge>
+              )}
+            </div>
+            
+            {/* Indicateur de completion */}
+            {isCompleted && (
+              <div className="flex items-center gap-1 text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">Terminé !</span>
+              </div>
+            )}
           </div>
-          Quêtes du jour
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {quests.map((quest) => (
-            <DailyQuestCard
-              key={quest.id}
-              quest={quest}
-              onComplete={onQuestComplete}
-            />
-          ))}
         </div>
       </CardContent>
     </Card>
   );
 };
+
+export const DailyQuests: React.FC = () => {
+  const { 
+    dailyQuests, 
+    weeklyQuests, 
+    completedQuests, 
+    getTotalDailyXP,
+    getQuestCompletionRate 
+  } = useQuests();
+
+  const totalDailyXP = getTotalDailyXP();
+  const completionRate = getQuestCompletionRate();
+
+  return (
+    <div className="space-y-6">
+      {/* Header avec statistiques */}
+      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">🎯 Quêtes Journalières</h2>
+            <p className="text-purple-100">Défis quotidiens pour booster votre progression</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold">+{totalDailyXP}</div>
+            <div className="text-purple-100">XP Bonus</div>
+          </div>
+        </div>
+        
+        {/* Statistiques */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-white/20 rounded-lg p-3 text-center">
+            <div className="text-lg font-bold">{dailyQuests.length}</div>
+            <div className="text-sm text-purple-100">Quêtes Actives</div>
+          </div>
+          <div className="bg-white/20 rounded-lg p-3 text-center">
+            <div className="text-lg font-bold">{Math.round(completionRate)}%</div>
+            <div className="text-sm text-purple-100">Taux de Réussite</div>
+          </div>
+          <div className="bg-white/20 rounded-lg p-3 text-center">
+            <div className="text-lg font-bold">{completedQuests.length}</div>
+            <div className="text-sm text-purple-100">Quêtes Terminées</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quêtes Quotidiennes */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="w-5 h-5 text-blue-500" />
+          <h3 className="text-xl font-semibold text-gray-800">Quêtes du Jour</h3>
+        </div>
+        
+        {dailyQuests.length > 0 ? (
+          <div className="grid gap-4">
+            {dailyQuests.map(quest => (
+              <QuestCard key={quest.id} quest={quest} />
+            ))}
+          </div>
+        ) : (
+          <Card className="p-8 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Toutes les quêtes sont terminées !
+            </h3>
+            <p className="text-gray-600">
+              Revenez demain pour de nouveaux défis.
+            </p>
+          </Card>
+        )}
+      </div>
+
+      {/* Quêtes Hebdomadaires */}
+      {weeklyQuests.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-orange-500" />
+            <h3 className="text-xl font-semibold text-gray-800">Défis Hebdomadaires</h3>
+          </div>
+          
+          <div className="grid gap-4">
+            {weeklyQuests.map(quest => (
+              <QuestCard key={quest.id} quest={quest} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quêtes Terminées Récemment */}
+      {completedQuests.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-yellow-500" />
+            <h3 className="text-xl font-semibold text-gray-800">Réussites Récentes</h3>
+          </div>
+          
+          <div className="grid gap-3">
+            {completedQuests.slice(-3).map(quest => (
+              <Card key={quest.id} className="bg-yellow-50 border-yellow-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
+                        <Trophy className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-800">{quest.title}</h4>
+                        <p className="text-sm text-gray-600">{quest.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-500" />
+                      <span className="font-semibold text-yellow-600">+{quest.reward.xp} XP</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default DailyQuests;

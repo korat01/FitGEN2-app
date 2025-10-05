@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
+import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
 import { 
   Dumbbell, Target, TrendingUp, Zap, Clock, Weight, 
@@ -16,6 +17,7 @@ import {
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
 import { DailyQuests } from '@/components/DailyQuests';
+import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 
 // Utilitaires pour les calculs
@@ -28,12 +30,12 @@ import { XPData, DailyQuest, StreakData } from '@/types/stats';
 
 export const Dashboard: React.FC = () => {
   const { user, updateUser } = useAuth();
+  const { xpData } = useExerciseValidation();
   const [userRank, setUserRank] = useState<any>(null);
   const [performances, setPerformances] = useState<any[]>([]);
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
   // NOUVEAUX ÉTATS POUR LES COMPOSANTS DASHBOARD
-  const [xpData, setXpData] = useState<XPData | null>(null);
   const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
 
@@ -344,13 +346,8 @@ export const Dashboard: React.FC = () => {
         {/* Barre XP & Niveau */}
         {xpData && <XPLevelBar xpData={xpData} />}
 
-        {/* Quêtes journalières */}
-        {dailyQuests.length > 0 && (
-          <DailyQuests 
-            quests={dailyQuests} 
-            onQuestComplete={handleQuestComplete} 
-          />
-        )}
+        {/* Widget Quêtes */}
+        <QuestWidget />
 
         {/* Streak & Régularité */}
         {streakData && <StreakDisplay streakData={streakData} />}

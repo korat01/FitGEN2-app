@@ -10,12 +10,14 @@ import {
   Calendar,
   Settings,
   Trophy,
-  Users
+  Users,
+  Target
 } from 'lucide-react';
 
 const navigationItems = [
   { to: '/dashboard', icon: Home, label: 'Accueil', badge: null },
   { to: '/programme', icon: Dumbbell, label: 'Programmes', badge: 'Nouveau' },
+  { to: '/quetes', icon: Target, label: 'Quêtes', badge: '3' },
   { to: '/stats', icon: BarChart3, label: 'Statistiques', badge: null },
   { to: '/nutrition', icon: Apple, label: 'Nutrition', badge: null },
   { to: '/blocs-entrainement', icon: Calendar, label: 'Planning', badge: '3' },

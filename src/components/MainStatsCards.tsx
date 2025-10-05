@@ -136,21 +136,6 @@ interface MainStatsCardsProps {
 }
 
 export const MainStatsCards: React.FC<MainStatsCardsProps> = ({ stats }) => {
-  console.log('🎯 MainStatsCards reçoit:', {
-    stats,
-    forcePoints: stats?.force?.performancePoints,
-    speedPoints: stats?.speed?.performancePoints,
-    endurancePoints: stats?.endurance?.performancePoints
-  });
-
-  if (!stats) {
-    return (
-      <div className="text-center p-8 bg-gray-100 rounded-lg">
-        <p className="text-gray-600">Aucune donnée de statistiques disponible</p>
-      </div>
-    );
-  }
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       {/* Force */}

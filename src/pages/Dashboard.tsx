@@ -261,29 +261,29 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-futuristic-primary text-text-primary font-exo xp-particles">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
       <div className="space-y-8">
           
-          {/* Header Principal - Design Futuriste */}
-          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-futuristic-secondary via-futuristic-tertiary to-futuristic-secondary p-4 md:p-8 text-text-primary shadow-2xl border border-neon-blue/30 glow-blue">
-            {/* Effets visuels futuristes */}
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-blue/10 via-neon-purple/10 to-neon-blue/10"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-neon-blue/20 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-neon-purple/20 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
+          {/* Header Principal - Design Moderne */}
+          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-4 md:p-8 text-white shadow-2xl">
+            {/* Effets visuels */}
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
             
           <div className="relative z-10">
               <div className="flex flex-col gap-6">
                 <div className="space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-3 md:p-4 bg-neon-blue/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0 border border-neon-blue/30">
-                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8 text-neon-blue" />
+                    <div className="p-3 md:p-4 bg-white/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
+                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
                   <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-orbitron font-bold tracking-tight truncate text-neon-blue text-neon">
+                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
                         Salut, {user.name} !
                     </h1>
-                      <p className="text-text-secondary font-rajdhani text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord futuriste 🚀</p>
+                      <p className="text-white/90 text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord</p>
                     </div>
                   </div>
                   
@@ -376,57 +376,57 @@ export const Dashboard: React.FC = () => {
 
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-blue/30 shadow-xl glow-blue hover-glow transition-futuristic">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-text-secondary mb-1 truncate font-rajdhani">Poids</p>
-                    <p className="text-lg md:text-2xl font-bold text-text-primary truncate font-orbitron">{user.weight} kg</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
+                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
               </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-neon-blue/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-neon-blue/30">
-                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-neon-blue" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                   </div>
             </div>
           </CardContent>
         </Card>
 
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-endurance/30 shadow-xl glow-endurance hover-glow transition-futuristic">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-text-secondary mb-1 truncate font-rajdhani">Âge</p>
-                    <p className="text-lg md:text-2xl font-bold text-text-primary truncate font-orbitron">{user.age} ans</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
+                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-neon-endurance/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-neon-endurance/30">
-                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-neon-endurance" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-purple/30 shadow-xl glow-purple hover-glow transition-futuristic">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-text-secondary mb-1 truncate font-rajdhani">Sport</p>
-                    <p className="text-lg md:text-2xl font-bold text-text-primary capitalize truncate font-orbitron">{user.sportClass}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
+                    <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
                       </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-neon-purple/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-neon-purple/30">
-                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-neon-purple" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
                   </div>
               </div>
             </CardContent>
           </Card>
 
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-force/30 shadow-xl glow-force hover-glow transition-futuristic">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-text-secondary mb-1 truncate font-rajdhani">Performances</p>
-                    <p className="text-lg md:text-2xl font-bold text-text-primary truncate font-orbitron">{performances.length}</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
+                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-neon-force/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-neon-force/30">
-                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-neon-force" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
                   </div>
                 </div>
               </CardContent>
@@ -435,10 +435,10 @@ export const Dashboard: React.FC = () => {
 
           {/* Détail du rang calculé */}
           {userRank && (
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-purple/30 shadow-xl glow-purple">
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2 text-neon-purple font-orbitron">
-                  <Award className="w-6 h-6 text-neon-purple" />
+                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                  <Award className="w-6 h-6 text-yellow-500" />
                   Votre rang calculé
               </CardTitle>
             </CardHeader>
@@ -503,33 +503,33 @@ export const Dashboard: React.FC = () => {
 
           {/* Actions rapides */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-blue/30 shadow-xl hover-glow transition-futuristic cursor-pointer" onClick={() => window.location.href = '/stats'}>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-neon-blue to-neon-purple rounded-2xl flex items-center justify-center mx-auto mb-4 glow-blue">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-text-primary mb-2 font-orbitron">Mes Statistiques</h3>
-                <p className="text-text-secondary font-rajdhani">Voir mes performances et mon rang</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Mes Statistiques</h3>
+                <p className="text-gray-600">Voir mes performances et mon rang</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-endurance/30 shadow-xl hover-glow transition-futuristic cursor-pointer" onClick={() => window.location.href = '/programme'}>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/programme'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-neon-endurance to-green-500 rounded-2xl flex items-center justify-center mx-auto mb-4 glow-endurance">
+                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Dumbbell className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-text-primary mb-2 font-orbitron">Mon Programme</h3>
-                <p className="text-text-secondary font-rajdhani">Gérer mes entraînements</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Programme</h3>
+                <p className="text-gray-600">Gérer mes entraînements</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-futuristic-secondary/80 backdrop-blur-sm border border-neon-purple/30 shadow-xl hover-glow transition-futuristic cursor-pointer" onClick={() => window.location.href = '/profile'}>
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/profile'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-neon-purple to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 glow-purple">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
               </div>
-                <h3 className="text-xl font-bold text-text-primary mb-2 font-orbitron">Mon Profil</h3>
-                <p className="text-text-secondary font-rajdhani">Modifier mes informations</p>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Profil</h3>
+                <p className="text-gray-600">Modifier mes informations</p>
             </CardContent>
           </Card>
           </div>

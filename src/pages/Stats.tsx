@@ -19,8 +19,7 @@ import { GlobalStatsDisplay } from '@/components/GlobalStatsDisplay';
 import { 
   calculateMainStats, 
   generateAchievements, 
-  calculateGlobalStats,
-  getBestPerformances
+  calculateGlobalStats 
 } from '@/utils/statsCalculator';
 import { MainStats, Achievement, GlobalStats } from '@/types/stats';
 
@@ -45,7 +44,6 @@ export const Stats: React.FC = () => {
   const [mainStats, setMainStats] = useState<MainStats | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
-  const [bestPerformances, setBestPerformances] = useState<Record<string, any>>({});
 
   // Charger les performances depuis le localStorage
   useEffect(() => {
@@ -73,21 +71,6 @@ export const Stats: React.FC = () => {
 
         // CALCULER LES STATISTIQUES POUR LA PAGE STATS
         try {
-          console.log('📊 Performances brutes:', performancesList);
-          
-          // Si aucune performance, créer des données de test
-          if (performancesList.length === 0) {
-            console.log('⚠️ Aucune performance trouvée, création de données de test');
-            performancesList.push(
-              { id: 'test1', discipline: 'squat', value: '120', date: new Date().toISOString().split('T')[0] },
-              { id: 'test2', discipline: 'bench_press', value: '100', date: new Date().toISOString().split('T')[0] },
-              { id: 'test3', discipline: 'deadlift', value: '150', date: new Date().toISOString().split('T')[0] },
-              { id: 'test4', discipline: '100m', value: '12.5', date: new Date().toISOString().split('T')[0] },
-              { id: 'test5', discipline: '200m', value: '25.0', date: new Date().toISOString().split('T')[0] },
-              { id: 'test6', discipline: '30min', value: '8.5', date: new Date().toISOString().split('T')[0] }
-            );
-          }
-          
           // Convertir les performances au bon format
           const formattedPerformances = performancesList.map((p: any) => ({
             id: p.id || Math.random().toString(),
@@ -99,28 +82,20 @@ export const Stats: React.FC = () => {
             context: 'raw',
             verified: true
           }));
-          
-          console.log('📊 Performances formatées:', formattedPerformances);
 
           // Calculer les statistiques spécifiques à la page Stats
           const calculatedMainStats = calculateMainStats(user, formattedPerformances);
           const generatedAchievements = generateAchievements(user, formattedPerformances);
           const calculatedGlobalStats = calculateGlobalStats(user, formattedPerformances);
-          const bestPerfs = getBestPerformances(formattedPerformances);
 
           // Mettre à jour les états
           setMainStats(calculatedMainStats);
           setAchievements(generatedAchievements);
           setGlobalStats(calculatedGlobalStats);
-          setBestPerformances(bestPerfs);
 
           console.log('✅ Stats calculées:', {
             mainStats: calculatedMainStats,
-            achievements: generatedAchievements.length,
-            performances: formattedPerformances,
-            forcePoints: calculatedMainStats.force.performancePoints,
-            speedPoints: calculatedMainStats.speed.performancePoints,
-            endurancePoints: calculatedMainStats.endurance.performancePoints
+            achievements: generatedAchievements.length
           });
         } catch (error) {
           console.error('❌ Erreur lors du calcul des stats:', error);
@@ -529,82 +504,12 @@ export const Stats: React.FC = () => {
 
               {/* Vue d'accueil - NOUVELLE VERSION AVEC STATISTIQUES AVANCÉES */}
           <TabsContent value="overview" className="space-y-8">
-          {/* Stats Principales */}
-          {mainStats ? (
-            <MainStatsCards stats={mainStats} />
-          ) : (
-            <div className="text-center p-8 bg-gray-100 rounded-lg">
-              <p className="text-gray-600">Chargement des statistiques...</p>
-              <p className="text-sm text-gray-500 mt-2">mainStats: {mainStats ? 'OK' : 'NULL'}</p>
-                    </div>
-          )}
-          
-          {/* Stats de Performance - Affichage Direct */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
-            <h3 className="font-bold text-xl text-gray-800 mb-4 text-center">📊 Points de Performance</h3>
-            
-            {mainStats ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Force */}
-                <div className="bg-white p-4 rounded-lg shadow-md text-center">
-                  <div className="text-2xl mb-2">💪</div>
-                  <h4 className="font-semibold text-blue-600 mb-2">Force</h4>
-                  <div className="text-3xl font-bold text-blue-600 mb-1">
-                    {mainStats.force.performancePoints}
-                      </div>
-                  <div className="text-sm text-gray-600 mb-2">points</div>
-                  <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {mainStats.force.performanceLevel}
-                    </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    Total: {mainStats.force.total}kg ({mainStats.force.wilks} Wilks)
-                    </div>
-                  </div>
-
-                {/* Vitesse */}
-                <div className="bg-white p-4 rounded-lg shadow-md text-center">
-                  <div className="text-2xl mb-2">🏃</div>
-                  <h4 className="font-semibold text-green-600 mb-2">Vitesse</h4>
-                  <div className="text-3xl font-bold text-green-600 mb-1">
-                    {mainStats.speed.performancePoints}
-                    </div>
-                  <div className="text-sm text-gray-600 mb-2">points</div>
-                  <div className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                    {mainStats.speed.performanceLevel}
-                    </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    100m: {mainStats.speed.time100m}s ({mainStats.speed.maxSpeed} km/h)
-                        </div>
-            </div>
-
-                {/* Endurance */}
-                <div className="bg-white p-4 rounded-lg shadow-md text-center">
-                  <div className="text-2xl mb-2">💨</div>
-                  <h4 className="font-semibold text-purple-600 mb-2">Endurance</h4>
-                  <div className="text-3xl font-bold text-purple-600 mb-1">
-                    {mainStats.endurance.performancePoints}
-                  </div>
-                  <div className="text-sm text-gray-600 mb-2">points</div>
-                  <div className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                    {mainStats.endurance.performanceLevel}
-                        </div>
-                  <div className="text-xs text-gray-500 mt-2">
-                    VO₂max: {mainStats.endurance.vo2max} ({mainStats.endurance.distance30min} km/30min)
-                        </div>
-                      </div>
-                      </div>
-            ) : (
-              <div className="text-center py-8">
-                <div className="text-4xl mb-4">⏳</div>
-                <p className="text-gray-600">Chargement des statistiques...</p>
-                <p className="text-sm text-gray-500 mt-2">mainStats: {mainStats ? 'OK' : 'NULL'}</p>
-                    </div>
-            )}
-                </div>
+            {/* Stats Principales */}
+            {mainStats && <MainStatsCards stats={mainStats} />}
 
             {/* Stats Globales */}
             {globalStats && <GlobalStatsDisplay stats={globalStats} />}
-              </TabsContent>
+          </TabsContent>
 
               {/* Performances */}
               <TabsContent value="performance" className="space-y-8">
@@ -744,7 +649,7 @@ export const Stats: React.FC = () => {
 
               {/* Records */}
           <TabsContent value="records" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Force */}
                   <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
                     <CardHeader>
@@ -754,9 +659,7 @@ export const Stats: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                      {Object.entries(bestPerformances)
-                        .filter(([discipline]) => ['bench_press', 'squat', 'deadlift'].includes(discipline))
-                        .map(([discipline, perf]) => {
+                      {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).map((perf) => {
                         const weight = user?.weight || 75;
                         const ratio = Math.round((perf.value / weight) * 10) / 10;
                         
@@ -764,72 +667,28 @@ export const Stats: React.FC = () => {
                           <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-300">
                       <div className="space-y-1">
                               <div className="font-bold text-lg capitalize text-gray-800">
-                                  {discipline === 'bench_press' ? 'Développé couché' :
-                                   discipline === 'squat' ? 'Squat' :
-                                   discipline === 'deadlift' ? 'Soulevé de terre' : discipline}
+                                {perf.discipline === 'bench' ? 'Développé couché' :
+                                 perf.discipline === 'squat' ? 'Squat' :
+                                 perf.discipline === 'deadlift' ? 'Soulevé de terre' : perf.discipline}
                               </div>
                               <div className="text-sm font-semibold text-gray-600">
                                 Ratio: <span className="font-bold text-red-600">{ratio}×</span> poids corporel
                         </div>
-                                <div className="text-xs text-gray-500">
-                                  Record du {new Date(perf.date).toLocaleDateString('fr-FR')}
-                                </div>
                       </div>
                       <div className="text-right space-y-2">
                               <div className="text-2xl font-bold text-red-600">{perf.value} kg</div>
                               <Badge className="bg-red-100 text-red-800 border-red-200 font-semibold">
-                                  Meilleur Record
+                                Record
                         </Badge>
                       </div>
                     </div>
                         );
                       })}
                       
-                      {Object.keys(bestPerformances).filter(d => ['bench_press', 'squat', 'deadlift'].includes(d)).length === 0 && (
+                      {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).length === 0 && (
                         <div className="text-center text-gray-500 py-8">
                           <Weight className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                           <p className="text-lg">Aucun record de force</p>
-                          <p className="text-sm">Ajoutez vos performances !</p>
-                        </div>
-                      )}
-                </CardContent>
-              </Card>
-
-              {/* Vitesse */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-green-800 flex items-center gap-3">
-                    <Gauge className="w-6 h-6" />
-                    Vitesse - Vos Records
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(bestPerformances)
-                    .filter(([discipline]) => ['100m', '200m'].includes(discipline))
-                    .map(([discipline, perf]) => (
-                      <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:shadow-md transition-all duration-300">
-                        <div className="space-y-1">
-                          <div className="font-bold text-lg text-gray-800">
-                            {discipline === '100m' ? '100m' : '200m'}
-                          </div>
-                          <div className="text-sm font-semibold text-gray-600">Meilleur chrono</div>
-                          <div className="text-xs text-gray-500">
-                            Record du {new Date(perf.date).toLocaleDateString('fr-FR')}
-                          </div>
-                        </div>
-                        <div className="text-right space-y-2">
-                          <div className="text-2xl font-bold text-green-600">{perf.value}s</div>
-                          <Badge className="bg-green-100 text-green-800 border-green-200 font-semibold">
-                            Meilleur Record
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  
-                  {Object.keys(bestPerformances).filter(d => ['100m', '200m'].includes(d)).length === 0 && (
-                    <div className="text-center text-gray-500 py-8">
-                      <Gauge className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                      <p className="text-lg">Aucun record de vitesse</p>
                           <p className="text-sm">Ajoutez vos performances !</p>
                         </div>
                       )}
@@ -845,36 +704,22 @@ export const Stats: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                      {Object.entries(bestPerformances)
-                        .filter(([discipline]) => ['5k', '10k', 'marathon', '30min'].includes(discipline))
-                        .map(([discipline, perf]) => (
+                      {performances.filter(p => p.discipline === '5k').map((perf) => (
                         <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:shadow-md transition-all duration-300">
                       <div className="space-y-1">
-                              <div className="font-bold text-lg text-gray-800">
-                                {discipline === '5k' ? '5km' :
-                                 discipline === '10k' ? '10km' :
-                                 discipline === 'marathon' ? 'Marathon' :
-                                 discipline === '30min' ? '30min' : discipline}
-                              </div>
-                              <div className="text-sm font-semibold text-gray-600">
-                                {discipline === '30min' ? 'Meilleure distance' : 'Meilleur chrono'}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                Record du {new Date(perf.date).toLocaleDateString('fr-FR')}
-                              </div>
+                            <div className="font-bold text-lg text-gray-800">5km</div>
+                            <div className="text-sm font-semibold text-gray-600">Meilleur chrono</div>
                       </div>
                       <div className="text-right space-y-2">
-                              <div className="text-2xl font-bold text-blue-600">
-                                {perf.value} {discipline === '30min' ? 'km' : 'min'}
-                              </div>
+                            <div className="text-2xl font-bold text-blue-600">{perf.value} min</div>
                             <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-semibold">
-                                Meilleur Record
+                              Record
                         </Badge>
                       </div>
                     </div>
                   ))}
                       
-                      {Object.keys(bestPerformances).filter(d => ['5k', '10k', 'marathon', '30min'].includes(d)).length === 0 && (
+                      {performances.filter(p => p.discipline === '5k').length === 0 && (
                         <div className="text-center text-gray-500 py-8">
                           <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                           <p className="text-lg">Aucun record d'endurance</p>
@@ -1119,341 +964,32 @@ export const Stats: React.FC = () => {
 
           {/* Objectifs */}
               <TabsContent value="goals" className="space-y-6">
-                {/* Header */}
-                <div className="text-center space-y-4">
-                  <div className="flex items-center justify-center gap-3">
-                    <Target className="w-8 h-8 text-blue-600" />
-                    <h1 className="text-3xl font-bold text-gray-800">Objectifs</h1>
-                  </div>
-                  <p className="text-lg text-gray-600">Votre chemin vers le rang supérieur</p>
-                </div>
-
-                {/* Rang actuel et objectif */}
-                {userRank && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Rang actuel */}
                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
-                        <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                          <div className={`w-10 h-10 bg-gradient-to-r ${
-                            userRank.rank === 'World' ? 'from-yellow-400 to-yellow-600' :
-                            userRank.rank === 'Nation' ? 'from-purple-500 to-purple-700' :
-                            userRank.rank === 'S' ? 'from-purple-600 to-purple-800' :
-                            userRank.rank === 'A' ? 'from-red-500 to-red-700' :
-                            userRank.rank === 'B' ? 'from-blue-500 to-blue-700' :
-                            userRank.rank === 'C' ? 'from-green-500 to-green-700' :
-                            userRank.rank === 'D' ? 'from-yellow-500 to-yellow-700' :
-                            'from-gray-500 to-gray-700'
-                          } rounded-xl flex items-center justify-center text-white`}>
-                            {userRank.rank === 'World' ? <Crown className="w-6 h-6" /> :
-                             userRank.rank === 'Nation' ? <Award className="w-6 h-6" /> :
-                             userRank.rank === 'S' ? <Trophy className="w-6 h-6" /> :
-                             userRank.rank === 'A' ? <Medal className="w-6 h-6" /> :
-                             userRank.rank === 'B' ? <Star className="w-6 h-6" /> :
-                             userRank.rank === 'C' ? <Target className="w-6 h-6" /> :
-                             <Zap className="w-6 h-6" />}
-                          </div>
-                          Rang Actuel
+                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                  <Target className="w-6 h-6 text-purple-600" />
+                  Prochain objectif
                 </CardTitle>
               </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="text-center">
-                          <div className="text-4xl font-bold text-gray-800 mb-2">{userRank.rank}</div>
-                          <div className="text-2xl font-semibold text-blue-600">{userRank.globalScore} points</div>
-                          <div className="text-sm text-gray-500 mt-2">{userRank.reason}</div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Rang objectif */}
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                          <div className={`w-10 h-10 bg-gradient-to-r ${
-                            userRank.rank === 'E' ? 'from-yellow-500 to-yellow-700' :
-                            userRank.rank === 'D' ? 'from-green-500 to-green-700' :
-                            userRank.rank === 'C' ? 'from-blue-500 to-blue-700' :
-                            userRank.rank === 'B' ? 'from-red-500 to-red-700' :
-                            userRank.rank === 'A' ? 'from-purple-600 to-purple-800' :
-                            userRank.rank === 'S' ? 'from-purple-500 to-purple-700' :
-                            'from-yellow-400 to-yellow-600'
-                          } rounded-xl flex items-center justify-center text-white`}>
-                            {userRank.rank === 'E' ? <Zap className="w-6 h-6" /> :
-                             userRank.rank === 'D' ? <Target className="w-6 h-6" /> :
-                             userRank.rank === 'C' ? <Star className="w-6 h-6" /> :
-                             userRank.rank === 'B' ? <Medal className="w-6 h-6" /> :
-                             userRank.rank === 'A' ? <Trophy className="w-6 h-6" /> :
-                             userRank.rank === 'S' ? <Award className="w-6 h-6" /> :
-                             <Crown className="w-6 h-6" />}
-                          </div>
-                          Prochain Rang
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="text-center">
-                          <div className="text-4xl font-bold text-gray-800 mb-2">
-                            {userRank.rank === 'E' ? 'D' :
-                             userRank.rank === 'D' ? 'C' :
-                             userRank.rank === 'C' ? 'B' :
-                             userRank.rank === 'B' ? 'A' :
-                             userRank.rank === 'A' ? 'S' :
-                             userRank.rank === 'S' ? 'Nation' :
-                             userRank.rank === 'Nation' ? 'World' : 'World'}
-                          </div>
-                          <div className="text-2xl font-semibold text-green-600">
-                            {userRank.rank === 'E' ? '250' :
-                             userRank.rank === 'D' ? '400' :
-                             userRank.rank === 'C' ? '550' :
-                             userRank.rank === 'B' ? '700' :
-                             userRank.rank === 'A' ? '800' :
-                             userRank.rank === 'S' ? '900' :
-                             userRank.rank === 'Nation' ? '1000' : '1000'} points
-                          </div>
-                          <div className="text-sm text-gray-500 mt-2">
-                            Il vous faut {Math.max(0, (
-                              userRank.rank === 'E' ? 250 :
-                              userRank.rank === 'D' ? 400 :
-                              userRank.rank === 'C' ? 550 :
-                              userRank.rank === 'B' ? 700 :
-                              userRank.rank === 'A' ? 800 :
-                              userRank.rank === 'S' ? 900 :
-                              userRank.rank === 'Nation' ? 1000 : 1000
-                            ) - userRank.globalScore)} points supplémentaires
+              <CardContent>
+                    <div className="p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200 text-center space-y-6">
+                  <div className="text-6xl animate-bounce">🎯</div>
+                  
+                  <div className="space-y-4">
+                        <h3 className="text-2xl font-bold text-gray-800">Atteignez le niveau supérieur</h3>
+                        <div className="text-4xl font-bold text-purple-600">Rang {userRank?.rank === 'S' ? 'World' : userRank?.rank === 'A' ? 'S' : 'A'}</div>
+                        <div className="text-lg font-semibold text-gray-600">
+                          Continuez à vous améliorer !
                     </div>
                   </div>
                   
-                        {/* Barre de progression */}
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span>Progression</span>
-                            <span>{Math.round((userRank.globalScore / (
-                              userRank.rank === 'E' ? 250 :
-                              userRank.rank === 'D' ? 400 :
-                              userRank.rank === 'C' ? 550 :
-                              userRank.rank === 'B' ? 700 :
-                              userRank.rank === 'A' ? 800 :
-                              userRank.rank === 'S' ? 900 :
-                              userRank.rank === 'Nation' ? 1000 : 1000
-                            )) * 100)}%</span>
-                          </div>
-                          <Progress 
-                            value={(userRank.globalScore / (
-                              userRank.rank === 'E' ? 250 :
-                              userRank.rank === 'D' ? 400 :
-                              userRank.rank === 'C' ? 550 :
-                              userRank.rank === 'B' ? 700 :
-                              userRank.rank === 'A' ? 800 :
-                              userRank.rank === 'S' ? 900 :
-                              userRank.rank === 'Nation' ? 1000 : 1000
-                            )) * 100} 
-                            className="h-3"
-                          />
+                      <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold text-lg px-8 py-3">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Accepter le défi
+                  </Button>
                 </div>
               </CardContent>
             </Card>
-                  </div>
-                )}
-
-                {/* Objectifs par catégorie - Basés sur la classe de sport */}
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-800 text-center">
-                    Objectifs pour votre classe : {user?.sportClass || 'classique'}
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    
-                    {/* Force - Pour toutes les classes sauf vitesse */}
-                    {user?.sportClass !== 'vitesse' && (
-                      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                        <CardHeader>
-                          <CardTitle className="text-xl font-bold text-red-800 flex items-center gap-3">
-                            <Zap className="w-6 h-6" />
-                            Force - Total des 3 mouvements
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="space-y-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-gray-700">Total Force</span>
-                                <Badge variant="outline" className="text-xs">Objectif</Badge>
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {(() => {
-                                  const squatMax = performances.filter(p => p.discipline === 'squat').length > 0 
-                                    ? Math.max(...performances.filter(p => p.discipline === 'squat').map(p => p.value)) : 0;
-                                  const benchMax = performances.filter(p => p.discipline === 'bench').length > 0 
-                                    ? Math.max(...performances.filter(p => p.discipline === 'bench').map(p => p.value)) : 0;
-                                  const deadliftMax = performances.filter(p => p.discipline === 'deadlift').length > 0 
-                                    ? Math.max(...performances.filter(p => p.discipline === 'deadlift').map(p => p.value)) : 0;
-                                  
-                                  const currentTotal = squatMax + benchMax + deadliftMax;
-                                  const targetTotal = currentTotal > 0 ? currentTotal + 60 : 370;
-                                  
-                                  return `${currentTotal}kg → ${targetTotal}kg`;
-                                })()}
-                              </div>
-                              <Progress value={(() => {
-                                const squatMax = performances.filter(p => p.discipline === 'squat').length > 0 
-                                  ? Math.max(...performances.filter(p => p.discipline === 'squat').map(p => p.value)) : 0;
-                                const benchMax = performances.filter(p => p.discipline === 'bench').length > 0 
-                                  ? Math.max(...performances.filter(p => p.discipline === 'bench').map(p => p.value)) : 0;
-                                const deadliftMax = performances.filter(p => p.discipline === 'deadlift').length > 0 
-                                  ? Math.max(...performances.filter(p => p.discipline === 'deadlift').map(p => p.value)) : 0;
-                                
-                                const currentTotal = squatMax + benchMax + deadliftMax;
-                                const targetTotal = currentTotal > 0 ? currentTotal + 60 : 370;
-                                
-                                return Math.min((currentTotal / targetTotal) * 100, 100);
-                              })()} className="h-2" />
-                            </div>
-                            
-                            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
-                              <strong>Détail :</strong><br/>
-                              Squat: {performances.filter(p => p.discipline === 'squat').length > 0 
-                                ? Math.max(...performances.filter(p => p.discipline === 'squat').map(p => p.value)) + 'kg'
-                                : '0kg'} +<br/>
-                              Bench: {performances.filter(p => p.discipline === 'bench').length > 0 
-                                ? Math.max(...performances.filter(p => p.discipline === 'bench').map(p => p.value)) + 'kg'
-                                : '0kg'} +<br/>
-                              Deadlift: {performances.filter(p => p.discipline === 'deadlift').length > 0 
-                                ? Math.max(...performances.filter(p => p.discipline === 'deadlift').map(p => p.value)) + 'kg'
-                                : '0kg'}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Vitesse - Pour les classes vitesse */}
-                    {user?.sportClass === 'vitesse' && (
-                      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                        <CardHeader>
-                          <CardTitle className="text-xl font-bold text-green-800 flex items-center gap-3">
-                            <Gauge className="w-6 h-6" />
-                            Vitesse
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="space-y-3">
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-gray-700">100m</span>
-                                <Badge variant="outline" className="text-xs">Objectif</Badge>
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {performances.filter(p => p.discipline === '100m').length > 0 
-                                  ? (() => {
-                                      const currentTime = Math.min(...performances.filter(p => p.discipline === '100m').map(p => p.value));
-                                      const targetTime = Math.max(10.5, currentTime - 0.3); // -0.3s minimum ou 10.5s max
-                                      return `${currentTime}s → ${targetTime}s`;
-                                    })()
-                                  : '12.0s → 10.5s'
-                                }
-                              </div>
-                              <Progress value={performances.filter(p => p.discipline === '100m').length > 0 ? 70 : 0} className="h-2" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-gray-700">200m</span>
-                                <Badge variant="outline" className="text-xs">Objectif</Badge>
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {performances.filter(p => p.discipline === '200m').length > 0 
-                                  ? (() => {
-                                      const currentTime = Math.min(...performances.filter(p => p.discipline === '200m').map(p => p.value));
-                                      const targetTime = Math.max(21.0, currentTime - 0.8); // -0.8s minimum ou 21.0s max
-                                      return `${currentTime}s → ${targetTime}s`;
-                                    })()
-                                  : '25.0s → 21.0s'
-                                }
-                              </div>
-                              <Progress value={performances.filter(p => p.discipline === '200m').length > 0 ? 65 : 0} className="h-2" />
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Endurance - Pour toutes les classes */}
-                    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                      <CardHeader>
-                        <CardTitle className="text-xl font-bold text-blue-800 flex items-center gap-3">
-                          <Heart className="w-6 h-6" />
-                          Endurance
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="font-semibold text-gray-700">5km</span>
-                              <Badge variant="outline" className="text-xs">Objectif</Badge>
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {performances.filter(p => p.discipline === '5k').length > 0 
-                                ? (() => {
-                                    const currentTime = Math.min(...performances.filter(p => p.discipline === '5k').map(p => p.value));
-                                    const targetTime = Math.max(15, currentTime - 2); // -2min minimum ou 15min max
-                                    return `${currentTime}min → ${targetTime}min`;
-                                  })()
-                                : '25min → 15min'
-                              }
-                            </div>
-                            <Progress value={performances.filter(p => p.discipline === '5k').length > 0 ? 75 : 0} className="h-2" />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="font-semibold text-gray-700">30min</span>
-                              <Badge variant="outline" className="text-xs">Objectif</Badge>
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {performances.filter(p => p.discipline === '30min').length > 0 
-                                ? (() => {
-                                    const currentDistance = Math.max(...performances.filter(p => p.discipline === '30min').map(p => p.value));
-                                    const targetDistance = Math.max(10, currentDistance + 1); // +1km minimum ou 10km
-                                    return `${currentDistance}km → ${targetDistance}km`;
-                                  })()
-                                : '6km → 10km'
-                              }
-                            </div>
-                            <Progress value={performances.filter(p => p.discipline === '30min').length > 0 ? 80 : 0} className="h-2" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-
-                {/* Message d'encouragement */}
-                <div className="text-center py-8">
-                  <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-6">
-                    <TrendingUp className="w-12 h-12 mx-auto mb-4 text-blue-600" />
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Continuez vos efforts !</h3>
-                    <p className="text-gray-600">
-                      Chaque performance vous rapproche de votre objectif. 
-                      {userRank && ` Il vous reste ${Math.max(0, (
-                        userRank.rank === 'E' ? 250 :
-                        userRank.rank === 'D' ? 400 :
-                        userRank.rank === 'C' ? 550 :
-                        userRank.rank === 'B' ? 700 :
-                        userRank.rank === 'A' ? 800 :
-                        userRank.rank === 'S' ? 900 :
-                        userRank.rank === 'Nation' ? 1000 : 1000
-                      ) - userRank.globalScore)} points pour atteindre le rang ${
-                        userRank.rank === 'E' ? 'D' :
-                        userRank.rank === 'D' ? 'C' :
-                        userRank.rank === 'C' ? 'B' :
-                        userRank.rank === 'B' ? 'A' :
-                        userRank.rank === 'A' ? 'S' :
-                        userRank.rank === 'S' ? 'Nation' :
-                        userRank.rank === 'Nation' ? 'World' : 'World'
-                      }.`}
-                    </p>
-                  </div>
-                </div>
           </TabsContent>
 
                {/* Classement Global */}

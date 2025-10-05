@@ -348,30 +348,30 @@ export const Stats: React.FC = () => {
         <div className="space-y-8">
             
             {/* Header Principal - Design Moderne */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-8 text-white shadow-2xl">
+            <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-4 md:p-8 text-white shadow-2xl">
               {/* Effets visuels */}
               <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
               
           <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-              <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
-                        <BarChart3 className="w-8 h-8" />
+            <div className="flex flex-col gap-6">
+              <div className="space-y-4 md:space-y-6">
+                    <div className="flex items-start gap-3 md:gap-4">
+                      <div className="p-3 md:p-4 bg-white/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
+                        <BarChart3 className="w-6 h-6 md:w-8 md:h-8" />
                   </div>
-                  <div>
-                        <h1 className="text-4xl font-bold tracking-tight">
+                  <div className="flex-1 min-w-0">
+                        <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
                           Salut, {user?.name || "Champion"} !
                     </h1>
-                        <p className="text-white/90 text-lg mt-2">Votre tableau de bord personnel</p>
+                        <p className="text-white/90 text-sm md:text-lg mt-1 md:mt-2">Vos statistiques</p>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-4">
-                      <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || "D")} text-white font-semibold shadow-lg`}>
-                        <span className="text-xl">{getRangIcon(userRank?.rank || "D")}</span>
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
+                      <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || "D")} text-white font-semibold shadow-lg text-sm md:text-base`}>
+                        <span className="text-lg md:text-xl">{getRangIcon(userRank?.rank || "D")}</span>
                         <span>Rang {userRank?.rank || "D"}</span>
                   </div>
                       
@@ -385,23 +385,24 @@ export const Stats: React.FC = () => {
                             alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
                           }
                         }}
-                        className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+                        size="sm"
+                        className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm"
                       >
                         🔄 Actualiser
                       </Button>
                 </div>
               </div>
 
-              <div className="lg:text-right space-y-4">
-                    <div className="text-white/90 font-medium">Progression</div>
-                <div className="w-80">
+              <div className="space-y-3 md:space-y-4">
+                    <div className="text-white/90 font-medium text-sm md:text-base">Progression</div>
+                <div className="w-full max-w-md">
                   <Progress 
                         value={(userRank?.globalScore || 0)} 
-                        className="h-3 bg-white/20 rounded-full"
+                        className="h-2 md:h-3 bg-white/20 rounded-full"
                   />
                 </div>
-                <div className="text-sm">
-                      <span className="text-white font-bold text-xl">{userRank?.globalScore || 0}</span> 
+                <div className="text-xs md:text-sm">
+                      <span className="text-white font-bold text-lg md:text-xl">{userRank?.globalScore || 0}</span> 
                       <span className="text-white/80"> / 1000 points</span>
                 </div>
               </div>

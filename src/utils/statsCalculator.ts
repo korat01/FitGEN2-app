@@ -26,8 +26,39 @@ export function estimateVO2Max(distance30min: number, age: number, isMale: boole
 
 // === CALCUL DES POINTS DE PERFORMANCE ===
 
+// Trouve la meilleure performance pour chaque discipline
+export function getBestPerformances(performances: PerformanceRecord[]): Record<string, PerformanceRecord> {
+  const bestPerformances: Record<string, PerformanceRecord> = {};
+  
+  performances.forEach(perf => {
+    const discipline = perf.discipline.id;
+    
+    // Pour les disciplines de force (plus c'est lourd, mieux c'est)
+    if (['squat', 'bench_press', 'deadlift'].includes(discipline)) {
+      if (!bestPerformances[discipline] || perf.value > bestPerformances[discipline].value) {
+        bestPerformances[discipline] = perf;
+      }
+    }
+    // Pour les disciplines de vitesse/endurance (moins c'est rapide, mieux c'est)
+    else if (['100m', '200m', '5k', '10k', 'marathon'].includes(discipline)) {
+      if (!bestPerformances[discipline] || perf.value < bestPerformances[discipline].value) {
+        bestPerformances[discipline] = perf;
+      }
+    }
+    // Pour les distances (plus c'est long, mieux c'est)
+    else if (['30min'].includes(discipline)) {
+      if (!bestPerformances[discipline] || perf.value > bestPerformances[discipline].value) {
+        bestPerformances[discipline] = perf;
+      }
+    }
+  });
+  
+  return bestPerformances;
+}
+
 // Calcul des points de Force basés sur les performances réelles
 export function calculateForcePoints(squat1RM: number, bench1RM: number, deadlift1RM: number, weight: number): { points: number; level: string } {
+  console.log('💪 calculateForcePoints appelée avec:', { squat1RM, bench1RM, deadlift1RM, weight });
   const total = squat1RM + bench1RM + deadlift1RM;
   const bodyweightRatio = total / weight;
   
@@ -70,7 +101,9 @@ export function calculateForcePoints(squat1RM: number, bench1RM: number, deadlif
   else if (points >= 100) level = "Intermédiaire";
   else level = "Débutant";
   
-  return { points: Math.min(points, 250), level };
+  const result = { points: Math.min(points, 250), level };
+  console.log('💪 calculateForcePoints résultat:', result);
+  return result;
 }
 
 // Calcul des points de Vitesse basés sur les temps

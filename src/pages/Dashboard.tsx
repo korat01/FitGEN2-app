@@ -13,11 +13,29 @@ import {
   Plus, Calendar, Timer, Users, Settings, Bell, Search 
 } from 'lucide-react';
 
+// Nouveaux composants pour le Dashboard
+import { XPLevelBar } from '@/components/XPLevelBar';
+import { DailyQuests } from '@/components/DailyQuests';
+import { StreakDisplay } from '@/components/StreakDisplay';
+
+// Utilitaires pour les calculs
+import { 
+  calculateXPData, 
+  generateDailyQuests, 
+  calculateStreakData 
+} from '@/utils/statsCalculator';
+import { XPData, DailyQuest, StreakData } from '@/types/stats';
+
 export const Dashboard: React.FC = () => {
   const { user, updateUser } = useAuth();
   const [userRank, setUserRank] = useState<any>(null);
   const [performances, setPerformances] = useState<any[]>([]);
   const [debugInfo, setDebugInfo] = useState<any>(null);
+
+  // NOUVEAUX ÉTATS POUR LES COMPOSANTS DASHBOARD
+  const [xpData, setXpData] = useState<XPData | null>(null);
+  const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
 
   // FONCTION POUR RECALCULER LE RANG
   const recalculateRank = () => {
@@ -94,6 +112,38 @@ export const Dashboard: React.FC = () => {
             });
             console.log('✅ Utilisateur mis à jour avec le nouveau rang');
           }
+
+          // CALCULER LES DONNÉES POUR LE DASHBOARD
+          try {
+            // Convertir les performances au bon format
+            const formattedPerformances = performancesList.map((p: any) => ({
+              id: p.id || Math.random().toString(),
+              userId: user.id,
+              discipline: { id: p.discipline, name: p.discipline },
+              value: parseFloat(p.value) || 0,
+              units: 'kg',
+              date: new Date(p.date),
+              context: 'raw',
+              verified: true
+            }));
+
+            // Calculer les données pour le dashboard
+            const calculatedStreakData = calculateStreakData(user, formattedPerformances);
+            const calculatedXpData = calculateXPData(user, formattedPerformances, calculatedStreakData);
+            const generatedQuests = generateDailyQuests(user);
+
+            // Mettre à jour les états
+            setXpData(calculatedXpData);
+            setDailyQuests(generatedQuests);
+            setStreakData(calculatedStreakData);
+
+            console.log('✅ Données Dashboard calculées:', {
+              xpData: calculatedXpData,
+              streakData: calculatedStreakData
+            });
+          } catch (error) {
+            console.error('❌ Erreur lors du calcul des données Dashboard:', error);
+          }
         } catch (error) {
           console.error('❌ Erreur lors du parsing des performances:', error);
         }
@@ -143,6 +193,59 @@ export const Dashboard: React.FC = () => {
       case 'C': return '⭐';
       case 'D': return '🔰';
       default: return '⭐';
+    }
+  };
+
+  // Fonction pour calculer la progression vers le rang supérieur
+  const getRankProgression = (currentRank: string, currentScore: number) => {
+    const rankThresholds = {
+      'D': { min: 0, max: 200 },
+      'C': { min: 200, max: 400 },
+      'B': { min: 400, max: 600 },
+      'A': { min: 600, max: 800 },
+      'S': { min: 800, max: 900 },
+      'Nation': { min: 900, max: 950 },
+      'World': { min: 950, max: 1000 }
+    };
+
+    const threshold = rankThresholds[currentRank as keyof typeof rankThresholds];
+    if (!threshold) return { percentage: 100, nextRank: 'World' };
+
+    // Calculer le pourcentage dans le rang actuel
+    const range = threshold.max - threshold.min;
+    const progress = currentScore - threshold.min;
+    const percentage = Math.min(Math.max((progress / range) * 100, 0), 100);
+
+    // Déterminer le rang suivant
+    const ranks = ['D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
+    const currentIndex = ranks.indexOf(currentRank);
+    const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : 'World';
+
+    return { percentage, nextRank };
+  };
+
+  // Fonctions pour gérer les interactions Dashboard
+  const handleQuestComplete = (questId: string) => {
+    setDailyQuests(prev => prev.map(quest => 
+      quest.id === questId 
+        ? { ...quest, completed: true, progress: quest.maxProgress }
+        : quest
+    ));
+    
+    // Ajouter XP à l'utilisateur
+    const quest = dailyQuests.find(q => q.id === questId);
+    if (quest && xpData) {
+      const newTotalXP = xpData.totalXP + quest.xpReward;
+      const newLevel = Math.floor(newTotalXP / 1000);
+      const newCurrentXP = newTotalXP % 1000;
+      
+      setXpData({
+        ...xpData,
+        totalXP: newTotalXP,
+        level: newLevel,
+        currentXP: newCurrentXP,
+        xpToNextLevel: 1000 - newCurrentXP
+      });
     }
   };
 
@@ -210,21 +313,47 @@ export const Dashboard: React.FC = () => {
               </div>
 
                 <div className="space-y-3 md:space-y-4 mt-4">
-                  <div className="text-white/90 font-medium text-sm md:text-base">Progression</div>
-                <div className="w-full max-w-md">
-                  <Progress 
-                      value={userRank?.globalScore || 0} 
-                      className="h-2 md:h-3 bg-white/20 rounded-full"
-                  />
+                  {(() => {
+                    const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
+                    return (
+                      <>
+                        <div className="text-white/90 font-medium text-sm md:text-base">
+                          Progression vers le rang {progression.nextRank}
+                        </div>
+                        <div className="w-full max-w-md">
+                          <Progress 
+                            value={progression.percentage} 
+                            className="h-2 md:h-3 bg-white/20 rounded-full"
+                          />
+                        </div>
+                        <div className="text-xs md:text-sm">
+                          <span className="text-white font-bold text-lg md:text-xl">
+                            {Math.round(progression.percentage)}%
+                          </span> 
+                          <span className="text-white/80"> vers le rang {progression.nextRank}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
-                <div className="text-xs md:text-sm">
-                    <span className="text-white font-bold text-lg md:text-xl">{userRank?.globalScore || 0}</span> 
-                    <span className="text-white/80"> / 1000 points</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
+
+        {/* NOUVEAUX COMPOSANTS DASHBOARD */}
+        {/* Barre XP & Niveau */}
+        {xpData && <XPLevelBar xpData={xpData} />}
+
+        {/* Quêtes journalières */}
+        {dailyQuests.length > 0 && (
+          <DailyQuests 
+            quests={dailyQuests} 
+            onQuestComplete={handleQuestComplete} 
+          />
+        )}
+
+        {/* Streak & Régularité */}
+        {streakData && <StreakDisplay streakData={streakData} />}
 
           {/* DEBUG INFO - Masqué par défaut */}
           {false && (
@@ -328,11 +457,18 @@ export const Dashboard: React.FC = () => {
 
                 {/* Barre de progression */}
                     <div className="space-y-2">
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>Progression vers le rang supérieur</span>
-                    <span>{userRank.globalScore}%</span>
-                  </div>
-                  <Progress value={userRank.globalScore} className="h-4" />
+                  {(() => {
+                    const progression = getRankProgression(userRank.rank, userRank.globalScore);
+                    return (
+                      <>
+                        <div className="flex justify-between text-sm text-gray-600">
+                          <span>Progression vers le rang {progression.nextRank}</span>
+                          <span>{Math.round(progression.percentage)}%</span>
+                        </div>
+                        <Progress value={progression.percentage} className="h-4" />
+                      </>
+                    );
+                  })()}
                       </div>
 
                 {/* Détail des scores */}

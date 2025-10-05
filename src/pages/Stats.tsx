@@ -10,6 +10,19 @@ import PageLayout from '@/components/PageLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { scoringEngine } from '../utils/scoring';
 
+// Nouveaux composants pour les statistiques avancées
+import { MainStatsCards } from '@/components/MainStatsCards';
+import { Achievements } from '@/components/Achievements';
+import { GlobalStatsDisplay } from '@/components/GlobalStatsDisplay';
+
+// Utilitaires pour les calculs
+import { 
+  calculateMainStats, 
+  generateAchievements, 
+  calculateGlobalStats 
+} from '@/utils/statsCalculator';
+import { MainStats, Achievement, GlobalStats } from '@/types/stats';
+
 export const Stats: React.FC = () => {
   const { user, updateUser } = useAuth();
   const [performances, setPerformances] = useState<any[]>([]);
@@ -26,6 +39,11 @@ export const Stats: React.FC = () => {
     value: '',
     date: new Date().toISOString().split('T')[0]
   });
+
+  // NOUVEAUX ÉTATS POUR LES STATISTIQUES AVANCÉES
+  const [mainStats, setMainStats] = useState<MainStats | null>(null);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
 
   // Charger les performances depuis le localStorage
   useEffect(() => {
@@ -50,12 +68,53 @@ export const Stats: React.FC = () => {
           rank: realRank.rank,
           globalScore: realRank.globalScore
         });
+
+        // CALCULER LES STATISTIQUES POUR LA PAGE STATS
+        try {
+          // Convertir les performances au bon format
+          const formattedPerformances = performancesList.map((p: any) => ({
+            id: p.id || Math.random().toString(),
+            userId: user.id,
+            discipline: { id: p.discipline, name: p.discipline },
+            value: parseFloat(p.value) || 0,
+            units: 'kg',
+            date: new Date(p.date),
+            context: 'raw',
+            verified: true
+          }));
+
+          // Calculer les statistiques spécifiques à la page Stats
+          const calculatedMainStats = calculateMainStats(user, formattedPerformances);
+          const generatedAchievements = generateAchievements(user, formattedPerformances);
+          const calculatedGlobalStats = calculateGlobalStats(user, formattedPerformances);
+
+          // Mettre à jour les états
+          setMainStats(calculatedMainStats);
+          setAchievements(generatedAchievements);
+          setGlobalStats(calculatedGlobalStats);
+
+          console.log('✅ Stats calculées:', {
+            mainStats: calculatedMainStats,
+            achievements: generatedAchievements.length
+          });
+        } catch (error) {
+          console.error('❌ Erreur lors du calcul des stats:', error);
+        }
       }
       
       // Charger le classement global
       loadGlobalRanking();
     }
   }, [user, updateUser]);
+
+  // Fonction pour gérer les achievements
+  const handleAchievementClaim = (achievementId: string) => {
+    setAchievements(prev => prev.map(achievement => 
+      achievement.id === achievementId 
+        ? { ...achievement, unlocked: true, unlockedDate: new Date() }
+        : achievement
+    ));
+  };
 
   // Fonction pour charger le classement global
   const loadGlobalRanking = () => {
@@ -443,129 +502,14 @@ export const Stats: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
-              {/* Vue d'accueil */}
+              {/* Vue d'accueil - NOUVELLE VERSION AVEC STATISTIQUES AVANCÉES */}
           <TabsContent value="overview" className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Programme du jour */}
-                  <Card className="lg:col-span-2 bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3 text-2xl">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
-                      <Dumbbell className="w-6 h-6 text-white" />
-                    </div>
-                    Programme du jour
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                    <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-gray-800">Séance Force</h3>
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                            <Timer className="w-3 h-3 mr-1" />
-                        45 min
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                          <div className="text-center p-3 bg-white rounded-xl shadow-sm">
-                        <p className="text-2xl font-bold text-blue-600">6</p>
-                        <p className="text-sm text-gray-600">Exercices</p>
-                      </div>
-                          <div className="text-center p-3 bg-white rounded-xl shadow-sm">
-                        <p className="text-2xl font-bold text-green-600">3</p>
-                        <p className="text-sm text-gray-600">Terminés</p>
-                      </div>
-                    </div>
+            {/* Stats Principales */}
+            {mainStats && <MainStatsCards stats={mainStats} />}
 
-                    <div className="mb-4">
-                      <div className="flex justify-between text-sm text-gray-600 mb-2">
-                        <span>Progression</span>
-                        <span>50%</span>
-                      </div>
-                      <Progress value={50} className="h-3" />
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button className="flex-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold">
-                        <Play className="w-4 h-4 mr-2" />
-                        Commencer
-                      </Button>
-                      <Button variant="outline" className="border-blue-200 text-blue-700 hover:bg-blue-50">
-                        <Pause className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-                  {/* Stats rapides */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3 text-xl">
-                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                      <Flame className="w-6 h-6 text-white" />
-                    </div>
-                        Aujourd'hui
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                          <span className="text-sm text-gray-600">Calories</span>
-                          <span className="text-lg font-bold text-green-600">1,250</span>
-                    </div>
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                          <span className="text-sm text-gray-600">Temps</span>
-                          <span className="text-lg font-bold text-blue-600">45min</span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                          <span className="text-sm text-gray-600">Séances</span>
-                          <span className="text-lg font-bold text-purple-600">1/2</span>
-                        </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-                {/* Activités récentes */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-2xl">
-                      <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        <Activity className="w-5 h-5 text-white" />
-                  </div>
-                  Activités récentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                      {[
-                        { exercice: 'Squats', series: '4x8', poids: '80kg', temps: '2h ago', status: 'completed' },
-                        { exercice: 'Développé couché', series: '3x6', poids: '70kg', temps: '2h ago', status: 'completed' },
-                        { exercice: 'Deadlift', series: '3x5', poids: '100kg', temps: '2h ago', status: 'completed' }
-                      ].map((activity, index) => (
-                        <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300">
-                      <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                              <div className="font-bold text-lg text-gray-800">{activity.exercice}</div>
-                              <div className="text-sm text-gray-600">{activity.series} • {activity.poids}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                            <div className="text-sm text-gray-600 font-medium">{activity.temps}</div>
-                            <Badge className="bg-green-100 text-green-800 border-green-200 text-xs">
-                          Terminé
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-              </TabsContent>
+            {/* Stats Globales */}
+            {globalStats && <GlobalStatsDisplay stats={globalStats} />}
+          </TabsContent>
 
               {/* Performances */}
               <TabsContent value="performance" className="space-y-8">
@@ -785,6 +729,14 @@ export const Stats: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Achievements - Section Records */}
+            {achievements.length > 0 && (
+              <Achievements 
+                achievements={achievements} 
+                onAchievementClaim={handleAchievementClaim} 
+              />
+            )}
           </TabsContent>
 
                {/* Progression */}

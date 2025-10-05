@@ -31,14 +31,6 @@ export const Programme: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTab, setCurrentTab] = useState<'today' | 'weekly' | 'planning'>('today');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedSession, setSelectedSession] = useState<any>(null);
-  const [showSessionModal, setShowSessionModal] = useState(false);
-
-  // Fonction pour ouvrir le modal de session
-  const openSessionModal = (session: any) => {
-    setSelectedSession(session);
-    setShowSessionModal(true);
-  };
 
   // Charger le programme existant
   useEffect(() => {
@@ -207,8 +199,8 @@ export const Programme: React.FC = () => {
     return value.toString();
   };
 
-      return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
+    return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
       <div className="mx-auto max-w-7xl space-y-6">
         
         {/* Header Principal */}
@@ -434,105 +426,47 @@ export const Programme: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {/* En-têtes des jours avec dates */}
-                  <div className="grid grid-cols-7 gap-2 mb-6">
-                    {(() => {
-                      const today = new Date();
-                      const startOfWeek = new Date(today);
-                      startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Lundi
-                      
-                      return ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((dayName, index) => {
-                        const dayDate = new Date(startOfWeek);
-                        dayDate.setDate(startOfWeek.getDate() + index);
-                        const isToday = dayDate.toDateString() === today.toDateString();
-                        
-                        return (
-                          <div key={dayName} className={`text-center p-3 rounded-lg border-2 ${
-                            isToday 
-                              ? 'bg-blue-100 border-blue-300 text-blue-800' 
-                              : 'bg-gray-100 border-gray-200 text-gray-700'
-                          }`}>
-                            <div className="text-sm font-bold">{dayName}</div>
-                            <div className={`text-lg font-bold ${isToday ? 'text-blue-900' : 'text-gray-900'}`}>
-                              {dayDate.getDate()}
-                            </div>
-                            {isToday && (
-                              <div className="text-xs text-blue-600 font-semibold">Aujourd'hui</div>
+                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-4`}>
+                    {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map(day => {
+                      const daySession = programme.sessions.find((s: any) => s.day === day);
+                      return (
+                        <Card key={day} className={`${daySession ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'} border-2`}>
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg capitalize">{day}</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            {daySession ? (
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="bg-green-100 text-green-800">
+                                    {daySession.intensity}
+                                  </Badge>
+                                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                    {daySession.duration}min
+                                  </Badge>
+                    </div>
+                                <p className="text-sm text-gray-600">
+                                  <strong>{daySession.exercises?.length || 0}</strong> exercices
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <strong>Phase:</strong> {daySession.phase}
+                                </p>
+                                <div className="text-xs text-gray-500">
+                                  {daySession.exercises?.slice(0, 2).map((ex: any) => ex.nom).join(', ') || 'Aucun exercice'}
+                                  {daySession.exercises?.length > 2 && '...'}
+                  </div>
+                    </div>
+                            ) : (
+                              <div className="text-center py-4">
+                                <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                <p className="text-sm text-gray-500">Repos</p>
+                  </div>
                             )}
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-
-                  {/* Sessions de la semaine */}
-                  <div className="grid grid-cols-7 gap-2">
-                    {(() => {
-                      const today = new Date();
-                      const startOfWeek = new Date(today);
-                      startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Lundi
-                      
-                      return ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map((day, index) => {
-                        const dayDate = new Date(startOfWeek);
-                        dayDate.setDate(startOfWeek.getDate() + index);
-                        const daySession = programme.sessions.find((s: any) => s.day === day);
-                        const isToday = dayDate.toDateString() === today.toDateString();
-                        
-                        return (
-                          <Card 
-                            key={day} 
-                            className={`min-h-[200px] cursor-pointer transition-all duration-200 hover:scale-105 ${
-                              daySession 
-                                ? 'bg-gradient-to-br from-green-50 to-green-100 border-green-300 hover:border-green-400 hover:shadow-lg' 
-                                : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 hover:border-gray-300'
-                            } border-2 ${isToday ? 'ring-2 ring-blue-500' : ''}`}
-                            onClick={() => daySession && openSessionModal(daySession)}
-                          >
-                            <CardContent className="p-4 h-full flex flex-col">
-                              {daySession ? (
-                                <div className="space-y-3 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <Dumbbell className="w-4 h-4 text-green-600" />
-                                    <span className="font-semibold text-green-800 text-sm">{daySession.nom}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                                    <Clock className="w-3 h-3" />
-                                    <span>{daySession.duration} min</span>
-                                  </div>
-                                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                                    <Target className="w-3 h-3" />
-                                    <span className="capitalize">{daySession.phase}</span>
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    <strong>{daySession.exercises?.length || 0}</strong> exercices
-                                  </div>
-                                  <div className="mt-auto">
-                                    <Button 
-                                      size="sm" 
-                                      className="w-full bg-green-600 hover:bg-green-700 text-white text-xs py-2"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        openSessionModal(daySession);
-                                      }}
-                                    >
-                                      <Eye className="w-3 h-3 mr-1" />
-                                      Voir le programme
-                                    </Button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="text-center py-4 text-gray-500 flex-1 flex flex-col justify-center">
-                                  <div className="text-2xl mb-2">😴</div>
-                                  <p className="text-sm font-medium">Jour de repos</p>
-                                  <p className="text-xs mt-1">Récupération</p>
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        );
-                      });
-                    })()}
-                  </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                    </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -609,14 +543,14 @@ export const Programme: React.FC = () => {
                         </Card>
                   </div>
                   
-                      {/* En-têtes des jours avec style amélioré */}
+                      {/* En-têtes des jours */}
                       <div className="grid grid-cols-7 gap-2 mb-4">
                         {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                          <div key={day} className="text-center text-sm font-bold text-gray-700 p-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg border border-gray-300 shadow-sm">
+                          <div key={day} className="text-center text-sm font-bold text-gray-700 p-3 bg-gray-100 rounded-lg">
                             {day}
-                          </div>
+                    </div>
                         ))}
-                      </div>
+                </div>
                 
                       {/* Grille du calendrier */}
                       <div className="grid grid-cols-7 gap-2">
@@ -631,62 +565,50 @@ export const Programme: React.FC = () => {
                               <div
                                 key={`${weekIndex}-${dayIndex}`}
                                 className={`
-                                  min-h-[140px] p-3 rounded-xl border-2 transition-all duration-200 hover:scale-105 cursor-pointer
-                                  ${isCurrentMonthDay ? 'bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-purple-300 hover:shadow-lg' : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-100'}
-                                  ${isTodayDate ? 'ring-2 ring-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-300 shadow-lg' : ''}
+                                  min-h-[120px] p-3 rounded-xl border-2 transition-all duration-200
+                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-purple-300 hover:shadow-md' : 'bg-gray-50 border-gray-100'}
+                                  ${isTodayDate ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : ''}
                                 `}
-                                onClick={() => sessionForDate && openSessionModal(sessionForDate)}
                               >
-                                {/* Numéro du jour avec style amélioré */}
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className={`text-xl font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
+                                {/* Numéro du jour */}
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className={`text-lg font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
                                     {date.getDate()}
                                   </span>
                                   {isTodayDate && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                                      <span className="text-xs font-semibold text-blue-600">Aujourd'hui</span>
-                                    </div>
+                                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                                   )}
-                                </div>
+                    </div>
                                 
-                                {/* Session du jour avec style amélioré */}
-                                <div className="space-y-2">
+                                {/* Session du jour */}
+                                <div className="space-y-1">
                                   {sessionForDate ? (
                                     <div
                                       className={`
-                                        text-xs p-3 rounded-lg text-white font-medium shadow-lg cursor-pointer border
-                                        ${sessionForDate.phase === 'Adaptation' ? 'bg-gradient-to-r from-green-500 to-green-600 border-green-400' : 
-                                          sessionForDate.phase === 'Progression' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 border-yellow-400' : 
-                                          'bg-gradient-to-r from-red-500 to-red-600 border-red-400'}
-                                        hover:scale-105 hover:shadow-xl transition-all duration-200
+                                        text-xs p-2 rounded-lg text-white font-medium shadow-sm cursor-pointer
+                                        ${sessionForDate.phase === 'Adaptation' ? 'bg-gradient-to-r from-green-500 to-green-600' : 
+                                          sessionForDate.phase === 'Progression' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
+                                          'bg-gradient-to-r from-red-500 to-red-600'}
+                                        hover:scale-105 transition-transform duration-200
                                       `}
                                     >
-                                      <div className="flex items-center justify-between mb-2">
-                                        <span className="truncate font-semibold">{sessionForDate.nom}</span>
+                    <div className="flex items-center justify-between">
+                                        <span className="truncate">{sessionForDate.nom}</span>
                                         <Eye className="w-3 h-3 opacity-90" />
-                                      </div>
-                                      <div className="text-xs opacity-90 space-y-1">
-                                        <div className="flex items-center gap-1">
-                                          <Clock className="w-3 h-3" />
-                                          <span>{sessionForDate.duration}min</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <Zap className="w-3 h-3" />
-                                          <span className="capitalize">{sessionForDate.intensity}</span>
-                                        </div>
-                                      </div>
-                                    </div>
+                        </div>
+                                      <div className="text-xs opacity-90 mt-1">
+                                        {sessionForDate.duration}min • {sessionForDate.intensity}
+                          </div>
+                          </div>
                                   ) : (
                                     isCurrentMonthDay && (
-                                      <div className="text-xs text-gray-500 text-center py-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-                                        <div className="text-2xl mb-2">😴</div>
-                                        <div className="font-medium">Repos</div>
-                                        <div className="text-xs opacity-75">Récupération</div>
-                                      </div>
+                                      <div className="text-xs text-gray-400 text-center py-3 bg-gray-50 rounded-lg">
+                                        <RefreshCw className="w-4 h-4 mx-auto mb-1" />
+                                        Repos
+                          </div>
                                     )
                                   )}
-                                </div>
+                        </div>
                       </div>
                             );
                           })
@@ -744,116 +666,11 @@ export const Programme: React.FC = () => {
               </CardContent>
             </Card>
         </TabsContent>
-        </Tabs>
-        )}
-
-        {/* Modal de détail de session */}
-        {showSessionModal && selectedSession && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                {/* Header du modal */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      selectedSession.phase === 'Adaptation' ? 'bg-green-100' : 
-                      selectedSession.phase === 'Progression' ? 'bg-yellow-100' : 
-                      'bg-red-100'
-                    }`}>
-                      <Dumbbell className={`w-6 h-6 ${
-                        selectedSession.phase === 'Adaptation' ? 'text-green-600' : 
-                        selectedSession.phase === 'Progression' ? 'text-yellow-600' : 
-                        'text-red-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800">{selectedSession.nom}</h2>
-                      <p className="text-gray-600 capitalize">{selectedSession.phase}</p>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowSessionModal(false)}
-                    className="hover:bg-gray-100"
-                  >
-                    ✕
-                  </Button>
-                </div>
-
-                {/* Infos de la session */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-5 h-5 text-blue-600" />
-                      <span className="font-semibold text-blue-800">Durée</span>
-                    </div>
-                    <p className="text-2xl font-bold text-blue-600">{selectedSession.duration} min</p>
-                  </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Zap className="w-5 h-5 text-green-600" />
-                      <span className="font-semibold text-green-800">Intensité</span>
-                    </div>
-                    <p className="text-2xl font-bold text-green-600 capitalize">{selectedSession.intensity}</p>
-                  </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="w-5 h-5 text-purple-600" />
-                      <span className="font-semibold text-purple-800">Exercices</span>
-                    </div>
-                    <p className="text-2xl font-bold text-purple-600">{selectedSession.exercises?.length || 0}</p>
-                  </div>
-                </div>
-
-                {/* Liste des exercices */}
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Exercices de la session</h3>
-                  {selectedSession.exercises?.map((exercise: any, index: number) => (
-                    <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-semibold text-gray-800">{exercise.nom}</h4>
-                        <Badge variant="outline" className="bg-blue-100 text-blue-800">
-                          {exercise.sets} séries
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p><strong>Répétitions:</strong> {exercise.reps}</p>
-                        {exercise.weight > 0 && <p><strong>Charge:</strong> {exercise.weight} kg</p>}
-                        {exercise.rest && <p><strong>Repos:</strong> {exercise.rest}</p>}
-                        {exercise.notes && <p><strong>Notes:</strong> {exercise.notes}</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Boutons d'action */}
-                <div className="flex gap-4 mt-8">
-                  <Button 
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3"
-                    onClick={() => {
-                      setShowSessionModal(false);
-                      // Ici vous pouvez ajouter la logique pour commencer la session
-                    }}
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    Commencer la session
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="px-6 py-3"
-                    onClick={() => setShowSessionModal(false)}
-                  >
-                    Fermer
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+      </Tabs>
         )}
         </div>
       </div>
-    );
-  };
+  );
+};
 
 export default Programme;

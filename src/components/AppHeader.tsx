@@ -25,13 +25,17 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-b border-border shadow-elegant safe-area-pt">
-      <div className="container mx-auto px-3 md:px-4 py-2 md:py-3">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-2xl border-b border-border/50 safe-area-pt">
+      <div className="container mx-auto px-4 md:px-6 py-3 md:py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2 md:gap-4">
-            <h1 className="text-lg md:text-2xl font-bold gradient-primary bg-clip-text text-transparent">
-              FitGEN22
+          <div className="flex items-center gap-2.5 md:gap-4">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center shadow-lg md:hidden">
+              <span className="text-primary-foreground font-bold text-base">FG</span>
+            </div>
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="hidden md:inline">FitGEN22</span>
+              <span className="md:hidden">FitGEN</span>
             </h1>
             
             {/* Navigation principale - hidden on mobile */}

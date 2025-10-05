@@ -13,7 +13,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-background safe-area-inset">
       <AppHeader />
-      <main className={`pt-14 md:pt-20 pb-20 md:pb-6 px-3 md:px-4 ${isMobile ? 'pb-safe-bottom' : ''}`}>
+      <main className={`pt-16 md:pt-20 pb-24 md:pb-6 px-4 md:px-6 ${isMobile ? 'pb-safe-bottom' : ''}`}>
         {children}
       </main>
       {isMobile && <MobileNavigation />}

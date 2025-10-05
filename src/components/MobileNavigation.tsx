@@ -16,25 +16,27 @@ const MobileNavigation: React.FC = () => {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/98 backdrop-blur-xl border-t border-border shadow-elegant">
-      <div className="safe-area-pb flex items-center justify-around h-16">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-2xl border-t border-border/50">
+      <div className="safe-area-pb flex items-center justify-around h-16 px-2">
         {navItems.map(({ path, icon: Icon, label }) => (
           <Link
             key={path}
             to={path}
-            className={`flex flex-col items-center justify-center gap-0.5 px-3 py-2 transition-all duration-200 active:scale-95 ${
+            className={`relative flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 active:scale-95 ${
               isActive(path)
                 ? 'text-primary'
-                : 'text-muted-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <div className={`relative ${isActive(path) ? 'scale-110' : ''} transition-transform`}>
-              <Icon className="w-6 h-6" />
-              {isActive(path) && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
-              )}
+            {isActive(path) && (
+              <div className="absolute inset-0 bg-primary/10 rounded-2xl" />
+            )}
+            <div className={`relative transition-transform ${isActive(path) ? 'scale-110' : ''}`}>
+              <Icon className={`w-5 h-5 ${isActive(path) ? 'stroke-[2.5]' : 'stroke-2'}`} />
             </div>
-            <span className="text-[10px] font-medium mt-0.5">{label}</span>
+            <span className={`text-[10px] font-medium ${isActive(path) ? 'font-semibold' : ''}`}>
+              {label}
+            </span>
           </Link>
         ))}
       </div>

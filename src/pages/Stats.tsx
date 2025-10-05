@@ -876,9 +876,9 @@ export const Stats: React.FC = () => {
                              <div className="text-2xl font-bold" style={{ color: getDisciplineColor(discipline) }}>
                                {latestValue} {discipline === '5k' ? 'min' : discipline === 'pullups' ? 'reps' : 'kg'}
                              </div>
-                             <div className="text-sm text-gray-600">
-                               {improvement > 0 ? '+' : ''}{improvement}% d'amélioration
-                             </div>
+                              <div className="text-sm text-muted-foreground">
+                                {Number(improvement) > 0 ? '+' : ''}{improvement}% d'amélioration
+                              </div>
                            </div>
                          </div>
                        </CardHeader>

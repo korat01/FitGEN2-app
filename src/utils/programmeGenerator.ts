@@ -589,10 +589,14 @@ export const filterBySportClass = (exercises: Exercise[], sportClass: string): E
   switch (sportClass.toLowerCase()) {
     case 'powerlifting':
     case 'power':
-      // Powerlifting: Focus sur les 3 mouvements de base + exercices de force
+      // Powerlifting: Focus sur les 3 mouvements de base + exercices de force avec charges
       const powerExercises = exercises.filter(ex => 
         ['squat', 'bench_press', 'deadlift'].includes(ex.id) ||
-        (ex.categorie === 'Force' && ex.type === 'Compound')
+        (ex.categorie === 'Force' && ex.type === 'Compound' && 
+         !ex.equipement.includes('Aucun') && 
+         !ex.nom.toLowerCase().includes('front lever') &&
+         !ex.nom.toLowerCase().includes('handstand') &&
+         !ex.nom.toLowerCase().includes('muscle up'))
       );
       console.log(`💪 Powerlifting: ${powerExercises.length} exercices sélectionnés`);
       return powerExercises;
@@ -610,23 +614,32 @@ export const filterBySportClass = (exercises: Exercise[], sportClass: string): E
       return enduranceExercises;
       
     case 'crossfit':
-      // Crossfit: Mix de force et endurance, exercices fonctionnels
+      // Crossfit: Mix de force et endurance, exercices fonctionnels mais sans calisthenics avancés
       const crossfitExercises = exercises.filter(ex => 
         ex.type === 'Compound' || 
         ex.categorie === 'Force' ||
         ex.categorie === 'Endurance' ||
-        ex.equipement.includes('Aucun')
+        (ex.equipement.includes('Aucun') && 
+         !ex.nom.toLowerCase().includes('front lever') &&
+         !ex.nom.toLowerCase().includes('handstand') &&
+         !ex.nom.toLowerCase().includes('muscle up'))
       );
       console.log(`🔥 Crossfit: ${crossfitExercises.length} exercices sélectionnés`);
       return crossfitExercises;
       
     case 'calisthenics':
     case 'streetlifting':
-      // Calisthenics: Exercices au poids du corps
+      // Calisthenics: Exercices au poids du corps + barres
       const calisthenicsExercises = exercises.filter(ex => 
         ex.categorie === 'Calisthenics' ||
         ex.equipement.includes('Aucun') ||
-        ex.equipement.includes('Barre de traction')
+        ex.equipement.includes('Barre de traction') ||
+        ex.equipement.includes('Barre') ||
+        ex.nom.toLowerCase().includes('pull') ||
+        ex.nom.toLowerCase().includes('dip') ||
+        ex.nom.toLowerCase().includes('front lever') ||
+        ex.nom.toLowerCase().includes('handstand') ||
+        ex.nom.toLowerCase().includes('muscle up')
       );
       console.log(`🤸 Calisthenics: ${calisthenicsExercises.length} exercices sélectionnés`);
       return calisthenicsExercises;
@@ -846,9 +859,43 @@ function getFocusExercises(focusAreas: string[], day: string, sportClass: string
   
   // Sélectionner les exercices selon les focus
   focusAreas.forEach(focus => {
-    const exercises = exercicesDatabase.filter(ex => 
+    let exercises = exercicesDatabase.filter(ex => 
       ex.muscles.includes(focus) || ex.categorie === focus
     );
+    
+    // Filtrer selon la classe de sport pour éviter les exercices inappropriés
+    if (sportClass === 'power' || sportClass === 'powerlifting') {
+      // Powerlifting : uniquement exercices avec charges
+      exercises = exercises.filter(ex => 
+        !ex.equipement.includes('Aucun') && 
+        !ex.nom.toLowerCase().includes('pull') &&
+        !ex.nom.toLowerCase().includes('dip') &&
+        !ex.nom.toLowerCase().includes('front lever') &&
+        !ex.nom.toLowerCase().includes('handstand') &&
+        !ex.nom.toLowerCase().includes('muscle up')
+      );
+    } else if (sportClass === 'marathon' || sportClass === 'endurance') {
+      // Marathon : uniquement exercices d'endurance/cardio
+      exercises = exercises.filter(ex => 
+        ex.categorie === 'Endurance' || 
+        ex.type === 'Cardio' ||
+        ex.id === 'running' ||
+        ex.id === 'burpees'
+      );
+    } else if (sportClass === 'calisthenics' || sportClass === 'streetlifting') {
+      // Calisthenics : uniquement exercices au poids du corps + barres
+      exercises = exercises.filter(ex => 
+        ex.categorie === 'Calisthenics' ||
+        ex.equipement.includes('Aucun') ||
+        ex.equipement.includes('Barre de traction') ||
+        ex.equipement.includes('Barre') ||
+        ex.nom.toLowerCase().includes('pull') ||
+        ex.nom.toLowerCase().includes('dip') ||
+        ex.nom.toLowerCase().includes('front lever') ||
+        ex.nom.toLowerCase().includes('handstand') ||
+        ex.nom.toLowerCase().includes('muscle up')
+      );
+    }
     
     if (exercises.length > 0) {
       const selected = exercises.slice(0, exercisesPerFocus);
@@ -865,36 +912,59 @@ function getComplementaryExercises(day: string, sportClass: string, count: numbe
   
   // Exercices complémentaires selon la classe
   if (sportClass === 'power') {
+    // Powerlifting : exercices d'assistance avec charges uniquement
     const complementary = [
-      'Fentes', 'Presse à Jambes', 'Rowing', 'Tractions', 'Dips'
+      'Fentes lestées', 'Presse à Jambes', 'Rowing barre', 'Extensions triceps', 'Curls biceps'
     ];
     complementary.forEach(name => {
       const exercise = exercicesDatabase.find(ex => ex.nom === name);
-      if (exercise) complementaryExercises.push(exercise);
+      if (exercise && !exercise.equipement.includes('Aucun')) {
+        complementaryExercises.push(exercise);
+      }
     });
   } else if (sportClass === 'crossfit') {
+    // Crossfit : exercices fonctionnels mais sans calisthenics avancés
     const complementary = [
-      'Mountain Climbers', 'Jumping Jacks', 'Planche', 'Pompes'
+      'Mountain Climbers', 'Jumping Jacks', 'Planche', 'Pompes', 'Burpees'
     ];
     complementary.forEach(name => {
       const exercise = exercicesDatabase.find(ex => ex.nom === name);
-      if (exercise) complementaryExercises.push(exercise);
+      if (exercise && 
+          !exercise.nom.toLowerCase().includes('front lever') &&
+          !exercise.nom.toLowerCase().includes('handstand') &&
+          !exercise.nom.toLowerCase().includes('muscle up')) {
+        complementaryExercises.push(exercise);
+      }
     });
   } else if (sportClass === 'marathon') {
     const complementary = [
-      'Squat', 'Fentes', 'Planche', 'Gainage'
+      'Squat', 'Fentes', 'Planche', 'Gainage', 'Course à Pied'
     ];
     complementary.forEach(name => {
       const exercise = exercicesDatabase.find(ex => ex.nom === name);
       if (exercise) complementaryExercises.push(exercise);
     });
-  } else {
+  } else if (sportClass === 'calisthenics' || sportClass === 'streetlifting') {
+    // Calisthenics : exercices au poids du corps uniquement
     const complementary = [
-      'Fentes', 'Rowing', 'Tractions', 'Dips', 'Planche'
+      'Pompes', 'Tractions', 'Dips', 'Muscle-Ups', 'Front Lever', 'Handstand Push-Ups'
     ];
     complementary.forEach(name => {
       const exercise = exercicesDatabase.find(ex => ex.nom === name);
-      if (exercise) complementaryExercises.push(exercise);
+      if (exercise && (exercise.equipement.includes('Aucun') || exercise.equipement.includes('Barre'))) {
+        complementaryExercises.push(exercise);
+      }
+    });
+  } else {
+    // Classique : exercices variés mais sans calisthenics pur
+    const complementary = [
+      'Fentes', 'Rowing barre', 'Presse à Jambes', 'Extensions triceps', 'Curls biceps'
+    ];
+    complementary.forEach(name => {
+      const exercise = exercicesDatabase.find(ex => ex.nom === name);
+      if (exercise && !exercise.equipement.includes('Aucun')) {
+        complementaryExercises.push(exercise);
+      }
     });
   }
   
@@ -926,18 +996,35 @@ function getFinishingExercises(sportClass: string, phase: string): Exercise[] {
 export const applyProgression = (exercise: Exercise, phase: string, level: string): Exercise => {
   const progression = { ...exercise.progression };
   
+  // Correction des poids pour les exercices au poids du corps
+  const isBodyweightExercise = exercise.equipement.includes('Aucun') || 
+                              exercise.nom.toLowerCase().includes('pull') ||
+                              exercise.nom.toLowerCase().includes('dip') ||
+                              exercise.nom.toLowerCase().includes('front lever') ||
+                              exercise.nom.toLowerCase().includes('handstand') ||
+                              exercise.nom.toLowerCase().includes('muscle up');
+  
   switch (phase) {
     case 'adaptation':
       progression.sets = Math.max(2, progression.sets - 1);
       progression.repos = '2-3 min';
+      if (isBodyweightExercise) {
+        progression.poids = 'Corps';
+      }
       break;
     case 'progression':
       progression.sets = progression.sets + 1;
       progression.repos = '2-4 min';
+      if (isBodyweightExercise) {
+        progression.poids = 'Corps + lest';
+      }
       break;
     case 'specialisation':
       progression.sets = progression.sets + 2;
       progression.repos = '3-5 min';
+      if (isBodyweightExercise) {
+        progression.poids = 'Corps + lest lourd';
+      }
       break;
   }
     
@@ -957,7 +1044,7 @@ export const generateProgramme = (user: UserProfile): Programme => {
     return generateSprintProgramme(user);
   } else if (user.sportClass === 'power' || user.sportClass === 'powerlifter') {
     console.log('✅ Génération programme powerlifting');
-    return generateStreetLiftingProgramme(user); // Utiliser la fonction existante
+    return generatePowerliftingProgramme(user); // Utiliser la fonction spécifique powerlifting
   } else if (user.sportClass === 'streetlifting') {
     console.log('✅ Génération programme street lifting');
     return generateStreetLiftingProgramme(user);
@@ -1024,6 +1111,16 @@ function generateSprintProgramme(user: UserProfile): Programme {
 function createSprintSession(semaine: number, jour: number, user: UserProfile, dayName?: string) {
   const estDeload = semaine === 4;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 4);
+  const semaineDansMois = ((semaine - 1) % 4) + 1;
+  
+  // Progression mensuelle : +5kg pour les exercices avec charges, +2.5kg pour les accessoires
+  const progressionMensuelle = (mois - 1) * 5; // +5kg par mois pour les exercices principaux
+  const progressionAccessoires = (mois - 1) * 2.5; // +2.5kg par mois pour les accessoires
+  
+  console.log(`🏃 Mois ${mois}, Semaine ${semaineDansMois} - Progression Sprint: +${progressionMensuelle}kg (principaux), +${progressionAccessoires}kg (accessoires)`);
+  
   let exercices = [];
   
   if (jour === 1) {
@@ -1036,9 +1133,9 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
   } else if (jour === 2) {
     // Séance force
     exercices = [
-      { nom: 'Back Squat', series: estDeload ? 3 : 5, reps: 5, poids: user.weight * 0.8, repos: 180 },
-      { nom: 'Power Clean', series: estDeload ? 3 : 4, reps: 3, poids: user.weight * 0.6, repos: 180 },
-      { nom: 'Hip Thrust', series: estDeload ? 3 : 4, reps: 8, poids: user.weight * 0.5, repos: 90 }
+      { nom: 'Back Squat', series: estDeload ? 3 : 5, reps: 5, poids: Math.round((user.weight * 0.8) + progressionMensuelle), repos: 180 },
+      { nom: 'Power Clean', series: estDeload ? 3 : 4, reps: 3, poids: Math.round((user.weight * 0.6) + progressionMensuelle), repos: 180 },
+      { nom: 'Hip Thrust', series: estDeload ? 3 : 4, reps: 8, poids: Math.round((user.weight * 0.5) + progressionAccessoires), repos: 90 }
     ];
   } else if (jour === 3) {
     // Séance endurance vitesse
@@ -1078,6 +1175,278 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
   };
 }
 
+// Nouvelle fonction pour le Powerlifting
+function generatePowerliftingProgramme(user: UserProfile): Programme {
+  console.log('=== GENERATE POWERLIFTING PROGRAMME ===');
+  console.log('User:', user);
+  
+  const sessions = [];
+  const seancesParSemaine = user.trainingDays?.length || 3;
+  const duree = 4;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi']; // 3 séances par semaine
+  
+  // Récupérer les vraies performances utilisateur depuis localStorage
+  const savedPerformances = localStorage.getItem('userPerformances');
+  let maxSquat = 150; // Valeurs par défaut
+  let maxBench = 120;
+  let maxDeadlift = 180;
+  
+  if (savedPerformances) {
+    try {
+      const performancesList = JSON.parse(savedPerformances);
+      console.log('📊 Performances utilisateur trouvées:', performancesList);
+      
+      // Debug : afficher toutes les disciplines disponibles
+      console.log('🔍 Disciplines disponibles:', performancesList.map((p: any) => p.discipline));
+      
+      // Chercher les MEILLEURES performances pour chaque discipline
+      const squatPerformances = performancesList.filter((p: any) => 
+        p.discipline?.toLowerCase().includes('squat')
+      );
+      const benchPerformances = performancesList.filter((p: any) => 
+        p.discipline?.toLowerCase().includes('bench') || 
+        p.discipline?.toLowerCase().includes('développé') ||
+        p.discipline?.toLowerCase().includes('couché')
+      );
+      const deadliftPerformances = performancesList.filter((p: any) => 
+        p.discipline?.toLowerCase().includes('deadlift') || 
+        p.discipline?.toLowerCase().includes('soulevé') ||
+        p.discipline?.toLowerCase().includes('terre')
+      );
+      
+      // Prendre la MEILLEURE performance (valeur maximale)
+      if (squatPerformances.length > 0) {
+        maxSquat = Math.max(...squatPerformances.map((p: any) => p.value || 0));
+      }
+      if (benchPerformances.length > 0) {
+        maxBench = Math.max(...benchPerformances.map((p: any) => p.value || 0));
+      }
+      if (deadliftPerformances.length > 0) {
+        maxDeadlift = Math.max(...deadliftPerformances.map((p: any) => p.value || 0));
+      }
+      
+      console.log('🏋️ 1RM utilisateur:', { maxSquat, maxBench, maxDeadlift });
+    } catch (error) {
+      console.error('❌ Erreur lors du chargement des performances:', error);
+    }
+  } else {
+    console.log('⚠️ Aucune performance trouvée, utilisation des valeurs par défaut');
+  }
+  
+  console.log('Charges max calculées:', { maxSquat, maxBench, maxDeadlift });
+  
+  for (let semaine = 1; semaine <= duree; semaine++) {
+    for (let jour = 0; jour < trainingDays.length; jour++) {
+      // Échange mardi (jour 2) et vendredi (jour 4) AU NIVEAU CONTENU en conservant les labels de jour
+      const logicalJour = (jour + 1 === 2) ? 4 : (jour + 1 === 4 ? 2 : jour + 1);
+      const session = createPowerliftingSession(
+        semaine,
+        logicalJour,
+        user,
+        maxSquat,
+        maxBench,
+        maxDeadlift,
+        trainingDays[jour]
+      );
+      sessions.push(session);
+      console.log(`Session Powerlifting créée: ${semaine}-${logicalJour} (${trainingDays[jour]})`);
+    }
+  }
+  
+  const programme: Programme = {
+    id: Date.now().toString(),
+    nom: `Programme Powerlifting - Basé sur vos 1RM`,
+    description: 'Programme d\'entraînement Powerlifting avec progression 5-3-1 basé sur vos performances réelles',
+    duree,
+    sessions,
+    phases: { adaptation: [], progression: [], specialisation: [] },
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 90 }
+  };
+  
+  console.log('Programme Powerlifting final:', programme);
+  console.log('Nombre de sessions:', programme.sessions.length);
+  
+  return programme;
+}
+
+function createPowerliftingSession(semaine: number, jour: number, user: UserProfile, maxSquat: number, maxBench: number, maxDeadlift: number, dayName?: string) {
+  const estDeload = semaine === 4;
+  
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 4);
+  const semaineDansMois = ((semaine - 1) % 4) + 1;
+  
+  // Progression mensuelle : +5kg pour les mouvements principaux, +2.5kg pour les accessoires
+  const progressionMensuelle = (mois - 1) * 5; // +5kg par mois pour squat/bench/deadlift
+  const progressionAccessoires = (mois - 1) * 2.5; // +2.5kg par mois pour les accessoires
+  
+  console.log(`📅 Mois ${mois}, Semaine ${semaineDansMois} - Progression: +${progressionMensuelle}kg (principaux), +${progressionAccessoires}kg (accessoires)`);
+  
+  let exercices = [];
+  
+  // Système 5-3-1 : 1 exercice principal par séance
+  if (jour === 1) {
+    // Lundi : Squat
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois)); // 50% deload, sinon 60% à 90%
+    const chargeSquat = Math.round((pourcentageCharge * maxSquat) + progressionMensuelle);
+    
+    exercices = [
+      { 
+        nom: 'Squat', 
+        series: estDeload ? 3 : 5, 
+        reps: estDeload ? 5 : (semaine === 3 ? 3 : 5), 
+        poids: chargeSquat, 
+        repos: '3 min' 
+      },
+      { 
+        nom: 'Fentes lestées', 
+        series: 3, 
+        reps: 8, 
+        poids: Math.round((maxSquat * 0.15) + progressionAccessoires), // 15% du squat max + progression mensuelle
+        repos: '2 min' 
+      },
+      { 
+        nom: 'Presse à Jambes', 
+        series: 3, 
+        reps: 12, 
+        poids: Math.round((maxSquat * 1.2) + progressionAccessoires), // 1.2x le squat max + progression mensuelle
+        repos: '1.5 min' 
+      },
+      { 
+        nom: 'Extensions de Jambes', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxSquat * 0.4) + progressionAccessoires), // 40% du squat max + progression mensuelle
+        repos: '1 min' 
+      }
+    ];
+  } else if (jour === 2) {
+    // Mercredi : Développé Couché
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois));
+    const chargeBench = Math.round((pourcentageCharge * maxBench) + progressionMensuelle);
+    
+    exercices = [
+      { 
+        nom: 'Développé Couché', 
+        series: estDeload ? 3 : 5, 
+        reps: estDeload ? 5 : (semaine === 3 ? 3 : 5), 
+        poids: chargeBench, 
+        repos: '3 min' 
+      },
+      { 
+        nom: 'Développé Incliné', 
+        series: 3, 
+        reps: 8, 
+        poids: Math.round((maxBench * 0.6) + progressionAccessoires), // 60% du bench max + progression mensuelle
+        repos: '2 min' 
+      },
+      { 
+        nom: 'Extensions Triceps', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxBench * 0.15) + progressionAccessoires), // 15% du bench max + progression mensuelle
+        repos: '1.5 min' 
+      },
+      { 
+        nom: 'Curls Biceps', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxBench * 0.15) + progressionAccessoires), // 15% du bench max + progression mensuelle
+        repos: '1 min' 
+      }
+    ];
+  } else if (jour === 3) {
+    // Vendredi : Soulevé de Terre
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois));
+    const chargeDeadlift = Math.round((pourcentageCharge * maxDeadlift) + progressionMensuelle);
+    
+    exercices = [
+      { 
+        nom: 'Soulevé de Terre', 
+        series: estDeload ? 3 : 5, 
+        reps: estDeload ? 5 : (semaine === 3 ? 3 : 5), 
+        poids: chargeDeadlift, 
+        repos: '3 min' 
+      },
+      { 
+        nom: 'Rowing Barre', 
+        series: 3, 
+        reps: 8, 
+        poids: Math.round((maxDeadlift * 0.5) + progressionAccessoires), // 50% du deadlift max + progression mensuelle
+        repos: '2 min' 
+      },
+      { 
+        nom: 'Tractions Assistées', 
+        series: 3, 
+        reps: 8, 
+        poids: Math.round((user.weight * 0.3) + progressionAccessoires), // Assistance pour les tractions + progression mensuelle
+        repos: '1.5 min' 
+      },
+      { 
+        nom: 'Shrugs Barre', 
+        series: 3, 
+        reps: 12, 
+        poids: Math.round((maxDeadlift * 0.4) + progressionAccessoires), // 40% du deadlift max + progression mensuelle
+        repos: '1 min' 
+      }
+    ];
+  } else if (jour === 4) {
+    // Vendredi : Session complémentaire (Upper Body Focus)
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois));
+    const chargeBench = Math.round((pourcentageCharge * maxBench) + progressionMensuelle);
+    
+    exercices = [
+      { 
+        nom: 'Développé Incliné', 
+        series: estDeload ? 3 : 4, 
+        reps: estDeload ? 8 : (semaine === 3 ? 6 : 8), 
+        poids: chargeBench, 
+        repos: '2.5 min' 
+      },
+      { 
+        nom: 'Rowing Barre', 
+        series: 3, 
+        reps: 8, 
+        poids: Math.round((maxDeadlift * 0.5) + progressionAccessoires), // + progression mensuelle
+        repos: '2 min' 
+      },
+      { 
+        nom: 'Extensions Triceps', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxBench * 0.15) + progressionAccessoires), // + progression mensuelle
+        repos: '1.5 min' 
+      },
+      { 
+        nom: 'Curls Biceps', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxBench * 0.15) + progressionAccessoires), // + progression mensuelle
+        repos: '1 min' 
+      },
+      { 
+        nom: 'Face Pulls', 
+        series: 3, 
+        reps: 15, 
+        poids: Math.round((maxBench * 0.1) + progressionAccessoires), // + progression mensuelle
+        repos: '1 min' 
+      }
+    ];
+  }
+  
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`}`,
+    day: dayName || `jour${jour}`,
+    phase: estDeload ? 'Deload' : 'Progression',
+    intensity: estDeload ? 'Faible' : 'Modérée',
+    duration: 90,
+    exercises: exercices,
+    notes: estDeload ? 'Semaine de récupération' : 'Basé sur vos 1RM',
+    equipment: ['Barre', 'Disques', 'Rack']
+  };
+}
+
 // Nouvelle fonction pour le Street Lifting
 function generateStreetLiftingProgramme(user: UserProfile): Programme {
   console.log('=== GENERATE STREET LIFTING PROGRAMME ===');
@@ -1099,8 +1468,10 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
   const poidsCorps = user.weight || 70;
   const ratio = ratioMax[niveau as keyof typeof ratioMax] || 1.0;
   
-  const maxPullUp = poidsCorps + poidsCorps * ratio;
-  const maxDip = poidsCorps + poidsCorps * (ratio + 0.2);
+  // Calcul correct : ratio représente le pourcentage du poids du corps qu'on peut ajouter
+  // Ex: ratio 0.5 = on peut faire des pull-ups avec 50% de son poids en plus
+  const maxPullUp = Math.round(poidsCorps * ratio); // Charge additionnelle pour les pull-ups
+  const maxDip = Math.round(poidsCorps * (ratio + 0.2)); // Charge additionnelle pour les dips
   
   for (let semaine = 1; semaine <= duree; semaine++) {
     for (let jour = 0; jour < trainingDays.length; jour++) {
@@ -1129,11 +1500,22 @@ function generateStreetLiftingProgramme(user: UserProfile): Programme {
 function createStreetLiftingSession(semaine: number, jour: number, user: UserProfile, maxPullUp: number, maxDip: number, dayName?: string) {
   const estDeload = semaine === 4;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 4);
+  const semaineDansMois = ((semaine - 1) % 4) + 1;
+  
+  // Progression mensuelle : +2.5kg pour les exercices lestés
+  const progressionMensuelle = (mois - 1) * 2.5; // +2.5kg par mois pour les exercices lestés
+  
+  console.log(`🏋️ Mois ${mois}, Semaine ${semaineDansMois} - Progression Street Lifting: +${progressionMensuelle}kg (lestés)`);
+  
   let exercices = [];
   
   if (jour % 2 === 1) {
     // Jour Tirage (Pull-Ups + Accessoires)
-    const chargePullUp = Math.round((0.7 + 0.05 * semaine) * maxPullUp);
+    // Calcul correct : pourcentage de la charge additionnelle max + progression mensuelle
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois)); // 50% deload, sinon 60% à 90%
+    const chargePullUp = Math.round((pourcentageCharge * maxPullUp) + progressionMensuelle);
     
     exercices = [
       { 
@@ -1161,13 +1543,15 @@ function createStreetLiftingSession(semaine: number, jour: number, user: UserPro
         nom: 'Biceps Curls barre', 
         series: 3, 
         reps: 12, 
-        poids: Math.round(user.weight * 0.3), 
+        poids: Math.round((user.weight * 0.3) + progressionMensuelle), // + progression mensuelle
         repos: 90 
       }
     ];
   } else {
     // Jour Poussée (Dips + Accessoires)
-    const chargeDip = Math.round((0.7 + 0.05 * semaine) * maxDip);
+    // Calcul correct : pourcentage de la charge additionnelle max + progression mensuelle
+    const pourcentageCharge = estDeload ? 0.5 : (0.6 + (0.1 * semaineDansMois)); // 50% deload, sinon 60% à 90%
+    const chargeDip = Math.round((pourcentageCharge * maxDip) + progressionMensuelle);
     
     exercices = [
       { 
@@ -1279,13 +1663,22 @@ function generateCalisthenicsProgramme(user: UserProfile): Programme {
 function createCalisthenicsSession(semaine: number, jour: number, user: UserProfile, progression: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 4;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 4);
+  const semaineDansMois = ((semaine - 1) % 4) + 1;
+  
+  // Progression mensuelle : +1 répétition par mois pour les exercices au poids du corps
+  const progressionMensuelle = (mois - 1) * 1; // +1 rep par mois pour les exercices au poids du corps
+  
+  console.log(`🤸 Mois ${mois}, Semaine ${semaineDansMois} - Progression Calisthenics: +${progressionMensuelle} rep (poids du corps)`);
+  
   let exercices = [];
   
   if (jour % 2 === 1) {
     // Push Focus
-    const repsPush = Math.max(3, Math.floor((8 + semaine) * (estDeload ? 0.7 : 1)));
-    const repsDips = Math.max(3, Math.floor((10 + semaine) * (estDeload ? 0.7 : 1)));
-    const tempsSkill = Math.max(5, Math.floor((20 + semaine * 5) * (estDeload ? 0.7 : 1)));
+    const repsPush = Math.max(3, Math.floor((8 + semaineDansMois) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
+    const repsDips = Math.max(3, Math.floor((10 + semaineDansMois) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
+    const tempsSkill = Math.max(5, Math.floor((20 + semaineDansMois * 5) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
     
     exercices = [
       { 
@@ -1312,16 +1705,16 @@ function createCalisthenicsSession(semaine: number, jour: number, user: UserProf
       { 
         nom: 'Leg Raises', 
         series: 3, 
-        reps: Math.max(5, Math.floor((12 + semaine) * (estDeload ? 0.7 : 1))), 
+        reps: Math.max(5, Math.floor((12 + semaineDansMois) * (estDeload ? 0.7 : 1)) + progressionMensuelle), 
         poids: 0, 
         repos: 60 
       }
     ];
   } else {
     // Pull Focus
-    const repsPull = Math.max(3, Math.floor((6 + semaine) * (estDeload ? 0.7 : 1)));
-    const repsLeg = Math.max(5, Math.floor((12 + semaine) * (estDeload ? 0.7 : 1)));
-    const tempsSkill = Math.max(5, Math.floor((10 + semaine * 5) * (estDeload ? 0.7 : 1)));
+    const repsPull = Math.max(3, Math.floor((6 + semaineDansMois) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
+    const repsLeg = Math.max(5, Math.floor((12 + semaineDansMois) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
+    const tempsSkill = Math.max(5, Math.floor((10 + semaineDansMois * 5) * (estDeload ? 0.7 : 1)) + progressionMensuelle);
     
     exercices = [
       { 
@@ -1418,11 +1811,20 @@ function generateMarathonProgramme(user: UserProfile): Programme {
 function createMarathonSession(semaine: number, jour: number, user: UserProfile, allure: any, objectif: string, niveau: string, dayName?: string) {
   const estDeload = semaine === 4;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 4);
+  const semaineDansMois = ((semaine - 1) % 4) + 1;
+  
+  // Progression mensuelle : +5 minutes par mois pour les courses longues
+  const progressionMensuelle = (mois - 1) * 5; // +5 min par mois pour les courses longues
+  
+  console.log(`🏃‍♂️ Mois ${mois}, Semaine ${semaineDansMois} - Progression Marathon: +${progressionMensuelle} min (courses longues)`);
+  
   let exercices = [];
   
   if (jour === 1) {
     // Endurance fondamentale
-    const duree = estDeload ? 30 : (45 + semaine * 5);
+    const duree = estDeload ? 30 : (45 + semaineDansMois * 5 + progressionMensuelle);
     exercices = [
       { 
         nom: 'Footing endurance', 
@@ -1443,7 +1845,7 @@ function createMarathonSession(semaine: number, jour: number, user: UserProfile,
     ];
   } else if (jour === 2) {
     // Fractionné
-    const repetitions = estDeload ? 4 : (6 + semaine);
+    const repetitions = estDeload ? 4 : (6 + semaineDansMois + Math.floor(progressionMensuelle / 5)); // +1 rep par mois
     const distance = objectif === 'marathon' ? 1000 : 400;
     exercices = [
       { 
@@ -1569,6 +1971,16 @@ function generateMusculationClassiqueProgramme(user: UserProfile): Programme {
 function createMusculationClassiqueSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 6;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 6);
+  const semaineDansMois = ((semaine - 1) % 6) + 1;
+  
+  // Progression mensuelle : +5kg pour les exercices principaux, +2.5kg pour les accessoires
+  const progressionMensuelle = (mois - 1) * 5; // +5kg par mois pour les exercices principaux
+  const progressionAccessoires = (mois - 1) * 2.5; // +2.5kg par mois pour les accessoires
+  
+  console.log(`💪 Mois ${mois}, Semaine ${semaineDansMois} - Progression Musculation: +${progressionMensuelle}kg (principaux), +${progressionAccessoires}kg (accessoires)`);
+  
   let exercices = [];
   let typeSession = '';
   
@@ -1579,22 +1991,22 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
       { 
         nom: 'Développé couché barre', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
-        reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.8), 
+        reps: Math.max(6, volumeConfig.reps[0] + semaineDansMois - 1), 
+        poids: Math.round((user.weight * 0.8) + progressionMensuelle), 
         repos: 120 
       },
       { 
         nom: 'Développé incliné haltères', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
+        poids: Math.round((user.weight * 0.6) + progressionAccessoires), 
         repos: 90 
       },
       { 
         nom: 'Développé militaire', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.5), 
+        poids: Math.round((user.weight * 0.5) + progressionAccessoires), 
         repos: 90 
       },
       { 
@@ -1626,7 +2038,7 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
         nom: 'Tirage poulie basse', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
+        poids: Math.round((user.weight * 0.6) + progressionAccessoires), 
         repos: 90 
       },
       { 
@@ -1644,7 +2056,7 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
         nom: 'Back Squat', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 1.2), 
+        poids: Math.round((user.weight * 1.2) + progressionMensuelle), 
         repos: 120 
       },
       { 
@@ -1658,14 +2070,14 @@ function createMusculationClassiqueSession(semaine: number, jour: number, user: 
         nom: 'Fentes marchées', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.4), 
+        poids: Math.round((user.weight * 0.4) + progressionAccessoires), 
         repos: 90 
       },
       { 
         nom: 'Mollets debout', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: Math.max(6, volumeConfig.reps[0] + semaine - 1), 
-        poids: Math.round(user.weight * 0.6), 
+        poids: Math.round((user.weight * 0.6) + progressionAccessoires), 
         repos: 60 
       }
     ];
@@ -1731,6 +2143,16 @@ function generateCrossfitProgramme(user: UserProfile): Programme {
 function createCrossfitSession(semaine: number, jour: number, user: UserProfile, volumeConfig: any, niveau: string, dayName?: string) {
   const estDeload = semaine === 6;
   
+  // Calculer le mois et la semaine dans le mois
+  const mois = Math.ceil(semaine / 6);
+  const semaineDansMois = ((semaine - 1) % 6) + 1;
+  
+  // Progression mensuelle : +5kg pour les exercices principaux, +2.5kg pour les accessoires
+  const progressionMensuelle = (mois - 1) * 5; // +5kg par mois pour les exercices principaux
+  const progressionAccessoires = (mois - 1) * 2.5; // +2.5kg par mois pour les accessoires
+  
+  console.log(`🔥 Mois ${mois}, Semaine ${semaineDansMois} - Progression CrossFit: +${progressionMensuelle}kg (principaux), +${progressionAccessoires}kg (accessoires)`);
+  
   let exercices = [];
   let typeSession = '';
   
@@ -1742,14 +2164,14 @@ function createCrossfitSession(semaine: number, jour: number, user: UserProfile,
         nom: 'Back Squat', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: estDeload ? Math.max(5, volumeConfig.reps[0] + 2) : volumeConfig.reps[0], 
-        poids: Math.round(user.weight * 1.2), 
+        poids: Math.round((user.weight * 1.2) + progressionMensuelle), 
         repos: 180 
       },
       { 
         nom: 'Deadlift', 
         series: estDeload ? Math.max(2, Math.floor(volumeConfig.series * 0.7)) : volumeConfig.series, 
         reps: estDeload ? Math.max(5, volumeConfig.reps[0] + 2) : volumeConfig.reps[0], 
-        poids: Math.round(user.weight * 1.3), 
+        poids: Math.round((user.weight * 1.3) + progressionMensuelle), 
         repos: 180 
       },
       { 
@@ -1789,7 +2211,7 @@ function createCrossfitSession(semaine: number, jour: number, user: UserProfile,
         nom: 'Snatch', 
         series: estDeload ? 4 : 6, 
         reps: estDeload ? 3 : 2, 
-        poids: Math.round(user.weight * 0.6), 
+        poids: Math.round((user.weight * 0.6) + progressionAccessoires), 
         repos: 120 
       },
       { 

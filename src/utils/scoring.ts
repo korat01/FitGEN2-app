@@ -9,6 +9,8 @@ export interface PerformanceRecord {
   verified?: boolean;
 }
 
+import { getFFForceReferences, calculateFFForceScore, getAgeCategory } from './ffforceStandards';
+
 export interface GlobalScore {
   rank: string;
   globalScore: number;
@@ -66,6 +68,19 @@ export class ScoringEngine {
       ageMultiplier,
       performancesCount: performances.length 
     });
+    
+    console.log('🔍 Vérification des données utilisateur:', {
+      'user.weight': user.weight,
+      'user.age': user.age,
+      'user.sex': user.sex,
+      'user.sportClass': user.sportClass,
+      'Calculé userWeight': userWeight,
+      'Calculé userAge': userAge,
+      'Calculé userSex': userSex,
+      'Calculé ageMultiplier': ageMultiplier,
+      'Type de user.sex': typeof user.sex,
+      'Valeur exacte user.sex': JSON.stringify(user.sex)
+    });
 
     let totalScore = 0;
     let performanceCount = 0;
@@ -76,7 +91,59 @@ export class ScoringEngine {
       calisthenics: 0
     };
 
-    performances.forEach((perf) => {
+    // CALCULER LES MEILLEURES PERFORMANCES POUR CHAQUE DISCIPLINE
+    const bestPerformances = this.getBestPerformances(performances);
+    console.log('🏆 Meilleures performances sélectionnées:', bestPerformances);
+
+    // UTILISER LES RÉFÉRENCES OFFICIELLES FFForce
+    const ffForceRefs = getFFForceReferences(userAge, userWeight, userSex);
+    
+    if (ffForceRefs) {
+      console.log('🏆 Utilisation des références FFForce officielles:', ffForceRefs);
+      
+      // Calculer le total des 3 mouvements principaux
+      const squatPerf = bestPerformances.find(p => p.discipline === 'squat');
+      const benchPerf = bestPerformances.find(p => p.discipline === 'bench');
+      const deadliftPerf = bestPerformances.find(p => p.discipline === 'deadlift');
+      
+      if (squatPerf && benchPerf && deadliftPerf) {
+        const totalWeight = squatPerf.value + benchPerf.value + deadliftPerf.value;
+        const ffForceResult = calculateFFForceScore(totalWeight, ffForceRefs);
+        
+        console.log(`🏋️ Total 3 mouvements: ${totalWeight}kg`);
+        console.log(`📊 Score FFForce: ${ffForceResult.score}, Rang: ${ffForceResult.rank}`);
+        
+        // MAPPING FFForce vers vos rangs
+        const ffForceToAppRank = (ffForceRank: string): string => {
+          switch (ffForceRank) {
+            case 'D': return 'Non classé';
+            case 'R3': return 'E';
+            case 'R2': return 'C';
+            case 'R1': return 'B';
+            case 'N2': return 'A';
+            case 'N1': return 'S';
+            case 'Europe': return 'Nation';
+            case 'Monde': return 'World';
+            default: return 'Non classé';
+          }
+        };
+
+        return {
+          rank: ffForceToAppRank(ffForceResult.rank),
+          globalScore: Math.round(ffForceResult.score),
+          breakdown: {
+            force: ffForceResult.score,
+            endurance: 0,
+            explosivite: 0,
+            calisthenics: 0
+          },
+          reason: `Basé sur les références FFForce officielles (${getAgeCategory(userAge)} - ${userWeight}kg - ${userSex})`
+        };
+      }
+    }
+
+    // FALLBACK: Système de scoring classique si pas de références FFForce
+    bestPerformances.forEach((perf) => {
       if (!perf.discipline || !perf.value || isNaN(perf.value)) {
         console.log('⚠️ Performance invalide ignorée:', perf);
         return;
@@ -90,18 +157,28 @@ export class ScoringEngine {
           // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
           let benchRefs = this.getBenchReferences(userWeight, userSex, userSportClass);
           
+          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, {
+            'Références avant âge': benchRefs,
+            'Multiplicateur âge': ageMultiplier,
+            'Sexe utilisé': userSex,
+            'Poids utilisé': userWeight
+          });
+          
           // APPLIQUER LE MULTIPLICATEUR D'ÂGE
           benchRefs.A *= ageMultiplier;
           benchRefs.S *= ageMultiplier;
           benchRefs.World *= ageMultiplier;
-          
-          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, benchRefs);
           
           if (perf.value >= benchRefs.A) {
             score = 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300;
           } else {
             score = (perf.value / benchRefs.A) * 600;
           }
+          
+          console.log(`💪 Bench ${perf.value}kg pour ${userWeight}kg (${userSex}, ${userSportClass}, ${ageCategory}):`, {
+            'Références après âge': benchRefs,
+            'Score calculé': score
+          });
           
           // BONUS POUR PERFORMANCES EXCEPTIONNELLES DANS LES DOMAINES NON-SPÉCIALISÉS
           score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, benchRefs);
@@ -187,7 +264,7 @@ export class ScoringEngine {
           
         default:
           console.log('⚠️ Discipline non reconnue:', perf.discipline);
-          return;
+          break;
       }
 
       console.log(`✅ Performance ${perf.discipline}: ${perf.value} → Score: ${score} (catégorie: ${category})`);
@@ -222,13 +299,22 @@ export class ScoringEngine {
       ageCategory,
       ageMultiplier,
       userSex,
+      userWeight,
+      userAge,
       breakdown 
     });
 
     const finalRank = this.determineRank(weightedScore);
     const finalScore = Math.round(weightedScore);
 
-    console.log('🏆 RANG FINAL:', { rank: finalRank, score: finalScore });
+    console.log('🏆 RANG FINAL:', { 
+      rank: finalRank, 
+      score: finalScore,
+      'Âge utilisé': userAge,
+      'Poids utilisé': userWeight,
+      'Multiplicateur âge': ageMultiplier,
+      'Profil sport': userSportClass
+    });
 
     return {
       rank: finalRank,
@@ -260,15 +346,9 @@ export class ScoringEngine {
     return 'World';
   }
 
-  // DÉTERMINER LA CATÉGORIE D'ÂGE
+  // DÉTERMINER LA CATÉGORIE D'ÂGE SELON LES STANDARDS FFForce
   private getAgeCategory(age: number): string {
-    if (age >= 14 && age <= 18) return 'sub-junior';
-    if (age >= 19 && age <= 23) return 'junior';
-    if (age >= 24 && age <= 39) return 'open';
-    if (age >= 40 && age <= 49) return 'masters1';
-    if (age >= 50 && age <= 59) return 'masters2';
-    if (age >= 60) return 'masters3+';
-    return 'open';
+    return getAgeCategory(age);
   }
 
   // MULTIPLICATEUR SELON LA CATÉGORIE D'ÂGE
@@ -573,7 +653,8 @@ export class ScoringEngine {
       if (weight <= 83) return { A: 140, S: 200, World: 250 };
       if (weight <= 93) return { A: 160, S: 220, World: 280 };
       if (weight <= 105) return { A: 180, S: 240, World: 300 };
-      return { A: 200, S: 260, World: 320 };
+      if (weight <= 120) return { A: 200, S: 260, World: 320 };
+      return { A: 220, S: 280, World: 340 };
     } else {
       if (weight <= 52) return { A: 60, S: 90, World: 120 };
       if (weight <= 57) return { A: 70, S: 105, World: 140 };
@@ -592,7 +673,8 @@ export class ScoringEngine {
       if (weight <= 83) return { A: 200, S: 280, World: 350 };
       if (weight <= 93) return { A: 220, S: 300, World: 380 };
       if (weight <= 105) return { A: 240, S: 320, World: 400 };
-      return { A: 260, S: 340, World: 420 };
+      if (weight <= 120) return { A: 260, S: 340, World: 420 };
+      return { A: 280, S: 360, World: 440 };
     } else {
       if (weight <= 52) return { A: 90, S: 130, World: 170 };
       if (weight <= 57) return { A: 105, S: 150, World: 195 };
@@ -611,7 +693,8 @@ export class ScoringEngine {
       if (weight <= 83) return { A: 200, S: 280, World: 350 };
       if (weight <= 93) return { A: 220, S: 300, World: 380 };
       if (weight <= 105) return { A: 240, S: 320, World: 400 };
-      return { A: 260, S: 340, World: 420 };
+      if (weight <= 120) return { A: 260, S: 340, World: 420 };
+      return { A: 280, S: 360, World: 440 };
     } else {
       if (weight <= 52) return { A: 90, S: 130, World: 170 };
       if (weight <= 57) return { A: 105, S: 150, World: 195 };
@@ -666,6 +749,58 @@ export class ScoringEngine {
     }
     
     return score;
+  }
+
+  // MÉTHODE POUR SÉLECTIONNER LES MEILLEURES PERFORMANCES
+  private getBestPerformances(performances: PerformanceRecord[]): PerformanceRecord[] {
+    const disciplineGroups: { [key: string]: PerformanceRecord[] } = {};
+    
+    // Grouper les performances par discipline
+    performances.forEach(perf => {
+      if (!disciplineGroups[perf.discipline]) {
+        disciplineGroups[perf.discipline] = [];
+      }
+      disciplineGroups[perf.discipline].push(perf);
+    });
+    
+    const bestPerformances: PerformanceRecord[] = [];
+    
+    // Pour chaque discipline, prendre la meilleure performance
+    Object.keys(disciplineGroups).forEach(discipline => {
+      const disciplinePerformances = disciplineGroups[discipline];
+      
+      if (disciplinePerformances.length === 0) return;
+      
+      let bestPerf: PerformanceRecord;
+      
+      // Logique différente selon le type d'exercice
+      if (['bench', 'squat', 'deadlift', 'pullups'].includes(discipline)) {
+        // Force : prendre le MAXIMUM (plus lourd)
+        bestPerf = disciplinePerformances.reduce((max, current) => 
+          current.value > max.value ? current : max
+        );
+      } else if (['5k', '10k', 'marathon', 'sprint'].includes(discipline)) {
+        // Vitesse : prendre le MINIMUM (plus rapide)
+        bestPerf = disciplinePerformances.reduce((min, current) => 
+          current.value < min.value ? current : min
+        );
+      } else if (['plank', 'wall-sit', 'burpees'].includes(discipline)) {
+        // Endurance : prendre le MAXIMUM (plus long)
+        bestPerf = disciplinePerformances.reduce((max, current) => 
+          current.value > max.value ? current : max
+        );
+      } else {
+        // Par défaut : prendre le maximum
+        bestPerf = disciplinePerformances.reduce((max, current) => 
+          current.value > max.value ? current : max
+        );
+      }
+      
+      bestPerformances.push(bestPerf);
+      console.log(`🏆 Meilleure performance ${discipline}: ${bestPerf.value} (${disciplinePerformances.length} performances au total)`);
+    });
+    
+    return bestPerformances;
   }
 }
 

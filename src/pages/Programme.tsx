@@ -42,27 +42,38 @@ export const Programme: React.FC = () => {
 
   // Charger le programme existant
   useEffect(() => {
+    console.log('🔄 Chargement du programme depuis localStorage...');
     const savedProgramme = localStorage.getItem('userProgramme');
     if (savedProgramme) {
       try {
-        setProgramme(JSON.parse(savedProgramme));
+        const parsedProgramme = JSON.parse(savedProgramme);
+        console.log('📅 Programme chargé:', parsedProgramme);
+        console.log('📊 Sessions dans le programme:', parsedProgramme.sessions?.length || 0);
+        setProgramme(parsedProgramme);
       } catch (error) {
-        console.error('Erreur lors du chargement du programme:', error);
+        console.error('❌ Erreur lors du chargement du programme:', error);
       }
+    } else {
+      console.log('❌ Aucun programme trouvé dans localStorage');
     }
   }, []);
 
-  // Ajoutez ce debug au début du composant
+  // Debug du composant
   useEffect(() => {
     console.log('=== DEBUG COMPOSANT PROGRAMME ===');
     console.log('User sportClass:', user.sportClass);
-    console.log('Type:', typeof user.sportClass);
-    console.log('Égalité avec "sprint":', user.sportClass === 'sprint');
-  }, [user]);
+    console.log('Programme actuel:', programme);
+    console.log('Nombre de sessions:', programme?.sessions?.length || 0);
+    if (programme?.sessions) {
+      console.log('Sessions:', programme.sessions.map(s => `${s.day}: ${s.nom}`));
+    }
+  }, [user, programme]);
 
   // Fonction pour générer un programme personnalisé selon le profil
   const handleGenerateProgramme = () => {
     console.log('🔴 Bouton cliqué !');
+    console.log('👤 Utilisateur:', user);
+    console.log('📅 Jours d\'entraînement:', user?.trainingDays);
     
     if (!user) {
       alert('❌ Vous devez être connecté');
@@ -71,54 +82,57 @@ export const Programme: React.FC = () => {
     
     setIsGenerating(true);
     
-    // Simuler une génération
-    setTimeout(() => {
+    try {
       console.log('👤 Profil utilisateur COMPLET:', user);
       
-      try {
-        // Utiliser la nouvelle fonction de génération
-        const generatedProgramme = generateProgramme(user as any);
-        console.log('📅 Programme généré:', generatedProgramme);
-        
-        // Adapter le format pour l'affichage existant
-        const adaptedProgramme = {
-          id: generatedProgramme.id,
-          nom: generatedProgramme.nom,
-          sessions: generatedProgramme.sessions.map((session: any) => ({
-            id: session.id,
-            nom: session.nom,
-            day: session.day || 'lundi', // Valeur par défaut
-            phase: session.phase || 'Adaptation',
-            intensity: session.intensity || 'Modérée',
-            duration: session.duration || session.duree || 60,
-            exercises: session.exercises || session.exercices || [],
-            notes: session.notes || '',
-            equipment: session.equipment || []
-          })),
+      // Utiliser la nouvelle fonction de génération
+      const generatedProgramme = generateProgramme(user as any);
+      console.log('📅 Programme généré:', generatedProgramme);
+      
+      // Adapter le format pour l'affichage existant
+      const adaptedProgramme = {
+        id: generatedProgramme.id,
+        nom: generatedProgramme.nom,
+        sessions: generatedProgramme.sessions.map((session: any) => ({
+          id: session.id,
+          nom: session.nom,
+          day: session.day || 'lundi', // Valeur par défaut
+          phase: session.phase || 'Adaptation',
+          intensity: session.intensity || 'Modérée',
+          duration: session.duration || session.duree || 60,
+          exercises: session.exercises || session.exercices || [],
+          notes: session.notes || '',
+          equipment: session.equipment || []
+        })),
         userProfile: {
-            sportClass: user.sportClass,
-            level: (user as any).niveau || (user as any).generalLevel || 'intermediaire',
-            weight: user.weight || 70,
-            age: user.age || 25,
-            sex: user.sex || 'male',
-            trainingDays: user.trainingDays || ['lundi', 'mercredi', 'vendredi'],
-            trainingMonths: user.trainingMonths || 3
-          }
-        };
-        
-        console.log('📅 Programme adapté:', adaptedProgramme);
-        
-        localStorage.setItem('userProgramme', JSON.stringify(adaptedProgramme));
-        setProgramme(adaptedProgramme);
+          sportClass: user.sportClass,
+          level: (user as any).niveau || (user as any).generalLevel || 'intermediaire',
+          weight: user.weight || 70,
+          age: user.age || 25,
+          sex: user.sex || 'male',
+          trainingDays: user.trainingDays || ['lundi', 'mercredi', 'vendredi'],
+          trainingMonths: user.trainingMonths || 3
+        }
+      };
+      
+      console.log('📅 Programme adapté:', adaptedProgramme);
+      
+      console.log('💾 Sauvegarde du programme dans localStorage...');
+      localStorage.setItem('userProgramme', JSON.stringify(adaptedProgramme));
+      
+      console.log('🔄 Mise à jour du state programme...');
+      setProgramme(adaptedProgramme);
       setIsGenerating(false);
       
-        alert(`🎉 Programme ${user.sportClass} généré avec succès ! ${adaptedProgramme.sessions.length} séances créées.`);
-      } catch (error) {
-        console.error('❌ Erreur lors de la génération:', error);
-        setIsGenerating(false);
-        alert('❌ Erreur lors de la génération du programme');
-      }
-    }, 2000);
+      console.log('✅ Programme généré et sauvegardé !');
+      console.log('📊 Sessions créées:', adaptedProgramme.sessions.map(s => `${s.day}: ${s.nom}`));
+      
+      alert(`🎉 Programme ${user.sportClass} généré avec succès !\n\n📅 ${adaptedProgramme.sessions.length} séances créées pour les jours :\n${user.trainingDays?.join(', ') || 'Non spécifiés'}\n\n✅ Vous pouvez maintenant voir vos entraînements dans les onglets "Hebdomadaire" et "Planning" !`);
+    } catch (error) {
+      console.error('❌ Erreur lors de la génération:', error);
+      setIsGenerating(false);
+      alert('❌ Erreur lors de la génération du programme');
+    }
   };
 
   // Fonction pour régénérer
@@ -190,7 +204,42 @@ export const Programme: React.FC = () => {
     if (!programme) return null;
     
     const dayName = getDayName(date.getDay());
-    return programme.sessions.find((session: any) => session.day === dayName);
+    
+    // Calculer la semaine du mois (1-4)
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    const firstWeekday = firstDayOfMonth.getDay();
+    const dayOfMonth = date.getDate();
+    const weekOfMonth = Math.ceil((dayOfMonth + firstWeekday) / 7);
+    
+    // Trouver la session correspondant au jour ET à la semaine
+    const session = programme.sessions.find((session: any) => {
+      if (session.day !== dayName) return false;
+      
+      // Extraire le numéro de semaine du nom de la session
+      const semaineMatch = session.nom.match(/Semaine (\d+)/);
+      if (!semaineMatch) return false;
+      
+      const sessionWeek = parseInt(semaineMatch[1]);
+      return sessionWeek === weekOfMonth;
+    });
+    
+    // Si pas de session trouvée, créer une session de repos
+    if (!session) {
+      return {
+        id: `repos-${dayName}`,
+        nom: `Repos - ${dayName}`,
+        day: dayName,
+        phase: 'Repos',
+        intensity: 'Repos',
+        duration: 0,
+        exercises: [],
+        notes: 'Jour de récupération',
+        equipment: [],
+        isRestDay: true
+      };
+    }
+    
+    return session;
   };
 
   // Fonction pour obtenir le nom du mois
@@ -229,21 +278,37 @@ export const Programme: React.FC = () => {
     return value.toString();
   };
 
-    return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
-      <div className="mx-auto max-w-7xl space-y-6">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-4">
+      <div className="mx-auto max-w-7xl space-y-8">
         
         {/* Header Principal */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-8 text-white shadow-2xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
+          {/* Effets de particules flottantes */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32 animate-pulse"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24 animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-x-16 -translate-y-16 animate-pulse delay-500"></div>
           
           <div className="relative z-10">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">🏋️ Mon Programme</h1>
-                <p className="text-xl text-blue-100">Programme personnalisé selon votre profil</p>
-            </div>
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                  🏋️ Mon Programme
+                </h1>
+                <p className="text-xl text-blue-100 max-w-2xl leading-relaxed">
+                  Programme personnalisé basé sur vos performances réelles
+                </p>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Activity className="w-5 h-5" />
+                    <span className="font-semibold">Powerlifting</span>
+                  </div>
+                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <Target className="w-5 h-5" />
+                    <span className="font-semibold">Progression 5-3-1</span>
+                  </div>
+                </div>
+              </div>
               <div className="flex gap-3">
                 {programme && (
                   <Button 
@@ -288,7 +353,7 @@ export const Programme: React.FC = () => {
 
         {/* Message si pas de programme */}
         {!programme && (
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl">
             <CardContent className="text-center py-12">
               <div className="text-6xl mb-4">🏋️</div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucun Programme Généré</h3>
@@ -314,27 +379,56 @@ export const Programme: React.FC = () => {
           </Card>
         )}
 
+        {/* Message d'information si les jours d'entraînement ont changé */}
+        {programme && user?.trainingDays && programme.sessions.length > 0 && (
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Jours d'Entraînement Configurés
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  {user.trainingDays.map(day => (
+                    <Badge key={day} className="bg-blue-100 text-blue-800 border-blue-300">
+                      {day}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="bg-blue-100/50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-blue-700 text-sm">
+                    <strong>💡 Astuce :</strong> Si vous avez modifié vos jours d'entraînement, 
+                    cliquez sur "Générer Mon Programme" pour créer un nouveau programme adapté à vos nouveaux jours.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Programme Généré */}
         {programme && (
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
-            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} bg-white/80 backdrop-blur-sm`}>
-              <TabsTrigger value="today" className="flex items-center gap-2">
+            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} bg-white/90 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
+              <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <Calendar className="w-4 h-4" />
                 Aujourd'hui
-          </TabsTrigger>
-              <TabsTrigger value="weekly" className="flex items-center gap-2">
+              </TabsTrigger>
+              <TabsTrigger value="weekly" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <CalendarDays className="w-4 h-4" />
                 Hebdomadaire
               </TabsTrigger>
-              <TabsTrigger value="planning" className="flex items-center gap-2">
+              <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <List className="w-4 h-4" />
-            Planning
-          </TabsTrigger>
-        </TabsList>
+                Planning
+              </TabsTrigger>
+            </TabsList>
 
             {/* Onglet Aujourd'hui */}
             <TabsContent value="today">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-blue-500" />
@@ -399,12 +493,12 @@ export const Programme: React.FC = () => {
                           return (
                             <div key={exercise.id || index} className="space-y-3">
                               {/* Informations de l'exercice */}
-                              <Card className={`bg-white/60 backdrop-blur-sm border ${
+                              <Card className={`bg-white/70 backdrop-blur-sm border-2 rounded-xl transition-all duration-200 ${
                                 isCompleted 
                                   ? isSuccess 
-                                    ? 'border-green-300 bg-green-50/50' 
-                                    : 'border-red-300 bg-red-50/50'
-                                  : 'border-gray-200'
+                                    ? 'border-green-300 bg-green-50/70 shadow-green-200' 
+                                    : 'border-red-300 bg-red-50/70 shadow-red-200'
+                                  : 'border-gray-200 hover:border-indigo-300 hover:shadow-lg'
                               }`}>
                                 <CardHeader className="pb-3">
                                   <div className="flex items-center justify-between">
@@ -490,7 +584,7 @@ export const Programme: React.FC = () => {
 
             {/* Onglet Hebdomadaire */}
             <TabsContent value="weekly">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <Card className="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
                     <CalendarDays className="w-6 h-6 text-green-500" />
@@ -502,6 +596,21 @@ export const Programme: React.FC = () => {
                     {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map(day => {
                       const daySession = programme.sessions.find((s: any) => s.day === day);
                       const today = new Date().toISOString().split('T')[0];
+                      
+                      // Créer une session de repos si pas de session trouvée
+                      const sessionToDisplay = daySession || {
+                        id: `repos-${day}`,
+                        nom: `Repos - ${day}`,
+                        day: day,
+                        phase: 'Repos',
+                        intensity: 'Repos',
+                        duration: 0,
+                        exercises: [],
+                        notes: 'Jour de récupération',
+                        equipment: [],
+                        isRestDay: true
+                      };
+                      
                       const sessionStatus = daySession ? getSessionStatus(daySession.id, today) : 'not-started';
                       
                       return (
@@ -510,14 +619,14 @@ export const Programme: React.FC = () => {
                           className={`${
                             daySession 
                               ? sessionStatus === 'completed'
-                                ? 'bg-green-50 border-green-300'
+                                ? 'bg-green-50/80 border-green-300 shadow-green-200'
                                 : sessionStatus === 'failed'
-                                ? 'bg-red-50 border-red-300'
+                                ? 'bg-red-50/80 border-red-300 shadow-red-200'
                                 : sessionStatus === 'partial'
-                                ? 'bg-yellow-50 border-yellow-300'
-                                : 'bg-blue-50 border-blue-200'
-                              : 'bg-gray-50 border-gray-200'
-                          } border-2 ${daySession ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : ''}`}
+                                ? 'bg-yellow-50/80 border-yellow-300 shadow-yellow-200'
+                                : 'bg-blue-50/80 border-blue-200 shadow-blue-200'
+                              : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300 shadow-gray-200'
+                          } border-2 ${daySession ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : 'cursor-default'}`}
                           onClick={() => daySession && handleSessionClick(daySession)}
                         >
                           <CardHeader className="pb-3">
@@ -579,7 +688,8 @@ export const Programme: React.FC = () => {
                             ) : (
                               <div className="text-center py-4">
                                 <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-sm text-gray-500">Repos</p>
+                                <p className="text-sm text-gray-500 font-medium">Repos</p>
+                                <p className="text-xs text-gray-400">Récupération</p>
                               </div>
                             )}
                           </CardContent>
@@ -593,87 +703,101 @@ export const Programme: React.FC = () => {
 
             {/* Onglet Planning */}
             <TabsContent value="planning">
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
-                    <Calendar className="w-6 h-6 text-purple-500" />
-                    Planning Mensuel
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {programme ? (
-                    <div className="space-y-6">
-                      {/* Navigation du calendrier */}
-                      <div className="flex items-center justify-between mb-6">
-                    <Button 
-                          variant="outline" 
-                          onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                          className="hover:bg-purple-50 hover:border-purple-300"
-                        >
-                          <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                        <h2 className="text-xl font-bold text-gray-800">
-                          {getMonthName(currentMonth)} {currentMonth.getFullYear()}
-                        </h2>
-                    <Button 
-                          variant="outline" 
-                          onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                          className="hover:bg-purple-50 hover:border-purple-300"
-                        >
-                          <ChevronRight className="w-4 h-4" />
-                    </Button>
+              <div className="space-y-8">
+                {/* Header avec navigation */}
+                <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-8 text-white shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                        <Calendar className="w-6 h-6" />
                       </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Planning Mensuel</h2>
+                        <p className="text-white/80">Votre calendrier d'entraînement personnalisé</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+                        className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </Button>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3">
+                        <h3 className="text-xl font-bold">
+                          {getMonthName(currentMonth)} {currentMonth.getFullYear()}
+                        </h3>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+                        className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
 
-                      {/* Stats du programme */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-xl">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                              <Activity className="w-6 h-6 text-blue-200" />
-                              <div>
-                                <p className="text-xl font-bold">{programme.sessions.length}</p>
-                                <p className="text-sm text-blue-200">Sessions/Semaine</p>
+                  {/* Stats du programme */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500/30 rounded-xl flex items-center justify-center">
+                          <Activity className="w-5 h-5 text-blue-200" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">{programme?.sessions.length || 0}</p>
+                          <p className="text-sm text-white/80">Sessions/Semaine</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-500/30 rounded-xl flex items-center justify-center">
+                          <Timer className="w-5 h-5 text-green-200" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">
+                            {programme ? Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0 : 0}
+                          </p>
+                          <p className="text-sm text-white/80">Min/Session</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-500/30 rounded-xl flex items-center justify-center">
+                          <Target className="w-5 h-5 text-purple-200" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">{programme?.userProfile?.sportClass || 'N/A'}</p>
+                          <p className="text-sm text-white/80">Classe Sport</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
 
-                        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-xl">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                              <Timer className="w-6 h-6 text-green-200" />
-                              <div>
-                                <p className="text-xl font-bold">{Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0}</p>
-                                <p className="text-sm text-green-200">Min/Session</p>
-                  </div>
-                    </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-xl">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-3">
-                              <Target className="w-6 h-6 text-purple-200" />
-                              <div>
-                                <p className="text-xl font-bold">{programme.userProfile?.sportClass || 'N/A'}</p>
-                                <p className="text-sm text-purple-200">Classe Sport</p>
-                    </div>
-                  </div>
-                          </CardContent>
-                        </Card>
-                  </div>
-                  
+                {programme ? (
+                  <Card className="bg-white/95 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
+                    <CardContent className="p-8">
                       {/* En-têtes des jours */}
-                      <div className="grid grid-cols-7 gap-2 mb-4">
+                      <div className="grid grid-cols-7 gap-3 mb-6">
                         {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                          <div key={day} className="text-center text-sm font-bold text-gray-700 p-3 bg-gray-100 rounded-lg">
+                          <div key={day} className="text-center text-sm font-bold text-gray-600 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200/50">
                             {day}
-                    </div>
+                          </div>
                         ))}
-                </div>
-                
+                      </div>
+                      
                       {/* Grille du calendrier */}
-                      <div className="grid grid-cols-7 gap-2">
+                      <div className="grid grid-cols-7 gap-3">
                         {calendar.map((week, weekIndex) =>
                           week.map((date, dayIndex) => {
                             const dayName = getDayName(dayIndex);
@@ -685,109 +809,124 @@ export const Programme: React.FC = () => {
                               <div
                                 key={`${weekIndex}-${dayIndex}`}
                                 className={`
-                                  min-h-[120px] p-3 rounded-xl border-2 transition-all duration-200
-                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-purple-300 hover:shadow-md' : 'bg-gray-50 border-gray-100'}
-                                  ${isTodayDate ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-300' : ''}
+                                  min-h-[140px] p-4 rounded-2xl border-2 transition-all duration-300 group
+                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-lg hover:scale-[1.02]' : 'bg-gray-50/50 border-gray-100'}
+                                  ${isTodayDate ? 'ring-4 ring-blue-400 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-xl' : ''}
                                 `}
                               >
                                 {/* Numéro du jour */}
-                                <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center justify-between mb-3">
                                   <span className={`text-lg font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
                                     {date.getDate()}
                                   </span>
                                   {isTodayDate && (
-                                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                                    <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-pulse shadow-lg"></div>
                                   )}
-                    </div>
+                                </div>
                                 
                                 {/* Session du jour */}
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                   {sessionForDate ? (
                                     <div
                                       className={`
-                                        text-xs p-2 rounded-lg text-white font-medium shadow-sm cursor-pointer
-                                        ${sessionForDate.phase === 'Adaptation' ? 'bg-gradient-to-r from-green-500 to-green-600' : 
-                                          sessionForDate.phase === 'Progression' ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
-                                          'bg-gradient-to-r from-red-500 to-red-600'}
-                                        hover:scale-105 transition-transform duration-200
+                                        text-xs p-3 rounded-xl text-white font-medium shadow-lg cursor-pointer
+                                        ${sessionForDate.phase === 'Progression' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600' : 
+                                          sessionForDate.phase === 'Deload' ? 'bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-500 hover:to-slate-600' :
+                                          'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600'}
+                                        hover:scale-105 transition-all duration-200 hover:shadow-xl
                                       `}
                                       onClick={() => handleSessionClick(sessionForDate)}
                                     >
-                    <div className="flex items-center justify-between">
-                                        <span className="truncate">{sessionForDate.nom}</span>
+                                      <div className="flex items-center justify-between mb-1">
+                                        <span className="truncate font-semibold">{sessionForDate.nom}</span>
                                         <Eye className="w-3 h-3 opacity-90" />
-                        </div>
-                                      <div className="text-xs opacity-90 mt-1">
-                                        {sessionForDate.duration}min • {sessionForDate.intensity}
-                          </div>
-                          </div>
+                                      </div>
+                                      <div className="text-xs opacity-90 space-y-1">
+                                        <div className="flex items-center gap-1">
+                                          <Timer className="w-3 h-3" />
+                                          {sessionForDate.duration}min
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <Activity className="w-3 h-3" />
+                                          {sessionForDate.intensity}
+                                        </div>
+                                      </div>
+                                    </div>
                                   ) : (
                                     isCurrentMonthDay && (
-                                      <div className="text-xs text-gray-400 text-center py-3 bg-gray-50 rounded-lg">
-                                        <RefreshCw className="w-4 h-4 mx-auto mb-1" />
-                                        Repos
-                          </div>
+                                      <div className="text-xs text-gray-300 text-center py-2 bg-gray-50/30 rounded-md border border-gray-50 hover:border-gray-100 transition-colors">
+                                        <div className="w-5 h-5 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-1">
+                                          <RefreshCw className="w-2.5 h-2.5 text-gray-200" />
+                                        </div>
+                                        <div className="font-light text-gray-400 text-xs">Repos</div>
+                                      </div>
                                     )
                                   )}
-                        </div>
-                      </div>
+                                </div>
+                              </div>
                             );
                           })
                         )}
                       </div>
                       
-                      {/* Légende */}
-                      <div className="flex items-center justify-center gap-8 pt-6 border-t border-gray-200">
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 bg-gradient-to-r from-green-500 to-green-600 rounded-lg"></div>
-                          <span className="text-sm font-medium text-gray-700">Adaptation</span>
-          </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg"></div>
-                          <span className="text-sm font-medium text-gray-700">Progression</span>
-                  </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 bg-gradient-to-r from-red-500 to-red-600 rounded-lg"></div>
-                          <span className="text-sm font-medium text-gray-700">Spécialisation</span>
-                      </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm font-medium text-gray-700">Aujourd'hui</span>
+                      {/* Légende avec couleurs spécifiques */}
+                      <div className="mt-8 pt-6 border-t border-gray-200">
+                        <div className="flex flex-wrap items-center justify-center gap-4">
+                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
+                            <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded"></div>
+                            <span className="text-sm font-medium text-gray-700">Progression</span>
                           </div>
+                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
+                            <div className="w-3 h-3 bg-gradient-to-r from-slate-400 to-slate-500 rounded"></div>
+                            <span className="text-sm font-medium text-gray-700">Deload</span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
+                            <div className="w-3 h-3 bg-gradient-to-r from-gray-100 to-gray-200 rounded"></div>
+                            <span className="text-sm font-medium text-gray-500">Repos</span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
+                            <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse"></div>
+                            <span className="text-sm font-medium text-gray-700">Aujourd'hui</span>
                           </div>
                         </div>
-                  ) : (
-                    <div className="text-center py-16">
-                      <div className="w-32 h-32 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Calendar className="w-16 h-16 text-white" />
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-3">Aucun Programme</h3>
-                      <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                        Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions.
-                      </p>
-                          <Button 
-                        onClick={handleGenerateProgramme} 
-                        disabled={isGenerating}
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8 py-3 text-lg"
-                      >
-                        {isGenerating ? (
-                          <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                            Génération...
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-5 h-5 mr-3" />
-                            Générer Programme
-                          </>
-                        )}
-                          </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="bg-white/95 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
+                    <CardContent className="p-16">
+                      <div className="text-center">
+                        <div className="w-40 h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                          <Calendar className="w-20 h-20 text-white" />
                         </div>
-                  )}
-              </CardContent>
-            </Card>
-        </TabsContent>
-      </Tabs>
+                        <h3 className="text-3xl font-bold text-gray-800 mb-4">Aucun Programme</h3>
+                        <p className="text-gray-600 mb-10 max-w-lg mx-auto text-lg leading-relaxed">
+                          Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions organisées.
+                        </p>
+                        <Button 
+                          onClick={handleGenerateProgramme} 
+                          disabled={isGenerating}
+                          className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                        >
+                          {isGenerating ? (
+                            <>
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                              Génération...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-6 h-6 mr-3" />
+                              Générer Programme
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         )}
 
         {/* Modal pour afficher les détails de la session */}
@@ -888,8 +1027,8 @@ export const Programme: React.FC = () => {
             )}
           </DialogContent>
         </Dialog>
-        </div>
       </div>
+    </div>
   );
 };
 

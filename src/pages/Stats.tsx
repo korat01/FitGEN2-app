@@ -659,33 +659,57 @@ export const Stats: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                      {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).map((perf) => {
-                        const weight = user?.weight || 75;
-                        const ratio = Math.round((perf.value / weight) * 10) / 10;
+                      {(() => {
+                        // Calculer les MEILLEURES performances de force (max weight)
+                        const forceDisciplines = ['bench', 'squat', 'deadlift'];
+                        const bestForceRecords = forceDisciplines.map(discipline => {
+                          const disciplinePerformances = performances.filter(p => p.discipline === discipline);
+                          if (disciplinePerformances.length === 0) return null;
+                          
+                          const bestPerf = disciplinePerformances.reduce((max, current) => 
+                            current.value > max.value ? current : max
+                          );
+                          
+                          return {
+                            discipline,
+                            ...bestPerf
+                          };
+                        }).filter(Boolean);
                         
-                        return (
-                          <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-300">
-                      <div className="space-y-1">
-                              <div className="font-bold text-lg capitalize text-gray-800">
-                                {perf.discipline === 'bench' ? 'Développé couché' :
-                                 perf.discipline === 'squat' ? 'Squat' :
-                                 perf.discipline === 'deadlift' ? 'Soulevé de terre' : perf.discipline}
+                        return bestForceRecords.map((perf) => {
+                          const weight = user?.weight || 75;
+                          const ratio = Math.round((perf.value / weight) * 10) / 10;
+                          
+                          return (
+                            <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-300">
+                              <div className="space-y-1">
+                                <div className="font-bold text-lg capitalize text-gray-800">
+                                  {perf.discipline === 'bench' ? 'Développé couché' :
+                                   perf.discipline === 'squat' ? 'Squat' :
+                                   perf.discipline === 'deadlift' ? 'Soulevé de terre' : perf.discipline}
+                                </div>
+                                <div className="text-sm font-semibold text-gray-600">
+                                  Ratio: <span className="font-bold text-red-600">{ratio}×</span> poids corporel
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {new Date(perf.date).toLocaleDateString()}
+                                </div>
                               </div>
-                              <div className="text-sm font-semibold text-gray-600">
-                                Ratio: <span className="font-bold text-red-600">{ratio}×</span> poids corporel
-                        </div>
-                      </div>
-                      <div className="text-right space-y-2">
-                              <div className="text-2xl font-bold text-red-600">{perf.value} kg</div>
-                              <Badge className="bg-red-100 text-red-800 border-red-200 font-semibold">
-                                Record
-                        </Badge>
-                      </div>
-                    </div>
-                        );
-                      })}
+                              <div className="text-right space-y-2">
+                                <div className="text-2xl font-bold text-red-600">{perf.value} kg</div>
+                                <Badge className="bg-red-100 text-red-800 border-red-200 font-semibold">
+                                  Record Personnel
+                                </Badge>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
                       
-                      {performances.filter(p => ['bench', 'squat', 'deadlift'].includes(p.discipline)).length === 0 && (
+                      {(() => {
+                        const forceDisciplines = ['bench', 'squat', 'deadlift'];
+                        return performances.filter(p => forceDisciplines.includes(p.discipline)).length === 0;
+                      })() && (
                         <div className="text-center text-gray-500 py-8">
                           <Weight className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                           <p className="text-lg">Aucun record de force</p>
@@ -700,26 +724,90 @@ export const Stats: React.FC = () => {
                     <CardHeader>
                   <CardTitle className="text-xl font-bold text-blue-800 flex items-center gap-3">
                     <Clock className="w-6 h-6" />
-                        Endurance - Vos Records
+                        Vitesse & Endurance - Vos Records
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                      {performances.filter(p => p.discipline === '5k').map((perf) => (
-                        <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:shadow-md transition-all duration-300">
-                      <div className="space-y-1">
-                            <div className="font-bold text-lg text-gray-800">5km</div>
-                            <div className="text-sm font-semibold text-gray-600">Meilleur chrono</div>
-                      </div>
-                      <div className="text-right space-y-2">
-                            <div className="text-2xl font-bold text-blue-600">{perf.value} min</div>
-                            <Badge className="bg-blue-100 text-blue-800 border-blue-200 font-semibold">
-                              Record
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
+                      {(() => {
+                        // Calculer les MEILLEURES performances de vitesse (min time) et endurance (max duration)
+                        const speedDisciplines = ['5k', '10k', 'marathon', 'sprint'];
+                        const enduranceDisciplines = ['plank', 'wall-sit', 'burpees'];
+                        
+                        // Vitesse : temps minimum
+                        const bestSpeedRecords = speedDisciplines.map(discipline => {
+                          const disciplinePerformances = performances.filter(p => p.discipline === discipline);
+                          if (disciplinePerformances.length === 0) return null;
+                          
+                          const bestPerf = disciplinePerformances.reduce((min, current) => 
+                            current.value < min.value ? current : min
+                          );
+                          
+                          return {
+                            discipline,
+                            ...bestPerf
+                          };
+                        }).filter(Boolean);
+                        
+                        // Endurance : durée maximum
+                        const bestEnduranceRecords = enduranceDisciplines.map(discipline => {
+                          const disciplinePerformances = performances.filter(p => p.discipline === discipline);
+                          if (disciplinePerformances.length === 0) return null;
+                          
+                          const bestPerf = disciplinePerformances.reduce((max, current) => 
+                            current.value > max.value ? current : max
+                          );
+                          
+                          return {
+                            discipline,
+                            ...bestPerf
+                          };
+                        }).filter(Boolean);
+                        
+                        const allRecords = [...bestSpeedRecords, ...bestEnduranceRecords];
+                        
+                        return allRecords.map((perf) => {
+                          const isSpeedRecord = speedDisciplines.includes(perf.discipline);
+                          const unit = isSpeedRecord ? 'min' : 'sec';
+                          const colorClass = isSpeedRecord ? 'text-blue-600' : 'text-green-600';
+                          const bgClass = isSpeedRecord ? 'from-blue-50 to-indigo-50' : 'from-green-50 to-emerald-50';
+                          const badgeClass = isSpeedRecord ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-green-100 text-green-800 border-green-200';
+                          
+                          return (
+                            <div key={perf.id} className={`flex justify-between items-center p-4 bg-gradient-to-r ${bgClass} rounded-xl hover:shadow-md transition-all duration-300`}>
+                              <div className="space-y-1">
+                                <div className="font-bold text-lg text-gray-800">
+                                  {perf.discipline === '5k' ? '5km' :
+                                   perf.discipline === '10k' ? '10km' :
+                                   perf.discipline === 'marathon' ? 'Marathon' :
+                                   perf.discipline === 'sprint' ? 'Sprint' :
+                                   perf.discipline === 'plank' ? 'Planche' :
+                                   perf.discipline === 'wall-sit' ? 'Mur' :
+                                   perf.discipline === 'burpees' ? 'Burpees' : perf.discipline}
+                                </div>
+                                <div className="text-sm font-semibold text-gray-600">
+                                  {isSpeedRecord ? 'Meilleur chrono' : 'Durée maximale'}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {new Date(perf.date).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <div className="text-right space-y-2">
+                                <div className={`text-2xl font-bold ${colorClass}`}>{perf.value} {unit}</div>
+                                <Badge className={`${badgeClass} font-semibold`}>
+                                  {isSpeedRecord ? 'Record Vitesse' : 'Record Endurance'}
+                                </Badge>
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
                       
-                      {performances.filter(p => p.discipline === '5k').length === 0 && (
+                      {(() => {
+                        const speedDisciplines = ['5k', '10k', 'marathon', 'sprint'];
+                        const enduranceDisciplines = ['plank', 'wall-sit', 'burpees'];
+                        const allEnduranceDisciplines = [...speedDisciplines, ...enduranceDisciplines];
+                        return performances.filter(p => allEnduranceDisciplines.includes(p.discipline)).length === 0;
+                      })() && (
                         <div className="text-center text-gray-500 py-8">
                           <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                           <p className="text-lg">Aucun record d'endurance</p>

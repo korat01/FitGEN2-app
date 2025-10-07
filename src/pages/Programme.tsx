@@ -279,7 +279,7 @@ export const Programme: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-4 md:p-6 overflow-x-hidden">
       <div className="mx-auto max-w-7xl space-y-4 md:space-y-8">
         
         {/* Header Principal */}
@@ -705,15 +705,15 @@ export const Programme: React.FC = () => {
             <TabsContent value="planning">
               <div className="space-y-8">
                 {/* Header avec navigation */}
-                <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-8 text-white shadow-2xl">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-2xl">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 md:mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                        <Calendar className="w-6 h-6" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                        <Calendar className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold">Planning Mensuel</h2>
-                        <p className="text-white/80">Votre calendrier d'entraînement personnalisé</p>
+                      <div className="min-w-0">
+                        <h2 className="text-xl md:text-2xl font-bold truncate">Planning Mensuel</h2>
+                        <p className="text-white/80 text-sm md:text-base truncate">Votre calendrier d'entraînement personnalisé</p>
                       </div>
                     </div>
                     
@@ -786,9 +786,9 @@ export const Programme: React.FC = () => {
 
                 {programme ? (
                   <Card className="bg-white/95 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
-                    <CardContent className="p-8">
+                    <CardContent className="p-4 md:p-8">
                       {/* En-têtes des jours */}
-                      <div className="grid grid-cols-7 gap-3 mb-6">
+                      <div className="grid grid-cols-3 xs:grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mb-4 md:mb-6">
                         {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
                           <div key={day} className="text-center text-sm font-bold text-gray-600 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200/50">
                             {day}
@@ -797,7 +797,7 @@ export const Programme: React.FC = () => {
                       </div>
                       
                       {/* Grille du calendrier */}
-                      <div className="grid grid-cols-7 gap-3">
+                      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2 md:gap-3">
                         {calendar.map((week, weekIndex) =>
                           week.map((date, dayIndex) => {
                             const dayName = getDayName(dayIndex);

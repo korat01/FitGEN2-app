@@ -1176,9 +1176,9 @@ const RepasDetail: React.FC = () => {
           Retour
         </Button>
         <div className="flex items-center gap-3">
-          <div className="text-4xl">{repas.emoji}</div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">{repas.nom}</h1>
+          <div className="text-3xl md:text-4xl">{repas.emoji}</div>
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 truncate">{repas.nom}</h1>
             <p className="text-gray-600">{'description' in repas ? repas.description : ''}</p>
           </div>
         </div>
@@ -1209,19 +1209,19 @@ const RepasDetail: React.FC = () => {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
-                  <div className="text-3xl font-bold text-orange-600">{repas.calories}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-orange-600">{repas.calories}</div>
                   <div className="text-sm text-orange-700">Calories</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-3xl font-bold text-blue-600">{repas.proteines}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-blue-600">{repas.proteines}g</div>
                   <div className="text-sm text-blue-700">Protéines</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-                  <div className="text-3xl font-bold text-green-600">{repas.glucides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-green-600">{repas.glucides}g</div>
                   <div className="text-sm text-green-700">Glucides</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                  <div className="text-3xl font-bold text-purple-600">{repas.lipides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-purple-600">{repas.lipides}g</div>
                   <div className="text-sm text-purple-700">Lipides</div>
                 </div>
               </div>

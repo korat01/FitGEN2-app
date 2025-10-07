@@ -129,15 +129,14 @@ export const Dashboard: React.FC = () => {
               verified: true
             }));
 
-            // Calculer les données pour le dashboard
-            const calculatedStreakData = calculateStreakData(user, formattedPerformances);
-            const calculatedXpData = calculateXPData(user, formattedPerformances, calculatedStreakData);
-            const generatedQuests = generateDailyQuests(user);
+          // Calculer les données pour le dashboard
+          const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
+          const calculatedXpData = calculateXPData(user as any, formattedPerformances, calculatedStreakData);
+          const generatedQuests = generateDailyQuests(user as any);
 
-            // Mettre à jour les états
-            setXpData(calculatedXpData);
-            setDailyQuests(generatedQuests);
-            setStreakData(calculatedStreakData);
+          // Mettre à jour les états
+          setDailyQuests(generatedQuests);
+          setStreakData(calculatedStreakData);
 
             console.log('✅ Données Dashboard calculées:', {
               xpData: calculatedXpData,
@@ -233,22 +232,6 @@ export const Dashboard: React.FC = () => {
         ? { ...quest, completed: true, progress: quest.maxProgress }
         : quest
     ));
-    
-    // Ajouter XP à l'utilisateur
-    const quest = dailyQuests.find(q => q.id === questId);
-    if (quest && xpData) {
-      const newTotalXP = xpData.totalXP + quest.xpReward;
-      const newLevel = Math.floor(newTotalXP / 1000);
-      const newCurrentXP = newTotalXP % 1000;
-      
-      setXpData({
-        ...xpData,
-        totalXP: newTotalXP,
-        level: newLevel,
-        currentXP: newCurrentXP,
-        xpToNextLevel: 1000 - newCurrentXP
-      });
-    }
   };
 
   if (!user) {
@@ -344,7 +327,7 @@ export const Dashboard: React.FC = () => {
 
         {/* NOUVEAUX COMPOSANTS DASHBOARD */}
         {/* Barre XP & Niveau */}
-        {xpData && <XPLevelBar xpData={xpData} />}
+        <XPLevelBar />
 
         {/* Widget Quêtes */}
         <QuestWidget />

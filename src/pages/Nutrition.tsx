@@ -2756,19 +2756,19 @@ const Nutrition: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
+    <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
-            <Apple className="h-6 w-6 text-white" />
+        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+          <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Apple className="h-5 w-5 md:h-6 md:w-6 text-white" />
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Nutrition</h1>
-            <p className="text-gray-600">Gérez votre alimentation et vos apports</p>
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-3xl font-bold text-gray-800 truncate">Nutrition</h1>
+            <p className="text-sm md:text-base text-gray-600 truncate">Gérez votre alimentation</p>
           </div>
         </div>
-        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
+        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold text-sm md:text-base">
           <Plus className="h-4 w-4 mr-2" />
           Créer un repas
         </Button>
@@ -2834,7 +2834,7 @@ const Nutrition: React.FC = () => {
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div className="text-4xl mb-2">{aliment.emoji}</div>
+                    <div className="text-3xl md:text-4xl mb-2">{aliment.emoji}</div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -2956,7 +2956,7 @@ const Nutrition: React.FC = () => {
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div className="text-4xl mb-2">{repas.emoji}</div>
+                    <div className="text-3xl md:text-4xl mb-2">{repas.emoji}</div>
                     <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">
                       {repas.categorie}
                     </Badge>

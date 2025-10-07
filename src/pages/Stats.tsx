@@ -84,9 +84,9 @@ export const Stats: React.FC = () => {
           }));
 
           // Calculer les statistiques spécifiques à la page Stats
-          const calculatedMainStats = calculateMainStats(user, formattedPerformances);
-          const generatedAchievements = generateAchievements(user, formattedPerformances);
-          const calculatedGlobalStats = calculateGlobalStats(user, formattedPerformances);
+          const calculatedMainStats = calculateMainStats(user as any, formattedPerformances);
+          const generatedAchievements = generateAchievements(user as any, formattedPerformances);
+          const calculatedGlobalStats = calculateGlobalStats(user as any, formattedPerformances);
 
           // Mettre à jour les états
           setMainStats(calculatedMainStats);
@@ -577,7 +577,7 @@ export const Stats: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-gray-800">Votre score global</p>
-                      <div className="text-4xl font-bold text-indigo-600">{userRank?.globalScore || 0}</div>
+                      <div className="text-2xl md:text-4xl font-bold text-indigo-600">{userRank?.globalScore || 0}</div>
                       <p className="text-sm text-gray-600">sur 1000 points</p>
                 </div>
                   </div>
@@ -971,7 +971,7 @@ export const Stats: React.FC = () => {
                          </div>
                          
                          {/* Statistiques de la discipline */}
-                         <div className="grid grid-cols-3 gap-4 mt-6">
+                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
                            <div className="text-center p-4 bg-gray-50 rounded-xl">
                              <div className="text-lg font-bold text-gray-800">{disciplineData.length}</div>
                              <div className="text-sm text-gray-600">Performances</div>
@@ -1065,7 +1065,7 @@ export const Stats: React.FC = () => {
                   
                   <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-gray-800">Atteignez le niveau supérieur</h3>
-                        <div className="text-4xl font-bold text-purple-600">Rang {userRank?.rank === 'S' ? 'World' : userRank?.rank === 'A' ? 'S' : 'A'}</div>
+                        <div className="text-2xl md:text-4xl font-bold text-purple-600">Rang {userRank?.rank === 'S' ? 'World' : userRank?.rank === 'A' ? 'S' : 'A'}</div>
                         <div className="text-lg font-semibold text-gray-600">
                           Continuez à vous améliorer !
                     </div>
@@ -1147,21 +1147,21 @@ export const Stats: React.FC = () => {
                    <CardContent>
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                        <div className="text-center p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
-                         <div className="text-3xl font-bold text-yellow-600 mb-2">
+                         <div className="text-2xl md:text-3xl font-bold text-yellow-600 mb-2">
                            {getFilteredRanking().findIndex(u => u.id === user?.id) + 1 || 'N/A'}
                          </div>
                          <div className="text-lg font-semibold text-gray-800">Votre position</div>
                          <div className="text-sm text-gray-600">sur {getFilteredRanking().length} athlètes</div>
                        </div>
                        <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
-                         <div className="text-3xl font-bold text-blue-600 mb-2">
+                         <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">
                            {userRank?.globalScore || 0}
                          </div>
                          <div className="text-lg font-semibold text-gray-800">Votre score</div>
                          <div className="text-sm text-gray-600">sur 1000 points</div>
                        </div>
                        <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
-                         <div className="text-3xl font-bold text-green-600 mb-2">
+                         <div className="text-2xl md:text-3xl font-bold text-green-600 mb-2">
                            {performances.length}
                          </div>
                          <div className="text-lg font-semibold text-gray-800">Performances</div>

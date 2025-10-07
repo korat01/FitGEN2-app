@@ -290,31 +290,31 @@ export const Programme: React.FC = () => {
           <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-x-16 -translate-y-16 animate-pulse delay-500"></div>
           
           <div className="relative z-10">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent truncate max-w-full">
                   🏋️ Mon Programme
                 </h1>
-                <p className="text-xl text-blue-100 max-w-2xl leading-relaxed">
+                <p className="text-sm md:text-xl text-blue-100 max-w-full md:max-w-2xl leading-relaxed break-words">
                   Programme personnalisé basé sur vos performances réelles
                 </p>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full">
                     <Activity className="w-5 h-5" />
                     <span className="font-semibold">Powerlifting</span>
                   </div>
-                  <div className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full">
                     <Target className="w-5 h-5" />
                     <span className="font-semibold">Progression 5-3-1</span>
                   </div>
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
                 {programme && (
                   <Button 
                     onClick={handleRegenerateProgramme}
                     disabled={isGenerating}
-                    className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                    className="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white border-white/30"
                   >
                     {isGenerating ? (
                       <>
@@ -332,7 +332,7 @@ export const Programme: React.FC = () => {
                 <Button 
                   onClick={handleGenerateProgramme}
                   disabled={isGenerating}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
+                  className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
                 >
                   {isGenerating ? (
                     <>

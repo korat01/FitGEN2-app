@@ -386,21 +386,21 @@ export const Programme: React.FC = () => {
           
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="space-y-4">
-                <h1 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent truncate max-w-full">
+                <div className="space-y-2 md:space-y-4">
+                <h1 className="text-xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent truncate">
                   🏋️ Mon Programme
                 </h1>
-                <p className="text-sm md:text-xl text-blue-100 max-w-full md:max-w-2xl leading-relaxed break-words">
-                  Programme personnalisé basé sur vos performances réelles
+                <p className="text-xs md:text-xl text-blue-100 max-w-full md:max-w-2xl leading-relaxed">
+                  Programme personnalisé basé sur vos performances
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full">
-                    <Activity className="w-5 h-5" />
-                    <span className="font-semibold">Powerlifting</span>
+                <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
+                  <div className="flex items-center gap-1.5 md:gap-2 bg-white/20 backdrop-blur-sm px-2 md:px-4 py-1 md:py-2 rounded-full">
+                    <Activity className="w-3 h-3 md:w-5 md:h-5" />
+                    <span className="font-semibold text-xs md:text-base truncate">Powerlifting</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 rounded-full">
-                    <Target className="w-5 h-5" />
-                    <span className="font-semibold">Progression 5-3-1</span>
+                  <div className="flex items-center gap-1.5 md:gap-2 bg-white/20 backdrop-blur-sm px-2 md:px-4 py-1 md:py-2 rounded-full">
+                    <Target className="w-3 h-3 md:w-5 md:h-5" />
+                    <span className="font-semibold text-xs md:text-base truncate">5-3-1</span>
                   </div>
                 </div>
               </div>
@@ -865,79 +865,79 @@ export const Programme: React.FC = () => {
             <TabsContent value="planning">
               <div className="space-y-8">
                 {/* Header avec navigation */}
-                <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-8 border border-gray-200 shadow-lg">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 md:mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-md">
-                        <Calendar className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200 shadow-lg">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3 md:mb-4">
+                    <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+                      <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
+                        <Calendar className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
-                      <div className="min-w-0">
-                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 truncate">Planning Mensuel</h2>
-                        <p className="text-gray-600 text-sm md:text-base truncate">Votre calendrier d'entraînement personnalisé</p>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-base md:text-2xl font-bold text-gray-800 truncate">Planning Mensuel</h2>
+                        <p className="text-gray-600 text-xs md:text-base truncate hidden sm:block">Calendrier d'entraînement</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm px-2 md:px-4"
                       >
-                        <ChevronLeft className="w-4 h-4" />
+                        <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
-                      <div className="bg-white border border-gray-300 rounded-xl px-6 py-3 shadow-sm">
-                        <h3 className="text-xl font-bold text-gray-800">
-                          {getMonthName(currentMonth)} {currentMonth.getFullYear()}
+                      <div className="bg-white border border-gray-300 rounded-lg md:rounded-xl px-3 md:px-6 py-1.5 md:py-3 shadow-sm">
+                        <h3 className="text-sm md:text-xl font-bold text-gray-800 truncate">
+                          {getMonthName(currentMonth).slice(0, 3)} {currentMonth.getFullYear()}
                         </h3>
                       </div>
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm px-2 md:px-4"
                       >
-                        <ChevronRight className="w-4 h-4" />
+                        <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
                     </div>
                   </div>
 
-                  {/* Stats du programme */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                          <Activity className="w-5 h-5 text-blue-600" />
+                  {/* Stats du programme - Compact Mobile */}
+                  <div className="grid grid-cols-3 gap-2 md:gap-4">
+                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                      <div className="flex flex-col md:flex-row items-center md:gap-3">
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Activity className="w-3 h-3 md:w-5 md:h-5 text-blue-600" />
                         </div>
-                        <div>
-                          <p className="text-2xl font-bold text-gray-800">{programme?.sessions.length || 0}</p>
-                          <p className="text-sm text-gray-600">Sessions/Semaine</p>
+                        <div className="text-center md:text-left">
+                          <p className="text-base md:text-2xl font-bold text-gray-800">{programme?.sessions.length || 0}</p>
+                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Sessions</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                          <Timer className="w-5 h-5 text-green-600" />
+                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                      <div className="flex flex-col md:flex-row items-center md:gap-3">
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-green-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Timer className="w-3 h-3 md:w-5 md:h-5 text-green-600" />
                         </div>
-                        <div>
-                          <p className="text-2xl font-bold text-gray-800">
+                        <div className="text-center md:text-left">
+                          <p className="text-base md:text-2xl font-bold text-gray-800">
                             {programme ? Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0 : 0}
                           </p>
-                          <p className="text-sm text-gray-600">Min/Session</p>
+                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Min</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                          <Target className="w-5 h-5 text-purple-600" />
+                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                      <div className="flex flex-col md:flex-row items-center md:gap-3">
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-purple-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Target className="w-3 h-3 md:w-5 md:h-5 text-purple-600" />
                         </div>
-                        <div>
-                          <p className="text-2xl font-bold text-gray-800">{programme?.userProfile?.sportClass || 'N/A'}</p>
-                          <p className="text-sm text-gray-600">Classe Sport</p>
+                        <div className="text-center md:text-left">
+                          <p className="text-xs md:text-2xl font-bold text-gray-800 truncate">{programme?.userProfile?.sportClass || 'N/A'}</p>
+                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Sport</p>
                         </div>
                       </div>
                     </div>
@@ -945,19 +945,20 @@ export const Programme: React.FC = () => {
                 </div>
 
                 {programme ? (
-                  <Card className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
-                    <CardContent className="p-4 md:p-8">
-                      {/* En-têtes des jours */}
-                      <div className="grid grid-cols-3 xs:grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mb-4 md:mb-6">
-                        {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                          <div key={day} className="text-center text-sm font-semibold text-gray-700 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                            {day}
+                  <Card className="bg-white border border-gray-200 shadow-lg rounded-xl md:rounded-2xl overflow-hidden">
+                    <CardContent className="p-2 md:p-6">
+                      {/* En-têtes des jours - Mobile Compact */}
+                      <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-4">
+                        {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, i) => (
+                          <div key={day} className="text-center text-[10px] md:text-sm font-semibold text-gray-700 p-1 md:p-2 bg-gray-50 rounded md:rounded-lg border border-gray-100">
+                            <span className="hidden md:inline">{['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][i]}</span>
+                            <span className="md:hidden">{day}</span>
                           </div>
                         ))}
                       </div>
                       
-                      {/* Grille du calendrier */}
-                      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2 md:gap-3">
+                      {/* Grille du calendrier - Mobile Optimized */}
+                      <div className="grid grid-cols-7 gap-1 md:gap-2">
                         {calendar.map((week, weekIndex) =>
                           week.map((date, dayIndex) => {
                             const dayName = getDayName(dayIndex);
@@ -969,58 +970,48 @@ export const Programme: React.FC = () => {
                               <div
                                 key={`${weekIndex}-${dayIndex}`}
                                 className={`
-                                  min-h-[140px] p-4 rounded-2xl border-2 transition-all duration-300 group
-                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-lg hover:scale-[1.02]' : 'bg-gray-50/50 border-gray-100'}
-                                  ${isTodayDate ? 'ring-4 ring-blue-400 bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 shadow-xl' : ''}
+                                  min-h-[60px] md:min-h-[120px] p-1 md:p-3 rounded-lg md:rounded-xl border transition-all duration-200
+                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-md' : 'bg-gray-50/50 border-gray-100'}
+                                  ${isTodayDate ? 'ring-2 ring-blue-400 bg-blue-50 border-blue-300 shadow-md' : ''}
                                 `}
                               >
                                 {/* Numéro du jour */}
-                                <div className="flex items-center justify-between mb-3">
-                                  <span className={`text-lg font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className={`text-xs md:text-base font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
                                     {date.getDate()}
                                   </span>
                                   {isTodayDate && (
-                                    <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-pulse shadow-lg"></div>
+                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full animate-pulse"></div>
                                   )}
                                 </div>
                                 
-                                {/* Session du jour */}
-                                <div className="space-y-2">
+                                {/* Session du jour - Compact */}
+                                <div className="space-y-0.5 md:space-y-1">
                                   {sessionForDate ? (
                                     <div
                                       className={`
-                                        text-xs p-3 rounded-lg font-medium shadow-sm cursor-pointer border
-                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100' : 
-                                          sessionForDate.phase === 'Deload' ? 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100' :
-                                          sessionForDate.phase === 'Adaptation' ? 'bg-green-50 text-green-800 border-green-200 hover:bg-green-100' :
-                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-800 border-orange-200 hover:bg-orange-100' :
-                                          'bg-purple-50 text-purple-800 border-purple-200 hover:bg-purple-100'}
-                                        hover:scale-105 transition-all duration-200 hover:shadow-md
+                                        text-[8px] md:text-xs p-1 md:p-2 rounded md:rounded-lg font-medium cursor-pointer border
+                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-50 text-blue-800 border-blue-200' : 
+                                          sessionForDate.phase === 'Deload' ? 'bg-gray-50 text-gray-700 border-gray-200' :
+                                          sessionForDate.phase === 'Adaptation' ? 'bg-green-50 text-green-800 border-green-200' :
+                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-800 border-orange-200' :
+                                          'bg-purple-50 text-purple-800 border-purple-200'}
+                                        hover:scale-105 transition-all duration-200
                                       `}
                                       onClick={() => handleSessionClick(sessionForDate)}
                                     >
-                                      <div className="flex items-center justify-between mb-1">
-                                        <span className="truncate font-semibold">{sessionForDate.nom}</span>
-                                        <Eye className="w-3 h-3 opacity-90" />
-                                      </div>
-                                      <div className="text-xs opacity-90 space-y-1">
-                                        <div className="flex items-center gap-1">
-                                          <Timer className="w-3 h-3" />
-                                          {sessionForDate.duration}min
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                          <Activity className="w-3 h-3" />
-                                          {sessionForDate.intensity}
+                                      <div className="truncate font-semibold mb-0.5">{sessionForDate.nom.split('-')[0]}</div>
+                                      <div className="text-[7px] md:text-[10px] opacity-80 space-y-0.5">
+                                        <div className="flex items-center gap-0.5 truncate">
+                                          <Timer className="w-2 h-2 md:w-2.5 md:h-2.5 flex-shrink-0" />
+                                          <span className="truncate">{sessionForDate.duration}min</span>
                                         </div>
                                       </div>
                                     </div>
                                   ) : (
                                     isCurrentMonthDay && (
-                                      <div className="text-xs text-gray-300 text-center py-2 bg-gray-50/30 rounded-md border border-gray-50 hover:border-gray-100 transition-colors">
-                                        <div className="w-5 h-5 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-1">
-                                          <RefreshCw className="w-2.5 h-2.5 text-gray-200" />
-                                        </div>
-                                        <div className="font-light text-gray-400 text-xs">Repos</div>
+                                      <div className="text-[8px] md:text-xs text-gray-300 text-center py-1 bg-gray-50/30 rounded border border-gray-50">
+                                        <RefreshCw className="w-2 h-2 md:w-3 md:h-3 text-gray-200 mx-auto" />
                                       </div>
                                     )
                                   )}

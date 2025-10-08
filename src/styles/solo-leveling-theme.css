@@ -1,0 +1,280 @@
+/* === SOLO LEVELING THEME === */
+/* Palette de couleurs inspirée de Solo Leveling */
+
+:root {
+  /* Couleurs principales Solo Leveling */
+  --sl-black: #000000;
+  --sl-dark-gray: #0a0a0a;
+  --sl-gray: #1a1a1a;
+  --sl-light-gray: #2a2a2a;
+  
+  /* Couleurs d'accent */
+  --sl-blue: #00BFFF;
+  --sl-blue-dark: #0099CC;
+  --sl-blue-light: #33CCFF;
+  --sl-purple: #8A2BE2;
+  --sl-purple-dark: #6A1B9A;
+  --sl-purple-light: #A855F7;
+  
+  /* Couleurs de statut */
+  --sl-gold: #FFD700;
+  --sl-gold-dark: #CC9900;
+  --sl-red: #DC143C;
+  --sl-red-dark: #B22222;
+  --sl-green: #00FF7F;
+  --sl-green-dark: #00CC66;
+  
+  /* Gradients Solo Leveling */
+  --sl-gradient-primary: linear-gradient(135deg, var(--sl-blue) 0%, var(--sl-purple) 100%);
+  --sl-gradient-secondary: linear-gradient(135deg, var(--sl-purple) 0%, var(--sl-blue) 100%);
+  --sl-gradient-gold: linear-gradient(135deg, var(--sl-gold) 0%, #FFA500 100%);
+  --sl-gradient-danger: linear-gradient(135deg, var(--sl-red) 0%, #FF4500 100%);
+  
+  /* Effets de glow */
+  --sl-glow-blue: 0 0 20px var(--sl-blue);
+  --sl-glow-purple: 0 0 20px var(--sl-purple);
+  --sl-glow-gold: 0 0 20px var(--sl-gold);
+  --sl-glow-red: 0 0 20px var(--sl-red);
+  
+  /* Typographie */
+  --sl-font-primary: 'Orbitron', 'Exo 2', 'Roboto', sans-serif;
+  --sl-font-mono: 'Roboto Mono', 'Courier New', monospace;
+}
+
+/* === BACKGROUNDS SOLO LEVELING === */
+.sl-bg-primary {
+  background: var(--sl-black);
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+}
+
+.sl-bg-card {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sl-bg-card:hover {
+  border-color: var(--sl-blue);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    var(--sl-glow-blue),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* === TEXTES SOLO LEVELING === */
+.sl-text-primary {
+  color: #ffffff;
+  font-family: var(--sl-font-primary);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.sl-text-accent {
+  color: var(--sl-blue);
+  font-family: var(--sl-font-primary);
+  text-shadow: var(--sl-glow-blue);
+}
+
+.sl-text-gold {
+  color: var(--sl-gold);
+  font-family: var(--sl-font-primary);
+  text-shadow: var(--sl-glow-gold);
+}
+
+.sl-text-danger {
+  color: var(--sl-red);
+  font-family: var(--sl-font-primary);
+  text-shadow: var(--sl-glow-red);
+}
+
+.sl-text-gradient {
+  background: var(--sl-gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: var(--sl-font-primary);
+}
+
+/* === BOUTONS SOLO LEVELING === */
+.sl-btn-primary {
+  background: var(--sl-gradient-primary);
+  border: 1px solid var(--sl-blue);
+  color: white;
+  font-family: var(--sl-font-primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: var(--sl-glow-blue);
+  transition: all 0.3s ease;
+}
+
+.sl-btn-primary:hover {
+  background: var(--sl-gradient-secondary);
+  box-shadow: 
+    var(--sl-glow-purple),
+    0 0 30px rgba(0, 191, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.sl-btn-gold {
+  background: var(--sl-gradient-gold);
+  border: 1px solid var(--sl-gold);
+  color: var(--sl-black);
+  font-family: var(--sl-font-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: var(--sl-glow-gold);
+}
+
+.sl-btn-gold:hover {
+  box-shadow: 
+    var(--sl-glow-gold),
+    0 0 30px rgba(255, 215, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+/* === INPUTS SOLO LEVELING === */
+.sl-input {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(0, 191, 255, 0.3);
+  color: white;
+  font-family: var(--sl-font-primary);
+  transition: all 0.3s ease;
+}
+
+.sl-input:focus {
+  border-color: var(--sl-blue);
+  box-shadow: var(--sl-glow-blue);
+  outline: none;
+}
+
+.sl-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* === ICÔNES SOLO LEVELING === */
+.sl-icon {
+  filter: drop-shadow(var(--sl-glow-blue));
+  transition: all 0.3s ease;
+}
+
+.sl-icon:hover {
+  filter: drop-shadow(var(--sl-glow-purple));
+  transform: scale(1.1);
+}
+
+.sl-icon-gold {
+  filter: drop-shadow(var(--sl-glow-gold));
+}
+
+.sl-icon-danger {
+  filter: drop-shadow(var(--sl-glow-red));
+}
+
+/* === CARDS SOLO LEVELING === */
+.sl-card {
+  background: var(--sl-bg-card);
+  border-radius: 15px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sl-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--sl-gradient-primary);
+}
+
+.sl-card-header {
+  border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.sl-card-title {
+  color: var(--sl-blue);
+  font-family: var(--sl-font-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: var(--sl-glow-blue);
+}
+
+/* === ANIMATIONS SOLO LEVELING === */
+@keyframes sl-glow-pulse {
+  0%, 100% { 
+    box-shadow: var(--sl-glow-blue);
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 
+      var(--sl-glow-blue),
+      0 0 30px var(--sl-blue);
+    opacity: 0.8;
+  }
+}
+
+@keyframes sl-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes sl-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* === UTILITAIRES SOLO LEVELING === */
+.sl-glow-effect {
+  animation: sl-glow-pulse 2s infinite;
+}
+
+.sl-float-effect {
+  animation: sl-float 3s ease-in-out infinite;
+}
+
+.sl-text-shadow {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.sl-border-glow {
+  border: 1px solid var(--sl-blue);
+  box-shadow: var(--sl-glow-blue);
+}
+
+.sl-border-glow-purple {
+  border: 1px solid var(--sl-purple);
+  box-shadow: var(--sl-glow-purple);
+}
+
+.sl-border-glow-gold {
+  border: 1px solid var(--sl-gold);
+  box-shadow: var(--sl-glow-gold);
+}
+
+/* === RESPONSIVE SOLO LEVELING === */
+@media (max-width: 768px) {
+  .sl-card-title {
+    font-size: 1.2rem;
+  }
+  
+  .sl-btn-primary,
+  .sl-btn-gold {
+    font-size: 0.9rem;
+    padding: 10px 20px;
+  }
+}

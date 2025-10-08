@@ -29,6 +29,101 @@ import {
 // Import direct du générateur (pas de lazy loading pour les fonctions utilitaires)
 import { generateProgramme } from '../utils/programmeGenerator';
 
+// Fonction pour récupérer les informations de Training Max
+const getTrainingMaxInfo = () => {
+  const userPerformances = localStorage.getItem('userPerformances');
+  if (!userPerformances) return null;
+  
+  try {
+    const performances = JSON.parse(userPerformances);
+    
+    const getBestPerformance = (discipline: string) => {
+      const perf = performances.filter((p: any) => p.discipline === discipline);
+      return perf.length > 0 ? Math.max(...perf.map((p: any) => p.value)) : null;
+    };
+    
+    const maxSquat = getBestPerformance('squat');
+    const maxBench = getBestPerformance('bench');
+    const maxDeadlift = getBestPerformance('deadlift');
+    
+    if (!maxSquat || !maxBench || !maxDeadlift) return null;
+    
+    // Calculer les Training Max (Cycle 1)
+    const tmSquat = Math.round(maxSquat * 0.9);
+    const tmBench = Math.round(maxBench * 0.9);
+    const tmDeadlift = Math.round(maxDeadlift * 0.9);
+    
+    return {
+      maxSquat, maxBench, maxDeadlift,
+      tmSquat, tmBench, tmDeadlift
+    };
+  } catch (error) {
+    console.error('Erreur lors du calcul des Training Max:', error);
+    return null;
+  }
+};
+
+// Fonction pour calculer le pourcentage d'un exercice principal
+const calculatePercentage = (exerciseName: string, weight: number, notes: string) => {
+  if (typeof weight !== 'number') return null;
+  
+  // Récupérer les vraies performances de l'utilisateur depuis localStorage
+  const userPerformances = localStorage.getItem('userPerformances');
+  if (!userPerformances) return null;
+  
+  try {
+    const performances = JSON.parse(userPerformances);
+    
+    // Trouver les meilleures performances pour chaque exercice
+    const getBestPerformance = (discipline: string) => {
+      const perf = performances.filter((p: any) => p.discipline === discipline);
+      return perf.length > 0 ? Math.max(...perf.map((p: any) => p.value)) : null;
+    };
+    
+    const maxSquat = getBestPerformance('squat');
+    const maxBench = getBestPerformance('bench');
+    const maxDeadlift = getBestPerformance('deadlift');
+    
+    if (!maxSquat || !maxBench || !maxDeadlift) return null;
+    
+    // Extraire le cycle depuis les notes
+    let cycle = 1;
+    if (notes && notes.includes('Cycle')) {
+      const cycleMatch = notes.match(/Cycle (\d+)/);
+      if (cycleMatch) {
+        cycle = parseInt(cycleMatch[1]);
+      }
+    }
+    
+    // Calculer les Training Max exactement comme dans le programme
+    const progressionCycle = (cycle - 1) * 2.5; // +2.5kg par cycle pour haut du corps
+    const progressionCycleBas = (cycle - 1) * 5; // +5kg par cycle pour bas du corps
+    
+    const tmSquat = Math.round((maxSquat * 0.9) + progressionCycleBas);
+    const tmBench = Math.round((maxBench * 0.9) + progressionCycle);
+    const tmDeadlift = Math.round((maxDeadlift * 0.9) + progressionCycleBas);
+    
+    // Calculer le pourcentage selon l'exercice
+    switch (exerciseName) {
+      case 'Squat':
+        return Math.round((weight / tmSquat) * 100);
+      case 'Développé Couché':
+        return Math.round((weight / tmBench) * 100);
+      case 'Soulevé de Terre':
+        return Math.round((weight / tmDeadlift) * 100);
+      case 'Développé Militaire':
+        // Estimation du TM Press basé sur le Bench (environ 60-70%)
+        const tmPress = Math.round((maxBench * 0.9 * 0.65) + progressionCycle);
+        return Math.round((weight / tmPress) * 100);
+      default:
+        return null;
+    }
+  } catch (error) {
+    console.error('Erreur lors du calcul du pourcentage:', error);
+    return null;
+  }
+};
+
 export const Programme: React.FC = () => {
   const { user } = useAuth();
   const { isMobile } = useMobileDetection();
@@ -410,6 +505,51 @@ export const Programme: React.FC = () => {
 
         {/* Programme Généré */}
         {programme && (
+          <>
+            {/* Informations Training Max */}
+            {(() => {
+              const tmInfo = getTrainingMaxInfo();
+              return tmInfo ? (
+                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl mb-6">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                        <Target className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-800">Vos Training Max (Cycle 1)</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 mb-1">Squat</p>
+                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxSquat}kg</p>
+                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmSquat}kg</p>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 mb-1">Bench</p>
+                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxBench}kg</p>
+                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmBench}kg</p>
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                        <div className="text-center">
+                          <p className="text-sm text-gray-600 mb-1">Deadlift</p>
+                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxDeadlift}kg</p>
+                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmDeadlift}kg</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+                      <p className="text-sm text-blue-800">
+                        <strong>💡 Note :</strong> Les pourcentages affichés sont calculés sur le Training Max (90% du 1RM) + progression du cycle.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null;
+            })()}
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
             <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} bg-white/90 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
               <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
@@ -528,7 +668,17 @@ export const Programme: React.FC = () => {
                                       </div>
                                       <div className="text-center p-2 bg-gray-50 rounded">
                                         <p className="text-sm text-gray-600">Poids</p>
-                                        <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                                        <div className="flex flex-col items-center gap-1">
+                                          <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                                          {(() => {
+                                            const percentage = calculatePercentage(exercise.nom, exercise.poids, todaySession.notes);
+                                            return percentage ? (
+                                              <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+                                                {percentage}% du TM
+                                              </span>
+                                            ) : null;
+                                          })()}
+                                        </div>
                                       </div>
                                       <div className="text-center p-2 bg-gray-50 rounded">
                                         <p className="text-sm text-gray-600">Repos</p>
@@ -681,7 +831,17 @@ export const Programme: React.FC = () => {
                                   </div>
                                 )}
                                 <div className="text-xs text-gray-500">
-                                  {daySession.exercises?.slice(0, 2).map((ex: any) => ex.nom).join(', ') || 'Aucun exercice'}
+                                  {daySession.exercises?.slice(0, 2).map((ex: any) => {
+                                    const percentage = calculatePercentage(ex.nom, ex.poids, daySession.notes);
+                                    return (
+                                      <div key={ex.nom} className="flex items-center gap-1 mb-1">
+                                        <span>{ex.nom}</span>
+                                        {percentage && (
+                                          <span className="text-blue-600 font-medium">({percentage}% TM)</span>
+                                        )}
+                                      </div>
+                                    );
+                                  }) || 'Aucun exercice'}
                                   {daySession.exercises?.length > 2 && '...'}
                                 </div>
                               </div>
@@ -705,15 +865,15 @@ export const Programme: React.FC = () => {
             <TabsContent value="planning">
               <div className="space-y-8">
                 {/* Header avec navigation */}
-                <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-2xl">
+                <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-8 border border-gray-200 shadow-lg">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 md:mb-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                        <Calendar className="w-5 h-5 md:w-6 md:h-6" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-md">
+                        <Calendar className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
                       <div className="min-w-0">
-                        <h2 className="text-xl md:text-2xl font-bold truncate">Planning Mensuel</h2>
-                        <p className="text-white/80 text-sm md:text-base truncate">Votre calendrier d'entraînement personnalisé</p>
+                        <h2 className="text-xl md:text-2xl font-bold text-gray-800 truncate">Planning Mensuel</h2>
+                        <p className="text-gray-600 text-sm md:text-base truncate">Votre calendrier d'entraînement personnalisé</p>
                       </div>
                     </div>
                     
@@ -722,12 +882,12 @@ export const Programme: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                        className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </Button>
-                      <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3">
-                        <h3 className="text-xl font-bold">
+                      <div className="bg-white border border-gray-300 rounded-xl px-6 py-3 shadow-sm">
+                        <h3 className="text-xl font-bold text-gray-800">
                           {getMonthName(currentMonth)} {currentMonth.getFullYear()}
                         </h3>
                       </div>
@@ -735,7 +895,7 @@ export const Programme: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                        className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </Button>
@@ -744,40 +904,40 @@ export const Programme: React.FC = () => {
 
                   {/* Stats du programme */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-500/30 rounded-xl flex items-center justify-center">
-                          <Activity className="w-5 h-5 text-blue-200" />
+                        <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                          <Activity className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold">{programme?.sessions.length || 0}</p>
-                          <p className="text-sm text-white/80">Sessions/Semaine</p>
+                          <p className="text-2xl font-bold text-gray-800">{programme?.sessions.length || 0}</p>
+                          <p className="text-sm text-gray-600">Sessions/Semaine</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-500/30 rounded-xl flex items-center justify-center">
-                          <Timer className="w-5 h-5 text-green-200" />
+                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                          <Timer className="w-5 h-5 text-green-600" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold">
+                          <p className="text-2xl font-bold text-gray-800">
                             {programme ? Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0 : 0}
                           </p>
-                          <p className="text-sm text-white/80">Min/Session</p>
+                          <p className="text-sm text-gray-600">Min/Session</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                    <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-500/30 rounded-xl flex items-center justify-center">
-                          <Target className="w-5 h-5 text-purple-200" />
+                        <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                          <Target className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                          <p className="text-2xl font-bold">{programme?.userProfile?.sportClass || 'N/A'}</p>
-                          <p className="text-sm text-white/80">Classe Sport</p>
+                          <p className="text-2xl font-bold text-gray-800">{programme?.userProfile?.sportClass || 'N/A'}</p>
+                          <p className="text-sm text-gray-600">Classe Sport</p>
                         </div>
                       </div>
                     </div>
@@ -785,12 +945,12 @@ export const Programme: React.FC = () => {
                 </div>
 
                 {programme ? (
-                  <Card className="bg-white/95 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
+                  <Card className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
                     <CardContent className="p-4 md:p-8">
                       {/* En-têtes des jours */}
                       <div className="grid grid-cols-3 xs:grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mb-4 md:mb-6">
                         {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                          <div key={day} className="text-center text-sm font-bold text-gray-600 p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200/50">
+                          <div key={day} className="text-center text-sm font-semibold text-gray-700 p-3 bg-gray-50 rounded-lg border border-gray-100">
                             {day}
                           </div>
                         ))}
@@ -829,11 +989,13 @@ export const Programme: React.FC = () => {
                                   {sessionForDate ? (
                                     <div
                                       className={`
-                                        text-xs p-3 rounded-xl text-white font-medium shadow-lg cursor-pointer
-                                        ${sessionForDate.phase === 'Progression' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600' : 
-                                          sessionForDate.phase === 'Deload' ? 'bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-500 hover:to-slate-600' :
-                                          'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600'}
-                                        hover:scale-105 transition-all duration-200 hover:shadow-xl
+                                        text-xs p-3 rounded-lg font-medium shadow-sm cursor-pointer border
+                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100' : 
+                                          sessionForDate.phase === 'Deload' ? 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100' :
+                                          sessionForDate.phase === 'Adaptation' ? 'bg-green-50 text-green-800 border-green-200 hover:bg-green-100' :
+                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-800 border-orange-200 hover:bg-orange-100' :
+                                          'bg-purple-50 text-purple-800 border-purple-200 hover:bg-purple-100'}
+                                        hover:scale-105 transition-all duration-200 hover:shadow-md
                                       `}
                                       onClick={() => handleSessionClick(sessionForDate)}
                                     >
@@ -872,20 +1034,28 @@ export const Programme: React.FC = () => {
                       {/* Légende avec couleurs spécifiques */}
                       <div className="mt-8 pt-6 border-t border-gray-200">
                         <div className="flex flex-wrap items-center justify-center gap-4">
-                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
-                            <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded"></div>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-blue-500 rounded"></div>
                             <span className="text-sm font-medium text-gray-700">Progression</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
-                            <div className="w-3 h-3 bg-gradient-to-r from-slate-400 to-slate-500 rounded"></div>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-gray-400 rounded"></div>
                             <span className="text-sm font-medium text-gray-700">Deload</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
-                            <div className="w-3 h-3 bg-gradient-to-r from-gray-100 to-gray-200 rounded"></div>
-                            <span className="text-sm font-medium text-gray-500">Repos</span>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                            <span className="text-sm font-medium text-gray-700">Adaptation</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow border border-white/20">
-                            <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-pulse"></div>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                            <span className="text-sm font-medium text-gray-700">Spécialisation</span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-gray-200 rounded"></div>
+                            <span className="text-sm font-medium text-gray-700">Repos</span>
+                          </div>
+                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                            <div className="w-3 h-3 bg-blue-500 rounded animate-pulse"></div>
                             <span className="text-sm font-medium text-gray-700">Aujourd'hui</span>
                           </div>
                         </div>
@@ -927,6 +1097,7 @@ export const Programme: React.FC = () => {
               </div>
             </TabsContent>
           </Tabs>
+          </>
         )}
 
         {/* Modal pour afficher les détails de la session */}
@@ -1000,7 +1171,17 @@ export const Programme: React.FC = () => {
                             </div>
                             <div className="text-center p-2 bg-gray-50 rounded">
                               <p className="text-sm text-gray-600">Poids</p>
-                              <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                              <div className="flex flex-col items-center gap-1">
+                                <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                                {(() => {
+                                  const percentage = calculatePercentage(exercise.nom, exercise.poids, selectedSession.notes);
+                                  return percentage ? (
+                                    <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+                                      {percentage}% du TM
+                                    </span>
+                                  ) : null;
+                                })()}
+                              </div>
                             </div>
                             <div className="text-center p-2 bg-gray-50 rounded">
                               <p className="text-sm text-gray-600">Repos</p>

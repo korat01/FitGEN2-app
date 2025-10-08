@@ -1276,11 +1276,10 @@ function createPowerliftingSession(semaine: number, jour: number, user: UserProf
   
   // Vérifier si c'est un utilisateur expert
   const isExpert = user.niveau === 'expert' || user.niveau === 'avance' || 
-                   user.generalLevel === 'Expert' || user.generalLevel === 'Avancé' ||
-                   user.level === 'expert' || user.level === 'avance';
+                   user.generalLevel === 'Expert' || user.generalLevel === 'Avancé';
   const trainingDays = user.trainingDays?.length || 4;
   
-  console.log(`🔄 Cycle ${cycle}, Semaine ${semaineDansCycle} - Expert: ${isExpert}, Niveau: ${user.niveau}, GeneralLevel: ${user.generalLevel}, Level: ${user.level}, Jours: ${trainingDays}`);
+  console.log(`🔄 Cycle ${cycle}, Semaine ${semaineDansCycle} - Expert: ${isExpert}, Niveau: ${user.niveau}, GeneralLevel: ${user.generalLevel}, Jours: ${trainingDays}`);
   
   // Training Max (TM) = 90% du 1RM + progression du cycle
   const progressionCycle = (cycle - 1) * 2.5; // +2.5kg par cycle pour haut du corps

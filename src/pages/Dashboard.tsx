@@ -197,6 +197,149 @@ export const Dashboard: React.FC = () => {
     }
   };
 
+  // Fonction pour obtenir la statistique principale selon la classe de sport
+  const getMainStatForSportClass = (sportClass: string, performances: any[]) => {
+    switch (sportClass?.toLowerCase()) {
+      case 'power':
+      case 'powerlifting':
+      case 'powerlifter':
+        // Pour le powerlifting : MEILLEUR total des 3 mouvements (même session)
+        // D'abord, essayer de trouver des totaux de sessions complètes
+        const squatPerformances = performances.filter(p => p.discipline === 'squat');
+        const benchPerformances = performances.filter(p => p.discipline === 'bench' || p.discipline === 'bench_press');
+        const deadliftPerformances = performances.filter(p => p.discipline === 'deadlift');
+        
+        // Calculer le meilleur total possible en combinant les meilleures performances individuelles
+        // (car on n'a pas forcément des sessions complètes enregistrées)
+        const bestSquat = squatPerformances.length > 0 ? Math.max(...squatPerformances.map(p => p.value || 0)) : 0;
+        const bestBench = benchPerformances.length > 0 ? Math.max(...benchPerformances.map(p => p.value || 0)) : 0;
+        const bestDeadlift = deadliftPerformances.length > 0 ? Math.max(...deadliftPerformances.map(p => p.value || 0)) : 0;
+        const bestTotal = bestSquat + bestBench + bestDeadlift;
+        
+        // DEBUG: Afficher les performances pour comprendre le calcul
+        console.log('🏋️ DEBUG POWERLIFTING:', {
+          squatPerformances: squatPerformances.map(p => ({ value: p.value, date: p.date })),
+          benchPerformances: benchPerformances.map(p => ({ value: p.value, date: p.date })),
+          deadliftPerformances: deadliftPerformances.map(p => ({ value: p.value, date: p.date })),
+          bestSquat,
+          bestBench,
+          bestDeadlift,
+          bestTotal,
+          allPerformances: performances.map(p => ({ discipline: p.discipline, value: p.value, date: p.date }))
+        });
+        
+        return {
+          label: 'Meilleur Total',
+          value: `${bestTotal} kg`,
+          icon: '🏋️‍♂️',
+          description: `Squat: ${bestSquat}kg + Bench: ${bestBench}kg + Deadlift: ${bestDeadlift}kg`
+        };
+      
+      case 'streetlifting':
+      case 'street':
+        // Pour le streetlifting : MEILLEURES performances de chaque mouvement
+        const streetSquat = performances.filter(p => p.discipline === 'squat').map(p => p.value || 0);
+        const streetBench = performances.filter(p => p.discipline === 'bench' || p.discipline === 'bench_press').map(p => p.value || 0);
+        const streetDeadlift = performances.filter(p => p.discipline === 'deadlift').map(p => p.value || 0);
+        const streetPullups = performances.filter(p => p.discipline === 'pullups').map(p => p.value || 0);
+        
+        const bestStreetSquat = streetSquat.length > 0 ? Math.max(...streetSquat) : 0;
+        const bestStreetBench = streetBench.length > 0 ? Math.max(...streetBench) : 0;
+        const bestStreetDeadlift = streetDeadlift.length > 0 ? Math.max(...streetDeadlift) : 0;
+        const bestStreetPullups = streetPullups.length > 0 ? Math.max(...streetPullups) : 0;
+        
+        const streetTotal = bestStreetSquat + bestStreetBench + bestStreetDeadlift;
+        return {
+          label: 'Meilleur Total Street',
+          value: `${streetTotal} kg`,
+          icon: '💪',
+          description: `+ ${bestStreetPullups} tractions max`
+        };
+      
+      case 'sprint':
+        // Pour le sprint : MEILLEUR temps (le plus rapide)
+        const sprint100m = performances.filter(p => p.discipline === '100m').map(p => p.value || 0);
+        const sprint200m = performances.filter(p => p.discipline === '200m').map(p => p.value || 0);
+        
+        const bestTime100m = sprint100m.length > 0 ? Math.min(...sprint100m) : 0;
+        const bestTime200m = sprint200m.length > 0 ? Math.min(...sprint200m) : 0;
+        const maxSpeed = bestTime100m > 0 ? ((100 / bestTime100m) * 3.6).toFixed(1) : '0';
+        
+        return {
+          label: 'Meilleur 100m',
+          value: `${bestTime100m > 0 ? bestTime100m.toFixed(1) : '0'}s`,
+          icon: '⚡',
+          description: `Vitesse max: ${maxSpeed} km/h`
+        };
+      
+      case 'marathon':
+      case 'runner':
+        // Pour le marathon : MEILLEUR temps de marathon ou MEILLEURE distance
+        const marathonTimes = performances.filter(p => p.discipline === 'marathon').map(p => p.value || 0);
+        const distances30min = performances.filter(p => p.discipline === '30min').map(p => p.value || 0);
+        
+        const bestMarathonTime = marathonTimes.length > 0 ? Math.min(...marathonTimes) : null;
+        const bestDistance30min = distances30min.length > 0 ? Math.max(...distances30min) : 0;
+        
+        if (bestMarathonTime) {
+          const hours = Math.floor(bestMarathonTime / 60);
+          const minutes = bestMarathonTime % 60;
+          return {
+            label: 'Meilleur Marathon',
+            value: `${hours}h${minutes.toString().padStart(2, '0')}`,
+            icon: '🏃‍♂️',
+            description: 'Temps record'
+          };
+        } else {
+          return {
+            label: 'Meilleure Distance',
+            value: `${bestDistance30min.toFixed(1)} km`,
+            icon: '🏃‍♀️',
+            description: 'En 30 minutes'
+          };
+        }
+      
+      case 'crossfit':
+        // Pour le crossfit : MEILLEURES performances par discipline
+        const crossfitPerformances = performances.filter(p => 
+          ['burpees', 'pullups', 'squat', 'bench', 'bench_press'].includes(p.discipline)
+        );
+        const bestCrossfitScore = crossfitPerformances.length > 0 ? 
+          Math.max(...crossfitPerformances.map(p => p.value || 0)) : 0;
+        
+        return {
+          label: 'Meilleure Perf',
+          value: `${bestCrossfitScore}`,
+          icon: '🔥',
+          description: 'Meilleure performance'
+        };
+      
+      case 'calisthenics':
+        // Pour le calisthenics : MEILLEURES performances
+        const pullupsPerformances = performances.filter(p => p.discipline === 'pullups').map(p => p.value || 0);
+        const muscleUpsPerformances = performances.filter(p => p.discipline === 'muscle_up').map(p => p.value || 0);
+        
+        const bestPullups = pullupsPerformances.length > 0 ? Math.max(...pullupsPerformances) : 0;
+        const bestMuscleUps = muscleUpsPerformances.length > 0 ? Math.max(...muscleUpsPerformances) : 0;
+        
+        return {
+          label: 'Meilleures Tractions',
+          value: `${bestPullups} reps`,
+          icon: '🆙',
+          description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : 'En une série'
+        };
+      
+      default:
+        // Pour classique : score global
+        return {
+          label: 'Score Global',
+          value: `${userRank?.globalScore || 0}/1000`,
+          icon: '⭐',
+          description: 'Performance générale'
+        };
+    }
+  };
+
   // Fonction pour calculer la progression vers le rang supérieur
   const getRankProgression = (currentRank: string, currentScore: number) => {
     const rankThresholds = {
@@ -266,13 +409,24 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
-                        Salut, {user.name} !
+                        Salut, Kelyan !
                     </h1>
                       <p className="text-white/90 text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord</p>
                     </div>
                   </div>
                   
                   <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
+                    {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
+                    {(() => {
+                      const mainStat = getMainStatForSportClass(user.sportClass, performances);
+                      return (
+                        <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base">
+                          <span className="text-lg md:text-xl">{mainStat.icon}</span>
+                          <span>{mainStat.label}: {mainStat.value}</span>
+                        </div>
+                      );
+                    })()}
+                    
                     {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
                     <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || 'D')} text-white font-semibold shadow-lg text-sm md:text-base`}>
                       <span className="text-lg md:text-xl">{getRangIcon(userRank?.rank || 'D')}</span>
@@ -356,6 +510,30 @@ export const Dashboard: React.FC = () => {
 
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+            {/* STATISTIQUE PRINCIPALE - Plus grande et mise en avant */}
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 backdrop-blur-sm border-2 border-emerald-200 shadow-xl md:col-span-2">
+              <CardContent className="p-3 md:p-6">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs md:text-sm text-emerald-600 mb-1 font-semibold truncate">
+                      {getMainStatForSportClass(user.sportClass, performances).label}
+                    </p>
+                    <p className="text-xl md:text-3xl font-bold text-emerald-700 truncate">
+                      {getMainStatForSportClass(user.sportClass, performances).value}
+                    </p>
+                    <p className="text-xs text-emerald-500 mt-1">
+                      {getMainStatForSportClass(user.sportClass, performances).description}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <span className="text-2xl md:text-3xl">
+                      {getMainStatForSportClass(user.sportClass, performances).icon}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">

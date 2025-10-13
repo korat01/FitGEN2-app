@@ -1256,7 +1256,7 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
   const programme: Programme = {
     id: Date.now().toString(),
     nom: `Programme Powerlifting - Basé sur vos 1RM`,
-    description: 'Programme d\'entraînement Powerlifting avec progression 5-3-1 basé sur vos performances réelles',
+    description: 'Programme d\'entraînement Powerlifting avec progression 5-3-1 basé directement sur vos 1RM (au lieu du Training Max)',
     duree,
     sessions,
     phases: { adaptation: [], progression: [], specialisation: [] },
@@ -1281,29 +1281,32 @@ function createPowerliftingSession(semaine: number, jour: number, user: UserProf
   
   console.log(`🔄 Cycle ${cycle}, Semaine ${semaineDansCycle} - Expert: ${isExpert}, Niveau: ${user.niveau}, GeneralLevel: ${user.generalLevel}, Jours: ${trainingDays}`);
   
-  // Training Max (TM) = 90% du 1RM + progression du cycle
+  // Utilisation directe du 1RM avec progression du cycle (au lieu du TM)
+  // Le RM (Rep Max) est maintenant utilisé directement au lieu du TM (Training Max = 90% du 1RM)
+  // Cela permet des charges de travail plus élevées et une progression plus agressive
   const progressionCycle = (cycle - 1) * 2.5; // +2.5kg par cycle pour haut du corps
   const progressionCycleBas = (cycle - 1) * 5; // +5kg par cycle pour bas du corps
   
-  const tmSquat = Math.round((maxSquat * 0.9) + progressionCycleBas);
-  const tmBench = Math.round((maxBench * 0.9) + progressionCycle);
-  const tmDeadlift = Math.round((maxDeadlift * 0.9) + progressionCycleBas);
+  // Calcul des charges de travail basées sur le 1RM + progression
+  const rmSquat = Math.round(maxSquat + progressionCycleBas);
+  const rmBench = Math.round(maxBench + progressionCycle);
+  const rmDeadlift = Math.round(maxDeadlift + progressionCycleBas);
   
   let exercices = [];
   
   if (isExpert) {
     // SYSTÈME EXPERT : Programme de base + exercice SBD supplémentaire
-    exercices = createClassic531Session(semaineDansCycle, jour, tmSquat, tmBench, tmDeadlift, estDeload, user);
+    exercices = createClassic531Session(semaineDansCycle, jour, rmSquat, rmBench, rmDeadlift, estDeload, user);
     
     // Ajouter un exercice SBD supplémentaire selon le jour
-    const exerciceSupplementaire = getAdditionalSBDExercise(jour, tmSquat, tmBench, tmDeadlift, semaineDansCycle, estDeload);
+    const exerciceSupplementaire = getAdditionalSBDExercise(jour, rmSquat, rmBench, rmDeadlift, semaineDansCycle, estDeload);
     if (exerciceSupplementaire) {
       exercices.push(exerciceSupplementaire);
       console.log(`✅ Exercice expert ajouté: ${exerciceSupplementaire.nom} - ${exerciceSupplementaire.series}x${exerciceSupplementaire.reps} @ ${exerciceSupplementaire.poids}kg`);
     }
   } else {
     // SYSTÈME CLASSIQUE 5/3/1 pour débutants/intermédiaires
-    exercices = createClassic531Session(semaineDansCycle, jour, tmSquat, tmBench, tmDeadlift, estDeload, user);
+    exercices = createClassic531Session(semaineDansCycle, jour, rmSquat, rmBench, rmDeadlift, estDeload, user);
   }
   
   return {
@@ -1320,7 +1323,7 @@ function createPowerliftingSession(semaine: number, jour: number, user: UserProf
 }
 
 // Fonction pour ajouter un exercice SBD supplémentaire pour les experts
-function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number, tmDeadlift: number, semaineDansCycle: number, estDeload: boolean) {
+function getAdditionalSBDExercise(jour: number, rmSquat: number, rmBench: number, rmDeadlift: number, semaineDansCycle: number, estDeload: boolean) {
   // Calculer les pourcentages pour l'exercice supplémentaire
   let pourcentageSupplementaire;
   if (estDeload) {
@@ -1340,7 +1343,7 @@ function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number
       nom: 'Soulevé de Terre',
       series: 3,
       reps: 5,
-      poids: Math.round(tmDeadlift * pourcentageSupplementaire),
+      poids: Math.round(rmDeadlift * pourcentageSupplementaire),
       repos: '2-3 min'
     };
   } else if (jour === 2) {
@@ -1349,7 +1352,7 @@ function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number
       nom: 'Squat',
       series: 3,
       reps: 5,
-      poids: Math.round(tmSquat * pourcentageSupplementaire),
+      poids: Math.round(rmSquat * pourcentageSupplementaire),
       repos: '2-3 min'
     };
   } else if (jour === 3) {
@@ -1358,7 +1361,7 @@ function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number
       nom: 'Développé Couché',
       series: 3,
       reps: 5,
-      poids: Math.round(tmBench * pourcentageSupplementaire),
+      poids: Math.round(rmBench * pourcentageSupplementaire),
       repos: '2-3 min'
     };
   } else if (jour === 4) {
@@ -1367,7 +1370,7 @@ function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number
       nom: 'Squat',
       series: 3,
       reps: 5,
-      poids: Math.round(tmSquat * pourcentageSupplementaire),
+      poids: Math.round(rmSquat * pourcentageSupplementaire),
       repos: '2-3 min'
     };
   }
@@ -1376,7 +1379,7 @@ function getAdditionalSBDExercise(jour: number, tmSquat: number, tmBench: number
 }
 
 // SYSTÈME EXPERT MODULABLE - Dual SBD Adaptatif (ANCIEN - GARDÉ POUR RÉFÉRENCE)
-function createExpertPowerliftingSession(semaineDansCycle: number, jour: number, trainingDays: number, tmSquat: number, tmBench: number, tmDeadlift: number, estDeload: boolean, user: UserProfile) {
+function createExpertPowerliftingSession(semaineDansCycle: number, jour: number, trainingDays: number, rmSquat: number, rmBench: number, rmDeadlift: number, estDeload: boolean, user: UserProfile) {
   let exercices = [];
   
   // Calculer les pourcentages selon la semaine
@@ -1399,146 +1402,146 @@ function createExpertPowerliftingSession(semaineDansCycle: number, jour: number,
     // 3 JOURS - SBD Rotation
     if (jour === 1) {
       exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(tmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' }
+        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' },
+        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1 min' }
       ];
     } else if (jour === 2) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(tmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 3, reps: 8, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 3, reps: 8, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(rmDeadlift * 0.5), repos: '2 min' },
+        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
       ];
     } else if (jour === 3) {
       exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(tmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
+        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(rmSquat * 0.15), repos: '2 min' },
+        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(rmSquat * 1.2), repos: '2 min' },
+        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmBench * 0.1), repos: '1 min' }
       ];
     }
   } else if (trainingDays === 4) {
     // 4 JOURS - Upper/Lower Alterné
     if (jour === 1) {
       exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(tmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
+        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(rmSquat * 0.15), repos: '2 min' },
+        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(rmSquat * 1.2), repos: '2 min' }
       ];
     } else if (jour === 2) {
       exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(tmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(tmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(tmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
+        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(rmBench * 0.6), repos: '2 min' },
+        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' }
       ];
     } else if (jour === 3) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(tmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
+        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(rmDeadlift * 0.5), repos: '2 min' },
         { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' }
       ];
     } else if (jour === 4) {
       exercices = [
-        { nom: 'Développé Couché', series: 4, reps: 5, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 1, reps: 5, poids: Math.round(tmBench * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+        { nom: 'Développé Couché', series: 4, reps: 5, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Développé Couché', series: 1, reps: 5, poids: Math.round(rmBench * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1 min' },
+        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmBench * 0.1), repos: '1 min' },
+        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
       ];
     }
   } else if (trainingDays === 5) {
     // 5 JOURS - Dual SBD Standard Compétiteur
     if (jour === 1) {
       exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(tmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
+        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(rmSquat * 0.15), repos: '2 min' },
+        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(rmSquat * 1.2), repos: '2 min' }
       ];
     } else if (jour === 2) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(tmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(rmDeadlift * 0.5), repos: '2 min' },
+        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
       ];
     } else if (jour === 3) {
       exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(tmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(tmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(tmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
+        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(rmBench * 0.6), repos: '2 min' },
+        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' }
       ];
     } else if (jour === 4) {
       exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(tmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(tmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(tmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
+        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1 min' },
+        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmBench * 0.1), repos: '1 min' }
       ];
     } else if (jour === 5) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(tmDeadlift * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(rmDeadlift * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
         { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-        { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(tmSquat * 0.4), repos: '1.5 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+        { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(rmSquat * 0.4), repos: '1.5 min' },
+        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
       ];
     }
   } else if (trainingDays === 6) {
     // 6 JOURS - Haute Fréquence Élite
     if (jour === 1) {
       exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(tmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(tmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
+        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(rmSquat * 0.15), repos: '2 min' },
+        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(rmSquat * 1.2), repos: '2 min' }
       ];
     } else if (jour === 2) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(tmDeadlift * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
+        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(rmDeadlift * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(rmDeadlift * 0.5), repos: '2 min' },
+        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmBench * 0.1), repos: '1 min' }
       ];
     } else if (jour === 3) {
       exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(tmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(tmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(tmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(tmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
+        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(rmBench * 0.6), repos: '2 min' },
+        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' }
       ];
     } else if (jour === 4) {
       // Jour de mobilité/préparation nerveuse
@@ -1549,21 +1552,21 @@ function createExpertPowerliftingSession(semaineDansCycle: number, jour: number,
       ];
     } else if (jour === 5) {
       exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(tmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(tmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(tmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(tmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
+        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
+        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1 min' },
+        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmBench * 0.1), repos: '1 min' }
       ];
     } else if (jour === 6) {
       exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(tmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(tmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 3, reps: 6, poids: Math.round(tmBench * modPercent[0]), repos: '2-3 min' },
+        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
+        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
+        { nom: 'Développé Couché', series: 3, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
         { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
       ];
     }
   }
@@ -1572,7 +1575,7 @@ function createExpertPowerliftingSession(semaineDansCycle: number, jour: number,
 }
 
 // SYSTÈME CLASSIQUE 5/3/1 pour débutants/intermédiaires
-function createClassic531Session(semaineDansCycle: number, jour: number, tmSquat: number, tmBench: number, tmDeadlift: number, estDeload: boolean, user: UserProfile) {
+function createClassic531Session(semaineDansCycle: number, jour: number, rmSquat: number, rmBench: number, rmDeadlift: number, estDeload: boolean, user: UserProfile) {
   let exercices = [];
   
   // Système 5/3/1 classique
@@ -1599,12 +1602,12 @@ function createClassic531Session(semaineDansCycle: number, jour: number, tmSquat
     }
     
     exercices = [
-      { nom: 'Squat', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(tmSquat * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmSquat * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmSquat * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-      { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' },
-      { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(tmSquat * 0.4), repos: '1.5 min' }
+      { nom: 'Squat', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmSquat * pourcentages[0]), repos: '3-4 min' },
+      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmSquat * pourcentages[1]), repos: '3-4 min' },
+      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmSquat * pourcentages[2]), repos: '3-4 min' },
+      { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(rmSquat * 0.15), repos: '2 min' },
+      { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(rmSquat * 1.2), repos: '2 min' },
+      { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(rmSquat * 0.4), repos: '1.5 min' }
     ];
   } else if (jour === 2) {
     // Jour 2 : Bench Press
@@ -1629,12 +1632,12 @@ function createClassic531Session(semaineDansCycle: number, jour: number, tmSquat
     }
     
     exercices = [
-      { nom: 'Développé Couché', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(tmBench * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmBench * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmBench * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
-      { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' }
+      { nom: 'Développé Couché', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmBench * pourcentages[0]), repos: '3-4 min' },
+      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmBench * pourcentages[1]), repos: '3-4 min' },
+      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmBench * pourcentages[2]), repos: '3-4 min' },
+      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(rmBench * 0.6), repos: '2 min' },
+      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' },
+      { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1 min' }
     ];
   } else if (jour === 3) {
     // Jour 3 : Deadlift
@@ -1659,17 +1662,17 @@ function createClassic531Session(semaineDansCycle: number, jour: number, tmSquat
     }
     
     exercices = [
-      { nom: 'Soulevé de Terre', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(tmDeadlift * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmDeadlift * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmDeadlift * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
+      { nom: 'Soulevé de Terre', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[0]), repos: '3-4 min' },
+      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[1]), repos: '3-4 min' },
+      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[2]), repos: '3-4 min' },
+      { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(rmDeadlift * 0.5), repos: '2 min' },
       { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-      { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
+      { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(rmDeadlift * 0.4), repos: '1.5 min' }
     ];
   } else if (jour === 4) {
     // Jour 4 : Overhead Press
     let seriesPrincipales, repsPrincipales, pourcentages;
-    const tmPress = Math.round(tmBench * 0.7);
+    const tmPress = Math.round(rmBench * 0.7);
     
     if (estDeload) {
       seriesPrincipales = 3;
@@ -1693,8 +1696,8 @@ function createClassic531Session(semaineDansCycle: number, jour: number, tmSquat
       { nom: 'Développé Militaire', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(tmPress * pourcentages[0]), repos: '3-4 min' },
       { nom: 'Développé Militaire', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmPress * pourcentages[1]), repos: '3-4 min' },
       { nom: 'Développé Militaire', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(tmPress * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
+      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(rmBench * 0.6), repos: '2 min' },
+      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(rmBench * 0.15), repos: '1.5 min' },
       { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmPress * 0.1), repos: '1 min' }
     ];
   }

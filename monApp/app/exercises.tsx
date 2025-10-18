@@ -49,19 +49,19 @@ export default function ExercisesScreen() {
     checkLoginStatus();
   }, []);
 
-  const checkLoginStatus = async () => {
-    try {
-      const isLoggedInStatus = await AsyncStorage.getItem('isLoggedIn');
-      if (isLoggedInStatus === 'true') {
-        setIsLoggedIn(true);
-      } else {
-        router.replace('/login');
-      }
-    } catch (error) {
-      console.log('Erreur lors de la vérification:', error);
-      router.replace('/login');
-    }
-  };
+      const checkLoginStatus = async () => {
+        try {
+          const isLoggedInStatus = await AsyncStorage.getItem('isLoggedIn');
+          if (isLoggedInStatus === 'true') {
+            setIsLoggedIn(true);
+          } else {
+            router.replace('/auth');
+          }
+        } catch (error) {
+          console.log('Erreur lors de la vérification:', error);
+          router.replace('/auth');
+        }
+      };
 
   // Données des exercices (version mobile de la page web)
   const exercices: Exercise[] = [

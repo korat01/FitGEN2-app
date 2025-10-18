@@ -24,34 +24,34 @@ export default function HomeScreen() {
     checkLoginStatus();
   }, []);
 
-  const checkLoginStatus = async () => {
-    try {
-      const savedEmail = await AsyncStorage.getItem('userEmail');
-      const isLoggedInStatus = await AsyncStorage.getItem('isLoggedIn');
-      
-      if (savedEmail && isLoggedInStatus === 'true') {
-        setIsLoggedIn(true);
-        setUserName(savedEmail.split('@')[0]); // Utiliser la partie avant @ comme nom
-      } else {
-        // Rediriger vers le login si pas connecté
-        router.replace('/login');
-      }
-    } catch (error) {
-      console.log('Erreur lors de la vérification:', error);
-      router.replace('/login');
-    }
-  };
+      const checkLoginStatus = async () => {
+        try {
+          const savedEmail = await AsyncStorage.getItem('userEmail');
+          const isLoggedInStatus = await AsyncStorage.getItem('isLoggedIn');
+          
+          if (savedEmail && isLoggedInStatus === 'true') {
+            setIsLoggedIn(true);
+            setUserName(savedEmail.split('@')[0]); // Utiliser la partie avant @ comme nom
+          } else {
+            // Rediriger vers l'authentification si pas connecté
+            router.replace('/auth');
+          }
+        } catch (error) {
+          console.log('Erreur lors de la vérification:', error);
+          router.replace('/auth');
+        }
+      };
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('userEmail');
-      await AsyncStorage.removeItem('userPassword');
-      await AsyncStorage.removeItem('isLoggedIn');
-      router.replace('/login');
-    } catch (error) {
-      console.log('Erreur lors de la déconnexion:', error);
-    }
-  };
+      const handleLogout = async () => {
+        try {
+          await AsyncStorage.removeItem('userEmail');
+          await AsyncStorage.removeItem('userPassword');
+          await AsyncStorage.removeItem('isLoggedIn');
+          router.replace('/auth');
+        } catch (error) {
+          console.log('Erreur lors de la déconnexion:', error);
+        }
+      };
 
   if (!isLoggedIn) {
     return null; // Ou un loader

@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 30,
     justifyContent: 'center',
+    paddingBottom: 20,
   },
   header: {
     alignItems: 'center',
@@ -249,16 +249,17 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 30,
+    borderRadius: 24,
+    padding: 32,
+    marginHorizontal: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 10,
+      height: 15,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOpacity: 0.3,
+    shadowRadius: 25,
+    elevation: 15,
   },
   inputContainer: {
     flexDirection: 'row',

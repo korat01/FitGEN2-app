@@ -65,8 +65,8 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
-          {/* Route publique */}
-            <Route path="/login" element={<Login />} />
+          {/* Route publique - Redirige vers dashboard si déjà connecté */}
+            <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
           
           {/* Routes protégées */}
           <Route path="/" element={

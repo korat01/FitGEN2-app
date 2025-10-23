@@ -603,7 +603,7 @@ export const Dashboard: React.FC = () => {
           {/* Détail du rang calculé */}
           {userRank && <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader className="bg-slate-900">
-                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2 text-zinc-50">
                   <Award className="w-6 h-6 text-yellow-500" />
                   Votre rang calculé
               </CardTitle>

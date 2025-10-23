@@ -7,6 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
 import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search } from 'lucide-react';
+import AnimatedBackground from '../components/AnimatedBackground';
+import VitalForceTheme from '../config/VitalForceTheme';
 
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
@@ -415,12 +417,20 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8 bg-gray-900">
+  return (
+    <AnimatedBackground intensity="medium">
+      <div className="container mx-auto px-4 py-8">
       <div className="space-y-8">
           
-          {/* Header Principal - Design Moderne */}
-          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-4 md:p-8 text-white shadow-2xl">
+          {/* Header Principal - Design VitalForce */}
+          <div 
+            className="relative overflow-hidden rounded-3xl p-6 md:p-8 text-white shadow-2xl transform transition-all duration-300 hover:scale-105"
+            style={{
+              background: VitalForceTheme.colors.gradients.main,
+              boxShadow: `0 20px 60px ${VitalForceTheme.colors.glow.purple}`,
+              border: `2px solid ${VitalForceTheme.colors.primary.purple}40`
+            }}
+          >
             {/* Effets visuels */}
             <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
             <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32"></div>
@@ -661,40 +671,80 @@ export const Dashboard: React.FC = () => {
               </CardContent>
             </Card>}
 
-          {/* Actions rapides */}
+          {/* Actions rapides - Style VitalForce */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <BarChart3 className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mes Statistiques</h3>
-                <p className="text-gray-600">Voir mes performances et mon rang</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/programme'}>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Dumbbell className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Programme</h3>
-                <p className="text-gray-600">Gérer mes entraînements</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/profile'}>
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-white" />
+            <div 
+              className="relative overflow-hidden rounded-3xl p-6 text-center cursor-pointer transform transition-all duration-300 hover:scale-105"
+              style={{
+                background: VitalForceTheme.components.card.background,
+                borderRadius: VitalForceTheme.components.card.borderRadius,
+                border: VitalForceTheme.components.card.border,
+                boxShadow: VitalForceTheme.components.card.boxShadow
+              }}
+              onClick={() => window.location.href = '/stats'}
+            >
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{
+                  background: VitalForceTheme.colors.gradients.blueCyan,
+                  boxShadow: `0 0 20px ${VitalForceTheme.colors.glow.blue}`
+                }}
+              >
+                <BarChart3 className="w-8 h-8 text-white" />
               </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Profil</h3>
-                <p className="text-gray-600">Modifier mes informations</p>
-            </CardContent>
-          </Card>
+              <h3 className="text-xl font-bold text-white mb-2">Mes Statistiques</h3>
+              <p className="text-gray-300">Voir mes performances et mon rang</p>
+            </div>
+
+            <div 
+              className="relative overflow-hidden rounded-3xl p-6 text-center cursor-pointer transform transition-all duration-300 hover:scale-105"
+              style={{
+                background: VitalForceTheme.components.card.background,
+                borderRadius: VitalForceTheme.components.card.borderRadius,
+                border: VitalForceTheme.components.card.border,
+                boxShadow: VitalForceTheme.components.card.boxShadow
+              }}
+              onClick={() => window.location.href = '/programme'}
+            >
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{
+                  background: VitalForceTheme.colors.gradients.goldOrange,
+                  boxShadow: `0 0 20px ${VitalForceTheme.colors.glow.gold}`
+                }}
+              >
+                <Dumbbell className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Mon Programme</h3>
+              <p className="text-gray-300">Gérer mes entraînements</p>
+            </div>
+
+            <div 
+              className="relative overflow-hidden rounded-3xl p-6 text-center cursor-pointer transform transition-all duration-300 hover:scale-105"
+              style={{
+                background: VitalForceTheme.components.card.background,
+                borderRadius: VitalForceTheme.components.card.borderRadius,
+                border: VitalForceTheme.components.card.border,
+                boxShadow: VitalForceTheme.components.card.boxShadow
+              }}
+              onClick={() => window.location.href = '/profile'}
+            >
+              <div 
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                style={{
+                  background: VitalForceTheme.colors.gradients.pinkPurple,
+                  boxShadow: `0 0 20px ${VitalForceTheme.colors.glow.pink}`
+                }}
+              >
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Mon Profil</h3>
+              <p className="text-gray-300">Modifier mes informations</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>;
+    </AnimatedBackground>
+  );
 };
 export default Dashboard;

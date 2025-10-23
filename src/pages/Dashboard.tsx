@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,12 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
-import { 
-  Dumbbell, Target, TrendingUp, Zap, Clock, Weight, 
-  Gauge, Activity, BarChart3, Star, Award, Flame, 
-  Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, 
-  Plus, Calendar, Timer, Users, Settings, Bell, Search 
-} from 'lucide-react';
+import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search } from 'lucide-react';
 
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
@@ -21,16 +15,16 @@ import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 
 // Utilitaires pour les calculs
-import { 
-  calculateXPData, 
-  generateDailyQuests, 
-  calculateStreakData 
-} from '@/utils/statsCalculator';
+import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
 import { XPData, DailyQuest, StreakData } from '@/types/stats';
-
 export const Dashboard: React.FC = () => {
-  const { user, updateUser } = useAuth();
-  const { xpData } = useExerciseValidation();
+  const {
+    user,
+    updateUser
+  } = useAuth();
+  const {
+    xpData
+  } = useExerciseValidation();
   const [userRank, setUserRank] = useState<any>(null);
   const [performances, setPerformances] = useState<any[]>([]);
   const [debugInfo, setDebugInfo] = useState<any>(null);
@@ -47,19 +41,17 @@ export const Dashboard: React.FC = () => {
       if (savedPerformances) {
         const performancesList = JSON.parse(savedPerformances);
         console.log('📊 Performances pour recalcul:', performancesList);
-        
         const realRank = scoringEngine.calculateUserRank(user, performancesList);
         console.log('🏆 Nouveau rang calculé:', realRank);
-        
         setUserRank(realRank);
         updateUser({
           rank: realRank.rank,
           globalScore: realRank.globalScore
         });
-        
+
         // Mettre à jour les performances
         setPerformances(performancesList);
-        
+
         // Debug info
         setDebugInfo({
           userWeight: user.weight,
@@ -69,7 +61,6 @@ export const Dashboard: React.FC = () => {
           performances: performancesList,
           calculatedRank: realRank
         });
-        
         alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
       }
     }
@@ -80,22 +71,20 @@ export const Dashboard: React.FC = () => {
     if (user) {
       console.log('🔄 Dashboard: DÉBUT DU CHARGEMENT');
       console.log('👤 Utilisateur:', user);
-      
       const savedPerformances = localStorage.getItem('userPerformances');
       console.log('💾 Performances brutes du localStorage:', savedPerformances);
-      
       if (savedPerformances) {
         try {
           const performancesList = JSON.parse(savedPerformances);
           console.log('📊 Performances parsées:', performancesList);
           setPerformances(performancesList);
-          
+
           // Calculer le rang avec les vraies performances
           console.log('🧮 Calcul du rang...');
           const realRank = scoringEngine.calculateUserRank(user, performancesList);
           console.log('🏆 Rang calculé:', realRank);
           setUserRank(realRank);
-          
+
           // Debug info
           setDebugInfo({
             userWeight: user.weight,
@@ -105,7 +94,7 @@ export const Dashboard: React.FC = () => {
             performances: performancesList,
             calculatedRank: realRank
           });
-          
+
           // Mettre à jour l'utilisateur avec le vrai rang
           if (realRank.rank !== user.rank || realRank.globalScore !== user.globalScore) {
             updateUser({
@@ -121,7 +110,10 @@ export const Dashboard: React.FC = () => {
             const formattedPerformances = performancesList.map((p: any) => ({
               id: p.id || Math.random().toString(),
               userId: user.id,
-              discipline: { id: p.discipline, name: p.discipline },
+              discipline: {
+                id: p.discipline,
+                name: p.discipline
+              },
               value: parseFloat(p.value) || 0,
               units: 'kg',
               date: new Date(p.date),
@@ -129,15 +121,14 @@ export const Dashboard: React.FC = () => {
               verified: true
             }));
 
-          // Calculer les données pour le dashboard
-          const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
-          const calculatedXpData = calculateXPData(user as any, formattedPerformances, calculatedStreakData);
-          const generatedQuests = generateDailyQuests(user as any);
+            // Calculer les données pour le dashboard
+            const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
+            const calculatedXpData = calculateXPData(user as any, formattedPerformances, calculatedStreakData);
+            const generatedQuests = generateDailyQuests(user as any);
 
-          // Mettre à jour les états
-          setDailyQuests(generatedQuests);
-          setStreakData(calculatedStreakData);
-
+            // Mettre à jour les états
+            setDailyQuests(generatedQuests);
+            setStreakData(calculatedStreakData);
             console.log('✅ Données Dashboard calculées:', {
               xpData: calculatedXpData,
               streakData: calculatedStreakData
@@ -153,7 +144,12 @@ export const Dashboard: React.FC = () => {
         const defaultRank = {
           rank: 'D',
           globalScore: 0,
-          breakdown: { force: 0, endurance: 0, explosivite: 0, calisthenics: 0 },
+          breakdown: {
+            force: 0,
+            endurance: 0,
+            explosivite: 0,
+            calisthenics: 0
+          },
           reason: 'Aucune performance enregistrée'
         };
         setUserRank(defaultRank);
@@ -172,28 +168,44 @@ export const Dashboard: React.FC = () => {
   // Fonction pour obtenir la couleur du rang
   const getRangColor = (rang: string) => {
     switch (rang) {
-      case 'World': return 'from-yellow-400 to-yellow-600';
-      case 'Nation': return 'from-purple-500 to-purple-700';
-      case 'S': return 'from-purple-600 to-purple-800';
-      case 'A': return 'from-red-500 to-red-700';
-      case 'B': return 'from-blue-500 to-blue-700';
-      case 'C': return 'from-green-500 to-green-700';
-      case 'D': return 'from-yellow-500 to-yellow-700';
-      default: return 'from-gray-500 to-gray-700';
+      case 'World':
+        return 'from-yellow-400 to-yellow-600';
+      case 'Nation':
+        return 'from-purple-500 to-purple-700';
+      case 'S':
+        return 'from-purple-600 to-purple-800';
+      case 'A':
+        return 'from-red-500 to-red-700';
+      case 'B':
+        return 'from-blue-500 to-blue-700';
+      case 'C':
+        return 'from-green-500 to-green-700';
+      case 'D':
+        return 'from-yellow-500 to-yellow-700';
+      default:
+        return 'from-gray-500 to-gray-700';
     }
   };
 
   // Fonction pour obtenir l'icône du rang
   const getRangIcon = (rang: string) => {
     switch (rang) {
-      case 'World': return '🏆';
-      case 'Nation': return '🏆';
-      case 'S': return '🥇';
-      case 'A': return '🥈';
-      case 'B': return '🥉';
-      case 'C': return '⭐';
-      case 'D': return '🔰';
-      default: return '⭐';
+      case 'World':
+        return '🏆';
+      case 'Nation':
+        return '🏆';
+      case 'S':
+        return '🥇';
+      case 'A':
+        return '🥈';
+      case 'B':
+        return '🥉';
+      case 'C':
+        return '⭐';
+      case 'D':
+        return '🔰';
+      default:
+        return '⭐';
     }
   };
 
@@ -208,33 +220,44 @@ export const Dashboard: React.FC = () => {
         const squatPerformances = performances.filter(p => p.discipline === 'squat');
         const benchPerformances = performances.filter(p => p.discipline === 'bench' || p.discipline === 'bench_press');
         const deadliftPerformances = performances.filter(p => p.discipline === 'deadlift');
-        
+
         // Calculer le meilleur total possible en combinant les meilleures performances individuelles
         // (car on n'a pas forcément des sessions complètes enregistrées)
         const bestSquat = squatPerformances.length > 0 ? Math.max(...squatPerformances.map(p => p.value || 0)) : 0;
         const bestBench = benchPerformances.length > 0 ? Math.max(...benchPerformances.map(p => p.value || 0)) : 0;
         const bestDeadlift = deadliftPerformances.length > 0 ? Math.max(...deadliftPerformances.map(p => p.value || 0)) : 0;
         const bestTotal = bestSquat + bestBench + bestDeadlift;
-        
+
         // DEBUG: Afficher les performances pour comprendre le calcul
         console.log('🏋️ DEBUG POWERLIFTING:', {
-          squatPerformances: squatPerformances.map(p => ({ value: p.value, date: p.date })),
-          benchPerformances: benchPerformances.map(p => ({ value: p.value, date: p.date })),
-          deadliftPerformances: deadliftPerformances.map(p => ({ value: p.value, date: p.date })),
+          squatPerformances: squatPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
+          benchPerformances: benchPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
+          deadliftPerformances: deadliftPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
           bestSquat,
           bestBench,
           bestDeadlift,
           bestTotal,
-          allPerformances: performances.map(p => ({ discipline: p.discipline, value: p.value, date: p.date }))
+          allPerformances: performances.map(p => ({
+            discipline: p.discipline,
+            value: p.value,
+            date: p.date
+          }))
         });
-        
         return {
           label: 'Meilleur Total',
           value: `${bestTotal} kg`,
           icon: '🏋️‍♂️',
           description: `Squat: ${bestSquat}kg + Bench: ${bestBench}kg + Deadlift: ${bestDeadlift}kg`
         };
-      
       case 'streetlifting':
       case 'street':
         // Pour le streetlifting : MEILLEURES performances de chaque mouvement
@@ -242,12 +265,10 @@ export const Dashboard: React.FC = () => {
         const streetBench = performances.filter(p => p.discipline === 'bench' || p.discipline === 'bench_press').map(p => p.value || 0);
         const streetDeadlift = performances.filter(p => p.discipline === 'deadlift').map(p => p.value || 0);
         const streetPullups = performances.filter(p => p.discipline === 'pullups').map(p => p.value || 0);
-        
         const bestStreetSquat = streetSquat.length > 0 ? Math.max(...streetSquat) : 0;
         const bestStreetBench = streetBench.length > 0 ? Math.max(...streetBench) : 0;
         const bestStreetDeadlift = streetDeadlift.length > 0 ? Math.max(...streetDeadlift) : 0;
         const bestStreetPullups = streetPullups.length > 0 ? Math.max(...streetPullups) : 0;
-        
         const streetTotal = bestStreetSquat + bestStreetBench + bestStreetDeadlift;
         return {
           label: 'Meilleur Total Street',
@@ -255,32 +276,26 @@ export const Dashboard: React.FC = () => {
           icon: '💪',
           description: `+ ${bestStreetPullups} tractions max`
         };
-      
       case 'sprint':
         // Pour le sprint : MEILLEUR temps (le plus rapide)
         const sprint100m = performances.filter(p => p.discipline === '100m').map(p => p.value || 0);
         const sprint200m = performances.filter(p => p.discipline === '200m').map(p => p.value || 0);
-        
         const bestTime100m = sprint100m.length > 0 ? Math.min(...sprint100m) : 0;
         const bestTime200m = sprint200m.length > 0 ? Math.min(...sprint200m) : 0;
-        const maxSpeed = bestTime100m > 0 ? ((100 / bestTime100m) * 3.6).toFixed(1) : '0';
-        
+        const maxSpeed = bestTime100m > 0 ? (100 / bestTime100m * 3.6).toFixed(1) : '0';
         return {
           label: 'Meilleur 100m',
           value: `${bestTime100m > 0 ? bestTime100m.toFixed(1) : '0'}s`,
           icon: '⚡',
           description: `Vitesse max: ${maxSpeed} km/h`
         };
-      
       case 'marathon':
       case 'runner':
         // Pour le marathon : MEILLEUR temps de marathon ou MEILLEURE distance
         const marathonTimes = performances.filter(p => p.discipline === 'marathon').map(p => p.value || 0);
         const distances30min = performances.filter(p => p.discipline === '30min').map(p => p.value || 0);
-        
         const bestMarathonTime = marathonTimes.length > 0 ? Math.min(...marathonTimes) : null;
         const bestDistance30min = distances30min.length > 0 ? Math.max(...distances30min) : 0;
-        
         if (bestMarathonTime) {
           const hours = Math.floor(bestMarathonTime / 60);
           const minutes = bestMarathonTime % 60;
@@ -298,37 +313,28 @@ export const Dashboard: React.FC = () => {
             description: 'En 30 minutes'
           };
         }
-      
       case 'crossfit':
         // Pour le crossfit : MEILLEURES performances par discipline
-        const crossfitPerformances = performances.filter(p => 
-          ['burpees', 'pullups', 'squat', 'bench', 'bench_press'].includes(p.discipline)
-        );
-        const bestCrossfitScore = crossfitPerformances.length > 0 ? 
-          Math.max(...crossfitPerformances.map(p => p.value || 0)) : 0;
-        
+        const crossfitPerformances = performances.filter(p => ['burpees', 'pullups', 'squat', 'bench', 'bench_press'].includes(p.discipline));
+        const bestCrossfitScore = crossfitPerformances.length > 0 ? Math.max(...crossfitPerformances.map(p => p.value || 0)) : 0;
         return {
           label: 'Meilleure Perf',
           value: `${bestCrossfitScore}`,
           icon: '🔥',
           description: 'Meilleure performance'
         };
-      
       case 'calisthenics':
         // Pour le calisthenics : MEILLEURES performances
         const pullupsPerformances = performances.filter(p => p.discipline === 'pullups').map(p => p.value || 0);
         const muscleUpsPerformances = performances.filter(p => p.discipline === 'muscle_up').map(p => p.value || 0);
-        
         const bestPullups = pullupsPerformances.length > 0 ? Math.max(...pullupsPerformances) : 0;
         const bestMuscleUps = muscleUpsPerformances.length > 0 ? Math.max(...muscleUpsPerformances) : 0;
-        
         return {
           label: 'Meilleures Tractions',
           value: `${bestPullups} reps`,
           icon: '🆙',
           description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : 'En une série'
         };
-      
       default:
         // Pour classique : score global
         return {
@@ -343,54 +349,74 @@ export const Dashboard: React.FC = () => {
   // Fonction pour calculer la progression vers le rang supérieur
   const getRankProgression = (currentRank: string, currentScore: number) => {
     const rankThresholds = {
-      'D': { min: 0, max: 200 },
-      'C': { min: 200, max: 400 },
-      'B': { min: 400, max: 600 },
-      'A': { min: 600, max: 800 },
-      'S': { min: 800, max: 900 },
-      'Nation': { min: 900, max: 950 },
-      'World': { min: 950, max: 1000 }
+      'D': {
+        min: 0,
+        max: 200
+      },
+      'C': {
+        min: 200,
+        max: 400
+      },
+      'B': {
+        min: 400,
+        max: 600
+      },
+      'A': {
+        min: 600,
+        max: 800
+      },
+      'S': {
+        min: 800,
+        max: 900
+      },
+      'Nation': {
+        min: 900,
+        max: 950
+      },
+      'World': {
+        min: 950,
+        max: 1000
+      }
     };
-
     const threshold = rankThresholds[currentRank as keyof typeof rankThresholds];
-    if (!threshold) return { percentage: 100, nextRank: 'World' };
+    if (!threshold) return {
+      percentage: 100,
+      nextRank: 'World'
+    };
 
     // Calculer le pourcentage dans le rang actuel
     const range = threshold.max - threshold.min;
     const progress = currentScore - threshold.min;
-    const percentage = Math.min(Math.max((progress / range) * 100, 0), 100);
+    const percentage = Math.min(Math.max(progress / range * 100, 0), 100);
 
     // Déterminer le rang suivant
     const ranks = ['D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
     const currentIndex = ranks.indexOf(currentRank);
     const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : 'World';
-
-    return { percentage, nextRank };
+    return {
+      percentage,
+      nextRank
+    };
   };
 
   // Fonctions pour gérer les interactions Dashboard
   const handleQuestComplete = (questId: string) => {
-    setDailyQuests(prev => prev.map(quest => 
-      quest.id === questId 
-        ? { ...quest, completed: true, progress: quest.maxProgress }
-        : quest
-    ));
+    setDailyQuests(prev => prev.map(quest => quest.id === questId ? {
+      ...quest,
+      completed: true,
+      progress: quest.maxProgress
+    } : quest));
   };
-
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+    return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-lg text-gray-600">Chargement...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
+  return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8 bg-gray-900">
       <div className="space-y-8">
           
           {/* Header Principal - Design Moderne */}
@@ -418,14 +444,12 @@ export const Dashboard: React.FC = () => {
                   <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
                     {(() => {
-                      const mainStat = getMainStatForSportClass(user.sportClass, performances);
-                      return (
-                        <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base">
+                    const mainStat = getMainStatForSportClass(user.sportClass, performances);
+                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base">
                           <span className="text-lg md:text-xl">{mainStat.icon}</span>
                           <span>{mainStat.label}: {mainStat.value}</span>
-                        </div>
-                      );
-                    })()}
+                        </div>;
+                  })()}
                     
                     {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
                     <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || 'D')} text-white font-semibold shadow-lg text-sm md:text-base`}>
@@ -433,19 +457,11 @@ export const Dashboard: React.FC = () => {
                       <span>Rang {userRank?.rank || 'D'}</span>
                 </div>
                 
-                    <Button
-                      onClick={recalculateRank}
-                      size="sm"
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm"
-                    >
+                    <Button onClick={recalculateRank} size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm">
                       🔄 Recalculer
                     </Button>
                     
-                    <Button
-                      onClick={() => window.location.href = '/stats'}
-                      size="sm"
-                      className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm"
-                    >
+                    <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm">
                       📊 Stats
                     </Button>
                 </div>
@@ -453,17 +469,13 @@ export const Dashboard: React.FC = () => {
 
                 <div className="space-y-3 md:space-y-4 mt-4">
                   {(() => {
-                    const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
-                    return (
-                      <>
+                  const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
+                  return <>
                         <div className="text-white/90 font-medium text-sm md:text-base">
                           Progression vers le rang {progression.nextRank}
                         </div>
                         <div className="w-full max-w-md">
-                          <Progress 
-                            value={progression.percentage} 
-                            className="h-2 md:h-3 bg-white/20 rounded-full"
-                          />
+                          <Progress value={progression.percentage} className="h-2 md:h-3 bg-white/20 rounded-full" />
                         </div>
                         <div className="text-xs md:text-sm">
                           <span className="text-white font-bold text-lg md:text-xl">
@@ -471,9 +483,8 @@ export const Dashboard: React.FC = () => {
                           </span> 
                           <span className="text-white/80"> vers le rang {progression.nextRank}</span>
                         </div>
-                      </>
-                    );
-                  })()}
+                      </>;
+                })()}
                 </div>
             </div>
           </div>
@@ -490,8 +501,7 @@ export const Dashboard: React.FC = () => {
         {streakData && <StreakDisplay streakData={streakData} />}
 
           {/* DEBUG INFO - Masqué par défaut */}
-          {false && (
-            <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6">
+          {false && <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6">
               <h3 className="text-lg font-bold text-yellow-800 mb-2">🐛 DEBUG INFO</h3>
               <div className="text-sm text-yellow-700 space-y-1">
                 <p><strong>Utilisateur:</strong></p>
@@ -505,8 +515,7 @@ export const Dashboard: React.FC = () => {
                 <p><strong>Rang calculé:</strong></p>
                 <p>{JSON.stringify(userRank, null, 2)}</p>
                 </div>
-                </div>
-          )}
+                </div>}
 
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
@@ -592,8 +601,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           {/* Détail du rang calculé */}
-          {userRank && (
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+          {userRank && <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
                   <Award className="w-6 h-6 text-yellow-500" />
@@ -616,17 +624,15 @@ export const Dashboard: React.FC = () => {
                 {/* Barre de progression */}
                     <div className="space-y-2">
                   {(() => {
-                    const progression = getRankProgression(userRank.rank, userRank.globalScore);
-                    return (
-                      <>
+                const progression = getRankProgression(userRank.rank, userRank.globalScore);
+                return <>
                         <div className="flex justify-between text-sm text-gray-600">
                           <span>Progression vers le rang {progression.nextRank}</span>
                           <span>{Math.round(progression.percentage)}%</span>
                         </div>
                         <Progress value={progression.percentage} className="h-4" />
-                      </>
-                    );
-                  })()}
+                      </>;
+              })()}
                       </div>
 
                 {/* Détail des scores */}
@@ -648,16 +654,12 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Bouton pour aller aux stats */}
-                <Button
-                  onClick={() => window.location.href = '/stats'}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold"
-                >
+                <Button onClick={() => window.location.href = '/stats'} className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold">
                   <BarChart3 className="w-4 h-4 mr-2" />
                   Voir le détail de mes performances
                 </Button>
               </CardContent>
-            </Card>
-          )}
+            </Card>}
 
           {/* Actions rapides */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -693,8 +695,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;

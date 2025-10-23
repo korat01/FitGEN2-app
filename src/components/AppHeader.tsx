@@ -5,28 +5,23 @@ import { BarChart3, Home, Dumbbell, Apple, Calendar, Scan, User, Globe } from 'l
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import UserDropdown from '@/components/UserDropdown';
 import { useAuth } from '../contexts/AuthContext';
-
 const AppHeader: React.FC = () => {
   const location = useLocation();
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const isActive = (path: string) => location.pathname === path;
-
   const handleProfileClick = () => {
     window.location.href = '/profile';
   };
-
   const handleSettingsClick = () => {
     window.location.href = '/settings';
   };
-
   const handleProClick = () => {
     window.location.href = '/pro';
   };
-
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-2xl border-b border-border/50 safe-area-pt">
-      <div className="container mx-auto px-4 md:px-6 py-3 md:py-3">
+  return <header className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-2xl border-b border-border/50 safe-area-pt">
+      <div className="container mx-auto px-4 md:px-6 py-3 md:py-3 bg-gray-900">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2.5 md:gap-4">
@@ -60,17 +55,10 @@ const AppHeader: React.FC = () => {
             <div className="hidden md:block">
               <LanguageSwitcher />
             </div>
-            <UserDropdown
-              userName={user?.name || user?.firstName || 'Utilisateur'}
-              onProfileClick={handleProfileClick}
-              onSettingsClick={handleSettingsClick}
-              onProClick={handleProClick}
-            />
+            <UserDropdown userName={user?.name || user?.firstName || 'Utilisateur'} onProfileClick={handleProfileClick} onSettingsClick={handleSettingsClick} onProClick={handleProClick} />
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default AppHeader;

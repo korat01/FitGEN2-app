@@ -1,21 +1,18 @@
 import React from 'react';
 import AppHeader from './AppHeader';
 import MobileNavigation from './MobileNavigation';
-
 interface PageLayoutProps {
   children: React.ReactNode;
 }
-
-const PageLayout: React.FC<PageLayoutProps> = ({ children }) => {
-  return (
-    <div className="min-h-screen bg-background safe-area-inset">
+const PageLayout: React.FC<PageLayoutProps> = ({
+  children
+}) => {
+  return <div className="min-h-screen bg-background safe-area-inset">
       <AppHeader />
-      <main className="pt-16 md:pt-20 pb-20 md:pb-6 px-4 md:px-6">
+      <main className="pt-16 md:pt-20 pb-20 md:pb-6 px-4 md:px-6 bg-gray-900">
         {children}
       </main>
       <MobileNavigation />
-    </div>
-  );
+    </div>;
 };
-
 export default PageLayout;

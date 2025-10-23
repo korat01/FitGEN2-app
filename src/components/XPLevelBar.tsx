@@ -4,13 +4,12 @@ import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
 import { Zap, Star, Trophy, Crown, Sparkles } from 'lucide-react';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
-
 export const XPLevelBar: React.FC = () => {
-  const { xpData } = useExerciseValidation();
-
+  const {
+    xpData
+  } = useExerciseValidation();
   if (!xpData) {
-    return (
-      <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
+    return <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
         <CardContent className="p-6">
           <div className="text-center">
             <div className="animate-pulse">
@@ -19,12 +18,10 @@ export const XPLevelBar: React.FC = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
+  const progressPercentage = xpData.currentXP / xpData.xpToNextLevel * 100;
 
-  const progressPercentage = (xpData.currentXP / xpData.xpToNextLevel) * 100;
-  
   // Déterminer l'icône selon le niveau
   const getLevelIcon = (level: number) => {
     if (level >= 50) return <Crown className="w-6 h-6 text-yellow-500" />;
@@ -32,26 +29,24 @@ export const XPLevelBar: React.FC = () => {
     if (level >= 10) return <Star className="w-6 h-6 text-blue-500" />;
     return <Zap className="w-6 h-6 text-indigo-500" />;
   };
-
-  return (
-    <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl relative overflow-hidden">
+  return <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl relative overflow-hidden">
       {/* Effets visuels subtils */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30"></div>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>
       <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-100/20 to-transparent rounded-full translate-y-12 -translate-x-12"></div>
       
-      <CardContent className="p-6 relative z-10">
+      <CardContent className="p-6 relative z-10 bg-gray-900">
         <div className="space-y-4">
           {/* En-tête avec niveau et icône */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {getLevelIcon(xpData.level)}
               <div>
-                <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800">
+                <h3 className="text-xl font-bold flex items-center gap-2 text-stone-50">
                   Niveau {xpData.level}
                   <Sparkles className="w-4 h-4 text-indigo-500" />
                 </h3>
-                <p className="text-sm text-gray-600">Total: {xpData.totalXP.toLocaleString()} XP</p>
+                <p className="text-sm text-zinc-400">Total: {xpData.totalXP.toLocaleString()} XP</p>
               </div>
             </div>
             <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 border-indigo-200">
@@ -67,18 +62,12 @@ export const XPLevelBar: React.FC = () => {
               <span className="font-bold text-gray-800">{Math.round(progressPercentage)}%</span>
             </div>
             <div className="relative">
-              <Progress 
-                value={progressPercentage} 
-                className="h-3 bg-gray-200 rounded-full overflow-hidden"
-              />
+              <Progress value={progressPercentage} className="h-3 bg-gray-200 rounded-full overflow-hidden" />
               {/* Effet de brillance sur la barre */}
-              <div 
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent rounded-full"
-                style={{
-                  width: `${progressPercentage}%`,
-                  animation: 'shimmer 2s infinite'
-                }}
-              ></div>
+              <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-transparent via-white/50 to-transparent rounded-full" style={{
+              width: `${progressPercentage}%`,
+              animation: 'shimmer 2s infinite'
+            }}></div>
             </div>
           </div>
 
@@ -103,6 +92,5 @@ export const XPLevelBar: React.FC = () => {
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };

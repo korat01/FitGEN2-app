@@ -445,7 +445,7 @@ export const Dashboard: React.FC = () => {
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
                     {(() => {
                     const mainStat = getMainStatForSportClass(user.sportClass, performances);
-                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base">
+                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base bg-sky-700">
                           <span className="text-lg md:text-xl">{mainStat.icon}</span>
                           <span>{mainStat.label}: {mainStat.value}</span>
                         </div>;

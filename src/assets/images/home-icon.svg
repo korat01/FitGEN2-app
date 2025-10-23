@@ -1,0 +1,60 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond carré très sombre avec dégradé subtil bleu-violet -->
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0A0A0A"/>
+      <stop offset="50%" stopColor="#1A0B2E"/>
+      <stop offset="100%" stopColor="#0A0A0A"/>
+    </linearGradient>
+  </defs>
+  <rect width="24" height="24" rx="3" fill="url(#backgroundGradient)"/>
+  
+  <!-- Gradient violet éclatant vers bleu électrique -->
+  <defs>
+    <linearGradient id="homeGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stopColor="#8B45FF"/>
+      <stop offset="30%" stopColor="#6B2AFF"/>
+      <stop offset="70%" stopColor="#3B82F6"/>
+      <stop offset="100%" stopColor="#00C2FF"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Forme de maison stylisée avec effet lumineux -->
+  <!-- Corps de la maison (base carrée) -->
+  <rect x="6" y="12" width="12" height="8" fill="url(#homeGradient)" rx="1"/>
+  
+  <!-- Toit triangulaire -->
+  <path d="M 4 12 L 12 6 L 20 12 Z" fill="url(#homeGradient)"/>
+  
+  <!-- Effet de brillance interne -->
+  <defs>
+    <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="rgba(255,255,255,0.3)"/>
+      <stop offset="50%" stopColor="rgba(255,255,255,0.1)"/>
+      <stop offset="100%" stopColor="rgba(255,255,255,0.05)"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Brillance sur le toit -->
+  <path d="M 4 12 L 12 6 L 20 12 L 12 8 Z" fill="url(#shineGradient)"/>
+  
+  <!-- Brillance sur le corps -->
+  <rect x="6" y="12" width="3" height="8" fill="url(#shineGradient)" rx="1"/>
+  
+  <!-- Effet de lueur externe -->
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Appliquer l'effet de lueur à la maison -->
+  <g filter="url(#glow)">
+    <rect x="6" y="12" width="12" height="8" fill="url(#homeGradient)" rx="1"/>
+    <path d="M 4 12 L 12 6 L 20 12 Z" fill="url(#homeGradient)"/>
+  </g>
+</svg>

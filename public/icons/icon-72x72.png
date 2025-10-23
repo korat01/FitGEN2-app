@@ -1,0 +1,8 @@
+<svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="144" height="144" rx="24" fill="#3B82F6"/>
+  <rect x="12" y="12" width="120" height="120" rx="20" fill="white"/>
+  <path d="M72 24C72 24 60 36 60 48C60 60 72 72 72 72C72 72 84 60 84 48C84 36 72 24 72 24Z" fill="#3B82F6"/>
+  <rect x="48" y="72" width="48" height="24" rx="12" fill="#3B82F6"/>
+  <rect x="60" y="84" width="24" height="12" rx="6" fill="#3B82F6"/>
+  <text x="72" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#3B82F6">FitGEN</text>
+</svg>

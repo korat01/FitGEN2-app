@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { Badge } from './ui/badge';
 import {
-  Home,
   Dumbbell,
   BarChart3,
   Apple,
@@ -11,11 +10,15 @@ import {
   Settings,
   Trophy,
   Users,
-  Target
+  Target,
+  Palette,
+  Wand2,
+  Zap
 } from 'lucide-react';
+import CustomHomeIcon from './CustomHomeIcon';
 
 const navigationItems = [
-  { to: '/dashboard', icon: Home, label: 'Accueil', badge: null },
+  { to: '/dashboard', icon: CustomHomeIcon, label: 'Accueil', badge: null },
   { to: '/programme', icon: Dumbbell, label: 'Programmes', badge: 'Nouveau' },
   { to: '/quetes', icon: Target, label: 'Quêtes', badge: '3' },
   { to: '/stats', icon: BarChart3, label: 'Statistiques', badge: null },
@@ -23,6 +26,9 @@ const navigationItems = [
   { to: '/blocs-entrainement', icon: Calendar, label: 'Planning', badge: '3' },
   { to: '/communaute', icon: Users, label: 'Communauté', badge: null },
   { to: '/achievements', icon: Trophy, label: 'Succès', badge: null },
+  { to: '/ui-test', icon: Palette, label: 'Test UI/DA', badge: 'Test' },
+  { to: '/ui-customizer', icon: Wand2, label: '🎨 Personnaliser UI/DA', badge: 'HOT' },
+  { to: '/vitalforce', icon: Zap, label: 'VitalForce', badge: 'NEW' },
   { to: '/settings', icon: Settings, label: 'Paramètres', badge: null }
 ];
 
@@ -45,10 +51,17 @@ export const Navigation: React.FC = () => {
           >
             {({ isActive }) => (
               <>
-                <item.icon className={cn(
-                  'w-5 h-5 transition-transform group-hover:scale-110',
-                  isActive && 'text-white'
-                )} />
+                {typeof item.icon === 'function' ? (
+                  <item.icon size={20} className={cn(
+                    'transition-transform group-hover:scale-110',
+                    isActive && 'text-white'
+                  )} />
+                ) : (
+                  <item.icon className={cn(
+                    'w-5 h-5 transition-transform group-hover:scale-110',
+                    isActive && 'text-white'
+                  )} />
+                )}
                 <span className="font-medium">{item.label}</span>
                 {item.badge && (
                   <Badge 

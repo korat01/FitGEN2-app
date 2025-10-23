@@ -602,13 +602,13 @@ export const Dashboard: React.FC = () => {
 
           {/* Détail du rang calculé */}
           {userRank && <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader>
+              <CardHeader className="bg-slate-900">
                 <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
                   <Award className="w-6 h-6 text-yellow-500" />
                   Votre rang calculé
               </CardTitle>
             </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 bg-gray-900">
                 <div className="text-center space-y-4">
                   <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r ${getRangColor(userRank.rank)} text-white font-bold text-2xl shadow-lg`}>
                     <span className="text-2xl">{getRangIcon(userRank.rank)}</span>

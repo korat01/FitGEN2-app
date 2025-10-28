@@ -6,8 +6,6 @@ import { ExerciseProvider } from './contexts/ExerciseContext';
 import { QuestProvider } from './contexts/QuestContext';
 import { ThemeProvider } from './lib/theme-provider';
 import { Toaster } from './components/ui/toaster';
-import AnimatedBackground from './components/AnimatedBackground';
-import VitalForceTheme from './config/VitalForceTheme';
 
 // Composants
 import PageLayout from './components/PageLayout';
@@ -195,9 +193,7 @@ const App: React.FC = () => {
         <QuestProvider>
           <ExerciseProvider>
             <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-              <AnimatedBackground intensity="low">
-                <AppContent />
-              </AnimatedBackground>
+              <AppContent />
             </ThemeProvider>
           </ExerciseProvider>
         </QuestProvider>

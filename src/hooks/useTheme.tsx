@@ -54,11 +54,11 @@ export const useTheme = (): ThemeContextType => {
       config: DefaultConfig,
       getColor: (path: string) => {
         const parts = path.split('.');
-        let current = defaultColors;
+        let current: any = defaultColors;
         for (const part of parts) {
-          current = current[part];
+          current = current?.[part];
         }
-        return current || defaultColors.primary;
+        return typeof current === 'string' ? current : defaultColors.primary;
       },
       getGradient: (name: string) => {
         const gradients = {
@@ -184,11 +184,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       case 'accent':
         return [colors.accent, colors.primary];
       case 'success':
-        return [colors.success, colors.info];
+        return ['#2ECC71', '#3498DB'];
       case 'warning':
-        return [colors.warning, colors.accent];
+        return ['#F39C12', colors.accent];
       case 'info':
-        return [colors.info, colors.primary];
+        return ['#3498DB', colors.primary];
       default:
         return [colors.primary, colors.secondary];
     }
@@ -196,7 +196,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   // Obtenir le style d'un composant
   const getComponentStyle = (componentName: string) => {
-    return DefaultConfig.components?.[componentName] || {};
+    return (DefaultConfig as any).components?.[componentName] || {};
   };
 
   // Configuration du thème actuel

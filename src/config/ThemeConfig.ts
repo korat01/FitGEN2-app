@@ -2,13 +2,13 @@
 // Modifiez ces valeurs pour changer l'apparence de l'application
 
 export const ThemeConfig = {
-  // 🎨 COULEURS PRINCIPALES
+  // 🎨 COULEURS PRINCIPALES - VitalForce DA
   colors: {
     // Couleur principale de l'application
-    primary: '#00C2FF', // Bleu cyan lumineux
+    primary: '#6B2AFF', // Violet VitalForce
     
     // Couleur secondaire
-    secondary: '#6B2AFF', // Violet futuriste
+    secondary: '#00C2FF', // Bleu cyan VitalForce
     
     // Couleur d'accent
     accent: '#FF7D3B', // Orange vibrant
@@ -19,81 +19,81 @@ export const ThemeConfig = {
     error: '#E74C3C', // Rouge
     info: '#3498DB', // Bleu
     
-    // Couleurs de fond
-    background: '#FFFFFF', // Blanc
-    surface: '#F8F9FA', // Gris très clair
+    // Couleurs de fond VitalForce
+    background: '#0A0E1A', // Bleu nuit très sombre
+    surface: '#1A1F2E', // Cartes VitalForce
     
     // Couleurs de texte
     text: {
-      primary: '#1A1A1A', // Noir
-      secondary: '#6B7280', // Gris
-      inverse: '#FFFFFF' // Blanc
+      primary: '#FFFFFF', // Blanc
+      secondary: '#A0AEC0', // Gris clair VitalForce
+      inverse: '#0A0E1A' // Sombre
     },
     
     // Couleur des bordures
-    border: '#E5E7EB' // Gris clair
+    border: '#313849' // Bordures sombres
   },
 
-  // 🌈 THÈMES PRÉDÉFINIS
+  // 🌈 THÈMES PRÉDÉFINIS - VitalForce DA
   themes: {
     futuristic: {
-      name: 'Futuriste',
-      primary: '#00C2FF',
-      secondary: '#6B2AFF',
+      name: 'VitalForce',
+      primary: '#6B2AFF',
+      secondary: '#00C2FF',
       accent: '#FF7D3B',
-      background: '#FFFFFF',
-      surface: '#F8F9FA',
+      background: '#0A0E1A',
+      surface: '#1A1F2E',
       text: {
-        primary: '#1A1A1A',
-        secondary: '#6B7280',
-        inverse: '#FFFFFF'
+        primary: '#FFFFFF',
+        secondary: '#A0AEC0',
+        inverse: '#0A0E1A'
       },
-      border: '#E5E7EB'
+      border: '#313849'
     },
     
     neon: {
       name: 'Néon',
-      primary: '#6B2AFF',
-      secondary: '#00C2FF',
-      accent: '#FF7D3B',
-      background: '#FFFFFF',
-      surface: '#F8F9FA',
+      primary: '#FF6B9D',
+      secondary: '#00E0FF',
+      accent: '#FFD700',
+      background: '#0A0E1A',
+      surface: '#1A1F2E',
       text: {
-        primary: '#1A1A1A',
-        secondary: '#6B7280',
-        inverse: '#FFFFFF'
+        primary: '#FFFFFF',
+        secondary: '#A0AEC0',
+        inverse: '#0A0E1A'
       },
-      border: '#E5E7EB'
+      border: '#313849'
     },
     
     circuit: {
       name: 'Circuit',
       primary: '#00C2FF',
-      secondary: '#1E2335',
+      secondary: '#6B2AFF',
       accent: '#FF7D3B',
-      background: '#FFFFFF',
-      surface: '#F8F9FA',
+      background: '#0A0E1A',
+      surface: '#1A1F2E',
       text: {
-        primary: '#1A1A1A',
-        secondary: '#6B7280',
-        inverse: '#FFFFFF'
+        primary: '#FFFFFF',
+        secondary: '#A0AEC0',
+        inverse: '#0A0E1A'
       },
-      border: '#E5E7EB'
+      border: '#313849'
     },
     
     dark: {
-      name: 'Sombre',
-      primary: '#3498DB',
-      secondary: '#2ECC71',
-      accent: '#F39C12',
-      background: '#1A1A1A',
-      surface: '#2D2D2D',
+      name: 'Ultra Sombre',
+      primary: '#6B2AFF',
+      secondary: '#00C2FF',
+      accent: '#FF7D3B',
+      background: '#000000',
+      surface: '#0A0E1A',
       text: {
         primary: '#FFFFFF',
-        secondary: '#B8B9C3',
-        inverse: '#1A1A1A'
+        secondary: '#A0AEC0',
+        inverse: '#000000'
       },
-      border: '#404040'
+      border: '#1A1F2E'
     }
   },
 

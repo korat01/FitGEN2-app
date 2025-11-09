@@ -51,11 +51,8 @@ export const Navigation: React.FC = () => {
           >
             {({ isActive }) => (
               <>
-                {typeof item.icon === 'function' ? (
-                  <item.icon size={20} className={cn(
-                    'transition-transform group-hover:scale-110',
-                    isActive && 'text-white'
-                  )} />
+                {React.isValidElement(item.icon) ? (
+                  item.icon
                 ) : (
                   <item.icon className={cn(
                     'w-5 h-5 transition-transform group-hover:scale-110',

@@ -20,7 +20,7 @@ const ThemeDemo: React.FC = () => {
 
   const changeTheme = (themeId: string) => {
     setCurrentTheme(themeId);
-    setVariant(themeId);
+    setVariant(themeId as any);
   };
 
   return (

@@ -46,55 +46,71 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 240 10% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262 83% 58%;
+    /* VitalForce DA - Couleurs principales */
+    --background: 218 47% 8%;  /* #0A0E1A */
+    --foreground: 0 0% 100%;  /* Blanc */
+    --card: 222 28% 14%;  /* #1A1F2E */
+    --card-foreground: 0 0% 100%;
+    --popover: 222 28% 14%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 261 100% 59%;  /* #6B2AFF - Violet */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 262 83% 58%;
+    --secondary: 194 100% 50%;  /* #00C2FF - Bleu cyan */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 17% 32%;
+    --muted-foreground: 214 14% 65%;  /* #A0AEC0 */
+    --accent: 16 100% 62%;  /* #FF7D3B - Orange */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 262 83% 58%;
-    --radius: 1rem;
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(282 83% 58%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(340 82% 67%) 0%, hsl(10 84% 60%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(199 89% 65%) 0%, hsl(184 100% 50%) 100%);
-    --shadow-elegant: 0 4px 24px -2px hsl(262 83% 58% / 0.12);
-    --shadow-card: 0 2px 16px -4px hsl(240 5% 15% / 0.08);
+    --border: 220 17% 32%;
+    --input: 220 17% 32%;
+    --ring: 261 100% 59%;
+    --radius: 0.75rem;
+    
+    /* Couleurs VitalForce supplémentaires */
+    --vitalforce-cyan: 186 100% 50%;  /* #00E0FF */
+    --vitalforce-pink: 341 100% 71%;  /* #FF6B9D */
+    --vitalforce-gold: 51 100% 50%;  /* #FFD700 */
+    
+    /* Gradients VitalForce */
+    --gradient-primary: linear-gradient(135deg, hsl(261 100% 59%) 0%, hsl(194 100% 50%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(341 100% 71%) 0%, hsl(261 100% 59%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(201 96% 32%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(51 100% 50%) 0%, hsl(16 100% 62%) 100%);
+    --gradient-info: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(186 100% 50%) 100%);
+    
+    /* Ombres avec glow VitalForce */
+    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    --shadow-glow-purple: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-glow-blue: 0 0 25px rgba(0, 194, 255, 0.6);
+    --shadow-glow-pink: 0 0 25px rgba(255, 107, 157, 0.6);
   }
 
   .dark {
-    --background: 240 10% 6%;
-    --foreground: 0 0% 98%;
-    --card: 240 8% 10%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 8% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 262 83% 58%;
+    /* Mode dark maintient la même DA VitalForce */
+    --background: 218 47% 8%;
+    --foreground: 0 0% 100%;
+    --card: 222 28% 14%;
+    --card-foreground: 0 0% 100%;
+    --popover: 222 28% 14%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 261 100% 59%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 4% 16%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 262 83% 58%;
+    --secondary: 194 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 17% 32%;
+    --muted-foreground: 214 14% 65%;
+    --accent: 16 100% 62%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 50%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 262 83% 58%;
-    --shadow-elegant: 0 4px 24px -2px hsl(262 83% 58% / 0.24);
-    --shadow-card: 0 2px 16px -4px hsl(0 0% 0% / 0.32);
+    --border: 220 17% 32%;
+    --input: 220 17% 32%;
+    --ring: 261 100% 59%;
+    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
   }
 }
 

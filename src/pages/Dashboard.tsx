@@ -13,6 +13,7 @@ import { XPLevelBar } from '@/components/XPLevelBar';
 import { DailyQuests } from '@/components/DailyQuests';
 import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
+import { VitalForceBackground } from '@/components/VitalForceBackground';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -415,7 +416,9 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>;
   }
-  return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      <VitalForceBackground intensity="medium" />
       <div className="container mx-auto px-4 py-8 bg-gray-900">
       <div className="space-y-8">
           
@@ -695,6 +698,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default Dashboard;

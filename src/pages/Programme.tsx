@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { ExerciseValidation } from '../components/ExerciseValidation';
+import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { 
   Dumbbell, 
   Play, 
@@ -375,6 +376,7 @@ export const Programme: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-4 md:p-6 overflow-x-hidden">
+      <VitalForceBackground intensity="medium" />
       <div className="mx-auto max-w-7xl space-y-4 md:space-y-8">
         
         {/* Header Principal */}

@@ -14,6 +14,7 @@ import { scoringEngine } from '../utils/scoring';
 import { MainStatsCards } from '@/components/MainStatsCards';
 import { Achievements } from '@/components/Achievements';
 import { GlobalStatsDisplay } from '@/components/GlobalStatsDisplay';
+import { VitalForceBackground } from '@/components/VitalForceBackground';
 
 // Utilitaires pour les calculs
 import { 
@@ -402,6 +403,7 @@ export const Stats: React.FC = () => {
 
   return (
     <PageLayout>
+      <VitalForceBackground intensity="low" />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">

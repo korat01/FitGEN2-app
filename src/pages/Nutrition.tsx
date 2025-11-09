@@ -19,6 +19,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { VitalForceBackground } from '@/components/VitalForceBackground';
 
 const Nutrition: React.FC = () => {
   const navigate = useNavigate();
@@ -2757,6 +2758,7 @@ const Nutrition: React.FC = () => {
 
   return (
     <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6">
+      <VitalForceBackground intensity="low" />
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">

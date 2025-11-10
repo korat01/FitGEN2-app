@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -10,6 +10,8 @@ import { Toaster } from './components/ui/toaster';
 // Composants
 import PageLayout from './components/PageLayout';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
+import { ParticleContainer } from './components/ParticleContainer';
+import { useParticles } from './hooks/useParticles';
 
 // Lazy loading des pages
 const Login = lazy(() => import('./pages/Login'));
@@ -62,8 +64,30 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Composant principal de l'application
 const AppContent: React.FC = () => {
   const { user } = useAuth();
+  const { particles, spawnClickParticles } = useParticles();
+
+  // Effet de clic global sur les éléments interactifs
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Ne déclencher que sur les boutons et éléments interactifs
+      if (
+        target.tagName === 'BUTTON' ||
+        target.closest('button') ||
+        target.closest('a') ||
+        target.closest('[role="button"]')
+      ) {
+        spawnClickParticles(e as any);
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [spawnClickParticles]);
   
   return (
+      <>
+      <ParticleContainer particles={particles} />
       <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <Suspense fallback={<LoadingSpinner />}>
@@ -182,6 +206,7 @@ const AppContent: React.FC = () => {
           <PWAInstallPrompt />
         </div>
       </Router>
+      </>
   );
 };
 

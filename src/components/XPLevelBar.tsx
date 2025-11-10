@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
 import { Zap, Star, Trophy, Crown, Sparkles } from 'lucide-react';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
+import { useParticles } from '../hooks/useParticles';
+
 export const XPLevelBar: React.FC = () => {
-  const {
-    xpData
-  } = useExerciseValidation();
+  const { xpData } = useExerciseValidation();
+  const { spawnLevelUpParticles } = useParticles();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const previousLevel = useRef<number | null>(null);
+  // Détecter le level up
+  useEffect(() => {
+    if (xpData && previousLevel.current !== null && xpData.level > previousLevel.current) {
+      if (cardRef.current) {
+        spawnLevelUpParticles(cardRef.current);
+      }
+    }
+    if (xpData) {
+      previousLevel.current = xpData.level;
+    }
+  }, [xpData?.level, spawnLevelUpParticles]);
+
   if (!xpData) {
     return <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl">
         <CardContent className="p-6">
@@ -29,7 +44,7 @@ export const XPLevelBar: React.FC = () => {
     if (level >= 10) return <Star className="w-6 h-6 text-blue-500" />;
     return <Zap className="w-6 h-6 text-indigo-500" />;
   };
-  return <Card className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl relative overflow-hidden">
+  return <Card ref={cardRef} className="bg-white/80 backdrop-blur-sm border border-gray-200 shadow-xl relative overflow-hidden">
       {/* Effets visuels subtils */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30"></div>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100/20 to-transparent rounded-full -translate-y-16 translate-x-16"></div>

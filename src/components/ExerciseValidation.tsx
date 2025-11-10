@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { CheckCircle, XCircle, Clock, Target, Zap } from 'lucide-react';
+import { useParticles } from '../hooks/useParticles';
 
 interface ExerciseValidationProps {
   exercise: any;
@@ -20,9 +21,19 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
   isRestDay = false
 }) => {
   const [isValidating, setIsValidating] = useState(false);
+  const { spawnSuccessParticles, spawnErrorParticles } = useParticles();
+  const successButtonRef = useRef<HTMLButtonElement>(null);
+  const errorButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleValidation = async (success: boolean) => {
     setIsValidating(true);
+    
+    // Déclencher les particules
+    if (success && successButtonRef.current) {
+      spawnSuccessParticles(successButtonRef.current);
+    } else if (!success && errorButtonRef.current) {
+      spawnErrorParticles(errorButtonRef.current);
+    }
     
     // Simuler une petite animation
     setTimeout(() => {
@@ -100,6 +111,7 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
           {/* Boutons de validation */}
           <div className="flex gap-3">
             <Button
+              ref={successButtonRef}
               onClick={() => handleValidation(true)}
               disabled={isValidating}
               className="flex-1 bg-green-500 hover:bg-green-600 text-white"
@@ -108,6 +120,7 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
               Réussi
             </Button>
             <Button
+              ref={errorButtonRef}
               onClick={() => handleValidation(false)}
               disabled={isValidating}
               variant="destructive"

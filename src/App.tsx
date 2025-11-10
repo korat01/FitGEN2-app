@@ -11,7 +11,9 @@ import { Toaster } from './components/ui/toaster';
 import PageLayout from './components/PageLayout';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { ParticleContainer } from './components/ParticleContainer';
+import { CelebrationContainer } from './components/CelebrationContainer';
 import { useParticles } from './hooks/useParticles';
+import { useCelebration } from './hooks/useCelebration';
 
 // Lazy loading des pages
 const Login = lazy(() => import('./pages/Login'));
@@ -65,6 +67,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const AppContent: React.FC = () => {
   const { user } = useAuth();
   const { particles, spawnClickParticles } = useParticles();
+  const { celebrations, removeCelebration } = useCelebration();
 
   // Effet de clic global sur les éléments interactifs
   useEffect(() => {
@@ -88,6 +91,10 @@ const AppContent: React.FC = () => {
   return (
       <>
       <ParticleContainer particles={particles} />
+      <CelebrationContainer 
+        celebrations={celebrations} 
+        onCelebrationComplete={removeCelebration}
+      />
       <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <Suspense fallback={<LoadingSpinner />}>

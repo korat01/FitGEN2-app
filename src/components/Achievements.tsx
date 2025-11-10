@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, Crown, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Achievement } from '@/types/stats';
+import { useSounds } from '@/utils/sounds';
 import '../styles/achievements.css';
 
 interface AchievementCardProps {
   achievement: Achievement;
-  onClaim: (achievementId: string) => void;
+  onClaim: (achievementId: string, element: HTMLElement) => void;
 }
 
 const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { playSuccess } = useSounds();
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case 'common': return 'from-gray-400 to-gray-500';
@@ -45,7 +48,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
   const progressPercentage = (achievement.progress / achievement.maxProgress) * 100;
 
   return (
-    <Card className={`achievement-card bg-white/80 backdrop-blur-sm border-0 shadow-xl transition-all duration-300 ${
+    <Card ref={cardRef} className={`achievement-card bg-white/80 backdrop-blur-sm border-0 shadow-xl transition-all duration-300 ${
       achievement.unlocked 
         ? `achievement-unlocked ${getRarityGlow(achievement.rarity)} animate-glow` 
         : 'hover:shadow-2xl'
@@ -111,7 +114,12 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
             <Button 
               size="sm" 
               variant="outline"
-              onClick={() => onClaim(achievement.id)}
+              onClick={() => {
+                playSuccess();
+                if (cardRef.current) {
+                  onClaim(achievement.id, cardRef.current);
+                }
+              }}
               className="w-full"
             >
               <Zap className="w-4 h-4 mr-2" />
@@ -126,7 +134,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
 
 interface AchievementsProps {
   achievements: Achievement[];
-  onAchievementClaim: (achievementId: string) => void;
+  onAchievementClaim: (achievementId: string, achievement: Achievement, element: HTMLElement) => void;
 }
 
 export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchievementClaim }) => {
@@ -191,7 +199,7 @@ export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchi
             <AchievementCard
               key={achievement.id}
               achievement={achievement}
-              onClaim={onAchievementClaim}
+              onClaim={(id, element) => onAchievementClaim(id, achievement, element)}
             />
           ))}
         </div>

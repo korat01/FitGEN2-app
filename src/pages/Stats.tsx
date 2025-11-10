@@ -15,6 +15,7 @@ import { MainStatsCards } from '@/components/MainStatsCards';
 import { Achievements } from '@/components/Achievements';
 import { GlobalStatsDisplay } from '@/components/GlobalStatsDisplay';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
+import { useCelebration } from '@/hooks/useCelebration';
 
 // Utilitaires pour les calculs
 import { 
@@ -26,6 +27,7 @@ import { MainStats, Achievement, GlobalStats } from '@/types/stats';
 
 export const Stats: React.FC = () => {
   const { user, updateUser } = useAuth();
+  const { celebrate } = useCelebration();
   const [performances, setPerformances] = useState<any[]>([]);
   const [userRank, setUserRank] = useState<any>(null);
   const [globalRanking, setGlobalRanking] = useState<any[]>([]);
@@ -109,12 +111,16 @@ export const Stats: React.FC = () => {
   }, [user, updateUser]);
 
   // Fonction pour gérer les achievements
-  const handleAchievementClaim = (achievementId: string) => {
-    setAchievements(prev => prev.map(achievement => 
-      achievement.id === achievementId 
-        ? { ...achievement, unlocked: true, unlockedDate: new Date() }
-        : achievement
+  const handleAchievementClaim = (achievementId: string, achievement: Achievement, element: HTMLElement) => {
+    // Mettre à jour l'achievement comme débloqué
+    setAchievements(prev => prev.map(a => 
+      a.id === achievementId 
+        ? { ...a, unlocked: true, unlockedDate: new Date() }
+        : a
     ));
+
+    // Déclencher la célébration
+    celebrate(achievement);
   };
 
   // Fonction pour charger le classement global

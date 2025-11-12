@@ -375,16 +375,17 @@ export const Programme: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 p-4 md:p-6 overflow-x-hidden">
+    <div className="min-h-screen bg-background p-4 md:p-6 overflow-x-hidden relative">
       <VitalForceBackground intensity="medium" />
-      <div className="mx-auto max-w-7xl space-y-4 md:space-y-8">
+      <div className="mx-auto max-w-7xl space-y-4 md:space-y-8 relative z-10">
         
-        {/* Header Principal */}
-        <div className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-4 md:p-8 text-white shadow-2xl">
-          {/* Effets de particules flottantes */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32 animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24 animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-x-16 -translate-y-16 animate-pulse delay-500"></div>
+        {/* Header Principal - VitalForce DA */}
+        <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
+          <div className="absolute inset-0 gradient-primary opacity-80"></div>
+          {/* Effets de particules VitalForce */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-32 translate-x-32 animate-float"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full translate-y-24 -translate-x-24 animate-pulse-slow"></div>
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-x-16 -translate-y-16 animate-float"></div>
           
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

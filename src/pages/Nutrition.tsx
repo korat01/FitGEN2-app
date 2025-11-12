@@ -27,6 +27,8 @@ const Nutrition: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [favorites, setFavorites] = useState<string[]>([]);
+  
+  // Ajouter le VitalForceBackground en début de return
 
   // Données des aliments - AJOUT DE 20 NOUVEAUX ALIMENTS
   const aliments = [
@@ -2757,24 +2759,30 @@ const Nutrition: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6">
+    <div className="min-h-screen bg-background relative">
       <VitalForceBackground intensity="low" />
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Apple className="h-5 w-5 md:h-6 md:w-6 text-white" />
+      <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6 relative z-10">
+      {/* Header VitalForce DA */}
+      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
+        <div className="absolute inset-0 gradient-primary opacity-80"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-24 translate-x-24 animate-pulse-slow"></div>
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+              <Apple className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-4xl font-bold truncate">Nutrition</h1>
+              <p className="text-white/80 truncate">Gérez votre alimentation</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-xl md:text-3xl font-bold text-gray-800 truncate">Nutrition</h1>
-            <p className="text-sm md:text-base text-gray-600 truncate">Gérez votre alimentation</p>
-          </div>
+          <Button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold border border-white/30">
+            <Plus className="h-4 w-4 mr-2" />
+            Créer un repas
+          </Button>
         </div>
-        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold text-sm md:text-base">
-          <Plus className="h-4 w-4 mr-2" />
-          Créer un repas
-        </Button>
-        </div>
+      </div>
 
       {/* Recherche */}
       <Card className="bg-white border-0 shadow-lg">
@@ -3027,6 +3035,7 @@ const Nutrition: React.FC = () => {
               </div>
           </TabsContent>
         </Tabs>
+      </div>
     </div>
   );
 };

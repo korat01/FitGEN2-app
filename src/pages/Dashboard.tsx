@@ -434,14 +434,14 @@ export const Dashboard: React.FC = () => {
               <div className="flex flex-col gap-6">
                 <div className="space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-3 md:p-4 bg-white/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
-                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8" />
+                    <div className="p-3 md:p-4 bg-card/30 border border-primary/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
+                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
+                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-foreground">
                         Salut, Kelyan !
                     </h1>
-                      <p className="text-white/90 text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord</p>
+                      <p className="text-foreground/90 text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord</p>
                     </div>
                   </div>
                   
@@ -449,23 +449,23 @@ export const Dashboard: React.FC = () => {
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
                     {(() => {
                     const mainStat = getMainStatForSportClass(user.sportClass, performances);
-                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-lg text-sm md:text-base bg-sky-700">
+                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
                           <span className="text-lg md:text-xl">{mainStat.icon}</span>
                           <span>{mainStat.label}: {mainStat.value}</span>
                         </div>;
                   })()}
                     
                     {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
-                    <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || 'D')} text-white font-semibold shadow-lg text-sm md:text-base`}>
+                    <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || 'D')} text-foreground font-semibold shadow-[var(--shadow-glow-purple)] text-sm md:text-base`}>
                       <span className="text-lg md:text-xl">{getRangIcon(userRank?.rank || 'D')}</span>
                       <span>Rang {userRank?.rank || 'D'}</span>
                 </div>
                 
-                    <Button onClick={recalculateRank} size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm">
+                    <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
                       🔄 Recalculer
                     </Button>
                     
-                    <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm text-xs md:text-sm">
+                    <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
                       📊 Stats
                     </Button>
                 </div>
@@ -475,17 +475,17 @@ export const Dashboard: React.FC = () => {
                   {(() => {
                   const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
                   return <>
-                        <div className="text-white/90 font-medium text-sm md:text-base">
+                        <div className="text-foreground/90 font-medium text-sm md:text-base">
                           Progression vers le rang {progression.nextRank}
                         </div>
                         <div className="w-full max-w-md">
-                          <Progress value={progression.percentage} className="h-2 md:h-3 bg-white/20 rounded-full" />
+                          <Progress value={progression.percentage} className="h-2 md:h-3 bg-muted rounded-full" />
                         </div>
                         <div className="text-xs md:text-sm">
-                          <span className="text-white font-bold text-lg md:text-xl">
+                          <span className="text-foreground font-bold text-lg md:text-xl">
                             {Math.round(progression.percentage)}%
                           </span> 
-                          <span className="text-white/80"> vers le rang {progression.nextRank}</span>
+                          <span className="text-foreground/80"> vers le rang {progression.nextRank}</span>
                         </div>
                       </>;
                 })()}
@@ -524,7 +524,7 @@ export const Dashboard: React.FC = () => {
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {/* STATISTIQUE PRINCIPALE - Plus grande et mise en avant */}
-            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 backdrop-blur-sm border-2 border-emerald-200 shadow-xl md:col-span-2">
+            <Card className="glass-card border border-primary/30 shadow-[var(--shadow-glow-purple)] md:col-span-2">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">

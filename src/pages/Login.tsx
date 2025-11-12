@@ -160,15 +160,15 @@ export const Login: React.FC = () => {
         <div className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
       
-      <Card className="w-full max-w-md sl-bg-card sl-border-glow sl-glow-effect relative z-10">
-        <CardHeader className="text-center space-y-4 sl-card-header">
-          <div className="w-16 h-16 sl-bg-card rounded-2xl flex items-center justify-center mx-auto sl-border-glow sl-float-effect">
-            <Dumbbell className="w-8 h-8 sl-icon sl-text-accent" />
+      <Card className="w-full max-w-md bg-card/90 border border-primary/30 shadow-[var(--shadow-glow-purple)] backdrop-blur-xl relative z-10">
+        <CardHeader className="text-center space-y-4 border-b border-primary/20">
+          <div className="w-16 h-16 bg-card/80 rounded-2xl flex items-center justify-center mx-auto border border-primary/30 shadow-[var(--shadow-glow-blue)] animate-float">
+            <Dumbbell className="w-8 h-8 text-primary" />
           </div>
-          <CardTitle className="sl-card-title sl-text-gradient">
+          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             Créer votre Profil
           </CardTitle>
-          <p className="sl-text-primary opacity-80">
+          <p className="text-foreground/90">
             Rejoignez l'aventure FitGEN2
           </p>
         </CardHeader>
@@ -177,17 +177,17 @@ export const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nom */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-semibold sl-text-accent">
+              <Label htmlFor="name" className="text-sm font-semibold text-primary">
                 Nom complet *
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                 <Input
                   id="name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="pl-10 h-12 sl-input"
+                  className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
                   placeholder="Votre nom"
                   required
                   disabled={isLoading}
@@ -197,17 +197,17 @@ export const Login: React.FC = () => {
 
             {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-semibold sl-text-accent">
+              <Label htmlFor="email" className="text-sm font-semibold text-primary">
                 Email *
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="pl-10 h-12 sl-input"
+                  className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
                   placeholder="votre@email.com"
                   required
                   disabled={isLoading}
@@ -217,17 +217,17 @@ export const Login: React.FC = () => {
 
             {/* Mot de passe */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-semibold sl-text-accent">
+              <Label htmlFor="password" className="text-sm font-semibold text-primary">
                 Mot de passe *
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pl-10 pr-10 h-12 sl-input"
+                  className="pl-10 pr-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
                   placeholder="Votre mot de passe"
                   required
                   disabled={isLoading}
@@ -235,7 +235,7 @@ export const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 sl-icon hover:sl-text-accent"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary hover:text-secondary transition-colors"
                   disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -245,22 +245,22 @@ export const Login: React.FC = () => {
 
             {/* Informations personnelles */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold sl-text-primary sl-text-shadow">Informations personnelles</h3>
+              <h3 className="text-lg font-semibold text-foreground">Informations personnelles</h3>
               
               <div className="grid grid-cols-2 gap-4">
                 {/* Poids */}
                 <div className="space-y-2">
-                  <Label htmlFor="weight" className="text-sm font-semibold sl-text-accent">
+                  <Label htmlFor="weight" className="text-sm font-semibold text-primary">
                     Poids (kg)
                   </Label>
                   <div className="relative">
-                    <Weight className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                    <Weight className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                     <Input
                       id="weight"
                       type="number"
                       value={formData.weight}
                       onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-                      className="pl-10 h-12 sl-input"
+                      className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
                       placeholder="75"
                       min="30"
                       max="200"
@@ -272,17 +272,17 @@ export const Login: React.FC = () => {
 
                 {/* Âge */}
                 <div className="space-y-2">
-                  <Label htmlFor="age" className="text-sm font-semibold sl-text-accent">
+                  <Label htmlFor="age" className="text-sm font-semibold text-primary">
                     Âge
                   </Label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
                     <Input
                       id="age"
                       type="number"
                       value={formData.age}
                       onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
-                      className="pl-10 h-12 sl-input"
+                      className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
                       placeholder="28"
                       min="16"
                       max="100"
@@ -295,13 +295,13 @@ export const Login: React.FC = () => {
 
               {/* Sexe */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold sl-text-accent">Sexe</Label>
+                <Label className="text-sm font-semibold text-primary">Sexe</Label>
                 <div className="flex gap-3">
                   <Button
                     type="button"
                     variant={formData.sex === 'male' ? 'default' : 'outline'}
                     onClick={() => setFormData({ ...formData, sex: 'male' })}
-                    className={`flex-1 h-12 ${formData.sex === 'male' ? 'sl-btn-primary' : 'sl-input'}`}
+                    className={`flex-1 h-12 ${formData.sex === 'male' ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-[var(--shadow-glow-purple)]' : 'bg-background/80 border-primary/30 text-foreground hover:bg-primary/10'}`}
                     disabled={isLoading}
                   >
                     Homme
@@ -310,7 +310,7 @@ export const Login: React.FC = () => {
                     type="button"
                     variant={formData.sex === 'female' ? 'default' : 'outline'}
                     onClick={() => setFormData({ ...formData, sex: 'female' })}
-                    className={`flex-1 h-12 ${formData.sex === 'female' ? 'sl-btn-primary' : 'sl-input'}`}
+                    className={`flex-1 h-12 ${formData.sex === 'female' ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-[var(--shadow-glow-purple)]' : 'bg-background/80 border-primary/30 text-foreground hover:bg-primary/10'}`}
                     disabled={isLoading}
                   >
                     Femme
@@ -320,13 +320,13 @@ export const Login: React.FC = () => {
 
               {/* Classe de sport */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold sl-text-accent">Type de sport</Label>
+                <Label className="text-sm font-semibold text-primary">Type de sport</Label>
                 <div className="relative">
-                  <Activity className="absolute left-3 top-1/2 transform -translate-y-1/2 sl-icon w-4 h-4" />
+                  <Activity className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
                   <select
                     value={formData.sportClass}
                     onChange={(e) => setFormData({ ...formData, sportClass: e.target.value })}
-                    className="w-full h-12 pl-10 pr-4 sl-input"
+                    className="w-full h-12 pl-10 pr-4 bg-background/80 border border-primary/30 text-foreground rounded-lg focus:border-primary focus:ring-1 focus:ring-primary appearance-none"
                     disabled={isLoading}
                   >
                     <option value="classique">Classique</option>
@@ -344,12 +344,12 @@ export const Login: React.FC = () => {
             {/* Bouton de connexion */}
             <Button
               type="submit"
-              className="w-full h-14 sl-btn-gold font-semibold text-lg sl-glow-effect"
+              className="w-full h-14 bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent/70 text-background font-semibold text-lg shadow-[var(--shadow-glow-pink)] hover:shadow-[0_0_30px_rgba(255,125,59,0.8)] transition-all duration-300"
               disabled={isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-background"></div>
                   <span>Création en cours...</span>
                 </div>
               ) : (

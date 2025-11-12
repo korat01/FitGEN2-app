@@ -39,37 +39,37 @@ const StatCard: React.FC<StatCardProps> = ({
   }));
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-3 text-xl">
-          <div className={`w-10 h-10 ${bgGradient} rounded-xl flex items-center justify-center`}>
+    <Card className="bg-card/90 backdrop-blur-sm border border-primary/20 shadow-[var(--shadow-glow-purple)] hover:shadow-[var(--shadow-glow-blue)] transition-all duration-300">
+      <CardHeader className="pb-3 border-b border-primary/20">
+        <CardTitle className="flex items-center gap-3 text-xl text-foreground">
+          <div className={`w-10 h-10 ${bgGradient} rounded-xl flex items-center justify-center shadow-lg`}>
             {icon}
           </div>
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-4">
         {/* Valeurs principales */}
         <div className="text-center">
           <div className={`text-3xl font-bold ${color}`}>
             {mainValue}
           </div>
-          <div className="text-sm text-gray-600 mt-1">
+          <div className="text-sm text-muted-foreground mt-1">
             {subValue}
           </div>
           
           {/* Points de performance */}
-          <div className="mt-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
+          <div className="mt-3 p-3 bg-background/50 border border-primary/10 rounded-lg">
             <div className="flex items-center justify-between">
               <div className="text-left">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">Points Performance</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Points Performance</div>
                 <div className={`text-lg font-bold ${color}`}>
                   {performancePoints}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-xs text-gray-500 uppercase tracking-wide">Niveau</div>
-                <div className="text-sm font-semibold text-gray-700">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Niveau</div>
+                <div className="text-sm font-semibold text-foreground">
                   {performanceLevel}
                 </div>
               </div>
@@ -82,7 +82,7 @@ const StatCard: React.FC<StatCardProps> = ({
           <div className="relative w-20 h-20">
             <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
               <path
-                className="text-gray-200"
+                className="text-muted"
                 stroke="currentColor"
                 strokeWidth="3"
                 fill="none"
@@ -122,7 +122,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
         {/* Classement communautaire */}
         <div className="text-center">
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs border-primary/30">
             {communityRank}
           </Badge>
         </div>

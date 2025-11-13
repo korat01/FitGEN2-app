@@ -42,10 +42,10 @@ export const Navigation: React.FC = () => {
             to={item.to}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden',
+                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden',
                 isActive
-                  ? 'gradient-primary text-white shadow-lg'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/10'
+                  ? 'gradient-primary text-white shadow-[var(--shadow-glow-purple)] scale-105'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card/50 hover:border hover:border-primary/30 hover:shadow-[0_0_15px_rgba(107,42,255,0.2)] hover:scale-105 backdrop-blur-sm'
               )
             }
           >

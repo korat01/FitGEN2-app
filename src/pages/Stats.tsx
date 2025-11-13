@@ -409,9 +409,9 @@ export const Stats: React.FC = () => {
 
   return (
     <PageLayout>
-      <VitalForceBackground intensity="low" />
       <div className="min-h-screen bg-background relative">
-      <div className="container mx-auto px-4 py-8">
+        <VitalForceBackground intensity="low" />
+      <div className="container mx-auto px-4 py-8 relative z-10">{/* z-10 pour être au-dessus du background */}
         <div className="space-y-8">
             
             {/* Header Principal - VitalForce DA */}

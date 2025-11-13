@@ -419,8 +419,8 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <VitalForceBackground intensity="medium" />
-      <div className="container mx-auto px-4 py-8 relative z-10">
-      <div className="space-y-8">
+      <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
+      <div className="space-y-8 stagger-animation">
           
           {/* Header Principal - VitalForce DA */}
           <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">

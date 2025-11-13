@@ -377,7 +377,7 @@ export const Programme: React.FC = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 overflow-x-hidden relative">
       <VitalForceBackground intensity="medium" />
-      <div className="mx-auto max-w-7xl space-y-4 md:space-y-8 relative z-10">
+      <div className="mx-auto max-w-7xl space-y-4 md:space-y-8 relative z-10 page-transition stagger-animation">
         
         {/* Header Principal - VitalForce DA */}
         <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">

@@ -149,7 +149,7 @@ All colors MUST be HSL.
 
 @layer components {
   .glass-effect {
-    @apply backdrop-blur-xl bg-white/10 border border-white/20;
+    @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(107,42,255,0.1)];
   }
   
   .gradient-primary {
@@ -193,23 +193,36 @@ All colors MUST be HSL.
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse-slow;
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02];
+    @apply transition-all duration-300 hover:shadow-[var(--shadow-glow-purple)] hover:-translate-y-2 hover:scale-[1.02];
   }
   
   .glass-card {
-    @apply glass-effect border-white/30 backdrop-blur-2xl bg-white/5;
+    @apply glass-effect border-primary/30 backdrop-blur-2xl bg-card/50 shadow-[var(--shadow-card)];
   }
   
   .neon-glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.5), 0 0 40px rgba(107, 42, 255, 0.3);
   }
   
   .neon-glow:hover {
-    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 30px rgba(107, 42, 255, 0.8), 0 0 60px rgba(107, 42, 255, 0.4);
+    transform: scale(1.05);
+  }
+  
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.4);
+  }
+  
+  .glow-secondary {
+    box-shadow: 0 0 20px rgba(0, 194, 255, 0.4);
+  }
+  
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(255, 125, 59, 0.4);
   }
 }
 

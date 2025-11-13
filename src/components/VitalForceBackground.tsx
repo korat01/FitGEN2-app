@@ -138,8 +138,7 @@ export const VitalForceBackground: React.FC<VitalForceBackgroundProps> = ({ inte
         `}
       </style>
 
-      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-        {/* Aurora Borealis Effect */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">{/* Aurora Borealis Effect */}
         <div className="absolute inset-0">
           {Array.from({ length: counts.aurora }, (_, i) => (
             <div

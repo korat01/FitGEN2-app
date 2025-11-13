@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { Dumbbell, Eye, EyeOff, User, Lock, Mail, Weight, Calendar, Activity } from 'lucide-react';
+import { VitalForceBackground } from '@/components/VitalForceBackground';
 
 export const Login: React.FC = () => {
   const { login, user } = useAuth();
@@ -152,13 +153,8 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen sl-bg-primary flex items-center justify-center p-4">
-      {/* Effets de particules Solo Leveling */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-purple-500/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+      <VitalForceBackground intensity="low" />
       
       <Card className="w-full max-w-md bg-card/90 border border-primary/30 shadow-[var(--shadow-glow-purple)] backdrop-blur-xl relative z-10">
         <CardHeader className="text-center space-y-4 border-b border-primary/20">

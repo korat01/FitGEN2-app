@@ -411,8 +411,8 @@ export const Stats: React.FC = () => {
     <PageLayout>
       <div className="min-h-screen bg-background relative">
         <VitalForceBackground intensity="low" />
-      <div className="container mx-auto px-4 py-8 relative z-10">{/* z-10 pour être au-dessus du background */}
-        <div className="space-y-8">
+      <div className="container mx-auto px-4 py-8 relative z-10 page-transition">{/* z-10 pour être au-dessus du background */}
+        <div className="space-y-8 stagger-animation">
             
             {/* Header Principal - VitalForce DA */}
             <div className="relative overflow-hidden rounded-xl md:rounded-3xl p-3 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">

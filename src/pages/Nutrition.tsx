@@ -2761,7 +2761,8 @@ const Nutrition: React.FC = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <VitalForceBackground intensity="low" />
-      <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6 relative z-10">
+      <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6 relative z-10 page-transition">
+        <div className="stagger-animation">
       {/* Header VitalForce DA */}
       <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
         <div className="absolute inset-0 gradient-primary opacity-80"></div>
@@ -3035,6 +3036,7 @@ const Nutrition: React.FC = () => {
               </div>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );

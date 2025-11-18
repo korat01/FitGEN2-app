@@ -4,6 +4,7 @@ import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { CheckCircle, XCircle, Clock, Target, Zap } from 'lucide-react';
 import { useParticles } from '../hooks/useParticles';
+import { useSounds } from '../utils/sounds';
 
 interface ExerciseValidationProps {
   exercise: any;
@@ -22,11 +23,19 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
 }) => {
   const [isValidating, setIsValidating] = useState(false);
   const { spawnSuccessParticles, spawnErrorParticles } = useParticles();
+  const { playSuccess, playError } = useSounds();
   const successButtonRef = useRef<HTMLButtonElement>(null);
   const errorButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleValidation = async (success: boolean) => {
     setIsValidating(true);
+    
+    // Jouer le son approprié
+    if (success) {
+      playSuccess();
+    } else {
+      playError();
+    }
     
     // Déclencher les particules
     if (success && successButtonRef.current) {

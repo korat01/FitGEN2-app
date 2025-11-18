@@ -3,6 +3,7 @@ import { ParticleContainer } from './ParticleContainer';
 import { CelebrationContainer } from './CelebrationContainer';
 import { useParticles } from '@/hooks/useParticles';
 import { useCelebration } from '@/hooks/useCelebration';
+import { useSounds } from '@/utils/sounds';
 
 interface GameLayoutProps {
   children: React.ReactNode;
@@ -11,9 +12,13 @@ interface GameLayoutProps {
 export const GameLayout: React.FC<GameLayoutProps> = ({ children }) => {
   const { particles, spawnClickParticles } = useParticles();
   const { celebrations } = useCelebration();
+  const { playClick } = useSounds();
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
+      // Jouer le son de clic
+      playClick();
+      
       // Spawn particles on any click
       const syntheticEvent = {
         clientX: e.clientX,

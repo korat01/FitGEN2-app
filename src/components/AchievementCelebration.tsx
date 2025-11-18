@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, Star, Crown, Sparkles, Zap } from 'lucide-react';
 import { Achievement } from '@/types/stats';
+import { useSounds } from '@/utils/sounds';
 
 interface Confetti {
   id: number;
@@ -53,8 +54,12 @@ export const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
   const [confetti, setConfetti] = useState<Confetti[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [messageText, setMessageText] = useState('');
+  const { playNotification } = useSounds();
 
   useEffect(() => {
+    // Jouer le son d'achievement
+    playNotification();
+    
     // Choisir un message aléatoire selon la rareté
     const messages = CELEBRATION_MESSAGES[achievement.rarity];
     const randomMessage = messages[Math.floor(Math.random() * messages.length)];

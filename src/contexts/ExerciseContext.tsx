@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuests } from './QuestContext';
+import { SoundManager } from '../utils/sounds';
 
 interface ExerciseValidation {
   exerciseId: string;
@@ -122,6 +123,10 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
         newLevel += 1;
         newCurrentXP = newCurrentXP - prev.xpToNextLevel;
         newXPToNextLevel = newLevel * 100; // 100 XP par niveau
+        
+        // Jouer le son de level-up
+        const soundManager = SoundManager.getInstance();
+        soundManager.playNotification();
       }
       
       return {

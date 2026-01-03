@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+@import './styles/solo-leveling-theme.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -36,77 +40,77 @@
   }
 }
 
-/* Apple-inspired Design System - Soft & Clean */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
 
 @layer base {
   :root {
-    /* Apple-inspired soft colors */
-    --background: 0 0% 98%;  /* #FAFAFA - Soft white */
-    --foreground: 0 0% 9%;   /* #171717 - Almost black */
-    --card: 0 0% 100%;       /* Pure white */
-    --card-foreground: 0 0% 9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 211 100% 50%; /* #007AFF - Apple Blue */
+    /* VitalForce DA - Couleurs principales */
+    --background: 218 47% 8%;  /* #0A0E1A */
+    --foreground: 0 0% 100%;  /* Blanc */
+    --card: 222 28% 14%;  /* #1A1F2E */
+    --card-foreground: 0 0% 100%;
+    --popover: 222 28% 14%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 261 100% 59%;  /* #6B2AFF - Violet */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%; /* #F1F5F9 - Soft gray-blue */
-    --secondary-foreground: 215 25% 27%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 215 25% 27%;
-    --destructive: 0 84% 60%;
+    --secondary: 194 100% 50%;  /* #00C2FF - Bleu cyan */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 17% 32%;
+    --muted-foreground: 214 14% 65%;  /* #A0AEC0 */
+    --accent: 16 100% 62%;  /* #FF7D3B - Orange */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 211 100% 50%;
-    --radius: 0.875rem;
+    --border: 220 17% 32%;
+    --input: 220 17% 32%;
+    --ring: 261 100% 59%;
+    --radius: 0.75rem;
     
-    /* Apple accent colors */
-    --apple-green: 142 71% 45%;
-    --apple-orange: 28 100% 54%;
-    --apple-purple: 280 87% 55%;
-    --apple-pink: 340 82% 52%;
-    --apple-teal: 177 70% 41%;
+    /* Couleurs VitalForce supplémentaires */
+    --vitalforce-cyan: 186 100% 50%;  /* #00E0FF */
+    --vitalforce-pink: 341 100% 71%;  /* #FF6B9D */
+    --vitalforce-gold: 51 100% 50%;  /* #FFD700 */
     
-    /* Soft gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(211 100% 50%) 0%, hsl(280 87% 55%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(210 40% 96%) 0%, hsl(214 32% 91%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(177 70% 41%) 100%);
-    --gradient-warm: linear-gradient(135deg, hsl(28 100% 54%) 0%, hsl(340 82% 52%) 100%);
+    /* Gradients VitalForce */
+    --gradient-primary: linear-gradient(135deg, hsl(261 100% 59%) 0%, hsl(194 100% 50%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(341 100% 71%) 0%, hsl(261 100% 59%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(201 96% 32%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(51 100% 50%) 0%, hsl(16 100% 62%) 100%);
+    --gradient-info: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(186 100% 50%) 100%);
     
-    /* Soft Apple shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+    /* Ombres avec glow VitalForce */
+    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    --shadow-glow-purple: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-glow-blue: 0 0 25px rgba(0, 194, 255, 0.6);
+    --shadow-glow-pink: 0 0 25px rgba(255, 107, 157, 0.6);
   }
 
   .dark {
-    /* Dark mode - still Apple-inspired, elegant */
-    --background: 0 0% 7%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 211 100% 50%;
+    /* Mode dark maintient la même DA VitalForce */
+    --background: 218 47% 8%;
+    --foreground: 0 0% 100%;
+    --card: 222 28% 14%;
+    --card-foreground: 0 0% 100%;
+    --popover: 222 28% 14%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 261 100% 59%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 215 25% 17%;
-    --secondary-foreground: 0 0% 95%;
-    --muted: 215 25% 17%;
-    --muted-foreground: 215 16% 60%;
-    --accent: 215 25% 17%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 84% 60%;
+    --secondary: 194 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 17% 32%;
+    --muted-foreground: 214 14% 65%;
+    --accent: 16 100% 62%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 25% 20%;
-    --input: 215 25% 20%;
-    --ring: 211 100% 50%;
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+    --border: 220 17% 32%;
+    --input: 220 17% 32%;
+    --ring: 261 100% 59%;
+    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
+    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -115,11 +119,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-variation-settings: 'opsz' 32;
   }
   
   /* iOS Safe Area Support */
@@ -146,8 +149,7 @@
 
 @layer components {
   .glass-effect {
-    @apply backdrop-blur-xl bg-white/80 border border-white/20;
-    box-shadow: var(--shadow-md);
+    @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(107,42,255,0.1)];
   }
   
   .gradient-primary {
@@ -162,59 +164,72 @@
     background: var(--gradient-success);
   }
   
-  /* Smooth Apple-style animations */
   .animate-fade-in {
-    animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: fadeIn 0.5s ease-in-out;
   }
   
   .animate-slide-up {
-    animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: slideUp 0.3s ease-out;
   }
   
   .animate-scale-in {
-    animation: scaleIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: scaleIn 0.2s ease-out;
   }
   
-  .animate-bounce-subtle {
-    animation: bounceSubtle 2s infinite;
+  .shadow-3xl {
+    box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
   }
   
-  .animate-pulse-soft {
-    animation: pulseSoft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  .animate-bounce-slow {
+    animation: bounce 2s infinite;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
   
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
   
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+  
   .animate-slide-in-up {
-    animation: slideInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: slide-in-up 0.5s ease-out;
   }
   
   .animate-slide-in-right {
-    animation: slideInRight 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: slide-in-right 0.5s ease-out;
   }
   
   .animate-slide-in-left {
-    animation: slideInLeft 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: slide-in-left 0.5s ease-out;
   }
   
   .animate-bounce-in {
-    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  
+  .animate-glitch {
+    animation: glitch 0.3s ease-in-out;
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-[hsl(280_87%_55%)] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse-slow;
   }
   
   .card-hover {
-    @apply transition-all duration-300 ease-out;
-    box-shadow: var(--shadow-card);
+    @apply transition-all duration-300 hover:shadow-[var(--shadow-glow-purple)] hover:-translate-y-2 hover:scale-[1.02];
   }
   
-  .card-hover:hover {
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(-2px);
+  .gaming-hover {
+    @apply transition-all duration-300 hover:scale-110 hover:rotate-3 hover:shadow-[0_0_30px_rgba(107,42,255,0.8)];
   }
   
   .page-transition {
@@ -222,31 +237,35 @@
   }
   
   .glass-card {
-    @apply backdrop-blur-xl bg-card/90 border border-border/50 rounded-2xl;
-    box-shadow: var(--shadow-card);
+    @apply glass-effect border-primary/30 backdrop-blur-2xl bg-card/50 shadow-[var(--shadow-card)];
   }
   
-  /* Apple-style soft focus */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.5), 0 0 40px rgba(107, 42, 255, 0.3);
   }
   
-  /* Soft hover effect */
-  .hover-lift {
-    @apply transition-all duration-300 ease-out hover:-translate-y-1;
-    box-shadow: var(--shadow-sm);
+  .neon-glow:hover {
+    box-shadow: 0 0 30px rgba(107, 42, 255, 0.8), 0 0 60px rgba(107, 42, 255, 0.4);
+    transform: scale(1.05);
   }
   
-  .hover-lift:hover {
-    box-shadow: var(--shadow-lg);
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.4);
+  }
+  
+  .glow-secondary {
+    box-shadow: 0 0 20px rgba(0, 194, 255, 0.4);
+  }
+  
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(255, 125, 59, 0.4);
   }
 }
 
-/* Apple-style smooth animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -257,7 +276,7 @@
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -268,7 +287,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -276,22 +295,9 @@
   }
 }
 
-@keyframes bounceSubtle {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes pulseSoft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 @keyframes float {
@@ -299,14 +305,23 @@
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-6px);
+    transform: translateY(-10px);
   }
 }
 
-@keyframes slideInUp {
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(107, 42, 255, 0.8), 0 0 60px rgba(107, 42, 255, 0.4);
+  }
+}
+
+@keyframes slide-in-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -314,10 +329,10 @@
   }
 }
 
-@keyframes slideInRight {
+@keyframes slide-in-right {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
@@ -325,10 +340,10 @@
   }
 }
 
-@keyframes slideInLeft {
+@keyframes slide-in-left {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
@@ -336,24 +351,71 @@
   }
 }
 
-@keyframes bounceIn {
+@keyframes bounce-in {
   0% {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.3);
   }
   50% {
-    transform: scale(1.02);
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
   }
   100% {
-    opacity: 1;
     transform: scale(1);
   }
 }
 
-/* Apple-style scrollbar - minimal */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* Scrollbar personnalisé */
 ::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted/30;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Améliorations des scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -361,22 +423,36 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full;
+  @apply bg-gradient-to-b from-blue-400 to-purple-500 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/30;
+  @apply from-blue-500 to-purple-600;
 }
 
-/* Staggered animations */
+/* Effets de focus améliorés */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* Animations d'entrée */
 .stagger-animation > * {
-  animation: fadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
 }
 
-.stagger-animation > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-animation > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-animation > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-animation > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-animation > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-animation > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -34,18 +34,18 @@ const navigationItems = [
 
 export const Navigation: React.FC = () => {
   return (
-    <nav className="p-4">
-      <div className="space-y-1">
+    <nav className="p-6">
+      <div className="space-y-2">
         {navigationItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ease-out group',
+                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden',
                 isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                  ? 'gradient-primary text-white shadow-[var(--shadow-glow-purple)] scale-105'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-card/50 hover:border hover:border-primary/30 hover:shadow-[0_0_15px_rgba(107,42,255,0.2)] hover:scale-105 backdrop-blur-sm'
               )
             }
           >
@@ -55,22 +55,26 @@ export const Navigation: React.FC = () => {
                   item.icon
                 ) : (
                   <item.icon className={cn(
-                    'w-5 h-5 transition-transform duration-200',
-                    isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                    'w-5 h-5 transition-transform group-hover:scale-110',
+                    isActive && 'text-white'
                   )} />
                 )}
                 <span className="font-medium">{item.label}</span>
                 {item.badge && (
                   <Badge 
-                    variant={isActive ? "secondary" : "outline"}
                     className={cn(
                       'ml-auto text-xs',
-                      isActive && 'bg-white/20 text-primary-foreground border-white/30'
+                      isActive 
+                        ? 'bg-white/20 text-white border-white/30' 
+                        : 'bg-primary/10 text-primary border-primary/20'
                     )}
                   >
                     {item.badge}
                   </Badge>
                 )}
+                
+                {/* Effet de survol */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               </>
             )}
           </NavLink>
@@ -78,14 +82,14 @@ export const Navigation: React.FC = () => {
       </div>
       
       {/* Section utilisateur */}
-      <div className="mt-8 pt-6 border-t border-border">
-        <div className="bg-secondary/50 p-4 rounded-xl">
-          <div className="text-sm font-medium mb-2 text-foreground">Progression du jour</div>
+      <div className="mt-8 pt-6 border-t border-white/10">
+        <div className="glass-card p-4 rounded-xl">
+          <div className="text-sm font-medium mb-2">Progression du jour</div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="flex-1 bg-secondary rounded-full h-2">
-              <div className="bg-primary h-2 rounded-full w-3/4 transition-all duration-500"></div>
+            <div className="flex-1 bg-white/10 rounded-full h-2">
+              <div className="gradient-success h-2 rounded-full w-3/4"></div>
             </div>
-            <span className="text-xs text-muted-foreground font-medium">75%</span>
+            <span className="text-xs text-muted-foreground">75%</span>
           </div>
           <div className="text-xs text-muted-foreground">
             3 sur 4 objectifs atteints
@@ -94,4 +98,4 @@ export const Navigation: React.FC = () => {
       </div>
     </nav>
   );
-};
+}; 

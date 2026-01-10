@@ -277,17 +277,31 @@ export const VitalForceBackground: React.FC<VitalForceBackgroundProps> = ({ inte
           ))}
         </div>
 
-        {/* Gradient Overlays */}
+        {/* Gradient Overlays - Style gaming référence */}
         <div 
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at top, ${colors.purple}12 0%, transparent 60%)`,
+            background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${colors.purple}18 0%, transparent 50%)`,
           }}
         />
         <div 
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at bottom right, ${colors.blue}08 0%, transparent 60%)`,
+            background: `radial-gradient(ellipse 60% 40% at 80% 100%, ${colors.blue}12 0%, transparent 50%)`,
+          }}
+        />
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 50% 30% at 20% 80%, ${colors.cyan}08 0%, transparent 40%)`,
+          }}
+        />
+        {/* Subtle grid overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `linear-gradient(${colors.cyan}20 1px, transparent 1px), linear-gradient(90deg, ${colors.cyan}20 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
           }}
         />
       </div>

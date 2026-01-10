@@ -1,0 +1,81 @@
+import React from 'react';
+
+export const VitalForceBackground: React.FC = () => {
+  const colors = {
+    primary: {
+      purple: '#6B2AFF',
+      blue: '#00C2FF',
+      cyan: '#00E0FF',
+      pink: '#FF6B9D',
+      blueDark: '#3B82F6'
+    },
+    glow: {
+      purple: 'rgba(107, 42, 255, 0.6)',
+      blue: 'rgba(0, 194, 255, 0.6)',
+      pink: 'rgba(255, 107, 157, 0.6)',
+      cyan: 'rgba(0, 224, 255, 0.6)'
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      <style jsx>{`
+        @keyframes auroraBorealis {
+          0% { 
+            transform: translateY(0px) rotate(0deg) scaleX(1); 
+            opacity: 0.1; 
+            filter: hue-rotate(0deg) brightness(1) blur(0px);
+          }
+          25% { 
+            transform: translateY(-8px) rotate(0.5deg) scaleX(1.02); 
+            opacity: 0.2; 
+            filter: hue-rotate(30deg) brightness(1.1) blur(0.5px);
+          }
+          50% { 
+            transform: translateY(-15px) rotate(0deg) scaleX(1.05); 
+            opacity: 0.25; 
+            filter: hue-rotate(60deg) brightness(1.2) blur(1px);
+          }
+          75% { 
+            transform: translateY(-8px) rotate(-0.5deg) scaleX(1.02); 
+            opacity: 0.2; 
+            filter: hue-rotate(30deg) brightness(1.1) blur(0.5px);
+          }
+          100% { 
+            transform: translateY(0px) rotate(0deg) scaleX(1); 
+            opacity: 0.1; 
+            filter: hue-rotate(0deg) brightness(1) blur(0px);
+          }
+        }
+        
+        .aurora-borealis {
+          animation: auroraBorealis 15s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Aurora Borealis Layers */}
+      {Array.from({ length: 5 }, (_, i) => (
+        <div
+          key={`aurora-${i}`}
+          className="absolute aurora-borealis"
+          style={{
+            top: `${20 + i * 15}%`,
+            left: '0',
+            width: '100%',
+            height: '60px',
+            background: `linear-gradient(45deg, 
+              transparent 0%, 
+              ${colors.primary.cyan}08 25%, 
+              ${colors.primary.purple}12 50%, 
+              ${colors.primary.pink}08 75%, 
+              transparent 100%)`,
+            clipPath: 'polygon(0% 100%, 20% 80%, 40% 60%, 60% 40%, 80% 20%, 100% 0%, 100% 100%)',
+            animationDelay: `${i * 3}s`,
+            animationDuration: `${12 + i * 1.5}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+

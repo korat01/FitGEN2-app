@@ -14,6 +14,7 @@ import { DailyQuests } from '@/components/DailyQuests';
 import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
+import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -603,6 +604,9 @@ export const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Weekly Progress Chart - Gaming Style */}
+          <WeeklyProgressChart />
 
           {/* Détail du rang calculé */}
           {userRank && <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">

@@ -15,6 +15,7 @@ import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
+import { HexagonBadge, HexagonBadgeRow } from '@/components/HexagonBadge';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -432,17 +433,27 @@ export const Dashboard: React.FC = () => {
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
             
           <div className="relative z-10">
-              <div className="flex flex-col gap-6">
-                <div className="space-y-4 md:space-y-6">
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* Left: User Info */}
+                <div className="flex-1 space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-3 md:p-4 bg-card/30 border border-primary/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
-                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
+                    {/* Hexagon Badge Level */}
+                    <HexagonBadge 
+                      level={xpData?.level || 1} 
+                      variant={
+                        (xpData?.level || 1) >= 50 ? 'diamond' :
+                        (xpData?.level || 1) >= 30 ? 'gold' :
+                        (xpData?.level || 1) >= 15 ? 'platinum' :
+                        'primary'
+                      }
+                      size="lg"
+                      animated
+                    />
+                    <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-foreground">
-                        Salut, Kelyan !
+                        {user.name || 'Joueur'}
                     </h1>
-                      <p className="text-foreground/90 text-sm md:text-lg mt-1 md:mt-2">Votre tableau de bord</p>
+                      <p className="text-foreground/90 text-sm md:text-lg mt-1 md:mt-2">Niveau {xpData?.level || 1}</p>
                     </div>
                   </div>
                   
@@ -604,6 +615,28 @@ export const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Achievements Badges Row */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                <Award className="w-5 h-5 text-secondary" />
+                Achievements
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <HexagonBadgeRow 
+                badges={[
+                  { level: 1, title: 'Débutant', variant: 'bronze', unlocked: true },
+                  { level: 5, title: 'Régulier', variant: 'primary', unlocked: (xpData?.level || 1) >= 5 },
+                  { level: 10, title: 'Confirmé', variant: 'platinum', unlocked: (xpData?.level || 1) >= 10 },
+                  { level: 25, title: 'Expert', variant: 'gold', unlocked: (xpData?.level || 1) >= 25 },
+                  { level: 50, title: 'Légende', variant: 'diamond', unlocked: (xpData?.level || 1) >= 50 },
+                ]}
+                size="sm"
+              />
+            </CardContent>
+          </Card>
 
           {/* Weekly Progress Chart - Gaming Style */}
           <WeeklyProgressChart />

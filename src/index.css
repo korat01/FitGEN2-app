@@ -46,71 +46,77 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* VitalForce DA - Couleurs principales */
-    --background: 218 47% 8%;  /* #0A0E1A */
-    --foreground: 0 0% 100%;  /* Blanc */
-    --card: 222 28% 14%;  /* #1A1F2E */
+    /* VitalForce DA - Style référence app gaming */
+    --background: 225 47% 5%;  /* #0B0D1A - Plus sombre */
+    --foreground: 0 0% 100%;
+    --card: 225 30% 10%;  /* #151928 - Cartes sombres */
     --card-foreground: 0 0% 100%;
-    --popover: 222 28% 14%;
+    --popover: 225 30% 10%;
     --popover-foreground: 0 0% 100%;
     --primary: 261 100% 59%;  /* #6B2AFF - Violet */
     --primary-foreground: 0 0% 100%;
     --secondary: 194 100% 50%;  /* #00C2FF - Bleu cyan */
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 17% 32%;
-    --muted-foreground: 214 14% 65%;  /* #A0AEC0 */
-    --accent: 16 100% 62%;  /* #FF7D3B - Orange */
+    --muted: 225 20% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 16 100% 62%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 17% 32%;
-    --input: 220 17% 32%;
+    --border: 225 30% 20%;  /* Bordure visible */
+    --input: 225 30% 15%;
     --ring: 261 100% 59%;
-    --radius: 0.75rem;
+    --radius: 1rem;
     
-    /* Couleurs VitalForce supplémentaires */
-    --vitalforce-cyan: 186 100% 50%;  /* #00E0FF */
-    --vitalforce-pink: 341 100% 71%;  /* #FF6B9D */
-    --vitalforce-gold: 51 100% 50%;  /* #FFD700 */
+    /* Couleurs VitalForce gaming */
+    --vitalforce-cyan: 186 100% 50%;
+    --vitalforce-pink: 341 100% 71%;
+    --vitalforce-gold: 51 100% 50%;
+    --vitalforce-dark: 225 47% 5%;
+    --vitalforce-card: 225 30% 12%;
     
-    /* Gradients VitalForce */
-    --gradient-primary: linear-gradient(135deg, hsl(261 100% 59%) 0%, hsl(194 100% 50%) 100%);
+    /* Gradients VitalForce style app */
+    --gradient-primary: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(261 100% 59%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(341 100% 71%) 0%, hsl(261 100% 59%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(201 96% 32%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(194 100% 50%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(51 100% 50%) 0%, hsl(16 100% 62%) 100%);
     --gradient-info: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(186 100% 50%) 100%);
+    --gradient-cyan-purple: linear-gradient(90deg, hsl(194 100% 50%) 0%, hsl(261 100% 59%) 100%);
     
-    /* Ombres avec glow VitalForce */
-    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
-    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
-    --shadow-glow-purple: 0 0 25px rgba(107, 42, 255, 0.6);
-    --shadow-glow-blue: 0 0 25px rgba(0, 194, 255, 0.6);
-    --shadow-glow-pink: 0 0 25px rgba(255, 107, 157, 0.6);
+    /* Ombres et glow style gaming */
+    --shadow-elegant: 0 0 30px rgba(0, 194, 255, 0.4);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-glow-purple: 0 0 25px rgba(107, 42, 255, 0.5);
+    --shadow-glow-blue: 0 0 25px rgba(0, 194, 255, 0.5);
+    --shadow-glow-pink: 0 0 25px rgba(255, 107, 157, 0.5);
+    --shadow-glow-cyan: 0 0 30px rgba(0, 224, 255, 0.6);
+    
+    /* Bordures gaming */
+    --border-glow: 1px solid rgba(0, 194, 255, 0.3);
   }
 
   .dark {
-    /* Mode dark maintient la même DA VitalForce */
-    --background: 218 47% 8%;
+    --background: 225 47% 5%;
     --foreground: 0 0% 100%;
-    --card: 222 28% 14%;
+    --card: 225 30% 10%;
     --card-foreground: 0 0% 100%;
-    --popover: 222 28% 14%;
+    --popover: 225 30% 10%;
     --popover-foreground: 0 0% 100%;
     --primary: 261 100% 59%;
     --primary-foreground: 0 0% 100%;
     --secondary: 194 100% 50%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 17% 32%;
-    --muted-foreground: 214 14% 65%;
+    --muted: 225 20% 18%;
+    --muted-foreground: 215 20% 65%;
     --accent: 16 100% 62%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 17% 32%;
-    --input: 220 17% 32%;
+    --border: 225 30% 20%;
+    --input: 225 30% 15%;
     --ring: 261 100% 59%;
-    --shadow-elegant: 0 0 25px rgba(107, 42, 255, 0.6);
-    --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    --shadow-elegant: 0 0 30px rgba(0, 194, 255, 0.4);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -148,8 +154,24 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  /* Glass effect style gaming */
   .glass-effect {
-    @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(107,42,255,0.1)];
+    @apply backdrop-blur-xl border shadow-[var(--shadow-card)];
+    background: linear-gradient(135deg, rgba(21, 25, 40, 0.9) 0%, rgba(11, 13, 26, 0.95) 100%);
+    border-color: rgba(0, 194, 255, 0.15);
+  }
+  
+  /* Gaming card style - comme l'image référence */
+  .gaming-card {
+    @apply rounded-xl backdrop-blur-lg;
+    background: linear-gradient(180deg, rgba(21, 25, 40, 0.95) 0%, rgba(15, 18, 32, 0.98) 100%);
+    border: 1px solid rgba(0, 194, 255, 0.2);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+  
+  .gaming-card:hover {
+    border-color: rgba(0, 194, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 194, 255, 0.15);
   }
   
   .gradient-primary {
@@ -162,6 +184,22 @@ All colors MUST be HSL.
   
   .gradient-success {
     background: var(--gradient-success);
+  }
+  
+  .gradient-cyan-purple {
+    background: var(--gradient-cyan-purple);
+  }
+  
+  /* Progress bar style gaming */
+  .gaming-progress {
+    @apply rounded-full overflow-hidden;
+    background: rgba(0, 194, 255, 0.1);
+    border: 1px solid rgba(0, 194, 255, 0.2);
+  }
+  
+  .gaming-progress-bar {
+    background: linear-gradient(90deg, hsl(158 64% 52%) 0%, hsl(194 100% 50%) 50%, hsl(261 100% 59%) 100%);
+    box-shadow: 0 0 15px rgba(0, 194, 255, 0.5);
   }
   
   .animate-fade-in {
@@ -221,15 +259,24 @@ All colors MUST be HSL.
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-pulse-slow;
+    @apply bg-gradient-to-r from-secondary via-primary to-accent bg-clip-text text-transparent;
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-[var(--shadow-glow-purple)] hover:-translate-y-2 hover:scale-[1.02];
+    @apply transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  .card-hover:hover {
+    border-color: rgba(0, 194, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 194, 255, 0.2);
   }
   
   .gaming-hover {
-    @apply transition-all duration-300 hover:scale-110 hover:rotate-3 hover:shadow-[0_0_30px_rgba(107,42,255,0.8)];
+    @apply transition-all duration-300 hover:scale-105;
+  }
+  
+  .gaming-hover:hover {
+    box-shadow: 0 0 30px rgba(0, 194, 255, 0.5);
   }
   
   .page-transition {
@@ -237,16 +284,15 @@ All colors MUST be HSL.
   }
   
   .glass-card {
-    @apply glass-effect border-primary/30 backdrop-blur-2xl bg-card/50 shadow-[var(--shadow-card)];
+    @apply gaming-card;
   }
   
   .neon-glow {
-    box-shadow: 0 0 20px rgba(107, 42, 255, 0.5), 0 0 40px rgba(107, 42, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 194, 255, 0.4), 0 0 40px rgba(107, 42, 255, 0.2);
   }
   
   .neon-glow:hover {
-    box-shadow: 0 0 30px rgba(107, 42, 255, 0.8), 0 0 60px rgba(107, 42, 255, 0.4);
-    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 194, 255, 0.6), 0 0 60px rgba(107, 42, 255, 0.3);
   }
   
   .glow-primary {
@@ -254,11 +300,32 @@ All colors MUST be HSL.
   }
   
   .glow-secondary {
-    box-shadow: 0 0 20px rgba(0, 194, 255, 0.4);
+    box-shadow: 0 0 25px rgba(0, 194, 255, 0.5);
   }
   
   .glow-accent {
     box-shadow: 0 0 20px rgba(255, 125, 59, 0.4);
+  }
+  
+  .glow-cyan {
+    box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
+  }
+  
+  /* Badge hexagonal style gaming */
+  .hexagon-badge {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  
+  /* Navigation bottom style gaming */
+  .gaming-nav {
+    background: linear-gradient(180deg, rgba(21, 25, 40, 0.98) 0%, rgba(11, 13, 26, 1) 100%);
+    border-top: 1px solid rgba(0, 194, 255, 0.2);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  .gaming-nav-item-active {
+    @apply text-secondary;
+    filter: drop-shadow(0 0 8px rgba(0, 194, 255, 0.8));
   }
 }
 

@@ -46,42 +46,48 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* VitalForce DA - Style référence app gaming */
-    --background: 225 47% 5%;  /* #0B0D1A - Plus sombre */
-    --foreground: 0 0% 100%;
-    --card: 225 30% 10%;  /* #151928 - Cartes sombres */
+    /* VitalForce DA - Palette exacte depuis l'image référence */
+    --background: 220 50% 4%;  /* #0A0E1F - Fond principal très sombre */
+    --foreground: 0 0% 100%;  /* #FFFFFF - Texte principal */
+    --card: 220 30% 12%;  /* #1E2335 - Cartes sombres */
     --card-foreground: 0 0% 100%;
-    --popover: 225 30% 10%;
+    --popover: 220 30% 12%;
     --popover-foreground: 0 0% 100%;
-    --primary: 261 100% 59%;  /* #6B2AFF - Violet */
+    --primary: 261 100% 59%;  /* #6B2AFF - Violet néon */
     --primary-foreground: 0 0% 100%;
-    --secondary: 194 100% 50%;  /* #00C2FF - Bleu cyan */
+    --secondary: 194 100% 50%;  /* #00C2FF - Bleu cyan néon */
     --secondary-foreground: 0 0% 100%;
-    --muted: 225 20% 18%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 16 100% 62%;
+    --muted: 220 20% 18%;  /* #1E2335 - Gris foncé */
+    --muted-foreground: 220 15% 72%;  /* #B8B9C3 - Texte secondaire */
+    --accent: 16 100% 62%;  /* #FF7D3B - Orange accent */
     --accent-foreground: 0 0% 100%;
+    --success: 158 64% 52%;  /* #2ECC71 - Vert succès */
+    --success-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 30% 20%;  /* Bordure visible */
-    --input: 225 30% 15%;
+    --border: 220 30% 20%;
+    --input: 220 30% 15%;
     --ring: 261 100% 59%;
     --radius: 1rem;
     
-    /* Couleurs VitalForce gaming */
-    --vitalforce-cyan: 186 100% 50%;
-    --vitalforce-pink: 341 100% 71%;
-    --vitalforce-gold: 51 100% 50%;
-    --vitalforce-dark: 225 47% 5%;
-    --vitalforce-card: 225 30% 12%;
+    /* Couleurs VitalForce exactes depuis la palette */
+    --vitalforce-bg: #0A0E1F;
+    --vitalforce-card: #1E2335;
+    --vitalforce-purple: #6B2AFF;
+    --vitalforce-cyan: #00C2FF;
+    --vitalforce-orange: #FF7D3B;
+    --vitalforce-green: #2ECC71;
+    --vitalforce-white: #FFFFFF;
+    --vitalforce-grey: #B8B9C3;
     
-    /* Gradients VitalForce style app */
-    --gradient-primary: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(261 100% 59%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(341 100% 71%) 0%, hsl(261 100% 59%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(194 100% 50%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(51 100% 50%) 0%, hsl(16 100% 62%) 100%);
-    --gradient-info: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(186 100% 50%) 100%);
-    --gradient-cyan-purple: linear-gradient(90deg, hsl(194 100% 50%) 0%, hsl(261 100% 59%) 100%);
+    /* Gradients VitalForce - Purple to Blue (principal) */
+    --gradient-primary: linear-gradient(135deg, #6B2AFF 0%, #00C2FF 100%);
+    --gradient-primary-horizontal: linear-gradient(90deg, #6B2AFF 0%, #00C2FF 100%);
+    --gradient-secondary: linear-gradient(135deg, #FF6B9D 0%, #6B2AFF 100%);
+    --gradient-success: linear-gradient(135deg, #2ECC71 0%, #00C2FF 100%);
+    --gradient-warning: linear-gradient(135deg, #FFD700 0%, #FF7D3B 100%);
+    --gradient-info: linear-gradient(135deg, #00C2FF 0%, #00E0FF 100%);
+    --gradient-progress: linear-gradient(90deg, #6B2AFF 0%, #8B5CF6 50%, #00C2FF 100%);
     
     /* Ombres et glow style gaming */
     --shadow-elegant: 0 0 30px rgba(0, 194, 255, 0.4);
@@ -96,27 +102,28 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 225 47% 5%;
+    /* Même palette pour cohérence */
+    --background: 220 50% 4%;
     --foreground: 0 0% 100%;
-    --card: 225 30% 10%;
+    --card: 220 30% 12%;
     --card-foreground: 0 0% 100%;
-    --popover: 225 30% 10%;
+    --popover: 220 30% 12%;
     --popover-foreground: 0 0% 100%;
     --primary: 261 100% 59%;
     --primary-foreground: 0 0% 100%;
     --secondary: 194 100% 50%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 225 20% 18%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 72%;
     --accent: 16 100% 62%;
     --accent-foreground: 0 0% 100%;
+    --success: 158 64% 52%;
+    --success-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 30% 20%;
-    --input: 225 30% 15%;
+    --border: 220 30% 20%;
+    --input: 220 30% 15%;
     --ring: 261 100% 59%;
-    --shadow-elegant: 0 0 30px rgba(0, 194, 255, 0.4);
-    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -125,10 +132,12 @@ All colors MUST be HSL.
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply text-foreground font-sans;
+    background: #0A0E1F;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
+    min-height: 100vh;
   }
   
   /* iOS Safe Area Support */
@@ -161,17 +170,25 @@ All colors MUST be HSL.
     border-color: rgba(0, 194, 255, 0.15);
   }
   
-  /* Gaming card style - comme l'image référence */
-  .gaming-card {
-    @apply rounded-xl backdrop-blur-lg;
-    background: linear-gradient(180deg, rgba(21, 25, 40, 0.95) 0%, rgba(15, 18, 32, 0.98) 100%);
-    border: 1px solid rgba(0, 194, 255, 0.2);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  /* Glassmorphism premium - style VitalForce */
+  .glass-card {
+    @apply rounded-xl backdrop-blur-xl;
+    background: rgba(30, 35, 53, 0.6);
+    border: 1px solid rgba(107, 42, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 0 1px rgba(0, 194, 255, 0.1);
   }
   
-  .gaming-card:hover {
-    border-color: rgba(0, 194, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 194, 255, 0.15);
+  .glass-card:hover {
+    border-color: rgba(107, 42, 255, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                0 0 30px rgba(107, 42, 255, 0.2);
+  }
+  
+  .gaming-card {
+    @apply glass-card;
   }
   
   .gradient-primary {
@@ -190,16 +207,34 @@ All colors MUST be HSL.
     background: var(--gradient-cyan-purple);
   }
   
-  /* Progress bar style gaming */
-  .gaming-progress {
-    @apply rounded-full overflow-hidden;
-    background: rgba(0, 194, 255, 0.1);
-    border: 1px solid rgba(0, 194, 255, 0.2);
+  /* Progress bar style VitalForce - gradient purple-to-blue */
+  .vitalforce-progress {
+    @apply rounded-full overflow-hidden relative;
+    background: rgba(107, 42, 255, 0.15);
+    border: 1px solid rgba(107, 42, 255, 0.3);
+    height: 8px;
   }
   
-  .gaming-progress-bar {
-    background: linear-gradient(90deg, hsl(158 64% 52%) 0%, hsl(194 100% 50%) 50%, hsl(261 100% 59%) 100%);
-    box-shadow: 0 0 15px rgba(0, 194, 255, 0.5);
+  .vitalforce-progress-bar {
+    @apply h-full rounded-full transition-all duration-500 relative;
+    background: var(--gradient-progress);
+    box-shadow: 0 0 20px rgba(107, 42, 255, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .vitalforce-progress-bar::after {
+    content: '';
+    @apply absolute inset-0 rounded-full;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      transparent 100%);
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
   
   .animate-fade-in {
@@ -283,8 +318,23 @@ All colors MUST be HSL.
     @apply animate-slide-in-up;
   }
   
-  .glass-card {
-    @apply gaming-card;
+  /* Badge hexagonal 3D style VitalForce */
+  .clip-path-hexagon {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  
+  .hexagon-badge-3d {
+    transform: perspective(100px) rotateX(5deg);
+  }
+  
+  /* Icônes 3D avec effet glossy */
+  .icon-3d {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 0 10px rgba(107, 42, 255, 0.4));
+  }
+  
+  .icon-glow {
+    filter: drop-shadow(0 0 15px rgba(107, 42, 255, 0.6));
   }
   
   .neon-glow {

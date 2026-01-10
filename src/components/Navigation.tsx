@@ -55,8 +55,10 @@ export const Navigation: React.FC = () => {
                   item.icon
                 ) : (
                   <item.icon className={cn(
-                    'w-5 h-5 transition-transform group-hover:scale-110',
-                    isActive && 'text-white'
+                    'w-5 h-5 transition-all duration-300 group-hover:scale-110',
+                    isActive 
+                      ? 'text-white icon-glow' 
+                      : 'text-muted-foreground group-hover:text-foreground'
                   )} />
                 )}
                 <span className="font-medium">{item.label}</span>
@@ -82,14 +84,14 @@ export const Navigation: React.FC = () => {
       </div>
       
       {/* Section utilisateur */}
-      <div className="mt-8 pt-6 border-t border-white/10">
-        <div className="glass-card p-4 rounded-xl">
-          <div className="text-sm font-medium mb-2">Progression du jour</div>
+      <div className="mt-8 pt-6 border-t border-[rgba(107,42,255,0.2)]">
+        <div className="glass-card p-4">
+          <div className="text-sm font-semibold mb-3 text-foreground">Progression du jour</div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="flex-1 bg-white/10 rounded-full h-2">
-              <div className="gradient-success h-2 rounded-full w-3/4"></div>
+            <div className="flex-1 vitalforce-progress">
+              <div className="vitalforce-progress-bar w-3/4"></div>
             </div>
-            <span className="text-xs text-muted-foreground">75%</span>
+            <span className="text-xs font-semibold text-primary">75%</span>
           </div>
           <div className="text-xs text-muted-foreground">
             3 sur 4 objectifs atteints

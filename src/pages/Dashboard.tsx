@@ -450,10 +450,15 @@ export const Dashboard: React.FC = () => {
                       animated
                     />
                     <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-foreground">
-                        {user.name || 'Joueur'}
+                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
+                        VitalForce
                     </h1>
-                      <p className="text-foreground/90 text-sm md:text-lg mt-1 md:mt-2">Niveau {xpData?.level || 1}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="vitalforce-progress flex-1 max-w-xs">
+                          <div className="vitalforce-progress-bar" style={{ width: '78%' }}></div>
+                        </div>
+                        <span className="text-white font-semibold text-sm">78%</span>
+                      </div>
                     </div>
                   </div>
                   

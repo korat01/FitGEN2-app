@@ -169,7 +169,7 @@ const UITestPage: React.FC = () => {
                           fontWeight: uiConfig.typography.fontWeight.bold
                         }}
                       >
-                        Test UI/DA FitGEN
+                        Test UI/DA VitalForce
                       </h1>
                       <p 
                         className="text-sm md:text-lg mt-1 md:mt-2"

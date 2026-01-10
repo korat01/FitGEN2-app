@@ -28,9 +28,8 @@ const AppHeader: React.FC = () => {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center shadow-lg md:hidden">
               <span className="text-primary-foreground font-bold text-base">FG</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              <span className="hidden md:inline">FitGEN22</span>
-              <span className="md:hidden">FitGEN</span>
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#6B2AFF] via-[#8B5CF6] to-[#00C2FF] bg-clip-text text-transparent">
+              VitalForce
             </h1>
             
             {/* Navigation principale - hidden on mobile */}

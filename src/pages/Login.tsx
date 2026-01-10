@@ -165,7 +165,7 @@ export const Login: React.FC = () => {
             Créer votre Profil
           </CardTitle>
           <p className="text-foreground/90">
-            Rejoignez l'aventure FitGEN2
+            Rejoignez l'aventure VitalForce
           </p>
         </CardHeader>
         

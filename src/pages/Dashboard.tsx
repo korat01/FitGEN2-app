@@ -16,6 +16,7 @@ import { StreakDisplay } from '@/components/StreakDisplay';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 import { HexagonBadge, HexagonBadgeRow } from '@/components/HexagonBadge';
+import { UserAvatar } from '@/components/UserAvatar';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -437,6 +438,14 @@ export const Dashboard: React.FC = () => {
                 {/* Left: User Info */}
                 <div className="flex-1 space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
+                    {/* User Avatar with Glow */}
+                    <UserAvatar 
+                      fallback={user?.name || 'User'}
+                      size="lg"
+                      variant="gradient"
+                      showGlow
+                    />
+                    
                     {/* Hexagon Badge Level */}
                     <HexagonBadge 
                       level={xpData?.level || 1} 
@@ -449,15 +458,19 @@ export const Dashboard: React.FC = () => {
                       size="lg"
                       animated
                     />
+                    
                     <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
-                        VitalForce
+                        {user?.name || 'VitalForce'}
                     </h1>
+                      <p className="text-muted-foreground text-sm mt-1">
+                        {user?.sportClass || 'Athlète'} • Niveau {xpData?.level || 1}
+                      </p>
                       <div className="flex items-center gap-2 mt-2">
                         <div className="vitalforce-progress flex-1 max-w-xs">
-                          <div className="vitalforce-progress-bar" style={{ width: '78%' }}></div>
+                          <div className="vitalforce-progress-bar" style={{ width: `${xpData ? Math.round((xpData.currentXP / xpData.xpToNextLevel) * 100) : 78}%` }}></div>
                         </div>
-                        <span className="text-white font-semibold text-sm">78%</span>
+                        <span className="text-white font-semibold text-sm">{xpData ? Math.round((xpData.currentXP / xpData.xpToNextLevel) * 100) : 78}%</span>
                       </div>
                     </div>
                   </div>

@@ -17,6 +17,7 @@ import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 import { HexagonBadge, HexagonBadgeRow } from '@/components/HexagonBadge';
 import { UserAvatar } from '@/components/UserAvatar';
+import { GamingStatCard } from '@/components/GamingStatCard';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -551,87 +552,62 @@ export const Dashboard: React.FC = () => {
                 </div>
                 </div>}
 
-          {/* Statistiques rapides */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+          {/* Statistiques rapides - Style Gaming */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {/* STATISTIQUE PRINCIPALE - Plus grande et mise en avant */}
-            <Card className="glass-card border border-primary/30 shadow-[var(--shadow-glow-purple)] md:col-span-2">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-emerald-600 mb-1 font-semibold truncate">
-                      {getMainStatForSportClass(user.sportClass, performances).label}
-                    </p>
-                    <p className="text-xl md:text-3xl font-bold text-emerald-700 truncate">
-                      {getMainStatForSportClass(user.sportClass, performances).value}
-                    </p>
-                    <p className="text-xs text-emerald-500 mt-1">
-                      {getMainStatForSportClass(user.sportClass, performances).description}
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl md:text-3xl">
-                      {getMainStatForSportClass(user.sportClass, performances).icon}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
-              </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  </div>
+            <div className="col-span-2">
+              <GamingStatCard
+                label={getMainStatForSportClass(user.sportClass, performances).label}
+                value={getMainStatForSportClass(user.sportClass, performances).value}
+                icon={Dumbbell}
+                variant="green"
+                description={getMainStatForSportClass(user.sportClass, performances).description}
+                size="lg"
+              />
             </div>
-          </CardContent>
-        </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
-                  </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <GamingStatCard
+              label="Poids"
+              value={`${user.weight} kg`}
+              icon={Weight}
+              variant="cyan"
+            />
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
-                      </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  </div>
-              </div>
-            </CardContent>
-          </Card>
+            <GamingStatCard
+              label="Âge"
+              value={`${user.age} ans`}
+              icon={Calendar}
+              variant="purple"
+            />
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
-                  </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <GamingStatCard
+              label="Sport"
+              value={user.sportClass}
+              icon={Activity}
+              variant="orange"
+            />
+
+            <GamingStatCard
+              label="Performances"
+              value={performances.length}
+              icon={BarChart3}
+              variant="pink"
+            />
+            
+            <GamingStatCard
+              label="Score Global"
+              value={`${userRank?.globalScore || 0}/1000`}
+              icon={Star}
+              variant="gold"
+              trend={12}
+            />
+            
+            <GamingStatCard
+              label="Rang"
+              value={userRank?.rank || 'D'}
+              icon={Award}
+              variant="purple"
+            />
           </div>
 
           {/* Achievements Badges Row */}

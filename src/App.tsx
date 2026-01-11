@@ -29,7 +29,6 @@ const RepasDetail = lazy(() => import('./pages/RepasDetail'));
 const DailyQuests = lazy(() => import('./components/DailyQuests'));
 const UITestPage = lazy(() => import('./pages/UITestPage'));
 const UICustomizer = lazy(() => import('./pages/UICustomizer'));
-const VitalForcePage = lazy(() => import('./pages/VitalForcePage'));
 
 // Composant de chargement
 const LoadingSpinner = () => (
@@ -194,13 +193,6 @@ const AppContent: React.FC = () => {
           <Route path="/ui-customizer" element={
             <ProtectedRoute>
               <UICustomizer />
-            </ProtectedRoute>
-          } />
-          
-          {/* Route VitalForce */}
-          <Route path="/vitalforce" element={
-            <ProtectedRoute>
-              <VitalForcePage />
             </ProtectedRoute>
           } />
           

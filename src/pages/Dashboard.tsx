@@ -17,6 +17,8 @@ import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 import { HexagonBadge, HexagonBadgeRow } from '@/components/HexagonBadge';
 import { UserAvatar } from '@/components/UserAvatar';
+import { GamingStatCard, GamingStatsGrid } from '@/components/GamingStatCard';
+import { EliteChallengerCard } from '@/components/EliteChallengerCard';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -425,104 +427,15 @@ export const Dashboard: React.FC = () => {
       <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
       <div className="space-y-8 stagger-animation">
           
-          {/* Header Principal - VitalForce DA */}
-          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
-            <div className="absolute inset-0 gradient-primary opacity-80"></div>
-            {/* Particules flottantes VitalForce */}
-            <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32 animate-pulse-slow"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24 animate-pulse-slow"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
-            
-          <div className="relative z-10">
-              <div className="flex flex-col lg:flex-row gap-6">
-                {/* Left: User Info */}
-                <div className="flex-1 space-y-4 md:space-y-6">
-                  <div className="flex items-start gap-3 md:gap-4">
-                    {/* User Avatar with Glow */}
-                    <UserAvatar 
-                      fallback={user?.name || 'User'}
-                      size="lg"
-                      variant="gradient"
-                      showGlow
-                    />
-                    
-                    {/* Hexagon Badge Level */}
-                    <HexagonBadge 
-                      level={xpData?.level || 1} 
-                      variant={
-                        (xpData?.level || 1) >= 50 ? 'diamond' :
-                        (xpData?.level || 1) >= 30 ? 'gold' :
-                        (xpData?.level || 1) >= 15 ? 'platinum' :
-                        'primary'
-                      }
-                      size="lg"
-                      animated
-                    />
-                    
-                    <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
-                        {user?.name || 'VitalForce'}
-                    </h1>
-                      <p className="text-muted-foreground text-sm mt-1">
-                        {user?.sportClass || 'Athlète'} • Niveau {xpData?.level || 1}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="vitalforce-progress flex-1 max-w-xs">
-                          <div className="vitalforce-progress-bar" style={{ width: `${xpData ? Math.round((xpData.currentXP / xpData.xpToNextLevel) * 100) : 78}%` }}></div>
-                        </div>
-                        <span className="text-white font-semibold text-sm">{xpData ? Math.round((xpData.currentXP / xpData.xpToNextLevel) * 100) : 78}%</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
-                    {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
-                    {(() => {
-                    const mainStat = getMainStatForSportClass(user.sportClass, performances);
-                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
-                          <span className="text-lg md:text-xl">{mainStat.icon}</span>
-                          <span>{mainStat.label}: {mainStat.value}</span>
-                        </div>;
-                  })()}
-                    
-                    {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
-                    <div className={`inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || 'D')} text-foreground font-semibold shadow-[var(--shadow-glow-purple)] text-sm md:text-base`}>
-                      <span className="text-lg md:text-xl">{getRangIcon(userRank?.rank || 'D')}</span>
-                      <span>Rang {userRank?.rank || 'D'}</span>
-                </div>
-                
-                    <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      🔄 Recalculer
-                    </Button>
-                    
-                    <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      📊 Stats
-                    </Button>
-                </div>
-              </div>
-
-                <div className="space-y-3 md:space-y-4 mt-4">
-                  {(() => {
-                  const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
-                  return <>
-                        <div className="text-foreground/90 font-medium text-sm md:text-base">
-                          Progression vers le rang {progression.nextRank}
-                        </div>
-                        <div className="w-full max-w-md">
-                          <Progress value={progression.percentage} className="h-2 md:h-3 bg-muted rounded-full" />
-                        </div>
-                        <div className="text-xs md:text-sm">
-                          <span className="text-foreground font-bold text-lg md:text-xl">
-                            {Math.round(progression.percentage)}%
-                          </span> 
-                          <span className="text-foreground/80"> vers le rang {progression.nextRank}</span>
-                        </div>
-                      </>;
-                })()}
-                </div>
-            </div>
-          </div>
-        </div>
+          {/* Header Principal - Elite Challenger Card */}
+          <EliteChallengerCard
+            userName={user?.name || 'VitalForce'}
+            rank={userRank?.rank || 'D'}
+            globalScore={userRank?.globalScore || 0}
+            level={xpData?.level || 1}
+            sportClass={user?.sportClass || 'Athlète'}
+            streak={streakData?.currentStreak || 0}
+          />
 
         {/* NOUVEAUX COMPOSANTS DASHBOARD */}
         {/* Barre XP & Niveau */}
@@ -551,88 +464,77 @@ export const Dashboard: React.FC = () => {
                 </div>
                 </div>}
 
-          {/* Statistiques rapides */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-            {/* STATISTIQUE PRINCIPALE - Plus grande et mise en avant */}
-            <Card className="glass-card border border-primary/30 shadow-[var(--shadow-glow-purple)] md:col-span-2">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-emerald-600 mb-1 font-semibold truncate">
-                      {getMainStatForSportClass(user.sportClass, performances).label}
-                    </p>
-                    <p className="text-xl md:text-3xl font-bold text-emerald-700 truncate">
-                      {getMainStatForSportClass(user.sportClass, performances).value}
-                    </p>
-                    <p className="text-xs text-emerald-500 mt-1">
-                      {getMainStatForSportClass(user.sportClass, performances).description}
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl md:text-3xl">
-                      {getMainStatForSportClass(user.sportClass, performances).icon}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Gaming Stats Grid - Animated Cards */}
+          <GamingStatsGrid columns={4}>
+            <GamingStatCard
+              title="Performance"
+              value={getMainStatForSportClass(user.sportClass, performances).value}
+              subtitle={getMainStatForSportClass(user.sportClass, performances).description}
+              icon={Dumbbell}
+              variant="success"
+              animated
+              delay={0}
+              onClick={() => window.location.href = '/stats'}
+            />
+            <GamingStatCard
+              title="Poids"
+              value={`${user.weight} kg`}
+              icon={Weight}
+              variant="secondary"
+              animated
+              delay={100}
+            />
+            <GamingStatCard
+              title="Âge"
+              value={`${user.age} ans`}
+              icon={Calendar}
+              variant="primary"
+              animated
+              delay={200}
+            />
+            <GamingStatCard
+              title="Sport"
+              value={user.sportClass}
+              icon={Activity}
+              variant="accent"
+              animated
+              delay={300}
+            />
+          </GamingStatsGrid>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
-              </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  </div>
-            </div>
-          </CardContent>
-        </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
-                  </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
-                      </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  </div>
-              </div>
-            </CardContent>
-          </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardContent className="p-3 md:p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
-                    <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
-                  </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Secondary Stats Row */}
+          <GamingStatsGrid columns={3}>
+            <GamingStatCard
+              title="Performances"
+              value={performances.length}
+              subtitle="Total enregistrées"
+              icon={BarChart3}
+              variant="primary"
+              trend={{ value: 12, label: 'ce mois' }}
+              animated
+              delay={400}
+              onClick={() => window.location.href = '/stats'}
+            />
+            <GamingStatCard
+              title="Score Global"
+              value={userRank?.globalScore || 0}
+              subtitle="Sur 1000 points"
+              icon={Target}
+              variant="gold"
+              animated
+              delay={500}
+            />
+            <GamingStatCard
+              title="XP Total"
+              value={xpData?.totalXP || 0}
+              subtitle={`Niveau ${xpData?.level || 1}`}
+              icon={Zap}
+              variant="secondary"
+              trend={{ value: 8, label: 'cette semaine' }}
+              animated
+              delay={600}
+            />
+          </GamingStatsGrid>
 
           {/* Achievements Badges Row */}
           <Card>

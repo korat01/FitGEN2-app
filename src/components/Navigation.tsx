@@ -12,8 +12,7 @@ import {
   Users,
   Target,
   Palette,
-  Wand2,
-  Zap
+  Wand2
 } from 'lucide-react';
 import CustomHomeIcon from './CustomHomeIcon';
 
@@ -28,7 +27,6 @@ const navigationItems = [
   { to: '/achievements', icon: Trophy, label: 'Succès', badge: null },
   { to: '/ui-test', icon: Palette, label: 'Test UI/DA', badge: 'Test' },
   { to: '/ui-customizer', icon: Wand2, label: '🎨 Personnaliser UI/DA', badge: 'HOT' },
-  { to: '/vitalforce', icon: Zap, label: 'VitalForce', badge: 'NEW' },
   { to: '/settings', icon: Settings, label: 'Paramètres', badge: null }
 ];
 

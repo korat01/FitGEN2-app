@@ -1,17 +1,21 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Play, Square, Mail, User } from 'lucide-react';
+import { Home, Play, Apple, BarChart3, User } from 'lucide-react';
 import { VitalForceLogo } from './VitalForceLogo';
 
 const MobileNavigation: React.FC = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string, isLogo?: boolean) =>
+    isLogo
+      ? location.pathname === '/dashboard' || location.pathname === '/'
+      : location.pathname === path;
   
   const navItems = [
     { path: '/', icon: Home, label: 'Accueil' },
     { path: '/programme', icon: Play, label: 'Programme' },
-    { path: '/vitalforce', icon: null, label: 'VitalForce', isLogo: true },
-    { path: '/stats', icon: Mail, label: 'Stats' },
+    { path: '/dashboard', icon: null, label: 'VitalForce', isLogo: true },
+    { path: '/nutrition', icon: Apple, label: 'Nutrition' },
+    { path: '/stats', icon: BarChart3, label: 'Stats' },
     { path: '/profile', icon: User, label: 'Profil' }
   ];
   
@@ -19,7 +23,7 @@ const MobileNavigation: React.FC = () => {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 gaming-nav">
       <div className="safe-area-pb flex items-center justify-around h-16 px-2">
         {navItems.map(({ path, icon: Icon, label, isLogo }) => {
-          const active = isActive(path);
+          const active = isActive(path, isLogo);
           
           if (isLogo) {
             return (

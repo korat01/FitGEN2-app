@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -147,7 +147,7 @@ export const MainStatsCards: React.FC<MainStatsCardsProps> = ({ stats }) => {
         progress={stats.force.weeklyProgress}
         communityRank={stats.force.communityRank}
         evolution={stats.force.evolution}
-        color="text-blue-600"
+        color="text-blue-400"
         bgGradient="bg-gradient-to-r from-blue-500 to-indigo-500"
         performancePoints={stats.force.performancePoints}
         performanceLevel={stats.force.performanceLevel}
@@ -162,7 +162,7 @@ export const MainStatsCards: React.FC<MainStatsCardsProps> = ({ stats }) => {
         progress={stats.speed.weeklyProgress}
         communityRank={stats.speed.communityRank}
         evolution={stats.speed.evolution}
-        color="text-green-600"
+        color="text-green-400"
         bgGradient="bg-gradient-to-r from-green-500 to-emerald-500"
         performancePoints={stats.speed.performancePoints}
         performanceLevel={stats.speed.performanceLevel}
@@ -177,7 +177,7 @@ export const MainStatsCards: React.FC<MainStatsCardsProps> = ({ stats }) => {
         progress={stats.endurance.weeklyProgress}
         communityRank={stats.endurance.communityRank}
         evolution={stats.endurance.evolution}
-        color="text-purple-600"
+        color="text-purple-400"
         bgGradient="bg-gradient-to-r from-purple-500 to-pink-500"
         performancePoints={stats.endurance.performancePoints}
         performanceLevel={stats.endurance.performanceLevel}

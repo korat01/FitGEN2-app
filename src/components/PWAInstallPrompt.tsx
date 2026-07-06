@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
@@ -48,10 +48,10 @@ const PWAInstallPrompt: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-80">
-      <Card className="bg-white/95 backdrop-blur-sm border-2 border-blue-200 shadow-lg">
+      <Card className="glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-2 border-blue-200 shadow-lg">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
               <Download className="w-5 h-5 text-blue-500" />
               Installer FitGEN
             </CardTitle>
@@ -66,13 +66,13 @@ const PWAInstallPrompt: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Installez FitGEN sur votre appareil pour un accès rapide et une expérience optimale.
           </p>
           <div className="flex gap-2">
             <Button
               onClick={handleInstallClick}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+              className="flex-1 bg-blue-500/100 hover:bg-blue-600 text-white"
             >
               Installer
             </Button>

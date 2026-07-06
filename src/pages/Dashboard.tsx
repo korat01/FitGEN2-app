@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -411,10 +411,10 @@ export const Dashboard: React.FC = () => {
     } : quest));
   };
   if (!user) {
-    return <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+    return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-lg text-gray-600">Chargement...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-lg text-muted-foreground">Chargement...</p>
         </div>
       </div>;
   }
@@ -453,11 +453,17 @@ export const Dashboard: React.FC = () => {
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
                         VitalForce
                     </h1>
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="vitalforce-progress flex-1 max-w-xs">
-                          <div className="vitalforce-progress-bar" style={{ width: '78%' }}></div>
-                        </div>
-                        <span className="text-white font-semibold text-sm">78%</span>
+                      <div className="flex items-center gap-2 mt-2 max-w-xs">
+                        <Progress
+                          value={xpData ? Math.min(Math.max(xpData.currentXP / xpData.xpToNextLevel * 100, 0), 100) : 0}
+                          size="sm"
+                          variant="subtle"
+                          className="flex-1"
+                          aria-label="Progression XP"
+                        />
+                        <span className="text-white/90 font-medium text-sm tabular-nums shrink-0">
+                          {xpData ? Math.round(Math.min(Math.max(xpData.currentXP / xpData.xpToNextLevel * 100, 0), 100)) : 0}%
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -496,7 +502,7 @@ export const Dashboard: React.FC = () => {
                           Progression vers le rang {progression.nextRank}
                         </div>
                         <div className="w-full max-w-md">
-                          <Progress value={progression.percentage} className="h-2 md:h-3 bg-muted rounded-full" />
+                          <Progress value={progression.percentage} size="md" variant="subtle" />
                         </div>
                         <div className="text-xs md:text-sm">
                           <span className="text-foreground font-bold text-lg md:text-xl">
@@ -522,7 +528,7 @@ export const Dashboard: React.FC = () => {
         {streakData && <StreakDisplay streakData={streakData} />}
 
           {/* DEBUG INFO - Masqué par défaut */}
-          {false && <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6">
+          {false && <div className="bg-yellow-500/15 border border-yellow-500/25 border border-yellow-400 rounded-lg p-4 mb-6">
               <h3 className="text-lg font-bold text-yellow-800 mb-2">🐛 DEBUG INFO</h3>
               <div className="text-sm text-yellow-700 space-y-1">
                 <p><strong>Utilisateur:</strong></p>
@@ -541,21 +547,21 @@ export const Dashboard: React.FC = () => {
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {/* STATISTIQUE PRINCIPALE - Plus grande et mise en avant */}
-            <Card className="glass-card border border-primary/30 shadow-[var(--shadow-glow-purple)] md:col-span-2">
+            <Card className="glass-card border-primary/30 shadow-[var(--shadow-glow-purple)] md:col-span-2">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-emerald-600 mb-1 font-semibold truncate">
+                    <p className="text-xs md:text-sm text-secondary mb-1 font-semibold truncate">
                       {getMainStatForSportClass(user.sportClass, performances).label}
                     </p>
-                    <p className="text-xl md:text-3xl font-bold text-emerald-700 truncate">
+                    <p className="text-xl md:text-3xl font-bold text-foreground truncate">
                       {getMainStatForSportClass(user.sportClass, performances).value}
                     </p>
-                    <p className="text-xs text-emerald-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {getMainStatForSportClass(user.sportClass, performances).description}
                     </p>
                   </div>
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/15 border border-primary/30 rounded-xl flex items-center justify-center flex-shrink-0">
                     <span className="text-2xl md:text-3xl">
                       {getMainStatForSportClass(user.sportClass, performances).icon}
                     </span>
@@ -564,57 +570,57 @@ export const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="glass-card border-primary/20">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
-              </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                   </div>
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500/15 border border-blue-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="glass-card border-primary/20">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-500/15 border border-green-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-400" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="glass-card border-primary/20">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
                       </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-500/15 border border-purple-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
                   </div>
               </div>
             </CardContent>
           </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="glass-card border-primary/20">
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-600" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-500/15 border border-pink-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-400" />
                   </div>
                 </div>
               </CardContent>
@@ -647,24 +653,24 @@ export const Dashboard: React.FC = () => {
           <WeeklyProgressChart />
 
           {/* Détail du rang calculé */}
-          {userRank && <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-              <CardHeader className="bg-slate-900">
-                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2 text-zinc-50">
-                  <Award className="w-6 h-6 text-yellow-500" />
+          {userRank && <Card className="glass-card border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                  <Award className="w-6 h-6 text-yellow-400" />
                   Votre rang calculé
               </CardTitle>
             </CardHeader>
-              <CardContent className="space-y-6 bg-gray-900">
+              <CardContent className="space-y-6">
                 <div className="text-center space-y-4">
                   <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r ${getRangColor(userRank.rank)} text-white font-bold text-2xl shadow-lg`}>
                     <span className="text-2xl">{getRangIcon(userRank.rank)}</span>
                     <span>Rang {userRank.rank}</span>
                       </div>
                   
-                  <div className="text-4xl font-bold text-indigo-600">
+                  <div className="text-4xl font-bold text-secondary">
                     {userRank.globalScore}/1000
                       </div>
-                  <div className="text-lg text-gray-600">Score global</div>
+                  <div className="text-lg text-muted-foreground">Score global</div>
                     </div>
 
                 {/* Barre de progression */}
@@ -672,11 +678,11 @@ export const Dashboard: React.FC = () => {
                   {(() => {
                 const progression = getRankProgression(userRank.rank, userRank.globalScore);
                 return <>
-                        <div className="flex justify-between text-sm text-gray-600">
+                        <div className="flex justify-between text-sm text-muted-foreground">
                           <span>Progression vers le rang {progression.nextRank}</span>
                           <span>{Math.round(progression.percentage)}%</span>
                         </div>
-                        <Progress value={progression.percentage} className="h-4" />
+                        <Progress value={progression.percentage} size="lg" variant="subtle" />
                       </>;
               })()}
                       </div>
@@ -684,19 +690,19 @@ export const Dashboard: React.FC = () => {
                 {/* Détail des scores */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
-                    <div className="text-sm text-gray-600 mb-1">Force</div>
+                    <div className="text-sm text-muted-foreground mb-1">Force</div>
                     <div className="text-2xl font-bold text-red-600">{userRank.breakdown.force}</div>
                     </div>
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                    <div className="text-sm text-gray-600 mb-1">Endurance</div>
-                    <div className="text-2xl font-bold text-blue-600">{userRank.breakdown.endurance}</div>
+                    <div className="text-sm text-muted-foreground mb-1">Endurance</div>
+                    <div className="text-2xl font-bold text-blue-400">{userRank.breakdown.endurance}</div>
                   </div>
                 </div>
 
                 {/* Informations contextuelles */}
                 <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-                  <div className="text-sm text-gray-600 mb-1">Calcul basé sur</div>
-                  <div className="text-lg font-semibold text-gray-800">{userRank.reason}</div>
+                  <div className="text-sm text-muted-foreground mb-1">Calcul basé sur</div>
+                  <div className="text-lg font-semibold text-foreground">{userRank.reason}</div>
                 </div>
 
                 {/* Bouton pour aller aux stats */}
@@ -709,43 +715,43 @@ export const Dashboard: React.FC = () => {
 
           {/* Actions rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mes Statistiques</h3>
-                <p className="text-gray-600">Voir mes performances et mon rang</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Mes Statistiques</h3>
+                <p className="text-muted-foreground">Voir mes performances et mon rang</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/programme'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/programme'}>
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Dumbbell className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Programme</h3>
-                <p className="text-gray-600">Gérer mes entraînements</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Mon Programme</h3>
+                <p className="text-muted-foreground">Gérer mes entraînements</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/nutrition'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/nutrition'}>
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Apple className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Nutrition</h3>
-                <p className="text-gray-600">Aliments, repas et objectifs</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Nutrition</h3>
+                <p className="text-muted-foreground">Aliments, repas et objectifs</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/profile'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/profile'}>
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
               </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Mon Profil</h3>
-                <p className="text-gray-600">Modifier mes informations</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Mon Profil</h3>
+                <p className="text-muted-foreground">Modifier mes informations</p>
             </CardContent>
           </Card>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,9 +20,9 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
   const [nouveauxJours, setNouveauxJours] = useState<string[]>([]);
 
   const getBadgeColor = (difficulte: number) => {
-    if (difficulte <= 2) return 'bg-green-100 text-green-800';
-    if (difficulte <= 4) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+    if (difficulte <= 2) return 'bg-green-500/15 border border-green-500/25 text-green-800';
+    if (difficulte <= 4) return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800';
+    return 'bg-red-500/15 border border-red-500/25 text-red-800';
   };
 
   const getDifficulteLabel = (difficulte: number) => {
@@ -34,13 +34,13 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
   const getVitesseLabel = (vitesse: string) => {
     switch (vitesse) {
       case 'maintien':
-        return { label: 'Maintien', color: 'bg-blue-100 text-blue-800' };
+        return { label: 'Maintien', color: 'bg-blue-500/15 border border-blue-500/25 text-blue-300' };
       case 'progression_legere':
-        return { label: 'Modérée', color: 'bg-orange-100 text-orange-800' };
+        return { label: 'Modérée', color: 'bg-orange-500/15 border border-orange-500/25 text-orange-800' };
       case 'progression_rapide':
-        return { label: 'Rapide', color: 'bg-red-100 text-red-800' };
+        return { label: 'Rapide', color: 'bg-red-500/15 border border-red-500/25 text-red-800' };
       default:
-        return { label: 'Standard', color: 'bg-gray-100 text-gray-800' };
+        return { label: 'Standard', color: 'bg-white/5 text-foreground' };
     }
   };
 
@@ -111,10 +111,10 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-blue-600" />
+                <User className="h-5 w-5 text-blue-400" />
                 <span>Programme de {clientProfile.nom}</span>
               </CardTitle>
-              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
                   <Target className="h-4 w-4" />
                   <span>{clientProfile.objectif.replace('_', ' ')}</span>
@@ -150,43 +150,43 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <div>
-              <div className="text-sm font-medium text-gray-500">Niveau</div>
+              <div className="text-sm font-medium text-muted-foreground">Niveau</div>
               <Badge variant="secondary" className="mt-1">{clientProfile.niveau}</Badge>
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-500">Âge</div>
+              <div className="text-sm font-medium text-muted-foreground">Âge</div>
               <div className="mt-1">{clientProfile.age} ans</div>
             </div>
             {clientProfile.poids && (
               <div>
-                <div className="text-sm font-medium text-gray-500">Poids</div>
+                <div className="text-sm font-medium text-muted-foreground">Poids</div>
                 <div className="mt-1">{clientProfile.poids} kg</div>
               </div>
             )}
             {clientProfile.taille && (
               <div>
-                <div className="text-sm font-medium text-gray-500">Taille</div>
+                <div className="text-sm font-medium text-muted-foreground">Taille</div>
                 <div className="mt-1">{clientProfile.taille} cm</div>
               </div>
             )}
             {clientProfile.imc && (
               <div>
-                <div className="text-sm font-medium text-gray-500">IMC</div>
+                <div className="text-sm font-medium text-muted-foreground">IMC</div>
                 <Badge className={getIMCStatus(clientProfile.imc).color} variant="secondary">
                   {clientProfile.imc}
                 </Badge>
               </div>
             )}
             <div>
-              <div className="text-sm font-medium text-gray-500">Format</div>
+              <div className="text-sm font-medium text-muted-foreground">Format</div>
               <div className="mt-1 capitalize">{clientProfile.format_souhaite.replace('_', ' ')}</div>
             </div>
           </div>
 
           {/* Section des jours programmés avec possibilité de modification */}
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-3 surface-panel-sm">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-medium text-gray-900">Jours programmés :</h4>
+              <h4 className="font-medium text-foreground">Jours programmés :</h4>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -206,7 +206,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
             </div>
             
             {joursNonProgrammes.length > 0 && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 <strong>Jours disponibles non utilisés :</strong> {joursNonProgrammes.join(', ')}
               </div>
             )}
@@ -223,7 +223,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
 
           {/* Interface de modification des jours */}
           {showJourModification && (
-            <div className="mt-4 p-4 border rounded-lg bg-blue-50">
+            <div className="mt-4 p-4 border rounded-lg bg-blue-500/10">
               <h4 className="font-medium text-blue-900 mb-3">Modifier les jours d'entraînement :</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 {joursSelectionnables.map((jour) => (
@@ -253,7 +253,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
           )}
 
           {hasRM && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
               <h4 className="font-medium text-blue-900 mb-2">1RM configurés :</h4>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
                 {clientProfile.rm_values?.developpe_couche && (
@@ -289,11 +289,11 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center space-x-2 capitalize">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5 text-blue-400" />
                     <span>{jour}</span>
                     <Badge variant="outline">{seance.focus.replace('_', ' ')}</Badge>
                   </CardTitle>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <Dumbbell className="h-4 w-4" />
                       <span>{totalBlocs} exercices</span>
@@ -308,10 +308,10 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
               <CardContent>
                 <div className="space-y-4">
                   {seance.blocs.map((bloc: BlocExercice, index: number) => (
-                    <div key={index} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div key={index} className="border rounded-lg p-4 hover:bg-white/10 transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h4 className="font-medium text-gray-900">{bloc.nom}</h4>
+                          <h4 className="font-medium text-foreground">{bloc.nom}</h4>
                           <div className="flex items-center space-x-2 mt-1">
                             <Badge 
                               variant="secondary" 
@@ -323,7 +323,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                               {bloc.type}
                             </Badge>
                             {bloc.exercice_rm && hasRM && (
-                              <Badge variant="outline" className="text-xs bg-purple-100 text-purple-800">
+                              <Badge variant="outline" className="text-xs bg-purple-500/15 border border-purple-500/25 text-purple-800">
                                 <Zap className="h-3 w-3 mr-1" />
                                 % 1RM
                               </Badge>
@@ -337,25 +337,25 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
                               : bloc.répétitions}
                           </div>
                           {bloc.séries && (
-                            <div className="text-gray-500">{bloc.séries} séries</div>
+                            <div className="text-muted-foreground">{bloc.séries} séries</div>
                           )}
                           {bloc.charge > 0 && (
-                            <div className="text-blue-600 font-medium">{bloc.charge}kg</div>
+                            <div className="text-blue-400 font-medium">{bloc.charge}kg</div>
                           )}
                         </div>
                       </div>
                       
-                      <div className="text-sm text-gray-600 mb-2">
+                      <div className="text-sm text-muted-foreground mb-2">
                         <strong>Muscles:</strong> {bloc.muscles_sollicités.join(', ')}
                       </div>
                       
                       {bloc.description && (
-                        <div className="text-sm text-gray-600 mb-2 italic">
+                        <div className="text-sm text-muted-foreground mb-2 italic">
                           {bloc.description}
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <div>
                           <strong>Équipement:</strong> {bloc.équipement.join(', ')}
                         </div>
@@ -381,7 +381,7 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-sm">
-            <div className="p-3 bg-blue-50 rounded-lg">
+            <div className="p-3 bg-blue-500/10 rounded-lg">
               <strong>💡 Progression:</strong> Augmentez progressivement l'intensité chaque semaine selon votre ressenti.
             </div>
             <div className="p-3 bg-yellow-50 rounded-lg">
@@ -409,10 +409,10 @@ const ProgrammeDisplay: React.FC<ProgrammeDisplayProps> = ({ programme, clientPr
 
 // Fonction helper pour le statut IMC
 const getIMCStatus = (imc: number) => {
-  if (imc < 18.5) return { label: 'Insuffisance pondérale', color: 'bg-blue-100 text-blue-800' };
-  if (imc < 25) return { label: 'Poids normal', color: 'bg-green-100 text-green-800' };
-  if (imc < 30) return { label: 'Surpoids', color: 'bg-yellow-100 text-yellow-800' };
-  return { label: 'Obésité', color: 'bg-red-100 text-red-800' };
+  if (imc < 18.5) return { label: 'Insuffisance pondérale', color: 'bg-blue-500/15 border border-blue-500/25 text-blue-300' };
+  if (imc < 25) return { label: 'Poids normal', color: 'bg-green-500/15 border border-green-500/25 text-green-800' };
+  if (imc < 30) return { label: 'Surpoids', color: 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800' };
+  return { label: 'Obésité', color: 'bg-red-500/15 border border-red-500/25 text-red-800' };
 };
 
 export default ProgrammeDisplay;

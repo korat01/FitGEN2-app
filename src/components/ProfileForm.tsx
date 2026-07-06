@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -141,9 +141,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="glass-card border-primary/20">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+          <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
               <UserIcon className="w-6 h-6 text-white" />
             </div>
@@ -154,7 +154,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Informations de base */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <UserIcon className="w-5 h-5 text-blue-500" />
                 Informations Personnelles
               </h3>
@@ -209,10 +209,10 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
                         age: newBirthDate ? calculateAge(newBirthDate) : null
                       }));
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {formData.age && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Âge calculé : {formData.age} ans
                     </p>
                   )}
@@ -246,7 +246,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
 
             {/* Paramètres d'entraînement */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-green-500" />
                 Paramètres d'Entraînement
               </h3>
@@ -330,14 +330,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
 
             {/* Zones de Focus */}
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Target className="w-5 h-5 text-purple-500" />
                 Zones de Focus
               </h3>
               
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Groupes Musculaires</h4>
+                  <h4 className="font-medium text-foreground/90 mb-3">Groupes Musculaires</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {[
                       { key: 'focus_pectoraux', label: 'Pectoraux' },
@@ -361,7 +361,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
                 </div>
                 
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-3">Focus Spécialisés</h4>
+                  <h4 className="font-medium text-foreground/90 mb-3">Focus Spécialisés</h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {[
                       { key: 'focus_squat', label: 'Squat' },

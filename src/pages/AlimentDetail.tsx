@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -2984,7 +2984,7 @@ const AlimentDetail: React.FC = () => {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-600 mb-4">Aliment non trouvé</h1>
+          <h1 className="text-2xl font-bold text-muted-foreground mb-4">Aliment non trouvé</h1>
           <Button onClick={() => navigate('/nutrition')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à la nutrition
@@ -2996,21 +2996,21 @@ const AlimentDetail: React.FC = () => {
 
   const getIGColor = (ig: string) => {
     switch (ig) {
-      case 'Bas': return 'bg-green-100 text-green-800';
-      case 'Modéré': return 'bg-yellow-100 text-yellow-800';
-      case 'Élevé': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Bas': return 'bg-green-500/15 border border-green-500/25 text-green-800';
+      case 'Modéré': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800';
+      case 'Élevé': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      default: return 'bg-white/5 text-foreground';
     }
   };
 
   const getClasseColor = (classe: string) => {
     switch (classe) {
-      case 'Prise de masse': return 'bg-blue-100 text-blue-800';
-      case 'Sèche': return 'bg-red-100 text-red-800';
-      case 'Récupération': return 'bg-green-100 text-green-800';
-      case 'Anti-inflammatoire': return 'bg-purple-100 text-purple-800';
-      case 'Boost performance': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Prise de masse': return 'bg-blue-500/15 border border-blue-500/25 text-blue-300';
+      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-800';
+      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-800';
+      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-800';
+      default: return 'bg-white/5 text-foreground';
     }
   };
 
@@ -3029,8 +3029,8 @@ const AlimentDetail: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="text-3xl md:text-4xl">{aliment.emoji}</div>
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 truncate">{aliment.nom}</h1>
-            <p className="text-gray-600">{aliment.description}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">{aliment.nom}</h1>
+            <p className="text-muted-foreground">{aliment.description}</p>
         </div>
         </div>
         <Button
@@ -3039,7 +3039,7 @@ const AlimentDetail: React.FC = () => {
           className={`p-2 ${
             isFavorite 
               ? 'text-red-500' 
-              : 'text-gray-400 hover:text-red-500'
+              : 'text-muted-foreground/70 hover:text-red-500'
           }`}
         >
           <Heart className={`h-6 w-6 ${isFavorite ? 'fill-current' : ''}`} />
@@ -3050,10 +3050,10 @@ const AlimentDetail: React.FC = () => {
         {/* Informations principales */}
         <div className="lg:col-span-2 space-y-6">
           {/* Valeurs nutritionnelles */}
-        <Card className="bg-white border-0 shadow-lg">
+        <Card className="glass-card border-primary/20 border-0 shadow-lg">
           <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-green-600" />
+                <Target className="h-5 w-5 text-green-400" />
                 Valeurs nutritionnelles (pour 100g)
                   </CardTitle>
             </CardHeader>
@@ -3064,27 +3064,27 @@ const AlimentDetail: React.FC = () => {
                   <div className="text-sm text-orange-700">Calories</div>
                   </div>
                 <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-600">{aliment.proteines}g</div>
-                  <div className="text-sm text-blue-700">Protéines</div>
+                  <div className="text-2xl md:text-3xl font-bold text-blue-400">{aliment.proteines}g</div>
+                  <div className="text-sm text-blue-300">Protéines</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-green-600">{aliment.glucides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-green-400">{aliment.glucides}g</div>
                   <div className="text-sm text-green-700">Glucides</div>
               </div>
                 <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-purple-600">{aliment.lipides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-purple-400">{aliment.lipides}g</div>
                   <div className="text-sm text-purple-700">Lipides</div>
                 </div>
                 </div>
-              <div className="mt-4 text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-xl font-bold text-gray-800">{aliment.fibres}g</div>
-                <div className="text-sm text-gray-600">Fibres</div>
+              <div className="mt-4 text-center p-3 surface-panel-sm">
+                <div className="text-xl font-bold text-foreground">{aliment.fibres}g</div>
+                <div className="text-sm text-muted-foreground">Fibres</div>
               </div>
             </CardContent>
           </Card>
 
           {/* Avantages */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-600" />
@@ -3096,7 +3096,7 @@ const AlimentDetail: React.FC = () => {
                 {aliment.avantages.map((avantage, index) => (
                   <li key={index} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-gray-700">{avantage}</span>
+                    <span className="text-foreground/90">{avantage}</span>
                   </li>
                 ))}
               </ul>
@@ -3104,10 +3104,10 @@ const AlimentDetail: React.FC = () => {
           </Card>
 
           {/* Conseils */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-blue-600" />
+                <Zap className="h-5 w-5 text-blue-400" />
                 Conseils d'utilisation
               </CardTitle>
             </CardHeader>
@@ -3115,8 +3115,8 @@ const AlimentDetail: React.FC = () => {
               <ol className="space-y-2">
                 {aliment.conseils.map((conseil, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-blue-600 font-bold">{index + 1}.</span>
-                    <span className="text-gray-700">{conseil}</span>
+                    <span className="text-blue-400 font-bold">{index + 1}.</span>
+                    <span className="text-foreground/90">{conseil}</span>
                   </li>
                 ))}
               </ol>
@@ -3127,25 +3127,25 @@ const AlimentDetail: React.FC = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Informations générales */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
           <CardHeader>
               <CardTitle>Informations</CardTitle>
           </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Catégorie</span>
-                <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
+                <span className="text-muted-foreground">Catégorie</span>
+                <Badge variant="outline" className="border-blue-300 text-blue-300 bg-blue-500/10">
                   {aliment.categorie}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Index glycémique</span>
+                <span className="text-muted-foreground">Index glycémique</span>
                 <Badge className={getIGColor(aliment.ig)}>
                   IG {aliment.ig}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Classe</span>
+                <span className="text-muted-foreground">Classe</span>
                 <Badge className={getClasseColor(aliment.classe)}>
                   {aliment.classe}
                 </Badge>
@@ -3154,7 +3154,7 @@ const AlimentDetail: React.FC = () => {
         </Card>
 
           {/* Micronutriments */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Micronutriments</CardTitle>
             </CardHeader>
@@ -3170,14 +3170,14 @@ const AlimentDetail: React.FC = () => {
           </Card>
 
           {/* Tags */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Tags</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {aliment.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="text-sm text-gray-600">
+                  <Badge key={index} variant="outline" className="text-sm text-muted-foreground">
                     {tag}
                   </Badge>
                 ))}
@@ -3186,7 +3186,7 @@ const AlimentDetail: React.FC = () => {
           </Card>
 
         {/* Actions */}
-        <Card className="bg-white border-0 shadow-lg">
+        <Card className="glass-card border-primary/20 border-0 shadow-lg">
           <CardContent className="p-6">
               <div className="space-y-3">
                 <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">

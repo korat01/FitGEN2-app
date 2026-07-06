@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -1563,7 +1563,7 @@ export const BlocsEntrainement: React.FC = () => {
       image: '🏋️‍♂️',
       couleur: 'from-gray-500 to-slate-500',
       bgCouleur: 'from-gray-50 to-slate-50',
-      borderCouleur: 'border-gray-200/50',
+      borderCouleur: 'border-white/10/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
         'Tenez la barre avec les bras tendus',
@@ -1702,7 +1702,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏔️',
       couleur: 'from-slate-500 to-gray-500',
-      bgCouleur: 'from-slate-50 to-gray-50',
+      bgCouleur: 'from-primary/10 to-secondary/10',
       borderCouleur: 'border-slate-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -2074,7 +2074,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🕷️',
       couleur: 'from-slate-500 to-gray-500',
-      bgCouleur: 'from-slate-50 to-gray-50',
+      bgCouleur: 'from-primary/10 to-secondary/10',
       borderCouleur: 'border-slate-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2192,29 +2192,29 @@ export const BlocsEntrainement: React.FC = () => {
           </div>
 
           {/* Filtres et recherche */}
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="glass-card border-primary/20">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
                 <div className="flex flex-col sm:flex-row gap-4 flex-1">
                   <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 w-4 h-4" />
                 <Input
                       placeholder="Rechercher un exercice..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 h-12 bg-white/80 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl"
+                      className="pl-10 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl"
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-full sm:w-48 h-12 bg-white/80 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
+                    <SelectTrigger className="w-full sm:w-48 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-xl">
+                    <SelectContent className="glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-0 shadow-xl rounded-xl">
                       {categories.map(category => (
                         <SelectItem 
                           key={category.value} 
                           value={category.value}
-                          className="hover:bg-blue-50 focus:bg-blue-50 transition-colors duration-200"
+                          className="hover:bg-blue-500/10 focus:bg-blue-500/10 transition-colors duration-200"
                         >
                           {category.label}
                         </SelectItem>
@@ -2252,7 +2252,7 @@ export const BlocsEntrainement: React.FC = () => {
                 {filteredExercices.map((exercice) => (
             <Card 
                     key={exercice.id} 
-                    className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+                    className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer group"
                     onClick={() => setSelectedExercise(exercice.id)}
                   >
                     <CardHeader className="pb-4">
@@ -2261,30 +2261,30 @@ export const BlocsEntrainement: React.FC = () => {
                           {exercice.icon}
                         </div>
                         <div className="flex gap-2">
-                          <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                          <Badge variant="secondary" className="bg-white/5 text-foreground/90">
                             {exercice.difficulte}
                   </Badge>
-                          <Badge variant="outline" className="border-blue-200 text-blue-600">
+                          <Badge variant="outline" className="border-blue-200 text-blue-400">
                             {exercice.type}
                           </Badge>
                     </div>
                       </div>
-                      <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                      <CardTitle className="text-xl font-bold text-foreground group-hover:text-blue-400 transition-colors">
                         {exercice.nom}
                       </CardTitle>
-                      <p className="text-gray-600 text-sm">{exercice.description}</p>
+                      <p className="text-muted-foreground text-sm">{exercice.description}</p>
               </CardHeader>
             <CardContent>
                       <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Target className="w-4 h-4" />
                           <span>{exercice.categorie}</span>
                   </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Users className="w-4 h-4" />
                           <span>{exercice.muscles.join(', ')}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Dumbbell className="w-4 h-4" />
                           <span>{exercice.equipement}</span>
                         </div>
@@ -2309,7 +2309,7 @@ export const BlocsEntrainement: React.FC = () => {
                 {filteredExercices.map((exercice) => (
                   <Card 
                     key={exercice.id} 
-                    className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+                    className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer group"
                     onClick={() => setSelectedExercise(exercice.id)}
                   >
                     <CardContent className="p-6">
@@ -2319,18 +2319,18 @@ export const BlocsEntrainement: React.FC = () => {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-4 mb-2">
-                            <h3 className="text-xl font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                            <h3 className="text-xl font-bold text-foreground group-hover:text-blue-400 transition-colors">
                               {exercice.nom}
                             </h3>
-                            <Badge variant="secondary" className="bg-gray-100 text-gray-700">
+                            <Badge variant="secondary" className="bg-white/5 text-foreground/90">
                               {exercice.difficulte}
                             </Badge>
-                            <Badge variant="outline" className="border-blue-200 text-blue-600">
+                            <Badge variant="outline" className="border-blue-200 text-blue-400">
                               {exercice.type}
                           </Badge>
                     </div>
-                          <p className="text-gray-600 mb-3">{exercice.description}</p>
-                          <div className="flex items-center gap-6 text-sm text-gray-500">
+                          <p className="text-muted-foreground mb-3">{exercice.description}</p>
+                          <div className="flex items-center gap-6 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                               <Target className="w-4 h-4" />
                               <span>{exercice.categorie}</span>
@@ -2370,7 +2370,7 @@ export const BlocsEntrainement: React.FC = () => {
 
             return (
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <Card className="w-full max-w-2xl bg-white/95 backdrop-blur-sm border-0 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <Card className="w-full max-w-2xl glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-0 shadow-2xl max-h-[90vh] overflow-y-auto">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -2378,8 +2378,8 @@ export const BlocsEntrainement: React.FC = () => {
                           {exercice.icon}
                         </div>
                         <div>
-                          <CardTitle className="text-2xl font-bold text-gray-800">{exercice.nom}</CardTitle>
-                          <p className="text-gray-600">{exercice.description}</p>
+                          <CardTitle className="text-2xl font-bold text-foreground">{exercice.nom}</CardTitle>
+                          <p className="text-muted-foreground">{exercice.description}</p>
                         </div>
                       </div>
                       <Button
@@ -2395,32 +2395,32 @@ export const BlocsEntrainement: React.FC = () => {
                     {/* Informations générales */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
-                        <div className="text-sm font-medium text-blue-600 mb-1">Catégorie</div>
-                        <div className="text-lg font-bold text-gray-800">{exercice.categorie}</div>
+                        <div className="text-sm font-medium text-blue-400 mb-1">Catégorie</div>
+                        <div className="text-lg font-bold text-foreground">{exercice.categorie}</div>
                       </div>
                       <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
-                        <div className="text-sm font-medium text-green-600 mb-1">Type</div>
-                        <div className="text-lg font-bold text-gray-800">{exercice.type}</div>
+                        <div className="text-sm font-medium text-green-400 mb-1">Type</div>
+                        <div className="text-lg font-bold text-foreground">{exercice.type}</div>
                       </div>
                       <div className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-200/50">
-                        <div className="text-sm font-medium text-purple-600 mb-1">Difficulté</div>
-                        <div className="text-lg font-bold text-gray-800">{exercice.difficulte}</div>
+                        <div className="text-sm font-medium text-purple-400 mb-1">Difficulté</div>
+                        <div className="text-lg font-bold text-foreground">{exercice.difficulte}</div>
                       </div>
                       <div className="p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-200/50">
                         <div className="text-sm font-medium text-orange-600 mb-1">Équipement</div>
-                        <div className="text-lg font-bold text-gray-800">{exercice.equipement}</div>
+                        <div className="text-lg font-bold text-foreground">{exercice.equipement}</div>
                       </div>
                     </div>
 
                     {/* Muscles travaillés */}
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Users className="w-5 h-5 text-blue-500" />
                         Muscles Travaillés
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {exercice.muscles.map((muscle, index) => (
-                          <Badge key={index} variant="secondary" className="bg-blue-100 text-blue-700">
+                          <Badge key={index} variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
                             {muscle}
                           </Badge>
                         ))}
@@ -2429,7 +2429,7 @@ export const BlocsEntrainement: React.FC = () => {
 
                     {/* Instructions */}
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Target className="w-5 h-5 text-green-500" />
                         Instructions
                       </h4>
@@ -2439,7 +2439,7 @@ export const BlocsEntrainement: React.FC = () => {
                             <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white text-sm font-bold mt-0.5">
                               {index + 1}
                             </div>
-                            <span className="text-gray-700">{instruction}</span>
+                            <span className="text-foreground/90">{instruction}</span>
                           </li>
                         ))}
                       </ol>
@@ -2447,24 +2447,24 @@ export const BlocsEntrainement: React.FC = () => {
 
                     {/* Conseils */}
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Star className="w-5 h-5 text-yellow-500" />
                         Conseils
                       </h4>
                       <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl border border-yellow-200/50">
-                        <p className="text-gray-700 font-medium">{exercice.conseils}</p>
+                        <p className="text-foreground/90 font-medium">{exercice.conseils}</p>
                       </div>
                     </div>
 
                     {/* Variations */}
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <h4 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
                         <Zap className="w-5 h-5 text-purple-500" />
                         Variations
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {exercice.variations.map((variation, index) => (
-                          <Badge key={index} variant="outline" className="border-purple-200 text-purple-600">
+                          <Badge key={index} variant="outline" className="border-purple-200 text-purple-400">
                             {variation}
                           </Badge>
                         ))}

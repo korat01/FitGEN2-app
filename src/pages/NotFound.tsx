@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -8,18 +8,18 @@ export const NotFound: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md glass-card border-primary/20">
         <CardHeader className="text-center">
           <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="w-10 h-10 text-white" />
           </div>
-          <CardTitle className="text-3xl font-bold text-gray-800">404</CardTitle>
-          <p className="text-lg text-gray-600 mt-2">Page non trouvée</p>
+          <CardTitle className="text-3xl font-bold text-foreground">404</CardTitle>
+          <p className="text-lg text-muted-foreground mt-2">Page non trouvée</p>
         </CardHeader>
         
         <CardContent className="text-center space-y-4">
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
           </p>
           

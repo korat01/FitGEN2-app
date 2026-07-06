@@ -102,7 +102,7 @@ export const StatsBreakdown: React.FC<StatsBreakdownProps> = ({
               <div className="text-sm text-muted-foreground">
                 Progression vers le rang suivant
               </div>
-              <Progress value={progressToNext} className="h-3" />
+              <Progress value={progressToNext} size="md" variant="subtle" />
               <div className="text-xs text-muted-foreground">
                 {Math.round(progressToNext)}% complété
               </div>
@@ -122,10 +122,7 @@ export const StatsBreakdown: React.FC<StatsBreakdownProps> = ({
                 <span className="capitalize">{category}</span>
                 <span className="font-medium">{score}/1000</span>
               </div>
-              <Progress 
-                value={score / 10} 
-                className="h-2"
-              />
+              <Progress value={score / 10} size="sm" variant="subtle" />
               <div className="text-xs text-muted-foreground">
                 Poids: {Math.round(profile[category as keyof typeof profile] * 100)}%
               </div>

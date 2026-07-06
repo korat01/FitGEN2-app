@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Dumbbell, UserPlus, LogIn, X } from 'lucide-react';
 import { LoginForm } from './LoginForm';
@@ -21,15 +21,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white/80 backdrop-blur-sm border-0 shadow-2xl rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="glass-card border-primary/20 border-0 shadow-2xl rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
                 <Dumbbell className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-foreground">
                 {isLogin ? 'Connexion' : 'Inscription'}
               </h2>
             </div>

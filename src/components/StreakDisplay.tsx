@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Flame, Trophy, Calendar } from 'lucide-react';
@@ -12,7 +12,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
   const { currentStreak, longestStreak, weeklyHistory, streakBonus } = streakData;
 
   const getStreakColor = (streak: number) => {
-    if (streak < 3) return 'text-gray-500';
+    if (streak < 3) return 'text-muted-foreground';
     if (streak < 7) return 'text-orange-500';
     if (streak < 14) return 'text-red-500';
     if (streak < 30) return 'text-purple-500';
@@ -36,7 +36,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
   };
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-8">
+    <Card className="glass-card border-primary/20 mb-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl">
           <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
@@ -53,10 +53,10 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
             <span className="text-4xl font-bold">{currentStreak}</span>
             <span className="text-lg">jours</span>
           </div>
-          <p className="text-sm text-gray-600 mb-2">{getStreakMessage(currentStreak)}</p>
+          <p className="text-sm text-muted-foreground mb-2">{getStreakMessage(currentStreak)}</p>
           
           {streakBonus > 0 && (
-            <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+            <Badge className="bg-orange-500/15 border border-orange-500/25 text-orange-300 border-orange-500/30">
               <Flame className="w-3 h-3 mr-1" />
               +{streakBonus}% Bonus XP
             </Badge>
@@ -65,7 +65,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
 
         {/* Historique 7 jours */}
         <div className="space-y-3">
-          <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             Historique 7 jours
           </h4>
@@ -78,12 +78,12 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold mb-1 ${
                     completed 
                       ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white' 
-                      : 'bg-gray-200 text-gray-500'
+                      : 'bg-white/10 text-muted-foreground'
                   }`}>
                     {dayNames[index]}
                   </div>
                   <div className={`w-3 h-3 rounded-full mx-auto ${
-                    completed ? 'bg-orange-500' : 'bg-gray-300'
+                    completed ? 'bg-orange-500' : 'bg-white/15'
                   }`} />
                 </div>
               );
@@ -92,27 +92,27 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
         </div>
 
         {/* Record personnel */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
+        <div className="surface-accent rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Trophy className="w-6 h-6 text-purple-600" />
+              <Trophy className="w-6 h-6 text-purple-400" />
               <div>
-                <h4 className="font-semibold text-gray-800">Record personnel</h4>
-                <p className="text-sm text-gray-600">Plus longue série</p>
+                <h4 className="font-semibold text-foreground">Record personnel</h4>
+                <p className="text-sm text-muted-foreground">Plus longue série</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-purple-600">{longestStreak}</div>
-              <div className="text-sm text-gray-600">jours</div>
+              <div className="text-2xl font-bold text-purple-400">{longestStreak}</div>
+              <div className="text-sm text-muted-foreground">jours</div>
             </div>
           </div>
         </div>
 
         {/* Conseils pour maintenir le streak */}
         {currentStreak > 0 && (
-          <div className="bg-blue-50 rounded-xl p-4">
-            <h4 className="font-semibold text-blue-800 mb-2">💡 Conseil</h4>
-            <p className="text-sm text-blue-700">
+          <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4">
+            <h4 className="font-semibold text-blue-300 mb-2">💡 Conseil</h4>
+            <p className="text-sm text-blue-300">
               {currentStreak < 7 
                 ? "Continue comme ça ! Chaque jour compte pour construire une habitude solide."
                 : currentStreak < 30

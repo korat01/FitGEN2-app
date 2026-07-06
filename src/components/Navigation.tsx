@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { Badge } from './ui/badge';
@@ -15,6 +15,8 @@ import {
   Wand2
 } from 'lucide-react';
 import CustomHomeIcon from './CustomHomeIcon';
+import { Progress } from './ui/progress';
+import { useQuests } from '../contexts/QuestContext';
 
 const navigationItems = [
   { to: '/dashboard', icon: CustomHomeIcon, label: 'Accueil', badge: null },
@@ -31,6 +33,9 @@ const navigationItems = [
 ];
 
 export const Navigation: React.FC = () => {
+  const { getQuestCompletionRate } = useQuests();
+  const dailyProgress = Math.round(getQuestCompletionRate());
+
   return (
     <nav className="p-6">
       <div className="space-y-2">
@@ -86,10 +91,8 @@ export const Navigation: React.FC = () => {
         <div className="glass-card p-4">
           <div className="text-sm font-semibold mb-3 text-foreground">Progression du jour</div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="flex-1 vitalforce-progress">
-              <div className="vitalforce-progress-bar w-3/4"></div>
-            </div>
-            <span className="text-xs font-semibold text-primary">75%</span>
+            <Progress value={dailyProgress} size="sm" variant="subtle" className="flex-1" />
+            <span className="text-xs font-semibold text-secondary tabular-nums">{dailyProgress}%</span>
           </div>
           <div className="text-xs text-muted-foreground">
             3 sur 4 objectifs atteints

@@ -190,6 +190,27 @@ All colors MUST be HSL.
   .gaming-card {
     @apply glass-card;
   }
+
+  /* Surfaces internes cohérentes (thème sombre violet/bleu) */
+  .surface-panel {
+    @apply rounded-xl bg-white/5 border border-white/10;
+  }
+
+  .surface-panel-sm {
+    @apply rounded-lg bg-white/5 border border-white/10;
+  }
+
+  .surface-accent {
+    @apply rounded-xl border;
+    background: linear-gradient(135deg, rgba(107, 42, 255, 0.12) 0%, rgba(0, 194, 255, 0.08) 100%);
+    border-color: rgba(107, 42, 255, 0.25);
+  }
+
+  .icon-badge {
+    @apply rounded-xl flex items-center justify-center border;
+    background: rgba(107, 42, 255, 0.15);
+    border-color: rgba(107, 42, 255, 0.3);
+  }
   
   .gradient-primary {
     background: var(--gradient-primary);
@@ -207,29 +228,49 @@ All colors MUST be HSL.
     background: var(--gradient-cyan-purple);
   }
   
-  /* Progress bar style VitalForce - gradient purple-to-blue */
+  /* Barres de progression — lisibles, contrastées, sans surcharge visuelle */
   .vitalforce-progress {
-    @apply rounded-full overflow-hidden relative;
-    background: rgba(107, 42, 255, 0.15);
-    border: 1px solid rgba(107, 42, 255, 0.3);
-    height: 8px;
+    @apply rounded-full overflow-hidden relative w-full;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
   }
   
   .vitalforce-progress-bar {
-    @apply h-full rounded-full transition-all duration-500 relative;
+    @apply h-full rounded-full transition-all duration-700 ease-out relative;
     background: var(--gradient-progress);
-    box-shadow: 0 0 20px rgba(107, 42, 255, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
-  
-  .vitalforce-progress-bar::after {
+
+  .vitalforce-progress-subtle {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .vitalforce-progress-subtle .vitalforce-progress-bar {
+    background: linear-gradient(90deg, #6B2AFF 0%, #00C2FF 100%);
+    box-shadow: none;
+  }
+
+  .vitalforce-progress-glow {
+    border-color: rgba(107, 42, 255, 0.35);
+    background: rgba(107, 42, 255, 0.12);
+  }
+
+  .vitalforce-progress-bar-glow {
+    box-shadow: 0 0 12px rgba(107, 42, 255, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .vitalforce-progress-bar-glow::after {
     content: '';
     @apply absolute inset-0 rounded-full;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(255, 255, 255, 0.3) 50%, 
-      transparent 100%);
-    animation: shimmer 2s infinite;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 100%
+    );
+    animation: shimmer 3s ease-in-out infinite;
   }
   
   @keyframes shimmer {

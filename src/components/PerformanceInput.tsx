@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -96,7 +96,7 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({ onPerformanc
               value={performance.discipline}
               onValueChange={(value) => setPerformance({ ...performance, discipline: value })}
             >
-              <SelectTrigger className="w-full h-12 text-lg font-semibold bg-white/90 border-0 shadow-lg">
+              <SelectTrigger className="w-full h-12 text-lg font-semibold glass-card border-primary/20 border-0 shadow-lg">
                 <SelectValue placeholder="Choisissez votre discipline" />
               </SelectTrigger>
               <SelectContent>
@@ -142,13 +142,13 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({ onPerformanc
                 type="number"
                 value={performance.value}
                 onChange={(e) => setPerformance({ ...performance, value: e.target.value })}
-                className="w-full h-12 text-lg font-semibold bg-white/90 border-0 shadow-lg pr-16"
+                className="w-full h-12 text-lg font-semibold glass-card border-primary/20 border-0 shadow-lg pr-16"
                 placeholder="Entrez votre performance"
                 step="0.1"
                 required
               />
               {performance.discipline && (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-semibold">
                   {getDisciplineUnit(performance.discipline)}
                 </div>
               )}
@@ -162,7 +162,7 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({ onPerformanc
               type="date"
               value={performance.date}
               onChange={(e) => setPerformance({ ...performance, date: e.target.value })}
-              className="w-full h-12 text-lg font-semibold bg-white/90 border-0 shadow-lg"
+              className="w-full h-12 text-lg font-semibold glass-card border-primary/20 border-0 shadow-lg"
               required
             />
           </div>
@@ -171,7 +171,7 @@ export const PerformanceInput: React.FC<PerformanceInputProps> = ({ onPerformanc
           <Button
             type="submit"
             disabled={!performance.discipline || !performance.value || isAdding}
-            className="w-full h-14 bg-white text-emerald-600 text-xl font-bold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 glass-card border-primary/20 text-emerald-400 text-xl font-bold hover:bg-white/10 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isAdding ? (
               <div className="flex items-center gap-2">

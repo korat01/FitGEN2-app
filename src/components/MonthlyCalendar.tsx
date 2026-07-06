@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -186,8 +186,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
     switch (status) {
       case 'other-month': return 'text-slate-300 bg-slate-50';
       case 'rest': return 'text-slate-500 bg-slate-100 border-slate-200';
-      case 'scheduled': return 'text-blue-700 bg-blue-50 border-blue-200';
-      case 'today': return 'text-green-700 bg-green-50 border-green-200';
+      case 'scheduled': return 'text-blue-300 bg-blue-500/10 border-blue-200';
+      case 'today': return 'text-green-700 bg-green-500/10 border-green-500/30';
       case 'completed': return 'text-purple-700 bg-purple-50 border-purple-200';
       default: return 'text-slate-500 bg-slate-100 border-slate-200';
     }
@@ -219,12 +219,12 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   return (
     <>
-      <Card className="bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="glass-card border-primary/20 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
-              <div className="bg-blue-100 rounded-full p-2">
-                <Calendar className="h-6 w-6 text-blue-600" />
+              <div className="bg-blue-500/15 border border-blue-500/25 rounded-full p-2">
+                <Calendar className="h-6 w-6 text-blue-400" />
               </div>
               Calendrier mensuel
             </CardTitle>
@@ -279,7 +279,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                     <div className="flex flex-col h-full">
                       <div className="flex items-center justify-between">
                         <span className={`text-sm font-medium ${
-                          day.isToday ? 'text-green-600 font-bold' : ''
+                          day.isToday ? 'text-green-400 font-bold' : ''
                         }`}>
                           {day.date.getDate()}
                         </span>
@@ -317,12 +317,12 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       {/* Modal de détails du programme */}
       {selectedDay && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <Card className="glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-0 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-3 text-slate-800 text-2xl">
-                  <div className="bg-blue-100 rounded-full p-2">
-                    <Dumbbell className="h-6 w-6 text-blue-600" />
+                  <div className="bg-blue-500/15 border border-blue-500/25 rounded-full p-2">
+                    <Dumbbell className="h-6 w-6 text-blue-400" />
                   </div>
                   Programme du {selectedDay.toLocaleDateString('fr-FR', { 
                     weekday: 'long', 
@@ -344,13 +344,13 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
               {selectedProgram ? (
                 <div className="space-y-6">
                   {/* Informations du programme */}
-                  <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-4 border border-slate-200">
+                  <div className="surface-accent rounded-xl p-4 border border-slate-200">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-2xl font-bold text-slate-800">{selectedProgram.name}</h3>
                       <Badge 
                         variant="outline" 
                         className={`${
-                          selectedProgram.difficulty === 'Débutant' ? 'border-emerald-300 text-emerald-700' :
+                          selectedProgram.difficulty === 'Débutant' ? 'border-emerald-300 text-emerald-300' :
                           selectedProgram.difficulty === 'Intermédiaire' ? 'border-amber-300 text-amber-700' :
                           'border-red-300 text-red-700'
                         }`}
@@ -381,7 +381,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
                     <div className="space-y-3">
                       {selectedProgram.exercises && selectedProgram.exercises.length > 0 ? (
                         selectedProgram.exercises.map((exercise: any, index: number) => (
-                          <div key={index} className="flex justify-between items-center p-3 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200">
+                          <div key={index} className="flex justify-between items-center p-3 surface-accent rounded-lg border border-slate-200">
                             <span className="font-medium text-slate-800">{exercise.name}</span>
                             <div className="text-sm text-slate-600">
                               <span className="bg-slate-200 px-2 py-1 rounded-md">{exercise.sets}</span>

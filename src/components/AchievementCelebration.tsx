@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Trophy, Star, Crown, Sparkles, Zap } from 'lucide-react';
 import { Achievement } from '@/types/stats';
 import { useSounds } from '@/utils/sounds';

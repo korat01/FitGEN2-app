@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
@@ -44,10 +44,10 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-100 text-green-800 border-green-300';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'hard': return 'bg-red-100 text-red-800 border-red-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'easy': return 'bg-green-500/15 border border-green-500/25 text-green-800 border-green-300';
+      case 'medium': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800 border-yellow-300';
+      case 'hard': return 'bg-red-500/15 border border-red-500/25 text-red-800 border-red-300';
+      default: return 'bg-white/5 text-foreground border-white/15';
     }
   };
 
@@ -69,21 +69,21 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
 
   return (
     <Card className={`transition-all duration-200 hover:shadow-lg ${
-      isCompleted ? 'bg-green-50 border-green-200' : 'bg-white'
+      isCompleted ? 'bg-green-500/10 border-green-500/30' : 'glass-card border-primary/20'
     }`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              isCompleted ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+              isCompleted ? 'bg-green-500/15 border border-green-500/25 text-green-400' : 'bg-blue-500/15 border border-blue-500/25 text-blue-400'
             }`}>
               {getQuestIcon(quest.type)}
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-gray-800">
+              <CardTitle className="text-lg font-semibold text-foreground">
                 {quest.title}
               </CardTitle>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 {quest.description}
               </p>
             </div>
@@ -110,22 +110,23 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
         {/* Barre de progression */}
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Progression</span>
-            <span className="font-semibold text-gray-800">
+            <span className="text-muted-foreground">Progression</span>
+            <span className="font-semibold text-foreground">
               {quest.current} / {quest.target}
             </span>
           </div>
           
-          <Progress 
-            value={progressPercentage} 
-            className="h-2"
+          <Progress
+            value={Math.min(Math.max(progressPercentage, 0), 100)}
+            size="sm"
+            variant="subtle"
           />
           
           {/* Récompense */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-yellow-500" />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-foreground/90">
                 +{quest.reward.xp} XP
               </span>
               {quest.reward.badge && (
@@ -138,7 +139,7 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
             
             {/* Indicateur de completion */}
             {isCompleted && (
-              <div className="flex items-center gap-1 text-green-600">
+              <div className="flex items-center gap-1 text-green-400">
                 <CheckCircle className="w-4 h-4" />
                 <span className="text-sm font-medium">Terminé !</span>
               </div>
@@ -198,7 +199,7 @@ export const DailyQuests: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <Calendar className="w-5 h-5 text-blue-500" />
-          <h3 className="text-xl font-semibold text-gray-800">Quêtes du Jour</h3>
+          <h3 className="text-xl font-semibold text-foreground">Quêtes du Jour</h3>
         </div>
         
         {dailyQuests.length > 0 ? (
@@ -210,10 +211,10 @@ export const DailyQuests: React.FC = () => {
         ) : (
           <Card className="p-8 text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Toutes les quêtes sont terminées !
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Revenez demain pour de nouveaux défis.
             </p>
           </Card>
@@ -225,7 +226,7 @@ export const DailyQuests: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-orange-500" />
-            <h3 className="text-xl font-semibold text-gray-800">Défis Hebdomadaires</h3>
+            <h3 className="text-xl font-semibold text-foreground">Défis Hebdomadaires</h3>
           </div>
           
           <div className="grid gap-4">
@@ -241,7 +242,7 @@ export const DailyQuests: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-500" />
-            <h3 className="text-xl font-semibold text-gray-800">Réussites Récentes</h3>
+            <h3 className="text-xl font-semibold text-foreground">Réussites Récentes</h3>
           </div>
           
           <div className="grid gap-3">
@@ -250,12 +251,12 @@ export const DailyQuests: React.FC = () => {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
+                      <div className="p-2 bg-yellow-500/15 border border-yellow-500/25 text-yellow-600 rounded-lg">
                         <Trophy className="w-4 h-4" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-800">{quest.title}</h4>
-                        <p className="text-sm text-gray-600">{quest.description}</p>
+                        <h4 className="font-semibold text-foreground">{quest.title}</h4>
+                        <p className="text-sm text-muted-foreground">{quest.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

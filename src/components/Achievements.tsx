@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
   const progressPercentage = (achievement.progress / achievement.maxProgress) * 100;
 
   return (
-    <Card ref={cardRef} className={`achievement-card bg-white/80 backdrop-blur-sm border-0 shadow-xl transition-all duration-300 ${
+    <Card ref={cardRef} className={`achievement-card glass-card border-primary/20 transition-all duration-300 ${
       achievement.unlocked 
         ? `achievement-unlocked ${getRarityGlow(achievement.rarity)} animate-glow` 
         : 'hover:shadow-2xl'
@@ -66,18 +66,18 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
           </div>
           
           <div>
-            <h3 className="text-lg font-bold text-gray-800 mb-1">{achievement.title}</h3>
-            <p className="text-sm text-gray-600 mb-3">{achievement.description}</p>
+            <h3 className="text-lg font-bold text-foreground mb-1">{achievement.title}</h3>
+            <p className="text-sm text-muted-foreground mb-3">{achievement.description}</p>
           </div>
 
           {/* Progression */}
           {!achievement.unlocked && (
             <div className="space-y-2">
-              <div className="flex justify-between text-xs text-gray-600">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Progression</span>
                 <span>{achievement.progress} / {achievement.maxProgress}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-white/10 rounded-full h-2">
                 <div 
                   className={`h-2 bg-gradient-to-r ${getRarityColor(achievement.rarity)} rounded-full transition-all duration-500`}
                   style={{ width: `${progressPercentage}%` }}
@@ -89,16 +89,16 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
           {/* Récompense XP */}
           <div className="flex items-center justify-center gap-2">
             {getRarityIcon(achievement.rarity)}
-            <span className="text-sm font-semibold text-gray-700">+{achievement.xpReward} XP</span>
+            <span className="text-sm font-semibold text-foreground/90">+{achievement.xpReward} XP</span>
           </div>
 
           {/* Badge de rareté */}
           <Badge 
             className={`text-xs ${
-              achievement.rarity === 'common' ? 'bg-gray-100 text-gray-800' :
-              achievement.rarity === 'rare' ? 'bg-blue-100 text-blue-800' :
-              achievement.rarity === 'epic' ? 'bg-purple-100 text-purple-800' :
-              'bg-yellow-100 text-yellow-800'
+              achievement.rarity === 'common' ? 'bg-white/5 text-foreground' :
+              achievement.rarity === 'rare' ? 'bg-blue-500/15 border border-blue-500/25 text-blue-300' :
+              achievement.rarity === 'epic' ? 'bg-purple-500/15 border border-purple-500/25 text-purple-800' :
+              'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800'
             }`}
           >
             {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
@@ -106,7 +106,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
 
           {/* Statut */}
           {achievement.unlocked ? (
-            <Badge className="bg-green-100 text-green-800 border-green-200">
+            <Badge className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-200">
               <Trophy className="w-3 h-3 mr-1" />
               Débloqué
             </Badge>
@@ -161,7 +161,7 @@ export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchi
   );
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl mb-8">
+    <Card className="glass-card border-primary/20 mb-8">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl">
           <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
@@ -184,7 +184,7 @@ export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchi
               }}
               className={currentCategory === category.id ? 
                 "bg-gradient-to-r from-yellow-500 to-orange-500 text-white" : 
-                "border-gray-300 text-gray-700"
+                "border-white/15 text-foreground/90"
               }
             >
               <span className="mr-2">{category.icon}</span>
@@ -216,7 +216,7 @@ export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchi
               <ChevronLeft className="w-4 h-4" />
             </Button>
             
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               Page {currentPage + 1} sur {totalPages}
             </span>
             
@@ -233,63 +233,63 @@ export const Achievements: React.FC<AchievementsProps> = ({ achievements, onAchi
 
         {/* Statistiques des achievements enrichies */}
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">📊 Statistiques des Succès</h4>
+          <h4 className="text-lg font-semibold text-foreground mb-4 text-center">📊 Statistiques des Succès</h4>
           
           {/* Statistiques principales */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-6">
-            <div className="bg-white/60 rounded-lg p-3">
+            <div className="bg-white/10 rounded-lg p-3">
               <div className="text-2xl font-bold text-yellow-600">
                 {achievements.filter(a => a.unlocked).length}
               </div>
-              <div className="text-sm text-gray-600">Débloqués</div>
+              <div className="text-sm text-muted-foreground">Débloqués</div>
             </div>
-            <div className="bg-white/60 rounded-lg p-3">
-              <div className="text-2xl font-bold text-gray-600">
+            <div className="bg-white/10 rounded-lg p-3">
+              <div className="text-2xl font-bold text-muted-foreground">
                 {achievements.length}
               </div>
-              <div className="text-sm text-gray-600">Total</div>
+              <div className="text-sm text-muted-foreground">Total</div>
             </div>
-            <div className="bg-white/60 rounded-lg p-3">
-              <div className="text-2xl font-bold text-purple-600">
+            <div className="bg-white/10 rounded-lg p-3">
+              <div className="text-2xl font-bold text-purple-400">
                 {achievements.filter(a => a.rarity === 'legendary').length}
               </div>
-              <div className="text-sm text-gray-600">Légendaires</div>
+              <div className="text-sm text-muted-foreground">Légendaires</div>
             </div>
-            <div className="bg-white/60 rounded-lg p-3">
+            <div className="bg-white/10 rounded-lg p-3">
               <div className="text-2xl font-bold text-orange-600">
                 {achievements.reduce((sum, a) => sum + (a.unlocked ? a.xpReward : 0), 0)}
               </div>
-              <div className="text-sm text-gray-600">XP gagnés</div>
+              <div className="text-sm text-muted-foreground">XP gagnés</div>
             </div>
           </div>
 
           {/* Répartition par rareté */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="text-center">
-              <div className="text-lg font-bold text-gray-500">🥉</div>
-              <div className="text-sm text-gray-600">Commun</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-lg font-bold text-muted-foreground">🥉</div>
+              <div className="text-sm text-muted-foreground">Commun</div>
+              <div className="text-xs text-muted-foreground">
                 {achievements.filter(a => a.rarity === 'common').length} badges
               </div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-blue-500">🥈</div>
-              <div className="text-sm text-gray-600">Rare</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-sm text-muted-foreground">Rare</div>
+              <div className="text-xs text-muted-foreground">
                 {achievements.filter(a => a.rarity === 'rare').length} badges
               </div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-purple-500">🥇</div>
-              <div className="text-sm text-gray-600">Épique</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-sm text-muted-foreground">Épique</div>
+              <div className="text-xs text-muted-foreground">
                 {achievements.filter(a => a.rarity === 'epic').length} badges
               </div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-yellow-500">💎</div>
-              <div className="text-sm text-gray-600">Légendaire</div>
-              <div className="text-xs text-gray-500">
+              <div className="text-sm text-muted-foreground">Légendaire</div>
+              <div className="text-xs text-muted-foreground">
                 {achievements.filter(a => a.rarity === 'legendary').length} badges
               </div>
             </div>

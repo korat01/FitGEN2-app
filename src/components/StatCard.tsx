@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
@@ -39,7 +39,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   const getTrendColor = () => {
     switch (trend) {
       case 'up':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-green-400 bg-green-500/10 border-green-500/30';
       case 'down':
         return 'text-red-600 bg-red-50 border-red-200';
       default:

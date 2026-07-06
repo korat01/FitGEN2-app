@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -1133,7 +1133,7 @@ const RepasDetail: React.FC = () => {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-600 mb-4">Repas non trouvé</h1>
+          <h1 className="text-2xl font-bold text-muted-foreground mb-4">Repas non trouvé</h1>
           <Button onClick={() => navigate('/nutrition')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à la nutrition
@@ -1145,21 +1145,21 @@ const RepasDetail: React.FC = () => {
 
   const getClasseColor = (classe: string) => {
     switch (classe) {
-      case 'Prise de masse': return 'bg-blue-100 text-blue-800';
-      case 'Sèche': return 'bg-red-100 text-red-800';
-      case 'Récupération': return 'bg-green-100 text-green-800';
-      case 'Anti-inflammatoire': return 'bg-purple-100 text-purple-800';
-      case 'Boost performance': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Prise de masse': return 'bg-blue-500/15 border border-blue-500/25 text-blue-300';
+      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-800';
+      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-800';
+      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-800';
+      default: return 'bg-white/5 text-foreground';
     }
   };
 
   const getDifficultyColor = (difficulte: string) => {
     switch (difficulte) {
-      case 'Facile': return 'bg-green-100 text-green-800';
-      case 'Moyen': return 'bg-yellow-100 text-yellow-800';
-      case 'Difficile': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Facile': return 'bg-green-500/15 border border-green-500/25 text-green-800';
+      case 'Moyen': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800';
+      case 'Difficile': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      default: return 'bg-white/5 text-foreground';
     }
   };
 
@@ -1178,8 +1178,8 @@ const RepasDetail: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="text-3xl md:text-4xl">{repas.emoji}</div>
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 truncate">{repas.nom}</h1>
-            <p className="text-gray-600">{'description' in repas ? repas.description : ''}</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">{repas.nom}</h1>
+            <p className="text-muted-foreground">{'description' in repas ? repas.description : ''}</p>
           </div>
         </div>
         <Button
@@ -1188,7 +1188,7 @@ const RepasDetail: React.FC = () => {
           className={`p-2 ${
             isFavorite 
               ? 'text-red-500' 
-              : 'text-gray-400 hover:text-red-500'
+              : 'text-muted-foreground/70 hover:text-red-500'
           }`}
         >
           <Heart className={`h-6 w-6 ${isFavorite ? 'fill-current' : ''}`} />
@@ -1199,10 +1199,10 @@ const RepasDetail: React.FC = () => {
         {/* Contenu principal */}
         <div className="lg:col-span-2 space-y-6">
           {/* Valeurs nutritionnelles */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-green-600" />
+                <Star className="h-5 w-5 text-green-400" />
                 Valeurs nutritionnelles totales
               </CardTitle>
             </CardHeader>
@@ -1213,57 +1213,57 @@ const RepasDetail: React.FC = () => {
                   <div className="text-sm text-orange-700">Calories</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-blue-600">{repas.proteines}g</div>
-                  <div className="text-sm text-blue-700">Protéines</div>
+                  <div className="text-2xl md:text-3xl font-bold text-blue-400">{repas.proteines}g</div>
+                  <div className="text-sm text-blue-300">Protéines</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-green-600">{repas.glucides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-green-400">{repas.glucides}g</div>
                   <div className="text-sm text-green-700">Glucides</div>
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-purple-600">{repas.lipides}g</div>
+                  <div className="text-2xl md:text-3xl font-bold text-purple-400">{repas.lipides}g</div>
                   <div className="text-sm text-purple-700">Lipides</div>
                 </div>
               </div>
-              <div className="mt-4 text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-xl font-bold text-gray-800">{'fibres' in repas ? repas.fibres : 0}g</div>
-                <div className="text-sm text-gray-600">Fibres</div>
+              <div className="mt-4 text-center p-3 surface-panel-sm">
+                <div className="text-xl font-bold text-foreground">{'fibres' in repas ? repas.fibres : 0}g</div>
+                <div className="text-sm text-muted-foreground">Fibres</div>
               </div>
             </CardContent>
           </Card>
 
           {/* Ingrédients détaillés */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ChefHat className="h-5 w-5 text-blue-600" />
+                <ChefHat className="h-5 w-5 text-blue-400" />
                 Ingrédients détaillés
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {repas.ingredients.map((ingredient, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-4 surface-panel-sm">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">{ingredient.nom}</h4>
-                      <p className="text-sm text-gray-600">{ingredient.quantite}</p>
+                      <h4 className="font-semibold text-foreground">{ingredient.nom}</h4>
+                      <p className="text-sm text-muted-foreground">{ingredient.quantite}</p>
                     </div>
                     <div className="flex gap-4 text-sm">
                       <div className="text-center">
                         <div className="font-bold text-orange-600">{ingredient.calories}</div>
-                        <div className="text-gray-600">cal</div>
+                        <div className="text-muted-foreground">cal</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-bold text-blue-600">{ingredient.proteines}g</div>
-                        <div className="text-gray-600">prot</div>
+                        <div className="font-bold text-blue-400">{ingredient.proteines}g</div>
+                        <div className="text-muted-foreground">prot</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-bold text-green-600">{ingredient.glucides}g</div>
-                        <div className="text-gray-600">gluc</div>
+                        <div className="font-bold text-green-400">{ingredient.glucides}g</div>
+                        <div className="text-muted-foreground">gluc</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-bold text-purple-600">{ingredient.lipides}g</div>
-                        <div className="text-gray-600">lip</div>
+                        <div className="font-bold text-purple-400">{ingredient.lipides}g</div>
+                        <div className="text-muted-foreground">lip</div>
                       </div>
                     </div>
                   </div>
@@ -1273,10 +1273,10 @@ const RepasDetail: React.FC = () => {
           </Card>
 
           {/* Étapes de préparation */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ChefHat className="h-5 w-5 text-green-600" />
+                <ChefHat className="h-5 w-5 text-green-400" />
                 Étapes de préparation
               </CardTitle>
             </CardHeader>
@@ -1284,10 +1284,10 @@ const RepasDetail: React.FC = () => {
               <ol className="space-y-3">
                 {repas.etapes.map((etape, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-green-100 text-green-800 rounded-full flex items-center justify-center font-bold text-sm">
+                    <div className="w-8 h-8 bg-green-500/15 border border-green-500/25 text-green-800 rounded-full flex items-center justify-center font-bold text-sm">
                       {index + 1}
                     </div>
-                    <p className="text-gray-700 flex-1">{etape}</p>
+                    <p className="text-foreground/90 flex-1">{etape}</p>
                   </li>
                 ))}
               </ol>
@@ -1295,7 +1295,7 @@ const RepasDetail: React.FC = () => {
           </Card>
 
           {/* Conseils */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-yellow-600" />
@@ -1307,7 +1307,7 @@ const RepasDetail: React.FC = () => {
                 {('conseils' in repas ? repas.conseils : []).map((conseil: string, index: number) => (
                   <li key={index} className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-gray-700">{conseil}</span>
+                    <span className="text-foreground/90">{conseil}</span>
                   </li>
                 ))}
               </ul>
@@ -1318,25 +1318,25 @@ const RepasDetail: React.FC = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Informations générales */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Informations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Catégorie</span>
+                <span className="text-muted-foreground">Catégorie</span>
                 <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">
                   {repas.categorie}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Objectif</span>
+                <span className="text-muted-foreground">Objectif</span>
                 <Badge className={getClasseColor(repas.objectif)}>
                   {repas.objectif}
                 </Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Difficulté</span>
+                <span className="text-muted-foreground">Difficulté</span>
                 <Badge className={getDifficultyColor('difficulte' in repas ? repas.difficulte : 'Facile')}>
                   {'difficulte' in repas ? repas.difficulte : 'Facile'}
                 </Badge>
@@ -1345,30 +1345,30 @@ const RepasDetail: React.FC = () => {
           </Card>
 
           {/* Temps et portions */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Détails</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-blue-600" />
+                <Clock className="h-5 w-5 text-blue-400" />
                 <div>
-                  <div className="font-semibold text-gray-800">{'tempsPreparation' in repas ? repas.tempsPreparation : '30 min'}</div>
-                  <div className="text-sm text-gray-600">Temps de préparation</div>
+                  <div className="font-semibold text-foreground">{'tempsPreparation' in repas ? repas.tempsPreparation : '30 min'}</div>
+                  <div className="text-sm text-muted-foreground">Temps de préparation</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <Users className="h-5 w-5 text-green-600" />
+                <Users className="h-5 w-5 text-green-400" />
                 <div>
-                  <div className="font-semibold text-gray-800">{'portions' in repas ? repas.portions : 1}</div>
-                  <div className="text-sm text-gray-600">Portion{('portions' in repas && repas.portions > 1) ? 's' : ''}</div>
+                  <div className="font-semibold text-foreground">{'portions' in repas ? repas.portions : 1}</div>
+                  <div className="text-sm text-muted-foreground">Portion{('portions' in repas && repas.portions > 1) ? 's' : ''}</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Actions */}
-          <Card className="bg-white border-0 shadow-lg">
+          <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="space-y-3">
                 <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">

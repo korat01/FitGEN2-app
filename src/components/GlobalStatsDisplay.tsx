@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, BarChart3, Weight, MapPin, Flame } from 'lucide-react';
@@ -19,14 +19,14 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
 
   const getEvolutionIcon = (value: number) => {
     return value >= 0 ? (
-      <TrendingUp className="w-4 h-4 text-green-600" />
+      <TrendingUp className="w-4 h-4 text-green-400" />
     ) : (
       <TrendingDown className="w-4 h-4 text-red-600" />
     );
   };
 
   const getEvolutionColor = (value: number) => {
-    return value >= 0 ? 'text-green-600' : 'text-red-600';
+    return value >= 0 ? 'text-green-400' : 'text-red-600';
   };
 
   const statItems = [
@@ -65,7 +65,7 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
   ];
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+    <Card className="glass-card border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center gap-3 text-2xl">
           <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
@@ -77,7 +77,7 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statItems.map((item, index) => (
-            <div key={index} className={`bg-gradient-to-r ${item.bgColor} rounded-2xl p-6 border border-gray-200`}>
+            <div key={index} className={`bg-gradient-to-r ${item.bgColor} rounded-2xl p-6 border border-white/10`}>
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center`}>
                   {item.icon}
@@ -91,8 +91,8 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
               </div>
               
               <div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-1">{item.value}</h3>
-                <p className="text-sm text-gray-600">{item.title}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-1">{item.value}</h3>
+                <p className="text-sm text-muted-foreground">{item.title}</p>
               </div>
             </div>
           ))}
@@ -100,59 +100,59 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
 
         {/* Résumé de performance */}
         <div className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4">Résumé de Performance</h4>
+          <h4 className="text-lg font-semibold text-foreground mb-4">Résumé de Performance</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Moyenne par semaine */}
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
+              <div className="text-3xl font-bold text-blue-400 mb-2">
                 {Math.round(totalSessions / 52)}
               </div>
-              <div className="text-sm text-gray-600">Séances/semaine</div>
+              <div className="text-sm text-muted-foreground">Séances/semaine</div>
             </div>
             
             {/* Volume moyen par séance */}
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">
+              <div className="text-3xl font-bold text-green-400 mb-2">
                 {Math.round(totalVolume / totalSessions)}
               </div>
-              <div className="text-sm text-gray-600">kg/séance</div>
+              <div className="text-sm text-muted-foreground">kg/séance</div>
             </div>
             
             {/* Distance moyenne par séance */}
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
+              <div className="text-3xl font-bold text-purple-400 mb-2">
                 {Math.round(totalDistance / totalSessions * 10) / 10}
               </div>
-              <div className="text-sm text-gray-600">km/séance</div>
+              <div className="text-sm text-muted-foreground">km/séance</div>
             </div>
           </div>
         </div>
 
         {/* Badges de performance */}
         <div className="mt-6">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4">Badges de Performance</h4>
+          <h4 className="text-lg font-semibold text-foreground mb-4">Badges de Performance</h4>
           <div className="flex flex-wrap gap-2">
             {totalSessions >= 100 && (
-              <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+              <Badge className="bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-200">
                 <BarChart3 className="w-3 h-3 mr-1" />
                 100+ Séances
               </Badge>
             )}
             {totalVolume >= 50000 && (
-              <Badge className="bg-green-100 text-green-800 border-green-200">
+              <Badge className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-200">
                 <Weight className="w-3 h-3 mr-1" />
                 50k+ kg soulevés
               </Badge>
             )}
             {totalDistance >= 1000 && (
-              <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+              <Badge className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-200">
                 <MapPin className="w-3 h-3 mr-1" />
                 1000+ km parcourus
               </Badge>
             )}
             {totalCalories >= 100000 && (
-              <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+              <Badge className="bg-orange-500/15 border border-orange-500/25 text-orange-300 border-orange-500/30">
                 <Flame className="w-3 h-3 mr-1" />
                 100k+ calories brûlées
               </Badge>

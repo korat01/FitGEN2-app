@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -451,11 +451,11 @@ export const Programme: React.FC = () => {
 
         {/* Message si pas de programme */}
         {!programme && (
-          <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl">
+          <Card className="border-0 shadow-xl glass-card border-primary/20 backdrop-blur-md border border-white/20 rounded-2xl">
             <CardContent className="text-center py-12">
               <div className="text-6xl mb-4">🏋️</div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Aucun Programme Généré</h3>
-              <p className="text-gray-500 mb-6">Générez votre programme personnalisé pour commencer votre entraînement !</p>
+              <h3 className="text-xl font-semibold text-foreground/90 mb-2">Aucun Programme Généré</h3>
+              <p className="text-muted-foreground mb-6">Générez votre programme personnalisé pour commencer votre entraînement !</p>
               <Button 
                 onClick={handleGenerateProgramme}
                 disabled={isGenerating}
@@ -481,7 +481,7 @@ export const Programme: React.FC = () => {
         {programme && user?.trainingDays && programme.sessions.length > 0 && (
           <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-blue-800 flex items-center gap-2">
+              <CardTitle className="text-lg font-semibold text-blue-300 flex items-center gap-2">
                 <Target className="w-5 h-5" />
                 Jours d'Entraînement Configurés
               </CardTitle>
@@ -490,13 +490,13 @@ export const Programme: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {user.trainingDays.map(day => (
-                    <Badge key={day} className="bg-blue-100 text-blue-800 border-blue-300">
+                    <Badge key={day} className="bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-300">
                       {day}
                     </Badge>
                   ))}
                 </div>
-                <div className="bg-blue-100/50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-blue-700 text-sm">
+                <div className="bg-blue-500/15 border border-blue-500/25/50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-blue-300 text-sm">
                     <strong>💡 Astuce :</strong> Si vous avez modifié vos jours d'entraînement, 
                     cliquez sur "Générer Mon Programme" pour créer un nouveau programme adapté à vos nouveaux jours.
                   </p>
@@ -516,36 +516,36 @@ export const Programme: React.FC = () => {
                 <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 bg-blue-500/100 rounded-xl flex items-center justify-center">
                         <Target className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-gray-800">Vos Training Max (Cycle 1)</h3>
+                      <h3 className="text-lg font-bold text-foreground">Vos Training Max (Cycle 1)</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
                         <div className="text-center">
-                          <p className="text-sm text-gray-600 mb-1">Squat</p>
-                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxSquat}kg</p>
-                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmSquat}kg</p>
+                          <p className="text-sm text-muted-foreground mb-1">Squat</p>
+                          <p className="text-lg font-bold text-foreground">{tmInfo.maxSquat}kg</p>
+                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmSquat}kg</p>
                         </div>
                       </div>
-                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
                         <div className="text-center">
-                          <p className="text-sm text-gray-600 mb-1">Bench</p>
-                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxBench}kg</p>
-                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmBench}kg</p>
+                          <p className="text-sm text-muted-foreground mb-1">Bench</p>
+                          <p className="text-lg font-bold text-foreground">{tmInfo.maxBench}kg</p>
+                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmBench}kg</p>
                         </div>
                       </div>
-                      <div className="bg-white rounded-lg p-4 border border-blue-100">
+                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
                         <div className="text-center">
-                          <p className="text-sm text-gray-600 mb-1">Deadlift</p>
-                          <p className="text-lg font-bold text-gray-800">{tmInfo.maxDeadlift}kg</p>
-                          <p className="text-sm text-blue-600 font-medium">TM: {tmInfo.tmDeadlift}kg</p>
+                          <p className="text-sm text-muted-foreground mb-1">Deadlift</p>
+                          <p className="text-lg font-bold text-foreground">{tmInfo.maxDeadlift}kg</p>
+                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmDeadlift}kg</p>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 p-3 bg-blue-100 rounded-lg">
-                      <p className="text-sm text-blue-800">
+                    <div className="mt-4 p-3 bg-blue-500/15 border border-blue-500/25 rounded-lg">
+                      <p className="text-sm text-blue-300">
                         <strong>💡 Note :</strong> Les pourcentages affichés sont calculés sur le Training Max (90% du 1RM) + progression du cycle.
                       </p>
                     </div>
@@ -554,7 +554,7 @@ export const Programme: React.FC = () => {
               ) : null;
             })()}
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
-            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} bg-white/90 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
+            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
               <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <Calendar className="w-4 h-4" />
                 Aujourd'hui
@@ -571,9 +571,9 @@ export const Programme: React.FC = () => {
 
             {/* Onglet Aujourd'hui */}
             <TabsContent value="today">
-              <Card className="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
+              <Card className="glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                  <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-blue-500" />
                         Programme du Jour
                   </CardTitle>
@@ -584,32 +584,32 @@ export const Programme: React.FC = () => {
                       {/* Informations de la session */}
                       <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-bold text-gray-800">{todaySession.nom}</h3>
+                          <h3 className="text-xl font-bold text-foreground">{todaySession.nom}</h3>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                            <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-300">
                               {todaySession.intensity}
                             </Badge>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                            <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
                               {todaySession.duration} min
                             </Badge>
-                            <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
+                            <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-300">
                               {todaySession.phase}
                             </Badge>
                     </div>
                   </div>
                   
                         {todaySession.notes && (
-                          <div className="p-3 bg-blue-50 rounded-lg mb-4">
-                            <p className="text-sm text-blue-800"><strong>Notes:</strong> {todaySession.notes}</p>
+                          <div className="p-3 bg-blue-500/10 rounded-lg mb-4">
+                            <p className="text-sm text-blue-300"><strong>Notes:</strong> {todaySession.notes}</p>
                     </div>
                         )}
 
                         {todaySession.equipment && todaySession.equipment.length > 0 && (
                           <div className="mb-4">
-                            <p className="text-sm font-medium text-gray-700 mb-2">Équipement requis:</p>
+                            <p className="text-sm font-medium text-foreground/90 mb-2">Équipement requis:</p>
                             <div className="flex flex-wrap gap-2">
                               {todaySession.equipment.map((eq: string, index: number) => (
-                                <Badge key={index} variant="outline" className="text-gray-600">{eq}</Badge>
+                                <Badge key={index} variant="outline" className="text-muted-foreground">{eq}</Badge>
                               ))}
                     </div>
                     </div>
@@ -619,9 +619,9 @@ export const Programme: React.FC = () => {
                       {/* Exercices avec validation */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold text-gray-800">Exercices ({todaySession.exercises.length})</h4>
+                          <h4 className="text-lg font-semibold text-foreground">Exercices ({todaySession.exercises.length})</h4>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-green-100 text-green-800">
+                            <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800">
                               <Zap className="w-3 h-3 mr-1" />
                               +{getSessionXP(todaySession.id, new Date().toISOString().split('T')[0])} XP
                             </Badge>
@@ -636,12 +636,12 @@ export const Programme: React.FC = () => {
                           return (
                             <div key={exercise.id || index} className="space-y-3">
                               {/* Informations de l'exercice */}
-                              <Card className={`bg-white/70 backdrop-blur-sm border-2 rounded-xl transition-all duration-200 ${
+                              <Card className={`glass-card border-primary/20 bg-white/5 backdrop-blur-sm border-2 rounded-xl transition-all duration-200 ${
                                 isCompleted 
                                   ? isSuccess 
                                     ? 'border-green-300 bg-green-50/70 shadow-green-200' 
                                     : 'border-red-300 bg-red-50/70 shadow-red-200'
-                                  : 'border-gray-200 hover:border-indigo-300 hover:shadow-lg'
+                                  : 'border-white/10 hover:border-indigo-300 hover:shadow-lg'
                               }`}>
                                 <CardHeader className="pb-3">
                                   <div className="flex items-center justify-between">
@@ -661,35 +661,35 @@ export const Programme: React.FC = () => {
                                 <CardContent>
                                   <div className="space-y-3">
                                     <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
-                                      <div className="text-center p-2 bg-gray-50 rounded">
-                                        <p className="text-sm text-gray-600">Séries</p>
-                                        <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
+                                      <div className="text-center p-2 bg-white/5 rounded">
+                                        <p className="text-sm text-muted-foreground">Séries</p>
+                                        <p className="font-bold text-foreground">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
                                       </div>
-                                      <div className="text-center p-2 bg-gray-50 rounded">
-                                        <p className="text-sm text-gray-600">Reps</p>
-                                        <p className="font-bold text-gray-800">{exercise.progression?.reps || exercise.reps}</p>
+                                      <div className="text-center p-2 bg-white/5 rounded">
+                                        <p className="text-sm text-muted-foreground">Reps</p>
+                                        <p className="font-bold text-foreground">{exercise.progression?.reps || exercise.reps}</p>
                                       </div>
-                                      <div className="text-center p-2 bg-gray-50 rounded">
-                                        <p className="text-sm text-gray-600">Poids</p>
+                                      <div className="text-center p-2 bg-white/5 rounded">
+                                        <p className="text-sm text-muted-foreground">Poids</p>
                                         <div className="flex flex-col items-center gap-1">
-                                          <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                                          <p className="font-bold text-foreground">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
                                           {(() => {
                                             const percentage = calculatePercentage(exercise.nom, exercise.poids, todaySession.notes);
                                             return percentage ? (
-                                              <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+                                              <span className="text-xs font-medium text-blue-400 bg-blue-500/15 border border-blue-500/25 px-2 py-1 rounded-md">
                                                 {percentage}% du TM
                                               </span>
                                             ) : null;
                                           })()}
                                         </div>
                                       </div>
-                                      <div className="text-center p-2 bg-gray-50 rounded">
-                                        <p className="text-sm text-gray-600">Repos</p>
-                                        <p className="font-bold text-gray-800">{exercise.progression?.repos || exercise.repos}</p>
+                                      <div className="text-center p-2 bg-white/5 rounded">
+                                        <p className="text-sm text-muted-foreground">Repos</p>
+                                        <p className="font-bold text-foreground">{exercise.progression?.repos || exercise.repos}</p>
                                       </div>
                                     </div>
 
-                                    <div className="text-sm text-gray-600">
+                                    <div className="text-sm text-muted-foreground">
                                       <p><strong>Muscles:</strong> {exercise.muscles?.join(', ') || 'Non spécifié'}</p>
                                       <p><strong>Équipement:</strong> {exercise.equipement?.join(', ') || 'Non spécifié'}</p>
                                     </div>
@@ -721,10 +721,10 @@ export const Programme: React.FC = () => {
                       <div className="w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <RefreshCw className="w-12 h-12 text-white" />
                 </div>
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">Jour de Repos</h3>
-                      <p className="text-gray-600 mb-6">Profitez de cette journée pour récupérer et vous détendre.</p>
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <p className="text-sm text-blue-800">
+                      <h3 className="text-xl font-bold text-foreground mb-2">Jour de Repos</h3>
+                      <p className="text-muted-foreground mb-6">Profitez de cette journée pour récupérer et vous détendre.</p>
+                      <div className="p-4 bg-blue-500/10 rounded-lg">
+                        <p className="text-sm text-blue-300">
                           💡 <strong>Conseil:</strong> La récupération est essentielle pour progresser. 
                           Vous pouvez faire des étirements légers ou une marche.
                         </p>
@@ -737,9 +737,9 @@ export const Programme: React.FC = () => {
 
             {/* Onglet Hebdomadaire */}
             <TabsContent value="weekly">
-              <Card className="bg-white/90 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
+              <Card className="glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                  <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                     <CalendarDays className="w-6 h-6 text-green-500" />
                     Planning Hebdomadaire
                   </CardTitle>
@@ -777,8 +777,8 @@ export const Programme: React.FC = () => {
                                 ? 'bg-red-50/80 border-red-300 shadow-red-200'
                                 : sessionStatus === 'partial'
                                 ? 'bg-yellow-50/80 border-yellow-300 shadow-yellow-200'
-                                : 'bg-blue-50/80 border-blue-200 shadow-blue-200'
-                              : 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-300 shadow-gray-200'
+                                : 'bg-blue-500/10/80 border-blue-200 shadow-blue-200'
+                              : 'bg-gradient-to-br from-gray-50 to-gray-100 border-white/15 shadow-gray-200'
                           } border-2 ${daySession ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : 'cursor-default'}`}
                           onClick={() => daySession && handleSessionClick(daySession)}
                         >
@@ -798,17 +798,17 @@ export const Programme: React.FC = () => {
                             {daySession ? (
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="bg-green-100 text-green-800">
+                                  <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800">
                                     {daySession.intensity}
                                   </Badge>
-                                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                  <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
                                     {daySession.duration}min
                                   </Badge>
                                 </div>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-muted-foreground">
                                   <strong>{daySession.exercises?.length || 0}</strong> exercices
                                 </p>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-muted-foreground">
                                   <strong>Phase:</strong> {daySession.phase}
                                 </p>
                                 {sessionStatus !== 'not-started' && (
@@ -817,30 +817,30 @@ export const Programme: React.FC = () => {
                                       variant="outline" 
                                       className={
                                         sessionStatus === 'completed' 
-                                          ? 'bg-green-100 text-green-800'
+                                          ? 'bg-green-500/15 border border-green-500/25 text-green-800'
                                           : sessionStatus === 'failed'
-                                          ? 'bg-red-100 text-red-800'
-                                          : 'bg-yellow-100 text-yellow-800'
+                                          ? 'bg-red-500/15 border border-red-500/25 text-red-800'
+                                          : 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800'
                                       }
                                     >
                                       {sessionStatus === 'completed' && 'Terminé'}
                                       {sessionStatus === 'failed' && 'Échoué'}
                                       {sessionStatus === 'partial' && 'En cours'}
                                     </Badge>
-                                    <Badge variant="outline" className="bg-purple-100 text-purple-800">
+                                    <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800">
                                       <Zap className="w-3 h-3 mr-1" />
                                       +{getSessionXP(daySession.id, today)} XP
                                     </Badge>
                                   </div>
                                 )}
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-muted-foreground">
                                   {daySession.exercises?.slice(0, 2).map((ex: any) => {
                                     const percentage = calculatePercentage(ex.nom, ex.poids, daySession.notes);
                                     return (
                                       <div key={ex.nom} className="flex items-center gap-1 mb-1">
                                         <span>{ex.nom}</span>
                                         {percentage && (
-                                          <span className="text-blue-600 font-medium">({percentage}% TM)</span>
+                                          <span className="text-blue-400 font-medium">({percentage}% TM)</span>
                                         )}
                                       </div>
                                     );
@@ -850,9 +850,9 @@ export const Programme: React.FC = () => {
                               </div>
                             ) : (
                               <div className="text-center py-4">
-                                <RefreshCw className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-sm text-gray-500 font-medium">Repos</p>
-                                <p className="text-xs text-gray-400">Récupération</p>
+                                <RefreshCw className="w-8 h-8 text-muted-foreground/70 mx-auto mb-2" />
+                                <p className="text-sm text-muted-foreground font-medium">Repos</p>
+                                <p className="text-xs text-muted-foreground/70">Récupération</p>
                               </div>
                             )}
                           </CardContent>
@@ -868,15 +868,15 @@ export const Programme: React.FC = () => {
             <TabsContent value="planning">
               <div className="space-y-8">
                 {/* Header avec navigation */}
-                <div className="bg-gradient-to-r from-slate-50 to-gray-100 rounded-xl md:rounded-2xl p-3 md:p-6 border border-gray-200 shadow-lg">
+                <div className="surface-accent rounded-xl md:rounded-2xl p-3 md:p-6 border border-white/10 shadow-lg">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3 md:mb-4">
                     <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
                       <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
                         <Calendar className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-base md:text-2xl font-bold text-gray-800 truncate">Planning Mensuel</h2>
-                        <p className="text-gray-600 text-xs md:text-base truncate hidden sm:block">Calendrier d'entraînement</p>
+                        <h2 className="text-base md:text-2xl font-bold text-foreground truncate">Planning Mensuel</h2>
+                        <p className="text-muted-foreground text-xs md:text-base truncate hidden sm:block">Calendrier d'entraînement</p>
                       </div>
                     </div>
                     
@@ -885,12 +885,12 @@ export const Programme: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm px-2 md:px-4"
+                        className="glass-card border border-white/15 text-foreground/90 hover:bg-white/10 shadow-sm px-2 md:px-4"
                       >
                         <ChevronLeft className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
-                      <div className="bg-white border border-gray-300 rounded-lg md:rounded-xl px-3 md:px-6 py-1.5 md:py-3 shadow-sm">
-                        <h3 className="text-sm md:text-xl font-bold text-gray-800 truncate">
+                      <div className="glass-card border border-white/15 rounded-lg md:rounded-xl px-3 md:px-6 py-1.5 md:py-3 shadow-sm">
+                        <h3 className="text-sm md:text-xl font-bold text-foreground truncate">
                           {getMonthName(currentMonth).slice(0, 3)} {currentMonth.getFullYear()}
                         </h3>
                       </div>
@@ -898,7 +898,7 @@ export const Programme: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                        className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm px-2 md:px-4"
+                        className="glass-card border border-white/15 text-foreground/90 hover:bg-white/10 shadow-sm px-2 md:px-4"
                       >
                         <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
                       </Button>
@@ -907,40 +907,40 @@ export const Programme: React.FC = () => {
 
                   {/* Stats du programme - Compact Mobile */}
                   <div className="grid grid-cols-3 gap-2 md:gap-4">
-                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                    <div className="glass-card border-primary/20 rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/10 shadow-sm">
                       <div className="flex flex-col md:flex-row items-center md:gap-3">
-                        <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
-                          <Activity className="w-3 h-3 md:w-5 md:h-5 text-blue-600" />
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-500/15 border border-blue-500/25 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Activity className="w-3 h-3 md:w-5 md:h-5 text-blue-400" />
                         </div>
                         <div className="text-center md:text-left">
-                          <p className="text-base md:text-2xl font-bold text-gray-800">{programme?.sessions.length || 0}</p>
-                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Sessions</p>
+                          <p className="text-base md:text-2xl font-bold text-foreground">{programme?.sessions.length || 0}</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Sessions</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                    <div className="glass-card border-primary/20 rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/10 shadow-sm">
                       <div className="flex flex-col md:flex-row items-center md:gap-3">
-                        <div className="w-6 h-6 md:w-10 md:h-10 bg-green-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
-                          <Timer className="w-3 h-3 md:w-5 md:h-5 text-green-600" />
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-green-500/15 border border-green-500/25 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Timer className="w-3 h-3 md:w-5 md:h-5 text-green-400" />
                         </div>
                         <div className="text-center md:text-left">
-                          <p className="text-base md:text-2xl font-bold text-gray-800">
+                          <p className="text-base md:text-2xl font-bold text-foreground">
                             {programme ? Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0 : 0}
                           </p>
-                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Min</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Min</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-white rounded-lg md:rounded-2xl p-2 md:p-4 border border-gray-200 shadow-sm">
+                    <div className="glass-card border-primary/20 rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/10 shadow-sm">
                       <div className="flex flex-col md:flex-row items-center md:gap-3">
-                        <div className="w-6 h-6 md:w-10 md:h-10 bg-purple-100 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
-                          <Target className="w-3 h-3 md:w-5 md:h-5 text-purple-600" />
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-purple-500/15 border border-purple-500/25 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Target className="w-3 h-3 md:w-5 md:h-5 text-purple-400" />
                         </div>
                         <div className="text-center md:text-left">
-                          <p className="text-xs md:text-2xl font-bold text-gray-800 truncate">{programme?.userProfile?.sportClass || 'N/A'}</p>
-                          <p className="text-[10px] md:text-sm text-gray-600 truncate">Sport</p>
+                          <p className="text-xs md:text-2xl font-bold text-foreground truncate">{programme?.userProfile?.sportClass || 'N/A'}</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Sport</p>
                         </div>
                       </div>
                     </div>
@@ -948,12 +948,12 @@ export const Programme: React.FC = () => {
                 </div>
 
                 {programme ? (
-                  <Card className="bg-white border border-gray-200 shadow-lg rounded-xl md:rounded-2xl overflow-hidden">
+                  <Card className="glass-card border-primary/20 border border-white/10 shadow-lg rounded-xl md:rounded-2xl overflow-hidden">
                     <CardContent className="p-2 md:p-6">
                       {/* En-têtes des jours - Mobile Compact */}
                       <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-4">
                         {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, i) => (
-                          <div key={day} className="text-center text-[10px] md:text-sm font-semibold text-gray-700 p-1 md:p-2 bg-gray-50 rounded md:rounded-lg border border-gray-100">
+                          <div key={day} className="text-center text-[10px] md:text-sm font-semibold text-foreground/90 p-1 md:p-2 bg-white/5 rounded md:rounded-lg border border-gray-100">
                             <span className="hidden md:inline">{['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][i]}</span>
                             <span className="md:hidden">{day}</span>
                           </div>
@@ -974,17 +974,17 @@ export const Programme: React.FC = () => {
                                 key={`${weekIndex}-${dayIndex}`}
                                 className={`
                                   min-h-[60px] md:min-h-[120px] p-1 md:p-3 rounded-lg md:rounded-xl border transition-all duration-200
-                                  ${isCurrentMonthDay ? 'bg-white border-gray-200 hover:border-indigo-300 hover:shadow-md' : 'bg-gray-50/50 border-gray-100'}
-                                  ${isTodayDate ? 'ring-2 ring-blue-400 bg-blue-50 border-blue-300 shadow-md' : ''}
+                                  ${isCurrentMonthDay ? 'glass-card border-primary/20 border-white/10 hover:border-indigo-300 hover:shadow-md' : 'bg-white/5/50 border-gray-100'}
+                                  ${isTodayDate ? 'ring-2 ring-blue-400 bg-blue-500/10 border-blue-300 shadow-md' : ''}
                                 `}
                               >
                                 {/* Numéro du jour */}
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className={`text-xs md:text-base font-bold ${isCurrentMonthDay ? 'text-gray-900' : 'text-gray-400'}`}>
+                                  <span className={`text-xs md:text-base font-bold ${isCurrentMonthDay ? 'text-foreground' : 'text-muted-foreground/70'}`}>
                                     {date.getDate()}
                                   </span>
                                   {isTodayDate && (
-                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500/100 rounded-full animate-pulse"></div>
                                   )}
                                 </div>
                                 
@@ -994,10 +994,10 @@ export const Programme: React.FC = () => {
                                     <div
                                       className={`
                                         text-[8px] md:text-xs p-1 md:p-2 rounded md:rounded-lg font-medium cursor-pointer border
-                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-50 text-blue-800 border-blue-200' : 
-                                          sessionForDate.phase === 'Deload' ? 'bg-gray-50 text-gray-700 border-gray-200' :
+                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-500/10 text-blue-300 border-blue-200' : 
+                                          sessionForDate.phase === 'Deload' ? 'bg-white/5 text-foreground/90 border-white/10' :
                                           sessionForDate.phase === 'Adaptation' ? 'bg-green-50 text-green-800 border-green-200' :
-                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-800 border-orange-200' :
+                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-300 border-orange-500/30' :
                                           'bg-purple-50 text-purple-800 border-purple-200'}
                                         hover:scale-105 transition-all duration-200
                                       `}
@@ -1013,7 +1013,7 @@ export const Programme: React.FC = () => {
                                     </div>
                                   ) : (
                                     isCurrentMonthDay && (
-                                      <div className="text-[8px] md:text-xs text-gray-300 text-center py-1 bg-gray-50/30 rounded border border-gray-50">
+                                      <div className="text-[8px] md:text-xs text-muted-foreground/50 text-center py-1 bg-white/5/30 rounded border border-gray-50">
                                         <RefreshCw className="w-2 h-2 md:w-3 md:h-3 text-gray-200 mx-auto" />
                                       </div>
                                     )
@@ -1026,45 +1026,45 @@ export const Programme: React.FC = () => {
                       </div>
                       
                       {/* Légende avec couleurs spécifiques */}
-                      <div className="mt-8 pt-6 border-t border-gray-200">
+                      <div className="mt-8 pt-6 border-t border-white/10">
                         <div className="flex flex-wrap items-center justify-center gap-4">
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
-                            <div className="w-3 h-3 bg-blue-500 rounded"></div>
-                            <span className="text-sm font-medium text-gray-700">Progression</span>
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
+                            <div className="w-3 h-3 bg-blue-500/100 rounded"></div>
+                            <span className="text-sm font-medium text-foreground/90">Progression</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
                             <div className="w-3 h-3 bg-gray-400 rounded"></div>
-                            <span className="text-sm font-medium text-gray-700">Deload</span>
+                            <span className="text-sm font-medium text-foreground/90">Deload</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
                             <div className="w-3 h-3 bg-green-500 rounded"></div>
-                            <span className="text-sm font-medium text-gray-700">Adaptation</span>
+                            <span className="text-sm font-medium text-foreground/90">Adaptation</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
                             <div className="w-3 h-3 bg-orange-500 rounded"></div>
-                            <span className="text-sm font-medium text-gray-700">Spécialisation</span>
+                            <span className="text-sm font-medium text-foreground/90">Spécialisation</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
-                            <div className="w-3 h-3 bg-gray-200 rounded"></div>
-                            <span className="text-sm font-medium text-gray-700">Repos</span>
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
+                            <div className="w-3 h-3 bg-white/10 rounded"></div>
+                            <span className="text-sm font-medium text-foreground/90">Repos</span>
                           </div>
-                          <div className="flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-gray-200">
-                            <div className="w-3 h-3 bg-blue-500 rounded animate-pulse"></div>
-                            <span className="text-sm font-medium text-gray-700">Aujourd'hui</span>
+                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
+                            <div className="w-3 h-3 bg-blue-500/100 rounded animate-pulse"></div>
+                            <span className="text-sm font-medium text-foreground/90">Aujourd'hui</span>
                           </div>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                 ) : (
-                  <Card className="bg-white/95 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
+                  <Card className="glass-card border-primary/20 bg-white/10 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
                     <CardContent className="p-16">
                       <div className="text-center">
                         <div className="w-40 h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
                           <Calendar className="w-20 h-20 text-white" />
                         </div>
-                        <h3 className="text-3xl font-bold text-gray-800 mb-4">Aucun Programme</h3>
-                        <p className="text-gray-600 mb-10 max-w-lg mx-auto text-lg leading-relaxed">
+                        <h3 className="text-3xl font-bold text-foreground mb-4">Aucun Programme</h3>
+                        <p className="text-muted-foreground mb-10 max-w-lg mx-auto text-lg leading-relaxed">
                           Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions organisées.
                         </p>
                         <Button 
@@ -1098,7 +1098,7 @@ export const Programme: React.FC = () => {
         <Dialog open={isSessionModalOpen} onOpenChange={setIsSessionModalOpen}>
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+              <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
                 <Dumbbell className="w-6 h-6 text-blue-500" />
                 {selectedSession?.nom}
               </DialogTitle>
@@ -1109,32 +1109,32 @@ export const Programme: React.FC = () => {
                 {/* Informations de la session */}
                 <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-800">{selectedSession.nom}</h3>
+                    <h3 className="text-xl font-bold text-foreground">{selectedSession.nom}</h3>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                      <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-300">
                         {selectedSession.intensity}
                       </Badge>
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                      <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
                         {selectedSession.duration} min
                       </Badge>
-                      <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-300">
+                      <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-300">
                         {selectedSession.phase}
                       </Badge>
                     </div>
                   </div>
                   
                   {selectedSession.notes && (
-                    <div className="p-3 bg-blue-50 rounded-lg mb-4">
-                      <p className="text-sm text-blue-800"><strong>Notes:</strong> {selectedSession.notes}</p>
+                    <div className="p-3 bg-blue-500/10 rounded-lg mb-4">
+                      <p className="text-sm text-blue-300"><strong>Notes:</strong> {selectedSession.notes}</p>
                     </div>
                   )}
 
                   {selectedSession.equipment && selectedSession.equipment.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Équipement requis:</p>
+                      <p className="text-sm font-medium text-foreground/90 mb-2">Équipement requis:</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedSession.equipment.map((eq: string, index: number) => (
-                          <Badge key={index} variant="outline" className="text-gray-600">{eq}</Badge>
+                          <Badge key={index} variant="outline" className="text-muted-foreground">{eq}</Badge>
                         ))}
                       </div>
                     </div>
@@ -1143,9 +1143,9 @@ export const Programme: React.FC = () => {
 
                 {/* Exercices */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-gray-800">Exercices ({selectedSession.exercises?.length || 0})</h4>
+                  <h4 className="text-lg font-semibold text-foreground">Exercices ({selectedSession.exercises?.length || 0})</h4>
                   {selectedSession.exercises?.map((exercise: any, index: number) => (
-                    <Card key={exercise.id || index} className="bg-white/60 backdrop-blur-sm border border-gray-200">
+                    <Card key={exercise.id || index} className="bg-white/10 backdrop-blur-sm border border-white/10">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <CardTitle className="text-lg">{exercise.nom}</CardTitle>
@@ -1155,35 +1155,35 @@ export const Programme: React.FC = () => {
                       <CardContent>
                         <div className="space-y-3">
                           <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
-                            <div className="text-center p-2 bg-gray-50 rounded">
-                              <p className="text-sm text-gray-600">Séries</p>
-                              <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
+                            <div className="text-center p-2 bg-white/5 rounded">
+                              <p className="text-sm text-muted-foreground">Séries</p>
+                              <p className="font-bold text-foreground">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
                             </div>
-                            <div className="text-center p-2 bg-gray-50 rounded">
-                              <p className="text-sm text-gray-600">Reps</p>
-                              <p className="font-bold text-gray-800">{exercise.progression?.reps || exercise.reps}</p>
+                            <div className="text-center p-2 bg-white/5 rounded">
+                              <p className="text-sm text-muted-foreground">Reps</p>
+                              <p className="font-bold text-foreground">{exercise.progression?.reps || exercise.reps}</p>
                             </div>
-                            <div className="text-center p-2 bg-gray-50 rounded">
-                              <p className="text-sm text-gray-600">Poids</p>
+                            <div className="text-center p-2 bg-white/5 rounded">
+                              <p className="text-sm text-muted-foreground">Poids</p>
                               <div className="flex flex-col items-center gap-1">
-                                <p className="font-bold text-gray-800">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
+                                <p className="font-bold text-foreground">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
                                 {(() => {
                                   const percentage = calculatePercentage(exercise.nom, exercise.poids, selectedSession.notes);
                                   return percentage ? (
-                                    <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-md">
+                                    <span className="text-xs font-medium text-blue-400 bg-blue-500/15 border border-blue-500/25 px-2 py-1 rounded-md">
                                       {percentage}% du TM
                                     </span>
                                   ) : null;
                                 })()}
                               </div>
                             </div>
-                            <div className="text-center p-2 bg-gray-50 rounded">
-                              <p className="text-sm text-gray-600">Repos</p>
-                              <p className="font-bold text-gray-800">{exercise.progression?.repos || exercise.repos}</p>
+                            <div className="text-center p-2 bg-white/5 rounded">
+                              <p className="text-sm text-muted-foreground">Repos</p>
+                              <p className="font-bold text-foreground">{exercise.progression?.repos || exercise.repos}</p>
                             </div>
                           </div>
 
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             <p><strong>Muscles:</strong> {exercise.muscles?.join(', ') || 'Non spécifié'}</p>
                             <p><strong>Équipement:</strong> {exercise.equipement?.join(', ') || 'Non spécifié'}</p>
                           </div>

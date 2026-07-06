@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
@@ -55,7 +55,7 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
   if (isRestDay) {
     return (
       <div className="flex items-center justify-center p-4">
-        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+        <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
           <Clock className="w-4 h-4 mr-2" />
           Jour de repos
         </Badge>
@@ -77,14 +77,14 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
             <p className="font-medium text-sm">
               {isSuccess ? 'Exercice réussi' : 'Exercice échoué'}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {isSuccess ? '+50 XP' : '+10 XP'}
             </p>
           </div>
         </div>
         <Badge 
           variant={isSuccess ? "default" : "destructive"}
-          className={isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+          className={isSuccess ? "bg-green-500/15 border border-green-500/25 text-green-800" : "bg-red-500/15 border border-red-500/25 text-red-800"}
         >
           {isSuccess ? 'Réussi' : 'Échoué'}
         </Badge>
@@ -93,13 +93,13 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
   }
 
   return (
-    <Card className="border-2 border-dashed border-gray-200 hover:border-blue-300 transition-colors">
+    <Card className="border-2 border-dashed border-white/10 hover:border-blue-300 transition-colors">
       <CardContent className="p-4">
         <div className="space-y-4">
           {/* Informations de l'exercice */}
           <div className="text-center">
             <h3 className="font-semibold text-lg mb-2">{exercise.nom}</h3>
-            <div className="flex justify-center gap-4 text-sm text-gray-600">
+            <div className="flex justify-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Target className="w-4 h-4" />
                 <span>{exercise.series || exercise.sets || 3} séries</span>
@@ -141,7 +141,7 @@ export const ExerciseValidation: React.FC<ExerciseValidationProps> = ({
           </div>
 
           {/* Indication XP */}
-          <div className="text-center text-xs text-gray-500">
+          <div className="text-center text-xs text-muted-foreground">
             <p>Réussi: +50 XP • Échoué: +10 XP</p>
           </div>
         </div>

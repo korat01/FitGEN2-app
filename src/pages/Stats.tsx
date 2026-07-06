@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -461,9 +461,10 @@ export const Stats: React.FC = () => {
               <div className="space-y-2 md:space-y-3">
                     <div className="text-white/90 font-medium text-xs md:text-base">Progression</div>
                 <div className="w-full max-w-md">
-                  <Progress 
-                        value={(userRank?.globalScore || 0)} 
-                        className="h-1.5 md:h-3 bg-white/20 rounded-full"
+                  <Progress
+                    value={(userRank?.globalScore || 0) / 10}
+                    size="md"
+                    variant="subtle"
                   />
                 </div>
                 <div className="text-xs md:text-sm">
@@ -477,7 +478,7 @@ export const Stats: React.FC = () => {
 
             {/* Navigation Mobile Optimized */}
         <Tabs defaultValue="overview" className="space-y-4 md:space-y-8">
-              <TabsList className="grid w-full grid-cols-7 bg-white/80 backdrop-blur-sm p-1 md:p-2 rounded-xl md:rounded-2xl shadow-lg border border-white/20 gap-0.5 md:gap-1">
+              <TabsList className="grid w-full grid-cols-7 glass-card border-primary/20 p-1 md:p-2 rounded-xl md:rounded-2xl shadow-lg border border-white/20 gap-0.5 md:gap-1">
                 <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white font-medium rounded-lg md:rounded-xl transition-all duration-300 px-1 md:px-3 py-1.5 md:py-2 text-xs md:text-sm">
               <Dumbbell className="w-3 h-3 md:w-4 md:h-4 md:mr-2" />
               <span className="hidden md:inline">Accueil</span>
@@ -519,16 +520,16 @@ export const Stats: React.FC = () => {
 
               {/* Performances */}
               <TabsContent value="performance" className="space-y-4 md:space-y-8">
-                <div className="bg-white/80 backdrop-blur-sm border-0 shadow-xl p-3 md:p-6 rounded-xl md:rounded-2xl">
-                  <h3 className="text-base md:text-xl font-bold text-gray-800 mb-3 md:mb-4">Ajouter une performance</h3>
+                <div className="glass-card border-primary/20 p-3 md:p-6 rounded-xl md:rounded-2xl">
+                  <h3 className="text-base md:text-xl font-bold text-foreground mb-3 md:mb-4">Ajouter une performance</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <div>
-                      <label htmlFor="discipline" className="block text-sm font-medium text-gray-700 mb-1">Discipline</label>
+                      <label htmlFor="discipline" className="block text-sm font-medium text-foreground/90 mb-1">Discipline</label>
                       <select
                         id="discipline"
                         value={performance.discipline}
                         onChange={(e) => setPerformance(prev => ({ ...prev, discipline: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Sélectionner une discipline</option>
                         <option value="bench">Développé couché</option>
@@ -539,24 +540,24 @@ export const Stats: React.FC = () => {
                       </select>
                   </div>
                     <div>
-                      <label htmlFor="value" className="block text-sm font-medium text-gray-700 mb-1">Valeur</label>
+                      <label htmlFor="value" className="block text-sm font-medium text-foreground/90 mb-1">Valeur</label>
                       <input
                         type="number"
                         id="value"
                         value={performance.value}
                         onChange={(e) => setPerformance(prev => ({ ...prev, value: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Ex: 100kg, 4min, 10 reps"
                       />
                         </div>
                         <div>
-                      <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                      <label htmlFor="date" className="block text-sm font-medium text-foreground/90 mb-1">Date</label>
                       <input
                         type="date"
                         id="date"
                         value={performance.date}
                         onChange={(e) => setPerformance(prev => ({ ...prev, date: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       />
                           </div>
                     <Button onClick={handleAddPerformance} className="col-span-full md:col-span-1 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold">
@@ -568,43 +569,43 @@ export const Stats: React.FC = () => {
                 {/* Utiliser le nouveau composant LiveRankCalculator */}
                 {/* The LiveRankCalculator component is not provided in the original file,
                     so we'll keep the placeholder for now. */}
-                <div className="bg-white/80 backdrop-blur-sm border-0 shadow-xl p-6 rounded-2xl">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Rang en temps réel</h3>
+                <div className="glass-card border-primary/20 p-6 rounded-2xl">
+                  <h3 className="text-xl font-bold text-foreground mb-4">Rang en temps réel</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-lg font-semibold text-gray-800">Votre rang actuel</p>
+                      <p className="text-lg font-semibold text-foreground">Votre rang actuel</p>
                       <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r ${getRangColor(userRank?.rank || "D")} text-white font-semibold shadow-lg`}>
                         <span className="text-xl">{getRangIcon(userRank?.rank || "D")}</span>
                         <span>Rang {userRank?.rank || "D"}</span>
                       </div>
                     </div>
                     <div>
-                      <p className="text-lg font-semibold text-gray-800">Votre score global</p>
-                      <div className="text-2xl md:text-4xl font-bold text-indigo-600">{userRank?.globalScore || 0}</div>
-                      <p className="text-sm text-gray-600">sur 1000 points</p>
+                      <p className="text-lg font-semibold text-foreground">Votre score global</p>
+                      <div className="text-2xl md:text-4xl font-bold text-secondary">{userRank?.globalScore || 0}</div>
+                      <p className="text-sm text-muted-foreground">sur 1000 points</p>
                 </div>
                   </div>
                   <div className="mt-6">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-2">Décomposition du score</h4>
-                    <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
+                    <h4 className="text-lg font-semibold text-foreground mb-2">Décomposition du score</h4>
+                    <div className="grid grid-cols-2 gap-3 text-sm text-foreground/90">
                       <div className="flex items-center gap-2">
                         <Weight className="w-4 h-4 text-red-600" /> Force: <span className="font-bold text-red-600">{userRank?.breakdown?.force || 0}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-blue-600" /> Endurance: <span className="font-bold text-blue-600">{userRank?.breakdown?.endurance || 0}</span>
+                        <Clock className="w-4 h-4 text-blue-400" /> Endurance: <span className="font-bold text-blue-400">{userRank?.breakdown?.endurance || 0}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Dumbbell className="w-4 h-4 text-purple-600" /> Calisthéniques: <span className="font-bold text-purple-600">{userRank?.breakdown?.calisthenics || 0}</span>
+                        <Dumbbell className="w-4 h-4 text-purple-400" /> Calisthéniques: <span className="font-bold text-purple-400">{userRank?.breakdown?.calisthenics || 0}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-green-600" /> Explosivité: <span className="font-bold text-green-600">{userRank?.breakdown?.explosivite || 0}</span>
+                        <Zap className="w-4 h-4 text-green-400" /> Explosivité: <span className="font-bold text-green-400">{userRank?.breakdown?.explosivite || 0}</span>
                 </div>
                     </div>
                     </div>
             </div>
 
                 {/* Liste des performances */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="glass-card border-primary/20">
                   <CardHeader>
                     <CardTitle className="text-xl font-bold flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-indigo-500" />
@@ -613,8 +614,8 @@ export const Stats: React.FC = () => {
               </CardHeader>
               <CardContent>
                     {performances.length === 0 ? (
-                      <div className="text-center text-gray-500 py-8">
-                        <Dumbbell className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                      <div className="text-center text-muted-foreground py-8">
+                        <Dumbbell className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                         <p className="text-lg">Aucune performance enregistrée</p>
                         <p className="text-sm">Ajoutez votre première performance !</p>
                       </div>
@@ -630,7 +631,7 @@ export const Stats: React.FC = () => {
                                  perf.discipline === '5k' ? '🏃 5km' :
                                  perf.discipline === 'pullups' ? '🤸‍♂️ Tractions' : perf.discipline}
                         </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-muted-foreground">
                                 {perf.value} {perf.discipline === '5k' ? 'min' : 'kg'} - {new Date(perf.date).toLocaleDateString()}
                       </div>
                             </div>
@@ -654,7 +655,7 @@ export const Stats: React.FC = () => {
           <TabsContent value="records" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Force */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                  <Card className="glass-card border-primary/20">
                     <CardHeader>
                   <CardTitle className="text-xl font-bold text-red-800 flex items-center gap-3">
                     <Weight className="w-6 h-6" />
@@ -686,21 +687,21 @@ export const Stats: React.FC = () => {
                           return (
                             <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-300">
                               <div className="space-y-1">
-                                <div className="font-bold text-lg capitalize text-gray-800">
+                                <div className="font-bold text-lg capitalize text-foreground">
                                   {perf.discipline === 'bench' ? 'Développé couché' :
                                    perf.discipline === 'squat' ? 'Squat' :
                                    perf.discipline === 'deadlift' ? 'Soulevé de terre' : perf.discipline}
                                 </div>
-                                <div className="text-sm font-semibold text-gray-600">
+                                <div className="text-sm font-semibold text-muted-foreground">
                                   Ratio: <span className="font-bold text-red-600">{ratio}×</span> poids corporel
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-muted-foreground">
                                   {new Date(perf.date).toLocaleDateString()}
                                 </div>
                               </div>
                               <div className="text-right space-y-2">
                                 <div className="text-2xl font-bold text-red-600">{perf.value} kg</div>
-                                <Badge className="bg-red-100 text-red-800 border-red-200 font-semibold">
+                                <Badge className="bg-red-500/15 border border-red-500/25 text-red-800 border-red-200 font-semibold">
                                   Record Personnel
                                 </Badge>
                               </div>
@@ -713,8 +714,8 @@ export const Stats: React.FC = () => {
                         const forceDisciplines = ['bench', 'squat', 'deadlift'];
                         return performances.filter(p => forceDisciplines.includes(p.discipline)).length === 0;
                       })() && (
-                        <div className="text-center text-gray-500 py-8">
-                          <Weight className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                        <div className="text-center text-muted-foreground py-8">
+                          <Weight className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                           <p className="text-lg">Aucun record de force</p>
                           <p className="text-sm">Ajoutez vos performances !</p>
                         </div>
@@ -723,9 +724,9 @@ export const Stats: React.FC = () => {
               </Card>
 
               {/* Endurance */}
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                  <Card className="glass-card border-primary/20">
                     <CardHeader>
-                  <CardTitle className="text-xl font-bold text-blue-800 flex items-center gap-3">
+                  <CardTitle className="text-xl font-bold text-blue-300 flex items-center gap-3">
                     <Clock className="w-6 h-6" />
                         Vitesse & Endurance - Vos Records
                   </CardTitle>
@@ -771,14 +772,14 @@ export const Stats: React.FC = () => {
                         return allRecords.map((perf) => {
                           const isSpeedRecord = speedDisciplines.includes(perf.discipline);
                           const unit = isSpeedRecord ? 'min' : 'sec';
-                          const colorClass = isSpeedRecord ? 'text-blue-600' : 'text-green-600';
+                          const colorClass = isSpeedRecord ? 'text-blue-400' : 'text-green-400';
                           const bgClass = isSpeedRecord ? 'from-blue-50 to-indigo-50' : 'from-green-50 to-emerald-50';
-                          const badgeClass = isSpeedRecord ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-green-100 text-green-800 border-green-200';
+                          const badgeClass = isSpeedRecord ? 'bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-200' : 'bg-green-500/15 border border-green-500/25 text-green-800 border-green-200';
                           
                           return (
                             <div key={perf.id} className={`flex justify-between items-center p-4 bg-gradient-to-r ${bgClass} rounded-xl hover:shadow-md transition-all duration-300`}>
                               <div className="space-y-1">
-                                <div className="font-bold text-lg text-gray-800">
+                                <div className="font-bold text-lg text-foreground">
                                   {perf.discipline === '5k' ? '5km' :
                                    perf.discipline === '10k' ? '10km' :
                                    perf.discipline === 'marathon' ? 'Marathon' :
@@ -787,10 +788,10 @@ export const Stats: React.FC = () => {
                                    perf.discipline === 'wall-sit' ? 'Mur' :
                                    perf.discipline === 'burpees' ? 'Burpees' : perf.discipline}
                                 </div>
-                                <div className="text-sm font-semibold text-gray-600">
+                                <div className="text-sm font-semibold text-muted-foreground">
                                   {isSpeedRecord ? 'Meilleur chrono' : 'Durée maximale'}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-muted-foreground">
                                   {new Date(perf.date).toLocaleDateString()}
                                 </div>
                               </div>
@@ -811,8 +812,8 @@ export const Stats: React.FC = () => {
                         const allEnduranceDisciplines = [...speedDisciplines, ...enduranceDisciplines];
                         return performances.filter(p => allEnduranceDisciplines.includes(p.discipline)).length === 0;
                       })() && (
-                        <div className="text-center text-gray-500 py-8">
-                          <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                        <div className="text-center text-muted-foreground py-8">
+                          <Clock className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                           <p className="text-lg">Aucun record d'endurance</p>
                           <p className="text-sm">Ajoutez vos performances !</p>
                     </div>
@@ -833,13 +834,13 @@ export const Stats: React.FC = () => {
                {/* Progression */}
                <TabsContent value="progress" className="space-y-8">
                  {/* Graphique global de toutes les performances */}
-                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                 <Card className="glass-card border-primary/20">
                    <CardHeader>
-                     <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                       <TrendingUp className="w-6 h-6 text-green-600" />
+                     <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                       <TrendingUp className="w-6 h-6 text-green-400" />
                        Évolution globale de vos performances
                      </CardTitle>
-                     <p className="text-gray-600">Progression de toutes vos disciplines dans le temps</p>
+                     <p className="text-muted-foreground">Progression de toutes vos disciplines dans le temps</p>
                    </CardHeader>
                    <CardContent>
                      {performances.length > 0 ? (
@@ -883,8 +884,8 @@ export const Stats: React.FC = () => {
                          </ResponsiveContainer>
                        </div>
                      ) : (
-                       <div className="text-center text-gray-500 py-8">
-                         <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                       <div className="text-center text-muted-foreground py-8">
+                         <TrendingUp className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
                          <p className="text-lg">Aucune performance enregistrée</p>
                          <p className="text-sm">Ajoutez vos performances pour voir vos graphiques !</p>
                        </div>
@@ -900,10 +901,10 @@ export const Stats: React.FC = () => {
                    const improvement = latestValue && firstValue ? ((latestValue - firstValue) / firstValue * 100).toFixed(1) : 0;
                    
                    return (
-                     <Card key={discipline} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                     <Card key={discipline} className="glass-card border-primary/20">
                        <CardHeader>
                          <div className="flex items-center justify-between">
-                           <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                           <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                              <div 
                                className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
                                style={{ backgroundColor: getDisciplineColor(discipline) }}
@@ -975,24 +976,24 @@ export const Stats: React.FC = () => {
                          
                          {/* Statistiques de la discipline */}
                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mt-4 md:mt-6">
-                           <div className="text-center p-4 bg-gray-50 rounded-xl">
-                             <div className="text-lg font-bold text-gray-800">{disciplineData.length}</div>
-                             <div className="text-sm text-gray-600">Performances</div>
+                           <div className="text-center p-4 surface-panel">
+                             <div className="text-lg font-bold text-foreground">{disciplineData.length}</div>
+                             <div className="text-sm text-muted-foreground">Performances</div>
                            </div>
-                           <div className="text-center p-4 bg-gray-50 rounded-xl">
-                             <div className="text-lg font-bold text-gray-800">
+                           <div className="text-center p-4 surface-panel">
+                             <div className="text-lg font-bold text-foreground">
                                {Math.max(...disciplineData.map(d => d.value))} {discipline === '5k' ? 'min' : discipline === 'pullups' ? 'reps' : 'kg'}
                              </div>
-                             <div className="text-sm text-gray-600">Record</div>
+                             <div className="text-sm text-muted-foreground">Record</div>
                            </div>
-                           <div className="text-center p-4 bg-gray-50 rounded-xl">
-                             <div className="text-lg font-bold text-gray-800">
+                           <div className="text-center p-4 surface-panel">
+                             <div className="text-lg font-bold text-foreground">
                                {disciplineData.length > 1 ? 
                                  ((Math.max(...disciplineData.map(d => d.value)) - Math.min(...disciplineData.map(d => d.value))) / Math.min(...disciplineData.map(d => d.value)) * 100).toFixed(1) + '%' 
                                  : '0%'
                                }
                              </div>
-                             <div className="text-sm text-gray-600">Progression</div>
+                             <div className="text-sm text-muted-foreground">Progression</div>
                            </div>
                          </div>
                        </CardContent>
@@ -1002,9 +1003,9 @@ export const Stats: React.FC = () => {
 
                  {/* Graphique en barres des records */}
                  {performances.length > 0 && (
-                   <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                   <Card className="glass-card border-primary/20">
                      <CardHeader>
-                       <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                       <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                          <Trophy className="w-6 h-6 text-yellow-600" />
                          Comparaison des records par discipline
                        </CardTitle>
@@ -1055,21 +1056,21 @@ export const Stats: React.FC = () => {
 
           {/* Objectifs */}
               <TabsContent value="goals" className="space-y-6">
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="glass-card border-primary/20">
               <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                  <Target className="w-6 h-6 text-purple-600" />
+                    <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                  <Target className="w-6 h-6 text-purple-400" />
                   Prochain objectif
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                    <div className="p-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200 text-center space-y-6">
+                    <div className="p-8 surface-accent rounded-2xl border border-purple-200 text-center space-y-6">
                   <div className="text-6xl animate-bounce">🎯</div>
                   
                   <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-gray-800">Atteignez le niveau supérieur</h3>
-                        <div className="text-2xl md:text-4xl font-bold text-purple-600">Rang {userRank?.rank === 'S' ? 'World' : userRank?.rank === 'A' ? 'S' : 'A'}</div>
-                        <div className="text-lg font-semibold text-gray-600">
+                        <h3 className="text-2xl font-bold text-foreground">Atteignez le niveau supérieur</h3>
+                        <div className="text-2xl md:text-4xl font-bold text-purple-400">Rang {userRank?.rank === 'S' ? 'World' : userRank?.rank === 'A' ? 'S' : 'A'}</div>
+                        <div className="text-lg font-semibold text-muted-foreground">
                           Continuez à vous améliorer !
                     </div>
                   </div>
@@ -1086,9 +1087,9 @@ export const Stats: React.FC = () => {
                {/* Classement Global */}
                <TabsContent value="ranking" className="space-y-8">
                  {/* Filtres de catégorie */}
-                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                 <Card className="glass-card border-primary/20">
                    <CardHeader>
-                     <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                     <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
                          <Target className="w-5 h-5 text-white" />
                        </div>
@@ -1137,15 +1138,15 @@ export const Stats: React.FC = () => {
                  </Card>
 
                  {/* Header du classement */}
-                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                 <Card className="glass-card border-primary/20">
                    <CardHeader>
-                     <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                     <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
                        <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
                          <Trophy className="w-6 h-6 text-white" />
                        </div>
                        {getCategoryTitle()}
                      </CardTitle>
-                     <p className="text-gray-600">{getCategoryDescription()}</p>
+                     <p className="text-muted-foreground">{getCategoryDescription()}</p>
                    </CardHeader>
                    <CardContent>
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1153,29 +1154,29 @@ export const Stats: React.FC = () => {
                          <div className="text-2xl md:text-3xl font-bold text-yellow-600 mb-2">
                            {getFilteredRanking().findIndex(u => u.id === user?.id) + 1 || 'N/A'}
                          </div>
-                         <div className="text-lg font-semibold text-gray-800">Votre position</div>
-                         <div className="text-sm text-gray-600">sur {getFilteredRanking().length} athlètes</div>
+                         <div className="text-lg font-semibold text-foreground">Votre position</div>
+                         <div className="text-sm text-muted-foreground">sur {getFilteredRanking().length} athlètes</div>
                        </div>
                        <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
-                         <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-2">
+                         <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">
                            {userRank?.globalScore || 0}
                          </div>
-                         <div className="text-lg font-semibold text-gray-800">Votre score</div>
-                         <div className="text-sm text-gray-600">sur 1000 points</div>
+                         <div className="text-lg font-semibold text-foreground">Votre score</div>
+                         <div className="text-sm text-muted-foreground">sur 1000 points</div>
                        </div>
                        <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
-                         <div className="text-2xl md:text-3xl font-bold text-green-600 mb-2">
+                         <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">
                            {performances.length}
                          </div>
-                         <div className="text-lg font-semibold text-gray-800">Performances</div>
-                         <div className="text-sm text-gray-600">enregistrées</div>
+                         <div className="text-lg font-semibold text-foreground">Performances</div>
+                         <div className="text-sm text-muted-foreground">enregistrées</div>
                        </div>
                      </div>
                    </CardContent>
                 </Card>
 
                  {/* Liste du classement */}
-                 <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                 <Card className="glass-card border-primary/20">
                    <CardHeader>
                      <CardTitle className="text-xl font-bold flex items-center gap-2">
                        <Medal className="w-5 h-5 text-yellow-500" />
@@ -1199,7 +1200,7 @@ export const Stats: React.FC = () => {
                           switch (trend) {
                             case 'up': return <ArrowUp className="w-4 h-4 text-green-500" />;
                             case 'down': return <ArrowDown className="w-4 h-4 text-red-500" />;
-                            default: return <Minus className="w-4 h-4 text-gray-500" />;
+                            default: return <Minus className="w-4 h-4 text-muted-foreground" />;
                           }
                         };
 
@@ -1208,7 +1209,7 @@ export const Stats: React.FC = () => {
                             key={athlete.id} 
                             className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
                               isCurrentUser 
-                                ? 'bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-lg' 
+                                ? 'bg-gradient-to-r from-primary/20 to-secondary/20 border-2 border-primary/40 shadow-lg' 
                                 : 'bg-gradient-to-r from-gray-50 to-gray-100 hover:shadow-md'
                             }`}
                           >
@@ -1218,12 +1219,12 @@ export const Stats: React.FC = () => {
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className={`font-bold text-lg ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                                  <span className={`font-bold text-lg ${isCurrentUser ? 'text-blue-300' : 'text-foreground'}`}>
                                     {athlete.name}
                                   </span>
-                                  {isCurrentUser && <Badge className="bg-blue-500 text-white">Vous</Badge>}
+                                  {isCurrentUser && <Badge className="bg-blue-500/100 text-white">Vous</Badge>}
                                 </div>
-                                 <div className="flex items-center gap-2 text-sm text-gray-600">
+                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                    <span>{getSportIcon(athlete.sportClass)}</span>
                                    <span className="capitalize">{athlete.sportClass}</span>
                                    <span>•</span>
@@ -1240,10 +1241,10 @@ export const Stats: React.FC = () => {
                             
                             <div className="flex items-center gap-4">
                               <div className="text-right">
-                                <div className={`font-bold text-xl ${isCurrentUser ? 'text-blue-600' : 'text-gray-800'}`}>
+                                <div className={`font-bold text-xl ${isCurrentUser ? 'text-blue-400' : 'text-foreground'}`}>
                                   {athlete.globalScore}
                                 </div>
-                                <div className="text-sm text-gray-600">points</div>
+                                <div className="text-sm text-muted-foreground">points</div>
                               </div>
                               
                               <div className="flex items-center gap-2">
@@ -1263,9 +1264,9 @@ export const Stats: React.FC = () => {
 
                 {/* Statistiques du classement */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                  <Card className="glass-card border-primary/20">
                     <CardHeader>
-                      <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                      <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                         <BarChart3 className="w-5 h-5 text-purple-500" />
                         Répartition par rang
                       </CardTitle>
@@ -1280,16 +1281,16 @@ export const Stats: React.FC = () => {
                             <div key={rank} className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className="text-lg">{getRangIcon(rank)}</span>
-                                <span className="font-semibold text-gray-800">Rang {rank}</span>
+                                <span className="font-semibold text-foreground">Rang {rank}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                <div className="w-20 bg-white/10 rounded-full h-2">
                                   <div 
                                     className={`h-2 rounded-full bg-gradient-to-r ${getRangColor(rank)}`}
                                     style={{ width: `${percentage}%` }}
                                   ></div>
                                 </div>
-                                <span className="text-sm font-semibold text-gray-600 w-8">{count}</span>
+                                <span className="text-sm font-semibold text-muted-foreground w-8">{count}</span>
                               </div>
                             </div>
                           );
@@ -1298,9 +1299,9 @@ export const Stats: React.FC = () => {
                     </CardContent>
                   </Card>
 
-                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                  <Card className="glass-card border-primary/20">
                     <CardHeader>
-                      <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                      <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                         <Activity className="w-5 h-5 text-green-500" />
                         Répartition par sport
                       </CardTitle>
@@ -1324,16 +1325,16 @@ export const Stats: React.FC = () => {
                             <div key={sport} className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <span className="text-lg">{getSportIcon(sport)}</span>
-                                <span className="font-semibold text-gray-800">{sportNames[sport]}</span>
+                                <span className="font-semibold text-foreground">{sportNames[sport]}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <div className="w-20 bg-gray-200 rounded-full h-2">
+                                <div className="w-20 bg-white/10 rounded-full h-2">
                                   <div 
                                     className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
                                     style={{ width: `${percentage}%` }}
                                   ></div>
                                 </div>
-                                <span className="text-sm font-semibold text-gray-600 w-8">{count}</span>
+                                <span className="text-sm font-semibold text-muted-foreground w-8">{count}</span>
                               </div>
                             </div>
                           );
@@ -1344,9 +1345,9 @@ export const Stats: React.FC = () => {
                 </div>
 
                 {/* Gestion des amis */}
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="glass-card border-primary/20">
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-3">
+                    <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                       <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                         <Users className="w-5 h-5 text-white" />
                       </div>
@@ -1355,7 +1356,7 @@ export const Stats: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <p className="text-gray-600">
+                      <p className="text-muted-foreground">
                         Ajoutez des amis pour comparer vos performances et vous motiver mutuellement !
                       </p>
                       
@@ -1370,7 +1371,7 @@ export const Stats: React.FC = () => {
 
                       {/* Liste des amis actuels */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-800">Vos amis ({friends.length - 1})</h4>
+                        <h4 className="font-semibold text-foreground">Vos amis ({friends.length - 1})</h4>
                         {friends.filter(f => f.id !== user?.id).map(friend => (
                           <div key={friend.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
                             <div className="flex items-center gap-3">
@@ -1378,8 +1379,8 @@ export const Stats: React.FC = () => {
                                 {friend.name.charAt(0)}
                               </div>
                               <div>
-                                <div className="font-semibold text-gray-800">{friend.name}</div>
-                                <div className="text-sm text-gray-600">
+                                <div className="font-semibold text-foreground">{friend.name}</div>
+                                <div className="text-sm text-muted-foreground">
                                   {getSportIcon(friend.sportClass)} {friend.sportClass} • {friend.weight}kg • {friend.age}ans
                                 </div>
                               </div>
@@ -1402,7 +1403,7 @@ export const Stats: React.FC = () => {
                 {/* Modal pour ajouter des amis */}
                 {showAddFriendModal && (
                   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <Card className="w-full max-w-md bg-white">
+                    <Card className="w-full max-w-md glass-card border-primary/20">
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
                           <span>Ajouter des amis</span>
@@ -1422,7 +1423,7 @@ export const Stats: React.FC = () => {
                             placeholder="Rechercher un athlète..."
                             value={searchFriend}
                             onChange={(e) => setSearchFriend(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                         <div className="max-h-60 overflow-y-auto space-y-2">
@@ -1434,7 +1435,7 @@ export const Stats: React.FC = () => {
                             )
                             .slice(0, 10)
                             .map(athlete => (
-                              <div key={athlete.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                              <div key={athlete.id} className="flex items-center justify-between p-2 surface-panel-sm">
                                 <div className="flex items-center gap-2">
                                   <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
                                     {athlete.name.charAt(0)}
@@ -1462,10 +1463,10 @@ export const Stats: React.FC = () => {
 
               {/* Profil */}
               <TabsContent value="profile" className="space-y-6">
-                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                <Card className="glass-card border-primary/20">
                   <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                      <Users className="w-6 h-6 text-indigo-600" />
+                    <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                      <Users className="w-6 h-6 text-secondary" />
                       Informations du profil
                     </CardTitle>
                   </CardHeader>
@@ -1473,30 +1474,30 @@ export const Stats: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
                         <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Nom</div>
-                          <div className="text-lg font-semibold text-gray-800">{user?.name || "Utilisateur"}</div>
+                          <div className="text-sm text-muted-foreground mb-1">Nom</div>
+                          <div className="text-lg font-semibold text-foreground">{user?.name || "Utilisateur"}</div>
                         </div>
                         <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Poids</div>
-                          <div className="text-lg font-semibold text-gray-800">{user?.weight || 75} kg</div>
+                          <div className="text-sm text-muted-foreground mb-1">Poids</div>
+                          <div className="text-lg font-semibold text-foreground">{user?.weight || 75} kg</div>
                         </div>
-                        <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Âge</div>
-                          <div className="text-lg font-semibold text-gray-800">{user?.age || 28} ans</div>
+                        <div className="p-4 surface-accent rounded-xl">
+                          <div className="text-sm text-muted-foreground mb-1">Âge</div>
+                          <div className="text-lg font-semibold text-foreground">{user?.age || 28} ans</div>
                         </div>
                       </div>
                       <div className="space-y-4">
                         <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Sexe</div>
-                          <div className="text-lg font-semibold text-gray-800">{user?.sex || "male"}</div>
+                          <div className="text-sm text-muted-foreground mb-1">Sexe</div>
+                          <div className="text-lg font-semibold text-foreground">{user?.sex || "male"}</div>
                         </div>
                         <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Sport</div>
-                          <div className="text-lg font-semibold text-gray-800">{user?.sportClass || "classique"}</div>
+                          <div className="text-sm text-muted-foreground mb-1">Sport</div>
+                          <div className="text-lg font-semibold text-foreground">{user?.sportClass || "classique"}</div>
                         </div>
                         <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
-                          <div className="text-sm text-gray-600 mb-1">Rang actuel</div>
-                          <div className="text-lg font-semibold text-gray-800">{userRank?.rank || "D"}</div>
+                          <div className="text-sm text-muted-foreground mb-1">Rang actuel</div>
+                          <div className="text-lg font-semibold text-foreground">{userRank?.rank || "D"}</div>
                         </div>
                       </div>
                     </div>

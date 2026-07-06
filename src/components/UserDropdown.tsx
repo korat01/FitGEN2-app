@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Settings, Crown, LogOut, ChevronDown } from 'lucide-react';
@@ -82,37 +82,37 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       </Button>
 
       {isOpen && (
-        <Card className="absolute right-0 top-full mt-2 w-56 z-50 shadow-xl border-0 bg-white">
+        <Card className="absolute right-0 top-full mt-2 w-56 z-50 shadow-xl border-0 glass-card border-primary/20">
           <CardContent className="p-2">
             <div className="space-y-1">
               <Button
                 variant="ghost"
                 onClick={handleProfileClick}
-                className="w-full justify-start text-gray-700 hover:bg-gray-100 h-12 px-4 rounded-lg transition-colors"
+                className="w-full justify-start text-foreground/90 hover:bg-white/10 h-12 px-4 rounded-lg transition-colors"
               >
-                <User className="w-5 h-5 mr-3 text-gray-600" />
+                <User className="w-5 h-5 mr-3 text-muted-foreground" />
                 <span className="font-medium">Profil</span>
               </Button>
               
               <Button
                 variant="ghost"
                 onClick={handleSettingsClick}
-                className="w-full justify-start text-gray-700 hover:bg-gray-100 h-12 px-4 rounded-lg transition-colors"
+                className="w-full justify-start text-foreground/90 hover:bg-white/10 h-12 px-4 rounded-lg transition-colors"
               >
-                <Settings className="w-5 h-5 mr-3 text-gray-600" />
+                <Settings className="w-5 h-5 mr-3 text-muted-foreground" />
                 <span className="font-medium">Paramètres</span>
               </Button>
               
               <Button
                 variant="ghost"
                 onClick={handleProClick}
-                className="w-full justify-start text-gray-700 hover:bg-gray-100 h-12 px-4 rounded-lg transition-colors"
+                className="w-full justify-start text-foreground/90 hover:bg-white/10 h-12 px-4 rounded-lg transition-colors"
               >
                 <Crown className="w-5 h-5 mr-3 text-yellow-600" />
                 <span className="font-medium">Devenir Pro</span>
               </Button>
               
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-white/10 my-2"></div>
               
               <Button
                 variant="ghost"

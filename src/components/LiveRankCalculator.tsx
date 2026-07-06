@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -164,10 +164,10 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({
 
   if (!user) {
     return (
-      <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="glass-card border-primary/20">
         <CardContent className="p-8 text-center">
-          <div className="text-gray-500">
-            <Star className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <div className="text-muted-foreground">
+            <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
             <p className="text-lg">Connectez-vous pour voir votre rang</p>
           </div>
         </CardContent>
@@ -176,7 +176,7 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({
   }
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+    <Card className="glass-card border-primary/20">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
           <Trophy className="w-6 h-6 text-yellow-500" />
@@ -187,7 +187,7 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({
         {isCalculating ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Calcul en cours...</p>
+            <p className="text-lg text-muted-foreground">Calcul en cours...</p>
           </div>
         ) : userRank ? (
           <>
@@ -198,37 +198,37 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({
                 <span>Rang {userRank.rank}</span>
               </div>
               
-              <div className="text-4xl font-bold text-indigo-600">
+              <div className="text-4xl font-bold text-secondary">
                 {userRank.score}/1000
               </div>
-              <div className="text-lg text-gray-600">Score global</div>
+              <div className="text-lg text-muted-foreground">Score global</div>
             </div>
 
             {/* Barre de progression */}
             <div className="space-y-2">
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-sm text-muted-foreground">
                 <span>Progression vers le rang supérieur</span>
                 <span>{userRank.score}%</span>
               </div>
-              <Progress value={userRank.score} className="h-4" />
+              <Progress value={Math.min(userRank.score / 10, 100)} size="lg" variant="subtle" />
             </div>
 
             {/* Détail des scores */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
-                <div className="text-sm text-gray-600 mb-1">Force</div>
+                <div className="text-sm text-muted-foreground mb-1">Force</div>
                 <div className="text-2xl font-bold text-red-600">{userRank.breakdown.force}</div>
               </div>
               <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
-                <div className="text-sm text-gray-600 mb-1">Endurance</div>
-                <div className="text-2xl font-bold text-blue-600">{userRank.breakdown.endurance}</div>
+                <div className="text-sm text-muted-foreground mb-1">Endurance</div>
+                <div className="text-2xl font-bold text-blue-400">{userRank.breakdown.endurance}</div>
               </div>
             </div>
 
             {/* Informations contextuelles */}
             <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-              <div className="text-sm text-gray-600 mb-1">Calcul basé sur</div>
-              <div className="text-lg font-semibold text-gray-800">{userRank.reason}</div>
+              <div className="text-sm text-muted-foreground mb-1">Calcul basé sur</div>
+              <div className="text-lg font-semibold text-foreground">{userRank.reason}</div>
             </div>
 
             {/* Bouton de recalcul */}
@@ -248,8 +248,8 @@ export const LiveRankCalculator: React.FC<LiveRankCalculatorProps> = ({
           </>
         ) : (
           <div className="text-center py-8">
-            <div className="text-gray-500">
-              <Target className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <div className="text-muted-foreground">
+              <Target className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
               <p className="text-lg">Aucune performance enregistrée</p>
               <p className="text-sm">Ajoutez vos performances pour calculer votre rang !</p>
             </div>

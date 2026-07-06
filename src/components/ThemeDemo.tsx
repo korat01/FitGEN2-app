@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -316,8 +316,8 @@ const ThemeDemo: React.FC = () => {
                 lineHeight: config.typography.lineHeight
               }}
             >
-              1. Ouvrez le fichier <code className="bg-gray-100 px-1 rounded">monApp/src/config/QuickConfig.ts</code><br/>
-              2. Modifiez les valeurs dans la section <code className="bg-gray-100 px-1 rounded">colors</code><br/>
+              1. Ouvrez le fichier <code className="bg-white/5 px-1 rounded">monApp/src/config/QuickConfig.ts</code><br/>
+              2. Modifiez les valeurs dans la section <code className="bg-white/5 px-1 rounded">colors</code><br/>
               3. Redémarrez l'application pour voir les changements<br/>
               4. Ou utilisez les boutons ci-dessus pour changer de thème instantanément !
             </p>

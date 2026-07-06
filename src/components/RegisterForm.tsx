@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -87,17 +87,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Nom */}
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-sm font-semibold text-gray-700">
+        <Label htmlFor="name" className="text-sm font-semibold text-foreground/90">
           Nom complet *
         </Label>
         <div className="relative">
-          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 w-4 h-4" />
           <Input
             id="name"
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
             placeholder="Votre nom"
             required
             disabled={isLoading}
@@ -107,17 +107,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-semibold text-gray-700">
+        <Label htmlFor="email" className="text-sm font-semibold text-foreground/90">
           Email *
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 w-4 h-4" />
           <Input
             id="email"
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
             placeholder="votre@email.com"
             required
             disabled={isLoading}
@@ -127,17 +127,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
       {/* Mot de passe */}
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-semibold text-gray-700">
+        <Label htmlFor="password" className="text-sm font-semibold text-foreground/90">
           Mot de passe *
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 w-4 h-4" />
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="pl-10 pr-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 pr-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
             placeholder="Votre mot de passe"
             required
             disabled={isLoading}
@@ -145,7 +145,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 hover:text-muted-foreground"
             disabled={isLoading}
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -155,17 +155,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
       {/* Confirmation mot de passe */}
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword" className="text-sm font-semibold text-gray-700">
+        <Label htmlFor="confirmPassword" className="text-sm font-semibold text-foreground/90">
           Confirmer le mot de passe *
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 w-4 h-4" />
           <Input
             id="confirmPassword"
             type={showPassword ? 'text' : 'password'}
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            className="pl-10 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
             placeholder="Confirmez votre mot de passe"
             required
             disabled={isLoading}
@@ -175,12 +175,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
       {/* Informations personnelles */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800">Informations personnelles</h3>
+        <h3 className="text-lg font-semibold text-foreground">Informations personnelles</h3>
         
         <div className="grid grid-cols-2 gap-4">
           {/* Poids */}
           <div className="space-y-2">
-            <Label htmlFor="weight" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="weight" className="text-sm font-semibold text-foreground/90">
               Poids (kg)
             </Label>
             <Input
@@ -188,7 +188,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
               type="number"
               value={formData.weight}
               onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
               placeholder="75"
               min="30"
               max="200"
@@ -215,10 +215,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
                   age: newBirthDate ? calculateAge(newBirthDate) : null
                 }));
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             {formData.age && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Âge calculé : {formData.age} ans
               </p>
             )}
@@ -227,7 +227,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
         {/* Sexe */}
         <div className="space-y-2">
-          <Label className="text-sm font-semibold text-gray-700">Sexe</Label>
+          <Label className="text-sm font-semibold text-foreground/90">Sexe</Label>
           <div className="flex gap-3">
             <Button
               type="button"
@@ -252,11 +252,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
 
         {/* Classe de sport */}
         <div className="space-y-2">
-          <Label className="text-sm font-semibold text-gray-700">Type de sport</Label>
+          <Label className="text-sm font-semibold text-foreground/90">Type de sport</Label>
           <select
             value={formData.sportClass}
             onChange={(e) => setFormData({ ...formData, sportClass: e.target.value })}
-            className="w-full h-12 px-4 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-blue-500 focus:ring-blue-500"
             disabled={isLoading}
           >
             <option value="classique">Classique</option>
@@ -274,7 +274,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
       {formData.sportClass === 'marathon' && (
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="vma" className="text-sm font-semibold text-gray-700">
+            <Label htmlFor="vma" className="text-sm font-semibold text-foreground/90">
               VMA (km/h)
             </Label>
             <Input
@@ -282,7 +282,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
               type="number"
               value={formData.vma || 15}
               onChange={(e) => setFormData({ ...formData, vma: Number(e.target.value) })}
-              className="h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
               placeholder="15"
               min="10"
               max="25"
@@ -291,11 +291,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
           </div>
           
           <div className="space-y-2">
-            <Label className="text-sm font-semibold text-gray-700">Objectif</Label>
+            <Label className="text-sm font-semibold text-foreground/90">Objectif</Label>
             <select
               value={formData.objectif || '10k'}
               onChange={(e) => setFormData({ ...formData, objectif: e.target.value })}
-              className="w-full h-12 px-4 border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+              className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-blue-500 focus:ring-blue-500"
               disabled={isLoading}
             >
               <option value="10k">10 km</option>

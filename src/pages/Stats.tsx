@@ -622,7 +622,7 @@ export const Stats: React.FC = () => {
                     ) : (
                       <div className="space-y-4">
                         {performances.map((perf) => (
-                          <div key={perf.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:shadow-md transition-all duration-300">
+                          <div key={perf.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-white/5 to-white/10 rounded-xl hover:shadow-md transition-all duration-300">
                             <div>
                               <div className="font-medium text-lg">
                                 {perf.discipline === 'bench' ? '💪 Développé couché' :
@@ -685,7 +685,7 @@ export const Stats: React.FC = () => {
                           const ratio = Math.round((perf.value / weight) * 10) / 10;
                           
                           return (
-                            <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl hover:shadow-md transition-all duration-300">
+                            <div key={perf.id} className="flex justify-between items-center p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-xl hover:shadow-md transition-all duration-300">
                               <div className="space-y-1">
                                 <div className="font-bold text-lg capitalize text-foreground">
                                   {perf.discipline === 'bench' ? 'Développé couché' :
@@ -773,7 +773,7 @@ export const Stats: React.FC = () => {
                           const isSpeedRecord = speedDisciplines.includes(perf.discipline);
                           const unit = isSpeedRecord ? 'min' : 'sec';
                           const colorClass = isSpeedRecord ? 'text-blue-400' : 'text-green-400';
-                          const bgClass = isSpeedRecord ? 'from-blue-50 to-indigo-50' : 'from-green-50 to-emerald-50';
+                          const bgClass = isSpeedRecord ? 'from-blue-500/10 to-indigo-500/10' : 'from-green-500/10 to-emerald-500/10';
                           const badgeClass = isSpeedRecord ? 'bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-200' : 'bg-green-500/15 border border-green-500/25 text-green-800 border-green-200';
                           
                           return (
@@ -1150,21 +1150,21 @@ export const Stats: React.FC = () => {
                    </CardHeader>
                    <CardContent>
                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                       <div className="text-center p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
+                       <div className="text-center p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl">
                          <div className="text-2xl md:text-3xl font-bold text-yellow-600 mb-2">
                            {getFilteredRanking().findIndex(u => u.id === user?.id) + 1 || 'N/A'}
                          </div>
                          <div className="text-lg font-semibold text-foreground">Votre position</div>
                          <div className="text-sm text-muted-foreground">sur {getFilteredRanking().length} athlètes</div>
                        </div>
-                       <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
+                       <div className="text-center p-6 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl">
                          <div className="text-2xl md:text-3xl font-bold text-blue-400 mb-2">
                            {userRank?.globalScore || 0}
                          </div>
                          <div className="text-lg font-semibold text-foreground">Votre score</div>
                          <div className="text-sm text-muted-foreground">sur 1000 points</div>
                        </div>
-                       <div className="text-center p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
+                       <div className="text-center p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl">
                          <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">
                            {performances.length}
                          </div>
@@ -1210,7 +1210,7 @@ export const Stats: React.FC = () => {
                             className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
                               isCurrentUser 
                                 ? 'bg-gradient-to-r from-primary/20 to-secondary/20 border-2 border-primary/40 shadow-lg' 
-                                : 'bg-gradient-to-r from-gray-50 to-gray-100 hover:shadow-md'
+                                : 'bg-gradient-to-r from-white/5 to-white/10 hover:shadow-md'
                             }`}
                           >
                             <div className="flex items-center gap-4">
@@ -1373,7 +1373,7 @@ export const Stats: React.FC = () => {
                       <div className="space-y-3">
                         <h4 className="font-semibold text-foreground">Vos amis ({friends.length - 1})</h4>
                         {friends.filter(f => f.id !== user?.id).map(friend => (
-                          <div key={friend.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                          <div key={friend.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-white/5 to-white/10 rounded-xl">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {friend.name.charAt(0)}
@@ -1473,11 +1473,11 @@ export const Stats: React.FC = () => {
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
-                        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+                        <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl">
                           <div className="text-sm text-muted-foreground mb-1">Nom</div>
                           <div className="text-lg font-semibold text-foreground">{user?.name || "Utilisateur"}</div>
                         </div>
-                        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
+                        <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-xl">
                           <div className="text-sm text-muted-foreground mb-1">Poids</div>
                           <div className="text-lg font-semibold text-foreground">{user?.weight || 75} kg</div>
                         </div>
@@ -1487,15 +1487,15 @@ export const Stats: React.FC = () => {
                         </div>
                       </div>
                       <div className="space-y-4">
-                        <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl">
+                        <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl">
                           <div className="text-sm text-muted-foreground mb-1">Sexe</div>
                           <div className="text-lg font-semibold text-foreground">{user?.sex || "male"}</div>
                         </div>
-                        <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
+                        <div className="p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-xl">
                           <div className="text-sm text-muted-foreground mb-1">Sport</div>
                           <div className="text-lg font-semibold text-foreground">{user?.sportClass || "classique"}</div>
                         </div>
-                        <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
+                        <div className="p-4 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl">
                           <div className="text-sm text-muted-foreground mb-1">Rang actuel</div>
                           <div className="text-lg font-semibold text-foreground">{userRank?.rank || "D"}</div>
                         </div>

@@ -479,7 +479,7 @@ export const Programme: React.FC = () => {
 
         {/* Message d'information si les jours d'entraînement ont changé */}
         {programme && user?.trainingDays && programme.sessions.length > 0 && (
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl">
+          <Card className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-200 shadow-lg rounded-2xl">
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-blue-300 flex items-center gap-2">
                 <Target className="w-5 h-5" />
@@ -513,7 +513,7 @@ export const Programme: React.FC = () => {
             {(() => {
               const tmInfo = getTrainingMaxInfo();
               return tmInfo ? (
-                <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-2xl mb-6">
+                <Card className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-200 shadow-lg rounded-2xl mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 bg-blue-500/100 rounded-xl flex items-center justify-center">
@@ -582,7 +582,7 @@ export const Programme: React.FC = () => {
                   {todaySession ? (
                     <div className="space-y-6">
                       {/* Informations de la session */}
-                      <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
+                      <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-200/50">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-xl font-bold text-foreground">{todaySession.nom}</h3>
                           <div className="flex items-center gap-2">
@@ -778,7 +778,7 @@ export const Programme: React.FC = () => {
                                 : sessionStatus === 'partial'
                                 ? 'bg-yellow-50/80 border-yellow-300 shadow-yellow-200'
                                 : 'bg-blue-500/10/80 border-blue-200 shadow-blue-200'
-                              : 'bg-gradient-to-br from-gray-50 to-gray-100 border-white/15 shadow-gray-200'
+                              : 'bg-gradient-to-br from-white/5 to-white/10 border-white/15 shadow-gray-200'
                           } border-2 ${daySession ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : 'cursor-default'}`}
                           onClick={() => daySession && handleSessionClick(daySession)}
                         >
@@ -1107,7 +1107,7 @@ export const Programme: React.FC = () => {
             {selectedSession && (
               <div className="space-y-6">
                 {/* Informations de la session */}
-                <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
+                <div className="p-6 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-200/50">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-foreground">{selectedSession.nom}</h3>
                     <div className="flex items-center gap-2">

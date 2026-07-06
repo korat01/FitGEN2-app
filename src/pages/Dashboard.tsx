@@ -689,18 +689,18 @@ export const Dashboard: React.FC = () => {
 
                 {/* Détail des scores */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-xl">
+                  <div className="p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-xl">
                     <div className="text-sm text-muted-foreground mb-1">Force</div>
                     <div className="text-2xl font-bold text-red-600">{userRank.breakdown.force}</div>
                     </div>
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+                  <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl">
                     <div className="text-sm text-muted-foreground mb-1">Endurance</div>
                     <div className="text-2xl font-bold text-blue-400">{userRank.breakdown.endurance}</div>
                   </div>
                 </div>
 
                 {/* Informations contextuelles */}
-                <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
+                <div className="p-4 bg-gradient-to-r from-white/5 to-white/10 rounded-xl">
                   <div className="text-sm text-muted-foreground mb-1">Calcul basé sur</div>
                   <div className="text-lg font-semibold text-foreground">{userRank.reason}</div>
                 </div>

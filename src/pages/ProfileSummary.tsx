@@ -142,7 +142,7 @@ export const ProfileSummary: React.FC = () => {
     gradient?: string
   ) => {
   return (
-      <div className={`p-6 rounded-2xl transition-all duration-300 hover:shadow-lg ${gradient || 'bg-gradient-to-r from-gray-50 to-gray-100'} border border-white/10/50 hover:border-white/15/70`}>
+      <div className={`p-6 rounded-2xl transition-all duration-300 hover:shadow-lg ${gradient || 'surface-panel'} border border-white/10 hover:border-white/20`}>
         <div className="flex items-center gap-3 mb-3">
           {icon && <div className="text-muted-foreground">{icon}</div>}
           <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{label}</div>
@@ -151,7 +151,7 @@ export const ProfileSummary: React.FC = () => {
                     <div className="flex items-center gap-3">
             {type === 'select' && options ? (
               <Select value={tempValue} onValueChange={setTempValue}>
-                <SelectTrigger className="flex-1 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
+                <SelectTrigger className="flex-1 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-primary/30 transition-all duration-200 rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-0 shadow-xl rounded-xl">
@@ -171,7 +171,7 @@ export const ProfileSummary: React.FC = () => {
                 type={type}
                 value={tempValue}
                 onChange={(e) => setTempValue(type === 'number' ? Number(e.target.value) : e.target.value)}
-                className="flex-1 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl text-lg font-semibold"
+                className="flex-1 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-primary/30 transition-all duration-200 rounded-xl text-lg font-semibold"
                 autoFocus
               />
             )}
@@ -186,7 +186,7 @@ export const ProfileSummary: React.FC = () => {
               size="sm"
               variant="outline"
               onClick={onCancel}
-              className="h-12 w-12 border-2 border-white/15 hover:border-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 hover:scale-105 rounded-xl"
+              className="h-12 w-12 border-2 border-white/15 hover:border-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 hover:scale-105 rounded-xl"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -215,9 +215,9 @@ export const ProfileSummary: React.FC = () => {
       key: 'bras',
       icon: <UserCheck className="w-6 h-6" />, 
       color: 'from-red-500 to-pink-500', 
-      bgColor: 'from-red-50 to-pink-50', 
-      borderColor: 'border-red-200/50', 
-      textColor: 'text-red-600',
+      bgColor: 'from-red-500/10 to-pink-500/10', 
+      borderColor: 'border-red-500/30', 
+      textColor: 'text-red-400',
       level: user?.[`muscleGroup_bras`] || 'Débutant'
     },
     { 
@@ -225,8 +225,8 @@ export const ProfileSummary: React.FC = () => {
       key: 'epaules',
       icon: <Users className="w-6 h-6" />, 
       color: 'from-blue-500 to-cyan-500', 
-      bgColor: 'from-blue-50 to-cyan-50', 
-      borderColor: 'border-blue-200/50', 
+      bgColor: 'from-blue-500/10 to-cyan-500/10', 
+      borderColor: 'border-blue-500/30', 
       textColor: 'text-blue-400',
       level: user?.[`muscleGroup_epaules`] || 'Débutant'
     },
@@ -235,8 +235,8 @@ export const ProfileSummary: React.FC = () => {
       key: 'poitrine',
       icon: <Heart className="w-6 h-6" />, 
       color: 'from-green-500 to-emerald-500', 
-      bgColor: 'from-green-50 to-emerald-50', 
-      borderColor: 'border-green-200/50', 
+      bgColor: 'from-green-500/10 to-emerald-500/10', 
+      borderColor: 'border-green-500/30', 
       textColor: 'text-green-400',
       level: user?.[`muscleGroup_poitrine`] || 'Débutant'
     },
@@ -245,8 +245,8 @@ export const ProfileSummary: React.FC = () => {
       key: 'dos',
       icon: <Users className="w-6 h-6" />, 
       color: 'from-purple-500 to-violet-500', 
-      bgColor: 'from-purple-50 to-violet-50', 
-      borderColor: 'border-purple-200/50', 
+      bgColor: 'from-purple-500/10 to-violet-500/10', 
+      borderColor: 'border-purple-500/30', 
       textColor: 'text-purple-400',
       level: user?.[`muscleGroup_dos`] || 'Débutant'
     },
@@ -255,9 +255,9 @@ export const ProfileSummary: React.FC = () => {
       key: 'jambes',
       icon: <Activity className="w-6 h-6" />, 
       color: 'from-orange-500 to-yellow-500', 
-      bgColor: 'from-orange-50 to-yellow-50', 
-      borderColor: 'border-orange-200/50', 
-      textColor: 'text-orange-600',
+      bgColor: 'from-orange-500/10 to-yellow-500/10', 
+      borderColor: 'border-orange-500/30', 
+      textColor: 'text-orange-400',
       level: user?.[`muscleGroup_jambes`] || 'Débutant'
     },
     { 
@@ -265,9 +265,9 @@ export const ProfileSummary: React.FC = () => {
       key: 'fesses',
       icon: <Activity className="w-6 h-6" />, 
       color: 'from-pink-500 to-rose-500', 
-      bgColor: 'from-pink-50 to-rose-50', 
-      borderColor: 'border-pink-200/50', 
-      textColor: 'text-pink-600',
+      bgColor: 'from-pink-500/10 to-rose-500/10', 
+      borderColor: 'border-pink-500/30', 
+      textColor: 'text-pink-400',
       level: user?.[`muscleGroup_fesses`] || 'Débutant'
     },
     { 
@@ -275,8 +275,8 @@ export const ProfileSummary: React.FC = () => {
       key: 'abdominaux',
       icon: <Activity className="w-6 h-6" />, 
       color: 'from-indigo-500 to-blue-500', 
-      bgColor: 'from-indigo-50 to-blue-50', 
-      borderColor: 'border-indigo-200/50', 
+      bgColor: 'from-indigo-500/10 to-blue-500/10', 
+      borderColor: 'border-indigo-500/30', 
       textColor: 'text-secondary',
       level: user?.[`muscleGroup_abdominaux`] || 'Débutant'
     }
@@ -323,7 +323,7 @@ export const ProfileSummary: React.FC = () => {
           reason: 'Niveau débutant - Priorité haute',
           icon: <AlertTriangle className="w-5 h-5" />,
           color: 'from-red-500 to-pink-500',
-          bgColor: 'from-red-50 to-pink-50'
+          bgColor: 'from-red-500/10 to-pink-500/10'
         });
       } else if (level === 'Intermédiaire') {
         focusAreas.push({
@@ -332,7 +332,7 @@ export const ProfileSummary: React.FC = () => {
           reason: 'Niveau intermédiaire - À améliorer',
           icon: <ArrowUp className="w-5 h-5" />,
           color: 'from-yellow-500 to-orange-500',
-          bgColor: 'from-yellow-50 to-orange-50'
+          bgColor: 'from-yellow-500/10 to-orange-500/10'
         });
       }
     });
@@ -346,7 +346,7 @@ export const ProfileSummary: React.FC = () => {
           key: 'force_max',
           icon: <Dumbbell className="w-6 h-6" />,
           color: 'from-purple-500 to-violet-500',
-          bgColor: 'from-purple-50 to-violet-50',
+          bgColor: 'from-purple-500/10 to-violet-500/10',
           priority: 'high',
           reason: 'Powerlifter - Développer la force maximale',
           // Correction : ne pas dupliquer la propriété icon, elle est déjà définie plus haut
@@ -360,7 +360,7 @@ export const ProfileSummary: React.FC = () => {
           key: 'endurance',
           icon: <Activity className="w-6 h-6" />,
           color: 'from-blue-500 to-cyan-500',
-          bgColor: 'from-blue-50 to-cyan-50',
+          bgColor: 'from-blue-500/10 to-cyan-500/10',
           priority: 'high',
           reason: 'Marathonien - Améliorer l\'endurance',
           // Correction : ne pas dupliquer la propriété icon, elle est déjà définie plus haut
@@ -478,7 +478,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               isSelected 
                                 ? `bg-gradient-to-r ${muscle.color}` 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               {muscle.icon}
                   </div>
@@ -492,7 +492,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               isSelected 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -522,7 +522,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_squat 
-                              ? 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -534,7 +534,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_squat 
                                 ? 'bg-gradient-to-r from-red-500 to-pink-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Dumbbell className="w-6 h-6" />
                   </div>
@@ -553,7 +553,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_squat 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_squat && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
@@ -563,7 +563,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_bench 
-                              ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -575,7 +575,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_bench 
                                 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Dumbbell className="w-6 h-6" />
                             </div>
@@ -594,7 +594,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_bench 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_bench && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -604,7 +604,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_deadlift 
-                              ? 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-purple-500/10 to-violet-500/10 border-purple-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -616,7 +616,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_deadlift 
                                 ? 'bg-gradient-to-r from-purple-500 to-violet-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Dumbbell className="w-6 h-6" />
                             </div>
@@ -635,7 +635,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_deadlift 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_deadlift && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -650,7 +650,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_endurance 
-                              ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -662,7 +662,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_endurance 
                                 ? 'bg-gradient-to-r from-blue-500 to-cyan-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Activity className="w-6 h-6" />
                             </div>
@@ -681,7 +681,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_endurance 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_endurance && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -691,7 +691,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_vo2max 
-                              ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -703,7 +703,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_vo2max 
                                 ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Heart className="w-6 h-6" />
                             </div>
@@ -722,7 +722,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_vo2max 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_vo2max && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -732,7 +732,7 @@ export const ProfileSummary: React.FC = () => {
                         <div 
                           className={`p-6 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                             user?.focus_economie 
-                              ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10 hover:border-white/15'
                           }`}
                           onClick={() => {
@@ -744,7 +744,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               user?.focus_economie 
                                 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' 
-                                : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <TrendingUp className="w-6 h-6" />
                             </div>
@@ -763,7 +763,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_economie 
                                 ? 'bg-green-500 border-green-500' 
-                                : 'border-white/15 group-hover:border-gray-400'
+                                : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_economie && <CheckCircle className="w-4 h-4 text-white" />}
                             </div>
@@ -799,7 +799,7 @@ export const ProfileSummary: React.FC = () => {
                   value={user?.generalLevel || 'Débutant'} 
                   onValueChange={(value) => handleFieldChange('generalLevel', value)}
                 >
-                  <SelectTrigger className="w-full h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl">
+                  <SelectTrigger className="w-full h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-primary/30 transition-all duration-200 rounded-xl">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="glass-card border-primary/20 bg-white/10 backdrop-blur-sm border-0 shadow-xl rounded-xl">
@@ -858,7 +858,7 @@ export const ProfileSummary: React.FC = () => {
                             key={day.key}
                             className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                               isSelected 
-                                ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-300 shadow-lg' 
+                                ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/40 shadow-lg' 
                                 : 'bg-white/5 border-white/10 hover:border-white/15'
                             }`}
                             onClick={() => handleTrainingDaysChange(day.key)}
@@ -872,8 +872,8 @@ export const ProfileSummary: React.FC = () => {
                               </div>
                               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                                 isSelected 
-                                  ? 'bg-blue-500/100 border-blue-500' 
-                                  : 'border-white/15 group-hover:border-gray-400'
+                                  ? 'bg-blue-500/20 border-blue-500' 
+                                  : 'border-white/15 group-hover:border-white/30'
                               }`}>
                                 {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
                               </div>
@@ -894,7 +894,7 @@ export const ProfileSummary: React.FC = () => {
                       <Button
                         variant="outline"
                         onClick={cancelTrainingDays}
-                        className="border-2 border-white/15 hover:border-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 hover:scale-105 rounded-xl"
+                        className="border-2 border-white/15 hover:border-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 hover:scale-105 rounded-xl"
                       >
                         <X className="w-4 h-4 mr-2" />
                         Annuler
@@ -910,7 +910,7 @@ export const ProfileSummary: React.FC = () => {
                           key={day.key}
                           className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
                             isSelected 
-                              ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10'
                           }`}
                         >
@@ -923,7 +923,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               isSelected 
-                                ? 'bg-blue-500/100 border-blue-500' 
+                                ? 'bg-blue-500/20 border-blue-500' 
                                 : 'border-white/15'
                             }`}>
                               {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
@@ -975,7 +975,7 @@ export const ProfileSummary: React.FC = () => {
                             key={option.value}
                             className={`p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer group ${
                               isSelected 
-                                ? 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-300 shadow-lg' 
+                                ? 'bg-gradient-to-r from-purple-500/10 to-violet-500/10 border-purple-500/40 shadow-lg' 
                                 : 'bg-white/5 border-white/10 hover:border-white/15'
                             }`}
                             onClick={() => handleTrainingTimeChange(option.value)}
@@ -984,7 +984,7 @@ export const ProfileSummary: React.FC = () => {
                               <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                                 isSelected 
                                   ? 'bg-gradient-to-r from-purple-500 to-violet-500' 
-                                  : 'bg-gray-400 bg-white/15 group-hover:bg-white/25'
+                                  : 'bg-white/15 group-hover:bg-white/25'
                               }`}>
                                 <Timer className="w-6 h-6" />
                               </div>
@@ -996,7 +996,7 @@ export const ProfileSummary: React.FC = () => {
                               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                                 isSelected 
                                   ? 'bg-purple-500 border-purple-500' 
-                                  : 'border-white/15 group-hover:border-gray-400'
+                                  : 'border-white/15 group-hover:border-white/30'
                               }`}>
                                 {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
                               </div>
@@ -1017,7 +1017,7 @@ export const ProfileSummary: React.FC = () => {
                       <Button
                         variant="outline"
                         onClick={cancelTrainingTime}
-                        className="border-2 border-white/15 hover:border-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-200 hover:scale-105 rounded-xl"
+                        className="border-2 border-white/15 hover:border-red-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 hover:scale-105 rounded-xl"
                       >
                         <X className="w-4 h-4 mr-2" />
                         Annuler
@@ -1033,7 +1033,7 @@ export const ProfileSummary: React.FC = () => {
                           key={option.value}
                           className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
                             isSelected 
-                              ? 'bg-gradient-to-r from-purple-50 to-violet-50 border-purple-300 shadow-lg' 
+                              ? 'bg-gradient-to-r from-purple-500/10 to-violet-500/10 border-purple-500/40 shadow-lg' 
                               : 'bg-white/5 border-white/10'
                           }`}
                         >
@@ -1041,7 +1041,7 @@ export const ProfileSummary: React.FC = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg transition-all duration-300 ${
                               isSelected 
                                 ? 'bg-gradient-to-r from-purple-500 to-violet-500' 
-                                : 'bg-gray-400'
+                                : 'bg-white/15 group-hover:bg-white/25'
                             }`}>
                               <Timer className="w-6 h-6" />
                             </div>
@@ -1064,7 +1064,7 @@ export const ProfileSummary: React.FC = () => {
                   </div>
                 )}
 
-                <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
+                <div className="mt-4 p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-500/30">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-5 h-5 text-blue-500" />
                     <span className="font-semibold text-blue-300">Planification</span>
@@ -1110,7 +1110,7 @@ export const ProfileSummary: React.FC = () => {
                   'text',
                   undefined,
                   <Users className="w-5 h-5" />,
-                  'bg-gradient-to-r from-blue-50 to-indigo-50'
+                  'bg-gradient-to-r from-blue-500/10 to-indigo-500/10'
                 )}
 
                 {/* Email */}
@@ -1132,7 +1132,7 @@ export const ProfileSummary: React.FC = () => {
                   'text',
                   undefined,
                   <Mail className="w-5 h-5" />,
-                  'bg-gradient-to-r from-green-50 to-emerald-50'
+                  'bg-gradient-to-r from-green-500/10 to-emerald-500/10'
                 )}
 
                 {/* Téléphone */}
@@ -1176,7 +1176,7 @@ export const ProfileSummary: React.FC = () => {
                   'text',
                   undefined,
                   <MapPin className="w-5 h-5" />,
-                  'bg-gradient-to-r from-yellow-50 to-orange-50'
+                  'bg-gradient-to-r from-yellow-500/10 to-orange-500/10'
                 )}
               </CardContent>
             </Card>
@@ -1211,7 +1211,7 @@ export const ProfileSummary: React.FC = () => {
                   'number',
                   undefined,
                   <Weight className="w-5 h-5" />,
-                  'bg-gradient-to-r from-red-50 to-pink-50'
+                  'bg-gradient-to-r from-red-500/10 to-pink-500/10'
                 )}
 
                 {/* Taille */}
@@ -1233,7 +1233,7 @@ export const ProfileSummary: React.FC = () => {
                   'number',
                   undefined,
                   <Activity className="w-5 h-5" />,
-                  'bg-gradient-to-r from-indigo-50 to-purple-50'
+                  'bg-gradient-to-r from-indigo-500/10 to-purple-500/10'
                 )}
 
                 {/* Âge */}
@@ -1255,7 +1255,7 @@ export const ProfileSummary: React.FC = () => {
                   'number',
                   undefined,
                   <Calendar className="w-5 h-5" />,
-                  'bg-gradient-to-r from-yellow-50 to-orange-50'
+                  'bg-gradient-to-r from-yellow-500/10 to-orange-500/10'
                 )}
 
                 {/* Sexe */}
@@ -1280,7 +1280,7 @@ export const ProfileSummary: React.FC = () => {
                     { value: 'female', label: 'Femme' }
                   ],
                   <Users className="w-5 h-5" />,
-                  'bg-gradient-to-r from-cyan-50 to-blue-50'
+                  'bg-gradient-to-r from-cyan-500/10 to-blue-500/10'
                 )}
               </CardContent>
             </Card>
@@ -1329,7 +1329,7 @@ export const ProfileSummary: React.FC = () => {
                     { value: 'classique', label: 'Classique' }
                   ],
                   <Lightning className="w-5 h-5" />,
-                  'bg-gradient-to-r from-orange-50 to-red-50'
+                  'bg-gradient-to-r from-orange-500/10 to-red-500/10'
                 )}
 
                 {/* Objectif */}
@@ -1360,7 +1360,7 @@ export const ProfileSummary: React.FC = () => {
                     { value: 'sante', label: 'Santé' }
                   ],
                   <Target className="w-5 h-5" />,
-                  'bg-gradient-to-r from-green-50 to-emerald-50'
+                  'bg-gradient-to-r from-green-500/10 to-emerald-500/10'
                 )}
               </CardContent>
             </Card>
@@ -1377,7 +1377,7 @@ export const ProfileSummary: React.FC = () => {
                   </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50 hover:border-blue-300/70 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <Trophy className="w-5 h-5 text-blue-400" />
                       <div className="text-sm font-medium text-blue-400 uppercase tracking-wide">Rang actuel</div>
@@ -1385,7 +1385,7 @@ export const ProfileSummary: React.FC = () => {
                     <div className="text-3xl font-bold text-blue-400">{user.rank || "D"}</div>
                 </div>
                 
-                  <div className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50 hover:border-green-300/70 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/30 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <Weight className="w-5 h-5 text-green-400" />
                       <div className="text-sm font-medium text-green-400 uppercase tracking-wide">Score global</div>
@@ -1393,7 +1393,7 @@ export const ProfileSummary: React.FC = () => {
                     <div className="text-3xl font-bold text-green-400">{user.globalScore || 0}</div>
             </div>
 
-                  <div className="p-6 surface-accent rounded-2xl border border-purple-200/50 hover:border-purple-300/70 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 surface-accent rounded-2xl border border-purple-500/30 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
                       <Calendar className="w-5 h-5 text-purple-400" />
                       <div className="text-sm font-medium text-purple-400 uppercase tracking-wide">Performances</div>
@@ -1404,12 +1404,12 @@ export const ProfileSummary: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl border border-yellow-200/50 hover:border-yellow-300/70 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <Activity className="w-5 h-5 text-yellow-600" />
-                      <div className="text-sm font-medium text-yellow-600 uppercase tracking-wide">IMC</div>
+                      <Activity className="w-5 h-5 text-yellow-400" />
+                      <div className="text-sm font-medium text-yellow-400 uppercase tracking-wide">IMC</div>
                     </div>
-                    <div className="text-3xl font-bold text-yellow-600">
+                    <div className="text-3xl font-bold text-yellow-400">
                       {user.weight && user.height ? 
                         Math.round((user.weight / Math.pow(user.height / 100, 2)) * 10) / 10 : 'N/A'}
                     </div>

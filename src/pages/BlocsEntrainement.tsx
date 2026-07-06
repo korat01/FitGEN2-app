@@ -51,7 +51,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Rack',
       image: '🏋️‍♂️',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -74,7 +74,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Banc',
       image: '💪',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -97,7 +97,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre',
       image: '🏋️‍♀️',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -120,7 +120,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre',
       image: '💪',
       couleur: 'from-indigo-500 to-blue-500',
-      bgCouleur: 'from-indigo-50 to-blue-50',
+      bgCouleur: 'from-indigo-500/10 to-blue-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -143,7 +143,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre',
       image: '🏋️‍♂️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -166,7 +166,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Rack',
       image: '🏋️‍♀️',
       couleur: 'from-orange-500 to-yellow-500',
-      bgCouleur: 'from-orange-50 to-yellow-50',
+      bgCouleur: 'from-orange-500/10 to-yellow-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -189,7 +189,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Plates',
       image: '🏋️‍♂️',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -212,7 +212,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Plates',
       image: '🏋️‍♀️',
       couleur: 'from-purple-500 to-pink-500',
-      bgCouleur: 'from-purple-50 to-pink-50',
+      bgCouleur: 'from-purple-500/10 to-pink-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -237,7 +237,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Chaussures de course',
       image: '🏃‍♂️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -260,7 +260,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Chaussures de course',
       image: '🏃‍♀️',
       couleur: 'from-blue-500 to-indigo-500',
-      bgCouleur: 'from-blue-50 to-indigo-50',
+      bgCouleur: 'from-blue-500/10 to-indigo-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -283,7 +283,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Chaussures de sprint',
       image: '🏃‍♂️',
       couleur: 'from-yellow-500 to-orange-500',
-      bgCouleur: 'from-yellow-50 to-orange-50',
+      bgCouleur: 'from-yellow-500/10 to-orange-500/10',
       borderCouleur: 'border-yellow-200/50',
       icon: <Zap className="w-6 h-6" />,
       instructions: [
@@ -306,7 +306,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Maillot de bain',
       image: '🏊‍♂️',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -329,7 +329,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Vélo',
       image: '🚴‍♂️',
       couleur: 'from-green-500 to-teal-500',
-      bgCouleur: 'from-green-50 to-teal-50',
+      bgCouleur: 'from-green-500/10 to-teal-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -352,7 +352,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine rameur',
       image: '🚣‍♂️',
       couleur: 'from-blue-500 to-purple-500',
-      bgCouleur: 'from-blue-50 to-purple-50',
+      bgCouleur: 'from-blue-500/10 to-purple-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -377,7 +377,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♂️',
       couleur: 'from-orange-500 to-yellow-500',
-      bgCouleur: 'from-orange-50 to-yellow-50',
+      bgCouleur: 'from-orange-500/10 to-yellow-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -400,7 +400,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barres parallèles',
       image: '🤸‍♀️',
       couleur: 'from-pink-500 to-rose-500',
-      bgCouleur: 'from-pink-50 to-rose-50',
+      bgCouleur: 'from-pink-500/10 to-rose-500/10',
       borderCouleur: 'border-pink-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -423,7 +423,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🧘‍♂️',
       couleur: 'from-indigo-500 to-blue-500',
-      bgCouleur: 'from-indigo-50 to-blue-50',
+      bgCouleur: 'from-indigo-500/10 to-blue-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -446,7 +446,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Mur (optionnel)',
       image: '🤸‍♂️',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -469,7 +469,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♀️',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -492,7 +492,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '💪',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -515,7 +515,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏃‍♂️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Zap className="w-6 h-6" />,
       instructions: [
@@ -538,7 +538,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barres parallèles',
       image: '🧘‍♀️',
       couleur: 'from-indigo-500 to-purple-500',
-      bgCouleur: 'from-indigo-50 to-purple-50',
+      bgCouleur: 'from-indigo-500/10 to-purple-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -563,7 +563,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🔥',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -586,7 +586,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Plates',
       image: '⚡',
       couleur: 'from-yellow-500 to-orange-500',
-      bgCouleur: 'from-yellow-50 to-orange-50',
+      bgCouleur: 'from-yellow-500/10 to-orange-500/10',
       borderCouleur: 'border-yellow-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -609,7 +609,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🏋️‍♂️',
       couleur: 'from-orange-500 to-red-500',
-      bgCouleur: 'from-orange-50 to-red-50',
+      bgCouleur: 'from-orange-500/10 to-red-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -632,7 +632,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Box',
       image: '🏃‍♀️',
       couleur: 'from-green-500 to-teal-500',
-      bgCouleur: 'from-green-50 to-teal-50',
+      bgCouleur: 'from-green-500/10 to-teal-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -655,7 +655,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Medecine Ball',
       image: '⚽',
       couleur: 'from-blue-500 to-indigo-500',
-      bgCouleur: 'from-blue-50 to-indigo-50',
+      bgCouleur: 'from-blue-500/10 to-indigo-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -678,7 +678,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Corde à sauter',
       image: '🪢',
       couleur: 'from-purple-500 to-pink-500',
-      bgCouleur: 'from-purple-50 to-pink-50',
+      bgCouleur: 'from-purple-500/10 to-pink-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -701,7 +701,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♂️',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -724,7 +724,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🤸‍♀️',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -749,7 +749,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Banc incliné',
       image: '💪',
       couleur: 'from-blue-500 to-indigo-500',
-      bgCouleur: 'from-blue-50 to-indigo-50',
+      bgCouleur: 'from-blue-500/10 to-indigo-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -772,7 +772,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre + Banc décliné',
       image: '💪',
       couleur: 'from-purple-500 to-pink-500',
-      bgCouleur: 'from-purple-50 to-pink-50',
+      bgCouleur: 'from-purple-500/10 to-pink-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -795,7 +795,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre',
       image: '💪',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -818,7 +818,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Banc',
       image: '💪',
       couleur: 'from-orange-500 to-yellow-500',
-      bgCouleur: 'from-orange-50 to-yellow-50',
+      bgCouleur: 'from-orange-500/10 to-yellow-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -841,7 +841,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '💪',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -864,7 +864,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '💪',
       couleur: 'from-indigo-500 to-purple-500',
-      bgCouleur: 'from-indigo-50 to-purple-50',
+      bgCouleur: 'from-indigo-500/10 to-purple-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -887,7 +887,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine presse',
       image: '🏋️‍♂️',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -910,7 +910,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine extension',
       image: '🏋️‍♀️',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -933,7 +933,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine curl',
       image: '🏋️‍♂️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -956,7 +956,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine mollets',
       image: '🏋️‍♀️',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -981,7 +981,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '⚡',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Zap className="w-6 h-6" />,
       instructions: [
@@ -1004,7 +1004,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine elliptique',
       image: '🏃‍♂️',
       couleur: 'from-blue-500 to-indigo-500',
-      bgCouleur: 'from-blue-50 to-indigo-50',
+      bgCouleur: 'from-blue-500/10 to-indigo-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1027,7 +1027,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Step mill',
       image: '🏃‍♀️',
       couleur: 'from-green-500 to-teal-500',
-      bgCouleur: 'from-green-50 to-teal-50',
+      bgCouleur: 'from-green-500/10 to-teal-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1050,7 +1050,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Tapis de course',
       image: '🏃‍♂️',
       couleur: 'from-purple-500 to-pink-500',
-      bgCouleur: 'from-purple-50 to-pink-50',
+      bgCouleur: 'from-purple-500/10 to-pink-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1073,7 +1073,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Machine rameur',
       image: '🚣‍♂️',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1096,7 +1096,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Vélo spinning',
       image: '🚴‍♀️',
       couleur: 'from-orange-500 to-red-500',
-      bgCouleur: 'from-orange-50 to-red-50',
+      bgCouleur: 'from-orange-500/10 to-red-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1121,7 +1121,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♂️',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1144,7 +1144,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♀️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1167,7 +1167,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '💪',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1190,7 +1190,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏹',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1213,7 +1213,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '💪',
       couleur: 'from-indigo-500 to-purple-500',
-      bgCouleur: 'from-indigo-50 to-purple-50',
+      bgCouleur: 'from-indigo-500/10 to-purple-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1236,7 +1236,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Mur (optionnel)',
       image: '🤸‍♂️',
       couleur: 'from-yellow-500 to-orange-500',
-      bgCouleur: 'from-yellow-50 to-orange-50',
+      bgCouleur: 'from-yellow-500/10 to-orange-500/10',
       borderCouleur: 'border-yellow-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1259,7 +1259,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏔️',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1282,7 +1282,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Mur',
       image: '🤸‍♂️',
       couleur: 'from-green-500 to-teal-500',
-      bgCouleur: 'from-green-50 to-teal-50',
+      bgCouleur: 'from-green-500/10 to-teal-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1305,7 +1305,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Poteau',
       image: '��‍♂️',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1330,7 +1330,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🏋️‍♂️',
       couleur: 'from-orange-500 to-yellow-500',
-      bgCouleur: 'from-orange-50 to-yellow-50',
+      bgCouleur: 'from-orange-500/10 to-yellow-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1353,7 +1353,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🏋️‍♀️',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1376,7 +1376,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🏋️‍♂️',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1399,7 +1399,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🏋️‍♀️',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1422,7 +1422,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebells',
       image: '🏋️‍♂️',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1445,7 +1445,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🎒',
       couleur: 'from-indigo-500 to-purple-500',
-      bgCouleur: 'from-indigo-50 to-purple-50',
+      bgCouleur: 'from-indigo-500/10 to-purple-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1468,7 +1468,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🌪️',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1491,7 +1491,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '8️⃣',
       couleur: 'from-purple-500 to-pink-500',
-      bgCouleur: 'from-purple-50 to-pink-50',
+      bgCouleur: 'from-purple-500/10 to-pink-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1514,7 +1514,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '🌪️',
       couleur: 'from-yellow-500 to-orange-500',
-      bgCouleur: 'from-yellow-50 to-orange-50',
+      bgCouleur: 'from-yellow-500/10 to-orange-500/10',
       borderCouleur: 'border-yellow-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1537,7 +1537,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '��',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1562,7 +1562,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre',
       image: '🏋️‍♂️',
       couleur: 'from-gray-500 to-slate-500',
-      bgCouleur: 'from-gray-50 to-slate-50',
+      bgCouleur: 'from-white/5 to-white/10',
       borderCouleur: 'border-white/10/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -1585,7 +1585,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Câble',
       image: '💪',
       couleur: 'from-teal-500 to-cyan-500',
-      bgCouleur: 'from-teal-50 to-cyan-50',
+      bgCouleur: 'from-teal-500/10 to-cyan-500/10',
       borderCouleur: 'border-teal-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -1608,7 +1608,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '💪',
       couleur: 'from-rose-500 to-pink-500',
-      bgCouleur: 'from-rose-50 to-pink-50',
+      bgCouleur: 'from-rose-500/10 to-pink-500/10',
       borderCouleur: 'border-rose-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -1631,7 +1631,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Banc prédicateur + Barre',
       image: '💪',
       couleur: 'from-emerald-500 to-green-500',
-      bgCouleur: 'from-emerald-50 to-green-50',
+      bgCouleur: 'from-emerald-500/10 to-green-500/10',
       borderCouleur: 'border-emerald-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -1654,7 +1654,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '🔨',
       couleur: 'from-amber-500 to-yellow-500',
-      bgCouleur: 'from-amber-50 to-yellow-50',
+      bgCouleur: 'from-amber-500/10 to-yellow-500/10',
       borderCouleur: 'border-amber-200/50',
       icon: <Dumbbell className="w-6 h-6" />,
       instructions: [
@@ -1679,7 +1679,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Corde à sauter',
       image: '🪢',
       couleur: 'from-pink-500 to-rose-500',
-      bgCouleur: 'from-pink-50 to-rose-50',
+      bgCouleur: 'from-pink-500/10 to-rose-500/10',
       borderCouleur: 'border-pink-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1725,7 +1725,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🤸‍♂️',
       couleur: 'from-violet-500 to-purple-500',
-      bgCouleur: 'from-violet-50 to-purple-50',
+      bgCouleur: 'from-violet-500/10 to-purple-500/10',
       borderCouleur: 'border-violet-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1748,7 +1748,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏃‍♂️',
       couleur: 'from-lime-500 to-green-500',
-      bgCouleur: 'from-lime-50 to-green-50',
+      bgCouleur: 'from-lime-500/10 to-green-500/10',
       borderCouleur: 'border-lime-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1771,7 +1771,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🏃‍♀️',
       couleur: 'from-orange-500 to-red-500',
-      bgCouleur: 'from-orange-50 to-red-50',
+      bgCouleur: 'from-orange-500/10 to-red-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Activity className="w-6 h-6" />,
       instructions: [
@@ -1796,7 +1796,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Banc',
       image: '🐉',
       couleur: 'from-red-500 to-orange-500',
-      bgCouleur: 'from-red-50 to-orange-50',
+      bgCouleur: 'from-red-500/10 to-orange-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1819,7 +1819,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♂️',
       couleur: 'from-blue-500 to-cyan-500',
-      bgCouleur: 'from-blue-50 to-cyan-50',
+      bgCouleur: 'from-blue-500/10 to-cyan-500/10',
       borderCouleur: 'border-blue-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1842,7 +1842,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Barre de traction',
       image: '🤸‍♀️',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1865,7 +1865,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '‍♂️',
       couleur: 'from-indigo-500 to-blue-500',
-      bgCouleur: 'from-indigo-50 to-blue-50',
+      bgCouleur: 'from-indigo-500/10 to-blue-500/10',
       borderCouleur: 'border-indigo-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1888,7 +1888,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🧘‍♀️',
       couleur: 'from-teal-500 to-cyan-500',
-      bgCouleur: 'from-teal-50 to-cyan-50',
+      bgCouleur: 'from-teal-500/10 to-cyan-500/10',
       borderCouleur: 'border-teal-200/50',
       icon: <Users className="w-6 h-6" />,
       instructions: [
@@ -1913,7 +1913,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Kettlebell',
       image: '😈',
       couleur: 'from-red-500 to-pink-500',
-      bgCouleur: 'from-red-50 to-pink-50',
+      bgCouleur: 'from-red-500/10 to-pink-500/10',
       borderCouleur: 'border-red-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1936,7 +1936,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '🏋️‍♂️',
       couleur: 'from-orange-500 to-yellow-500',
-      bgCouleur: 'from-orange-50 to-yellow-50',
+      bgCouleur: 'from-orange-500/10 to-yellow-500/10',
       borderCouleur: 'border-orange-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1959,7 +1959,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Haltères',
       image: '😈',
       couleur: 'from-purple-500 to-violet-500',
-      bgCouleur: 'from-purple-50 to-violet-50',
+      bgCouleur: 'from-purple-500/10 to-violet-500/10',
       borderCouleur: 'border-purple-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -1982,7 +1982,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🐻',
       couleur: 'from-amber-500 to-orange-500',
-      bgCouleur: 'from-amber-50 to-orange-50',
+      bgCouleur: 'from-amber-500/10 to-orange-500/10',
       borderCouleur: 'border-amber-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2005,7 +2005,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🦀',
       couleur: 'from-cyan-500 to-blue-500',
-      bgCouleur: 'from-cyan-50 to-blue-50',
+      bgCouleur: 'from-cyan-500/10 to-blue-500/10',
       borderCouleur: 'border-cyan-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2028,7 +2028,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🦆',
       couleur: 'from-green-500 to-emerald-500',
-      bgCouleur: 'from-green-50 to-emerald-50',
+      bgCouleur: 'from-green-500/10 to-emerald-500/10',
       borderCouleur: 'border-green-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2051,7 +2051,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🐛',
       couleur: 'from-lime-500 to-green-500',
-      bgCouleur: 'from-lime-50 to-green-50',
+      bgCouleur: 'from-lime-500/10 to-green-500/10',
       borderCouleur: 'border-lime-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2097,7 +2097,7 @@ export const BlocsEntrainement: React.FC = () => {
       equipement: 'Aucun',
       image: '🐊',
       couleur: 'from-emerald-500 to-teal-500',
-      bgCouleur: 'from-emerald-50 to-teal-50',
+      bgCouleur: 'from-emerald-500/10 to-teal-500/10',
       borderCouleur: 'border-emerald-200/50',
       icon: <Flame className="w-6 h-6" />,
       instructions: [
@@ -2394,19 +2394,19 @@ export const BlocsEntrainement: React.FC = () => {
                   <CardContent className="space-y-6">
                     {/* Informations générales */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50">
+                      <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-200/50">
                         <div className="text-sm font-medium text-blue-400 mb-1">Catégorie</div>
                         <div className="text-lg font-bold text-foreground">{exercice.categorie}</div>
                       </div>
-                      <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
+                      <div className="p-4 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-200/50">
                         <div className="text-sm font-medium text-green-400 mb-1">Type</div>
                         <div className="text-lg font-bold text-foreground">{exercice.type}</div>
                       </div>
-                      <div className="p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-200/50">
+                      <div className="p-4 bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-2xl border border-purple-200/50">
                         <div className="text-sm font-medium text-purple-400 mb-1">Difficulté</div>
                         <div className="text-lg font-bold text-foreground">{exercice.difficulte}</div>
                       </div>
-                      <div className="p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-2xl border border-orange-200/50">
+                      <div className="p-4 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-2xl border border-orange-200/50">
                         <div className="text-sm font-medium text-orange-600 mb-1">Équipement</div>
                         <div className="text-lg font-bold text-foreground">{exercice.equipement}</div>
                       </div>
@@ -2451,7 +2451,7 @@ export const BlocsEntrainement: React.FC = () => {
                         <Star className="w-5 h-5 text-yellow-500" />
                         Conseils
                       </h4>
-                      <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl border border-yellow-200/50">
+                      <div className="p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl border border-yellow-200/50">
                         <p className="text-foreground/90 font-medium">{exercice.conseils}</p>
                       </div>
                     </div>

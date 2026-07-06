@@ -3059,19 +3059,19 @@ const AlimentDetail: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
+                <div className="text-center p-4 bg-gradient-to-br from-orange-500/10 to-orange-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-orange-600">{aliment.calories}</div>
                   <div className="text-sm text-orange-700">Calories</div>
                   </div>
-                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+                <div className="text-center p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-blue-400">{aliment.proteines}g</div>
                   <div className="text-sm text-blue-300">Protéines</div>
                 </div>
-                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                <div className="text-center p-4 bg-gradient-to-br from-green-500/10 to-green-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-green-400">{aliment.glucides}g</div>
                   <div className="text-sm text-green-700">Glucides</div>
               </div>
-                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
+                <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-purple-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-purple-400">{aliment.lipides}g</div>
                   <div className="text-sm text-purple-700">Lipides</div>
                 </div>

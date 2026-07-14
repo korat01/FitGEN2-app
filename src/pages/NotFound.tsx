@@ -11,7 +11,7 @@ export const NotFound: React.FC = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md glass-card border-primary/20">
         <CardHeader className="text-center">
-          <div className="w-20 h-20 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
             <Search className="w-10 h-10 text-white" />
           </div>
           <CardTitle className="text-3xl font-bold text-foreground">404</CardTitle>
@@ -35,7 +35,7 @@ export const NotFound: React.FC = () => {
             
             <Button 
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white"
+              className="flex items-center gap-2 gradient-primary hover:opacity-90 text-white"
             >
               <Home className="w-4 h-4" />
               Accueil

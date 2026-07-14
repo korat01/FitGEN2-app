@@ -27,11 +27,11 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
 
   const getRarityGlow = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'shadow-gray-200';
-      case 'rare': return 'shadow-blue-200';
-      case 'epic': return 'shadow-purple-200';
-      case 'legendary': return 'shadow-yellow-200';
-      default: return 'shadow-gray-200';
+      case 'common': return 'shadow-white/5';
+      case 'rare': return 'shadow-blue-500/20';
+      case 'epic': return 'shadow-purple-500/25';
+      case 'legendary': return 'shadow-yellow-500/25';
+      default: return 'shadow-white/5';
     }
   };
 
@@ -95,10 +95,10 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
           {/* Badge de rareté */}
           <Badge 
             className={`text-xs ${
-              achievement.rarity === 'common' ? 'bg-white/5 text-foreground' :
+              achievement.rarity === 'common' ? 'bg-white/5 text-foreground border border-white/10' :
               achievement.rarity === 'rare' ? 'bg-blue-500/15 border border-blue-500/25 text-blue-300' :
-              achievement.rarity === 'epic' ? 'bg-purple-500/15 border border-purple-500/25 text-purple-800' :
-              'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800'
+              achievement.rarity === 'epic' ? 'bg-purple-500/15 border border-purple-500/25 text-purple-300' :
+              'bg-yellow-500/15 border border-yellow-500/25 text-yellow-300'
             }`}
           >
             {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
@@ -106,7 +106,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onClaim 
 
           {/* Statut */}
           {achievement.unlocked ? (
-            <Badge className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-200">
+            <Badge className="bg-green-500/15 border border-green-500/25 text-green-300">
               <Trophy className="w-3 h-3 mr-1" />
               Débloqué
             </Badge>

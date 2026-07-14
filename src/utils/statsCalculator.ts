@@ -1,5 +1,9 @@
 import { UserProfile } from '../types/profile';
 import { PerformanceRecord, MainStats, XPData, StreakData, DailyQuest, Achievement, GlobalStats } from '../types/stats';
+import {
+  calculateWeeklyActivityHistory,
+  calculateActivityStreak,
+} from './weeklyProgress';
 
 // Calcul du score Wilks/IPF pour la force
 export function calculateWilksScore(weight: number, total: number, isMale: boolean = true): number {
@@ -291,21 +295,38 @@ export function generateDailyQuests(user: UserProfile): DailyQuest[] {
   ];
 }
 
-// Calcul du streak
 export function calculateStreakData(user: UserProfile, performances: PerformanceRecord[]): StreakData {
+  const rawPerformances = performances.map((p) => ({
+    date: p.date,
+    value: p.value,
+  }));
+
+  let validations: { date: string; success?: boolean; xp?: number }[] = [];
+  try {
+    const saved = localStorage.getItem('exerciseValidations');
+    if (saved) validations = JSON.parse(saved);
+  } catch {
+    validations = [];
+  }
+
+  const weeklyHistory = calculateWeeklyActivityHistory(rawPerformances, validations);
+  const currentStreak = calculateActivityStreak(rawPerformances, validations);
+
+  const storedLongest = parseInt(localStorage.getItem('longestStreak') || '0', 10);
+  const longestStreak = Math.max(currentStreak, storedLongest);
+  if (longestStreak > storedLongest) {
+    localStorage.setItem('longestStreak', String(longestStreak));
+  }
+
   const today = new Date();
-  const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-  
-  // Simuler l'historique des 7 derniers jours
-  const weeklyHistory = [true, true, false, true, true, true, true]; // Exemple
-  const currentStreak = weeklyHistory.filter(Boolean).length;
-  
+  today.setHours(0, 0, 0, 0);
+
   return {
     currentStreak,
-    longestStreak: Math.max(currentStreak, 15), // Exemple
+    longestStreak,
     lastActivityDate: today,
     weeklyHistory,
-    streakBonus: Math.min(currentStreak * 5, 100) // 5% par jour, max 100%
+    streakBonus: Math.min(currentStreak * 5, 100),
   };
 }
 

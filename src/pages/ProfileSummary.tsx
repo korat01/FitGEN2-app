@@ -393,7 +393,7 @@ export const ProfileSummary: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           {/* Header Principal */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 p-8 text-white shadow-2xl">
+          <div className="relative overflow-hidden rounded-3xl gradient-primary p-8 text-white shadow-2xl">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.1%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24"></div>
@@ -442,7 +442,7 @@ export const ProfileSummary: React.FC = () => {
           <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                   <Focus className="w-6 h-6 text-white" />
                 </div>
                 Mes Zones de Focus
@@ -491,7 +491,7 @@ export const ProfileSummary: React.FC = () => {
                 </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               isSelected 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
@@ -552,7 +552,7 @@ export const ProfileSummary: React.FC = () => {
                   </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_squat 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_squat && <CheckCircle className="w-4 h-4 text-white" />}
@@ -593,7 +593,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_bench 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_bench && <CheckCircle className="w-4 h-4 text-white" />}
@@ -634,7 +634,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_deadlift 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_deadlift && <CheckCircle className="w-4 h-4 text-white" />}
@@ -680,7 +680,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_endurance 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_endurance && <CheckCircle className="w-4 h-4 text-white" />}
@@ -721,7 +721,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_vo2max 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_vo2max && <CheckCircle className="w-4 h-4 text-white" />}
@@ -762,7 +762,7 @@ export const ProfileSummary: React.FC = () => {
                             </div>
                             <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                               user?.focus_economie 
-                                ? 'bg-green-500 border-green-500' 
+                                ? 'bg-success border-success'
                                 : 'border-white/15 group-hover:border-white/30'
                             }`}>
                               {user?.focus_economie && <CheckCircle className="w-4 h-4 text-white" />}
@@ -783,7 +783,7 @@ export const ProfileSummary: React.FC = () => {
           <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
                 Niveau Général
@@ -825,7 +825,7 @@ export const ProfileSummary: React.FC = () => {
           <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                   <Calendar className="w-6 h-6 text-white" />
                 </div>
                 Jours d'Entraînement
@@ -942,7 +942,7 @@ export const ProfileSummary: React.FC = () => {
           <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                   <Timer className="w-6 h-6 text-white" />
                 </div>
                 Durée d'Entraînement
@@ -1064,12 +1064,12 @@ export const ProfileSummary: React.FC = () => {
                   </div>
                 )}
 
-                <div className="mt-4 p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-500/30">
+                <div className="mt-4 p-4 bg-secondary/10 rounded-2xl border border-secondary/30">
                   <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-5 h-5 text-blue-500" />
-                    <span className="font-semibold text-blue-300">Planification</span>
+                    <Calendar className="w-5 h-5 text-secondary" />
+                    <span className="font-semibold text-secondary">Planification</span>
                   </div>
-                  <p className="text-sm text-blue-400">
+                  <p className="text-sm text-secondary/90">
                     Vous vous entraînerez pendant <strong>{user?.trainingMonths || 3} mois</strong> sur 
                     <strong> {user?.trainingDays?.length || 0} jours par semaine</strong>
                   </p>
@@ -1084,7 +1084,7 @@ export const ProfileSummary: React.FC = () => {
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                     <Users className="w-6 h-6 text-white" />
             </div>
                   Informations personnelles
@@ -1185,7 +1185,7 @@ export const ProfileSummary: React.FC = () => {
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                     <Weight className="w-6 h-6 text-white" />
           </div>
                   Informations physiques
@@ -1289,7 +1289,7 @@ export const ProfileSummary: React.FC = () => {
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                     <Trophy className="w-6 h-6 text-white" />
                   </div>
                   Informations sportives
@@ -1369,7 +1369,7 @@ export const ProfileSummary: React.FC = () => {
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
               <CardHeader className="pb-4">
                 <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                     <Trophy className="w-6 h-6 text-white" />
                   </div>
                   Statistiques
@@ -1377,39 +1377,39 @@ export const ProfileSummary: React.FC = () => {
                   </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-6 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 bg-primary/10 rounded-2xl border border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <Trophy className="w-5 h-5 text-blue-400" />
-                      <div className="text-sm font-medium text-blue-400 uppercase tracking-wide">Rang actuel</div>
+                      <Trophy className="w-5 h-5 text-primary" />
+                      <div className="text-sm font-medium text-primary uppercase tracking-wide">Rang actuel</div>
                     </div>
-                    <div className="text-3xl font-bold text-blue-400">{user.rank || "D"}</div>
+                    <div className="text-3xl font-bold text-primary">{user.rank || "D"}</div>
                 </div>
-                
-                  <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/30 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg">
+
+                  <div className="p-6 bg-secondary/10 rounded-2xl border border-secondary/30 hover:border-secondary/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <Weight className="w-5 h-5 text-green-400" />
-                      <div className="text-sm font-medium text-green-400 uppercase tracking-wide">Score global</div>
+                      <Weight className="w-5 h-5 text-secondary" />
+                      <div className="text-sm font-medium text-secondary uppercase tracking-wide">Score global</div>
                   </div>
-                    <div className="text-3xl font-bold text-green-400">{user.globalScore || 0}</div>
+                    <div className="text-3xl font-bold text-secondary">{user.globalScore || 0}</div>
             </div>
 
-                  <div className="p-6 surface-accent rounded-2xl border border-purple-500/30 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg">
+                  <div className="p-6 surface-accent rounded-2xl border border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <Calendar className="w-5 h-5 text-purple-400" />
-                      <div className="text-sm font-medium text-purple-400 uppercase tracking-wide">Performances</div>
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <div className="text-sm font-medium text-primary uppercase tracking-wide">Performances</div>
                     </div>
-                    <div className="text-3xl font-bold text-purple-400">
-                      {localStorage.getItem('userPerformances') ? 
+                    <div className="text-3xl font-bold text-primary">
+                      {localStorage.getItem('userPerformances') ?
                         JSON.parse(localStorage.getItem('userPerformances')!).length : 0}
                     </div>
                   </div>
-                  
-                  <div className="p-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-2xl border border-yellow-500/30 hover:border-yellow-500/50 transition-all duration-300 hover:shadow-lg">
+
+                  <div className="p-6 bg-accent/10 rounded-2xl border border-accent/30 hover:border-accent/50 transition-all duration-300 hover:shadow-lg">
                     <div className="flex items-center gap-3 mb-3">
-                      <Activity className="w-5 h-5 text-yellow-400" />
-                      <div className="text-sm font-medium text-yellow-400 uppercase tracking-wide">IMC</div>
+                      <Activity className="w-5 h-5 text-accent" />
+                      <div className="text-sm font-medium text-accent uppercase tracking-wide">IMC</div>
                     </div>
-                    <div className="text-3xl font-bold text-yellow-400">
+                    <div className="text-3xl font-bold text-accent">
                       {user.weight && user.height ? 
                         Math.round((user.weight / Math.pow(user.height / 100, 2)) * 10) / 10 : 'N/A'}
                     </div>

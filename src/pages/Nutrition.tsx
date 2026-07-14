@@ -2794,7 +2794,7 @@ const Nutrition: React.FC = () => {
                 placeholder="Rechercher un aliment ou un repas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 text-lg border-2 border-white/10 focus:border-green-500 glass-card border-primary/20"
+              className="pl-10 h-12 text-lg border-2 border-white/10 focus:border-primary glass-card border-primary/20"
               />
             </div>
           </CardContent>

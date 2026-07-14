@@ -14,148 +14,139 @@ export const GlobalStatsDisplay: React.FC<GlobalStatsProps> = ({ stats }) => {
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
-    return num.toLocaleString();
+    return num.toLocaleString('fr-FR');
   };
 
-  const getEvolutionIcon = (value: number) => {
-    return value >= 0 ? (
+  const getEvolutionIcon = (value: number) =>
+    value >= 0 ? (
       <TrendingUp className="w-4 h-4 text-green-400" />
     ) : (
-      <TrendingDown className="w-4 h-4 text-red-600" />
+      <TrendingDown className="w-4 h-4 text-red-400" />
     );
-  };
 
-  const getEvolutionColor = (value: number) => {
-    return value >= 0 ? 'text-green-400' : 'text-red-600';
-  };
+  const getEvolutionColor = (value: number) =>
+    value >= 0 ? 'text-green-400' : 'text-red-400';
 
   const statItems = [
     {
       title: 'Total séances',
       value: totalSessions,
       evolution: evolution.sessions,
-      icon: <BarChart3 className="w-6 h-6" />,
-      color: 'from-blue-500 to-indigo-500',
-      bgColor: 'from-blue-50 to-indigo-50'
+      icon: <BarChart3 className="w-5 h-5 text-white" />,
+      iconGradient: 'from-blue-500 to-indigo-500',
+      bgClass: 'from-blue-500/10 to-indigo-500/10 border-blue-500/25',
     },
     {
       title: 'Volume total soulevé',
       value: `${formatNumber(totalVolume)} kg`,
       evolution: evolution.volume,
-      icon: <Weight className="w-6 h-6" />,
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'from-green-50 to-emerald-50'
+      icon: <Weight className="w-5 h-5 text-white" />,
+      iconGradient: 'from-green-500 to-emerald-500',
+      bgClass: 'from-green-500/10 to-emerald-500/10 border-green-500/25',
     },
     {
       title: 'Distance totale',
       value: `${formatNumber(totalDistance)} km`,
       evolution: evolution.distance,
-      icon: <MapPin className="w-6 h-6" />,
-      color: 'from-purple-500 to-pink-500',
-      bgColor: 'from-purple-50 to-pink-50'
+      icon: <MapPin className="w-5 h-5 text-white" />,
+      iconGradient: 'from-purple-500 to-violet-500',
+      bgClass: 'from-purple-500/10 to-violet-500/10 border-purple-500/25',
     },
     {
       title: 'Calories estimées',
       value: `${formatNumber(totalCalories)} kcal`,
       evolution: evolution.calories,
-      icon: <Flame className="w-6 h-6" />,
-      color: 'from-orange-500 to-red-500',
-      bgColor: 'from-orange-50 to-red-50'
-    }
+      icon: <Flame className="w-5 h-5 text-white" />,
+      iconGradient: 'from-orange-500 to-red-500',
+      bgClass: 'from-orange-500/10 to-red-500/10 border-orange-500/25',
+    },
   ];
+
+  const sessionsPerWeek = totalSessions > 0 ? Math.round(totalSessions / 52) : 0;
+  const volumePerSession = totalSessions > 0 ? Math.round(totalVolume / totalSessions) : 0;
+  const distancePerSession = totalSessions > 0 ? Math.round((totalDistance / totalSessions) * 10) / 10 : 0;
 
   return (
     <Card className="glass-card border-primary/20">
       <CardHeader>
-        <CardTitle className="flex items-center gap-3 text-2xl">
-          <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
-            <BarChart3 className="w-6 h-6 text-white" />
+        <CardTitle className="flex items-center gap-3 text-xl md:text-2xl">
+          <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center shrink-0">
+            <BarChart3 className="w-5 h-5 text-white" />
           </div>
-          Statistiques Globales
+          Statistiques globales
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {statItems.map((item, index) => (
-            <div key={index} className={`bg-gradient-to-r ${item.bgColor} rounded-2xl p-6 border border-white/10`}>
+            <div
+              key={index}
+              className={`rounded-2xl p-5 border bg-gradient-to-br ${item.bgClass} transition-all duration-300 hover:border-primary/40`}
+            >
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center`}>
+                <div className={`w-11 h-11 bg-gradient-to-r ${item.iconGradient} rounded-xl flex items-center justify-center shadow-md`}>
                   {item.icon}
                 </div>
                 <div className="flex items-center gap-1">
                   {getEvolutionIcon(item.evolution)}
-                  <span className={`text-sm font-semibold ${getEvolutionColor(item.evolution)}`}>
+                  <span className={`text-sm font-semibold tabular-nums ${getEvolutionColor(item.evolution)}`}>
                     {item.evolution > 0 ? '+' : ''}{item.evolution}%
                   </span>
                 </div>
               </div>
-              
-              <div>
-                <h3 className="text-2xl font-bold text-foreground mb-1">{item.value}</h3>
-                <p className="text-sm text-muted-foreground">{item.title}</p>
-              </div>
+              <h3 className="text-xl md:text-2xl font-bold text-foreground mb-1 tabular-nums">{item.value}</h3>
+              <p className="text-sm text-muted-foreground">{item.title}</p>
             </div>
           ))}
         </div>
 
-        {/* Résumé de performance */}
-        <div className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6">
-          <h4 className="text-lg font-semibold text-foreground mb-4">Résumé de Performance</h4>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Moyenne par semaine */}
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-400 mb-2">
-                {Math.round(totalSessions / 52)}
-              </div>
-              <div className="text-sm text-muted-foreground">Séances/semaine</div>
+        <div className="surface-accent rounded-2xl p-5 md:p-6">
+          <h4 className="text-base md:text-lg font-semibold text-foreground mb-4">Résumé de performance</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="surface-panel p-4 text-center">
+              <div className="text-2xl md:text-3xl font-bold text-secondary tabular-nums mb-1">{sessionsPerWeek}</div>
+              <div className="text-sm text-muted-foreground">Séances / semaine</div>
             </div>
-            
-            {/* Volume moyen par séance */}
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-400 mb-2">
-                {Math.round(totalVolume / totalSessions)}
-              </div>
-              <div className="text-sm text-muted-foreground">kg/séance</div>
+            <div className="surface-panel p-4 text-center">
+              <div className="text-2xl md:text-3xl font-bold text-green-400 tabular-nums mb-1">{volumePerSession}</div>
+              <div className="text-sm text-muted-foreground">kg / séance</div>
             </div>
-            
-            {/* Distance moyenne par séance */}
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-400 mb-2">
-                {Math.round(totalDistance / totalSessions * 10) / 10}
-              </div>
-              <div className="text-sm text-muted-foreground">km/séance</div>
+            <div className="surface-panel p-4 text-center">
+              <div className="text-2xl md:text-3xl font-bold text-purple-400 tabular-nums mb-1">{distancePerSession}</div>
+              <div className="text-sm text-muted-foreground">km / séance</div>
             </div>
           </div>
         </div>
 
-        {/* Badges de performance */}
-        <div className="mt-6">
-          <h4 className="text-lg font-semibold text-foreground mb-4">Badges de Performance</h4>
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground mb-3">Badges de performance</h4>
           <div className="flex flex-wrap gap-2">
             {totalSessions >= 100 && (
-              <Badge className="bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-200">
+              <Badge className="bg-blue-500/15 text-blue-300 border-blue-500/30">
                 <BarChart3 className="w-3 h-3 mr-1" />
-                100+ Séances
+                100+ séances
               </Badge>
             )}
             {totalVolume >= 50000 && (
-              <Badge className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-200">
+              <Badge className="bg-green-500/15 text-green-300 border-green-500/30">
                 <Weight className="w-3 h-3 mr-1" />
                 50k+ kg soulevés
               </Badge>
             )}
             {totalDistance >= 1000 && (
-              <Badge className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-200">
+              <Badge className="bg-purple-500/15 text-purple-300 border-purple-500/30">
                 <MapPin className="w-3 h-3 mr-1" />
                 1000+ km parcourus
               </Badge>
             )}
             {totalCalories >= 100000 && (
-              <Badge className="bg-orange-500/15 border border-orange-500/25 text-orange-300 border-orange-500/30">
+              <Badge className="bg-orange-500/15 text-orange-300 border-orange-500/30">
                 <Flame className="w-3 h-3 mr-1" />
-                100k+ calories brûlées
+                100k+ calories
               </Badge>
+            )}
+            {totalSessions < 100 && totalVolume < 50000 && totalDistance < 1000 && totalCalories < 100000 && (
+              <p className="text-sm text-muted-foreground">Continuez à vous entraîner pour débloquer des badges.</p>
             )}
           </div>
         </div>

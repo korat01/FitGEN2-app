@@ -2202,7 +2202,7 @@ export const BlocsEntrainement: React.FC = () => {
                       placeholder="Rechercher un exercice..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 rounded-xl"
+                      className="pl-10 h-12 glass-card border-primary/20 border-2 border-white/15 focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all duration-200 rounded-xl"
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>

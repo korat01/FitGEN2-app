@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useQuests } from './QuestContext';
 import { SoundManager } from '../utils/sounds';
+import { getTodayLocalKey } from '../utils/weeklyProgress';
 
 interface ExerciseValidation {
   exerciseId: string;
@@ -91,7 +92,7 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
   }, [xpData]);
 
   const addValidation = (exerciseId: string, sessionId: string, success: boolean) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getTodayLocalKey();
     const xp = success ? 50 : 10;
     
     const newValidation: ExerciseValidation = {

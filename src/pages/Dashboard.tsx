@@ -16,6 +16,9 @@ import { StreakDisplay } from '@/components/StreakDisplay';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 import { HexagonBadge, HexagonBadgeRow } from '@/components/HexagonBadge';
+import { ProgressionPreviewCard } from '@/components/stats/ProgressionPreviewCard';
+import { usePerformanceStats } from '@/hooks/usePerformanceStats';
+import { getWeekKey } from '@/utils/weeklyProgress';
 
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
@@ -26,147 +29,89 @@ export const Dashboard: React.FC = () => {
     updateUser
   } = useAuth();
   const {
-    xpData
+    xpData,
+    validations,
   } = useExerciseValidation();
-  const [userRank, setUserRank] = useState<any>(null);
-  const [performances, setPerformances] = useState<any[]>([]);
+  const {
+    performances,
+    userRank,
+    refreshFromStorage,
+  } = usePerformanceStats();
+  const [weekKey, setWeekKey] = useState(getWeekKey());
   const [debugInfo, setDebugInfo] = useState<any>(null);
 
   // NOUVEAUX ÉTATS POUR LES COMPOSANTS DASHBOARD
   const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
   const [streakData, setStreakData] = useState<StreakData | null>(null);
 
-  // FONCTION POUR RECALCULER LE RANG
   const recalculateRank = () => {
     if (user) {
-      console.log('🔄 RECALCUL FORCÉ DU RANG');
-      const savedPerformances = localStorage.getItem('userPerformances');
-      if (savedPerformances) {
-        const performancesList = JSON.parse(savedPerformances);
-        console.log('📊 Performances pour recalcul:', performancesList);
-        const realRank = scoringEngine.calculateUserRank(user, performancesList);
-        console.log('🏆 Nouveau rang calculé:', realRank);
-        setUserRank(realRank);
-        updateUser({
-          rank: realRank.rank,
-          globalScore: realRank.globalScore
-        });
-
-        // Mettre à jour les performances
-        setPerformances(performancesList);
-
-        // Debug info
-        setDebugInfo({
-          userWeight: user.weight,
-          userSex: user.sex,
-          userSportClass: user.sportClass,
-          performancesCount: performancesList.length,
-          performances: performancesList,
-          calculatedRank: realRank
-        });
-        alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
-      }
+      const list = refreshFromStorage();
+      const realRank = scoringEngine.calculateUserRank(user, list);
+      setDebugInfo({
+        userWeight: user.weight,
+        userSex: user.sex,
+        userSportClass: user.sportClass,
+        performancesCount: list.length,
+        performances: list,
+        calculatedRank: realRank,
+      });
+      alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
     }
   };
 
-  // Charger les performances et calculer le rang
+  // Calculer quêtes et streak quand les performances changent
   useEffect(() => {
     if (user) {
-      console.log('🔄 Dashboard: DÉBUT DU CHARGEMENT');
-      console.log('👤 Utilisateur:', user);
-      const savedPerformances = localStorage.getItem('userPerformances');
-      console.log('💾 Performances brutes du localStorage:', savedPerformances);
-      if (savedPerformances) {
-        try {
-          const performancesList = JSON.parse(savedPerformances);
-          console.log('📊 Performances parsées:', performancesList);
-          setPerformances(performancesList);
+      const formattedPerformances = performances.map((p: any) => ({
+        id: p.id || Math.random().toString(),
+        userId: user.id,
+        discipline: { id: p.discipline, name: p.discipline },
+        value: parseFloat(p.value) || 0,
+        units: 'kg',
+        date: new Date(p.date),
+        context: 'raw',
+        verified: true,
+      }));
 
-          // Calculer le rang avec les vraies performances
-          console.log('🧮 Calcul du rang...');
-          const realRank = scoringEngine.calculateUserRank(user, performancesList);
-          console.log('🏆 Rang calculé:', realRank);
-          setUserRank(realRank);
+      try {
+        const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
+        const generatedQuests = generateDailyQuests(user as any);
+        setDailyQuests(generatedQuests);
+        setStreakData(calculatedStreakData);
+      } catch (error) {
+        console.error('Erreur calcul dashboard:', error);
+      }
 
-          // Debug info
-          setDebugInfo({
-            userWeight: user.weight,
-            userSex: user.sex,
-            userSportClass: user.sportClass,
-            performancesCount: performancesList.length,
-            performances: performancesList,
-            calculatedRank: realRank
-          });
-
-          // Mettre à jour l'utilisateur avec le vrai rang
-          if (realRank.rank !== user.rank || realRank.globalScore !== user.globalScore) {
-            updateUser({
-              rank: realRank.rank,
-              globalScore: realRank.globalScore
-            });
-            console.log('✅ Utilisateur mis à jour avec le nouveau rang');
-          }
-
-          // CALCULER LES DONNÉES POUR LE DASHBOARD
-          try {
-            // Convertir les performances au bon format
-            const formattedPerformances = performancesList.map((p: any) => ({
-              id: p.id || Math.random().toString(),
-              userId: user.id,
-              discipline: {
-                id: p.discipline,
-                name: p.discipline
-              },
-              value: parseFloat(p.value) || 0,
-              units: 'kg',
-              date: new Date(p.date),
-              context: 'raw',
-              verified: true
-            }));
-
-            // Calculer les données pour le dashboard
-            const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
-            const calculatedXpData = calculateXPData(user as any, formattedPerformances, calculatedStreakData);
-            const generatedQuests = generateDailyQuests(user as any);
-
-            // Mettre à jour les états
-            setDailyQuests(generatedQuests);
-            setStreakData(calculatedStreakData);
-            console.log('✅ Données Dashboard calculées:', {
-              xpData: calculatedXpData,
-              streakData: calculatedStreakData
-            });
-          } catch (error) {
-            console.error('❌ Erreur lors du calcul des données Dashboard:', error);
-          }
-        } catch (error) {
-          console.error('❌ Erreur lors du parsing des performances:', error);
-        }
-      } else {
-        console.log('⚠️ Aucune performance trouvée dans localStorage');
-        const defaultRank = {
-          rank: 'D',
-          globalScore: 0,
-          breakdown: {
-            force: 0,
-            endurance: 0,
-            explosivite: 0,
-            calisthenics: 0
-          },
-          reason: 'Aucune performance enregistrée'
-        };
-        setUserRank(defaultRank);
+      if (userRank) {
         setDebugInfo({
           userWeight: user.weight,
           userSex: user.sex,
           userSportClass: user.sportClass,
-          performancesCount: 0,
-          performances: [],
-          calculatedRank: defaultRank
+          performancesCount: performances.length,
+          performances,
+          calculatedRank: userRank,
         });
       }
     }
-  }, [user, updateUser]);
+  }, [user, performances, userRank, validations]);
+
+  // Rafraîchir stats + reset visuel du graphique hebdo chaque lundi
+  useEffect(() => {
+    const tick = () => {
+      const current = getWeekKey();
+      if (current !== weekKey) setWeekKey(current);
+      refreshFromStorage();
+    };
+    tick();
+    const onFocus = () => tick();
+    window.addEventListener('focus', onFocus);
+    const interval = window.setInterval(tick, 60_000);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      window.clearInterval(interval);
+    };
+  }, [weekKey, refreshFromStorage]);
 
   // Fonction pour obtenir la couleur du rang
   const getRangColor = (rang: string) => {
@@ -489,7 +434,7 @@ export const Dashboard: React.FC = () => {
                     </Button>
                     
                     <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      📊 Stats
+                      ➕ Performances
                     </Button>
                 </div>
               </div>
@@ -577,8 +522,8 @@ export const Dashboard: React.FC = () => {
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-500/15 border border-blue-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Weight className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
                   </div>
                 </div>
               </CardContent>
@@ -591,8 +536,8 @@ export const Dashboard: React.FC = () => {
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-green-500/15 border border-green-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-green-400" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/15 border border-accent/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 md:w-6 md:h-6 text-accent" />
                   </div>
                 </div>
               </CardContent>
@@ -605,8 +550,8 @@ export const Dashboard: React.FC = () => {
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
                       </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-500/15 border border-purple-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/15 border border-primary/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
               </div>
             </CardContent>
@@ -619,8 +564,8 @@ export const Dashboard: React.FC = () => {
                     <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
                   </div>
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-500/15 border border-pink-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-pink-400" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-secondary" />
                   </div>
                 </div>
               </CardContent>
@@ -649,85 +594,32 @@ export const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Weekly Progress Chart - Gaming Style */}
-          <WeeklyProgressChart />
+          {/* Progression hebdomadaire (données réelles, reset lundi) */}
+          <WeeklyProgressChart
+            key={weekKey}
+            title="Progression hebdomadaire"
+            performances={performances}
+            validations={validations}
+          />
 
-          {/* Détail du rang calculé */}
-          {userRank && <Card className="glass-card border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-                  <Award className="w-6 h-6 text-yellow-400" />
-                  Votre rang calculé
-              </CardTitle>
-            </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center space-y-4">
-                  <div className={`inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r ${getRangColor(userRank.rank)} text-white font-bold text-2xl shadow-lg`}>
-                    <span className="text-2xl">{getRangIcon(userRank.rank)}</span>
-                    <span>Rang {userRank.rank}</span>
-                      </div>
-                  
-                  <div className="text-4xl font-bold text-secondary">
-                    {userRank.globalScore}/1000
-                      </div>
-                  <div className="text-lg text-muted-foreground">Score global</div>
-                    </div>
-
-                {/* Barre de progression */}
-                    <div className="space-y-2">
-                  {(() => {
-                const progression = getRankProgression(userRank.rank, userRank.globalScore);
-                return <>
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                          <span>Progression vers le rang {progression.nextRank}</span>
-                          <span>{Math.round(progression.percentage)}%</span>
-                        </div>
-                        <Progress value={progression.percentage} size="lg" variant="subtle" />
-                      </>;
-              })()}
-                      </div>
-
-                {/* Détail des scores */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-xl">
-                    <div className="text-sm text-muted-foreground mb-1">Force</div>
-                    <div className="text-2xl font-bold text-red-600">{userRank.breakdown.force}</div>
-                    </div>
-                  <div className="p-4 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl">
-                    <div className="text-sm text-muted-foreground mb-1">Endurance</div>
-                    <div className="text-2xl font-bold text-blue-400">{userRank.breakdown.endurance}</div>
-                  </div>
-                </div>
-
-                {/* Informations contextuelles */}
-                <div className="p-4 bg-gradient-to-r from-white/5 to-white/10 rounded-xl">
-                  <div className="text-sm text-muted-foreground mb-1">Calcul basé sur</div>
-                  <div className="text-lg font-semibold text-foreground">{userRank.reason}</div>
-                </div>
-
-                {/* Bouton pour aller aux stats */}
-                <Button onClick={() => window.location.href = '/stats'} className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Voir le détail de mes performances
-                </Button>
-              </CardContent>
-            </Card>}
+          {/* Accès rapide : records, graphiques, classement */}
+          <ProgressionPreviewCard userRank={userRank} performancesCount={performances.length} />
 
           {/* Actions rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/progression'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Mes Statistiques</h3>
-                <p className="text-muted-foreground">Voir mes performances et mon rang</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">Ma progression</h3>
+                <p className="text-muted-foreground">Records, graphiques et classement</p>
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/programme'}>
+            <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/stats'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Dumbbell className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Mon Programme</h3>
@@ -737,7 +629,7 @@ export const Dashboard: React.FC = () => {
 
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/nutrition'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Apple className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Nutrition</h3>
@@ -747,7 +639,7 @@ export const Dashboard: React.FC = () => {
 
             <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/profile'}>
               <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
               </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">Mon Profil</h3>

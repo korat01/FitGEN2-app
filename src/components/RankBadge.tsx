@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { getRankColors } from '@/config/rankTheme';
+import { RankBadgeAura } from './RankBadgeAura';
 
 import rankE from '@/assets/ranks/e.png';
 import rankD from '@/assets/ranks/d.png';
@@ -71,7 +72,14 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ rank, level, size = 'md', 
         style={{ filter: `drop-shadow(0 0 12px ${secondary}99)` }}
         title={label}
       >
-        <img src={src} alt={label} className="w-full h-full object-contain select-none" draggable={false} />
+        {animated && <RankBadgeAura rank={key} size={size} />}
+        <img
+          src={src}
+          alt={label}
+          className="relative w-full h-full object-contain select-none"
+          style={{ zIndex: 2 }}
+          draggable={false}
+        />
       </div>
 
       {level != null && (

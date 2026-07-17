@@ -1194,12 +1194,17 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
   const hauteFrequence = trainingDays.length >= 4;
 
   const sessions = [];
+  // Créneau spécial de la semaine (combo SBD, puis PR) : le jour qui bascule normalement pour
+  // espacer les séances bench (jour 4 en haute fréquence, jour 3 sinon).
+  const specialJour = hauteFrequence ? 4 : 3;
 
   for (let semaine = 1; semaine <= duree; semaine++) {
-    // Position dans le cycle de 4 semaines (1-4, se répète à chaque cycle) : le placement du jour
-    // SBD est calé sur cette position relative, pas sur le numéro de semaine absolu, pour se
-    // répéter identiquement à chaque cycle plutôt que de n'apparaître que dans le tout premier.
+    // Position dans le cycle de 4 semaines (1-4, se répète à chaque cycle) : le placement des
+    // séances spéciales est calé sur cette position relative, pas sur le numéro de semaine absolu,
+    // pour se répéter identiquement à chaque cycle plutôt que de n'apparaître que dans le premier.
     const semaineDansCycle = ((semaine - 1) % 4) + 1;
+    const cycle = Math.ceil(semaine / 4);
+    const { rmSquat, rmBench, rmDeadlift } = computeCycleMaxes(cycle, level, maxSquat, maxBench, maxDeadlift);
 
     for (let jour = 0; jour < trainingDays.length; jour++) {
       // Échange jour 2 et jour 4 AU NIVEAU CONTENU (pour espacer les 2 séances bench) — uniquement
@@ -1209,17 +1214,39 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
         ? ((jour + 1 === 2) ? 4 : (jour + 1 === 4 ? 2 : jour + 1))
         : jour + 1;
 
-      // Séance SBD combinée (simulation de passage) : UNE SEULE fois par cycle de 4 semaines
-      // (semaine 3, juste avant le deload) — pas plus, sinon ça donne l'impression que la moitié
-      // du bloc n'est que ça. Remplace le jour deadlift en basse fréquence, le jour 4 (bench
-      // technique) en haute fréquence.
-      const estSBD = hauteFrequence
-        ? (logicalJour === 4 && semaineDansCycle === 3)
-        : (logicalJour === 3 && semaineDansCycle === 3);
+      let session;
 
-      const session = estSBD
-        ? createSBDComboSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, trainingDays[jour])
-        : createPowerliftingSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, weakestLift, trainingDays[jour]);
+      if (logicalJour === specialJour && semaineDansCycle === 3) {
+        // Combo SBD sous-maximal (simulation) : UNE SEULE fois par cycle, juste avant le deload.
+        session = createSBDComboSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, trainingDays[jour]);
+      } else if (logicalJour === specialJour && semaineDansCycle === 2) {
+        // Créneau PR : fréquence et format selon le niveau — un débutant a plus de chances de
+        // décrocher un vrai record souvent, donc PR SBD complet ; les autres niveaux, un PR simple
+        // sur le mouvement que ce jour représente normalement (bench en haute fréquence, deadlift sinon).
+        if (level === 'debutant') {
+          session = createPRSBDSession(semaine, logicalJour, rmSquat, rmBench, rmDeadlift, level, trainingDays[jour]);
+        } else {
+          const prLift: MainLift = hauteFrequence ? 'bench' : 'deadlift';
+          const prRm = prLift === 'bench' ? rmBench : rmDeadlift;
+          const prNom = prLift === 'bench' ? 'Développé Couché' : 'Soulevé de Terre';
+          session = createPRSession(semaine, logicalJour, prRm, level, prLift, prNom, trainingDays[jour]);
+        }
+      } else if (level === 'debutant' && semaineDansCycle === 1 && (() => {
+        const liftRotation: MainLift[] = ['squat', 'bench', 'deadlift'];
+        const targetLift = liftRotation[(cycle - 1) % 3];
+        const targetJour = targetLift === 'squat' ? 1 : targetLift === 'bench' ? 2 : 3;
+        return logicalJour === targetJour;
+      })()) {
+        // Débutant seulement : un 2e créneau PR en semaine 1, sur un mouvement qui change à chaque
+        // cycle (squat puis bench puis deadlift) pour ne pas toujours tester le même.
+        const liftRotation: MainLift[] = ['squat', 'bench', 'deadlift'];
+        const targetLift = liftRotation[(cycle - 1) % 3];
+        const targetRm = targetLift === 'squat' ? rmSquat : targetLift === 'bench' ? rmBench : rmDeadlift;
+        const targetNom = targetLift === 'squat' ? 'Squat' : targetLift === 'bench' ? 'Développé Couché' : 'Soulevé de Terre';
+        session = createPRSession(semaine, logicalJour, targetRm, level, targetLift, targetNom, trainingDays[jour]);
+      } else {
+        session = createPowerliftingSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, weakestLift, trainingDays[jour]);
+      }
 
       sessions.push(session);
     }
@@ -1231,7 +1258,7 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
   const programme: Programme = {
     id: Date.now().toString(),
     nom: `Programme Powerlifting - Niveau ${levelLabel}`,
-    description: `Basé sur vos 1RM réels (Squat ${maxSquat}kg / Bench ${maxBench}kg / Deadlift ${maxDeadlift}kg) et votre poids de corps (${bodyweight}kg). Échauffement progressif avant chaque mouvement principal, vague de charge ${level === 'debutant' ? 'linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'}, accessoires ciblés sur votre point faible estimé (${weakLabel}), et une séance SBD combinée une fois par cycle (semaine 3, avant le deload) pour simuler un passage de compétition.`,
+    description: `Basé sur vos 1RM réels (Squat ${maxSquat}kg / Bench ${maxBench}kg / Deadlift ${maxDeadlift}kg) et votre poids de corps (${bodyweight}kg). Échauffement progressif avant chaque mouvement principal, vague de charge ${level === 'debutant' ? 'linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'}, accessoires ciblés sur votre point faible estimé (${weakLabel}), une séance SBD combinée une fois par cycle (semaine 3, avant le deload), et ${level === 'debutant' ? '2 créneaux PR par cycle (un simple, un complet en SBD)' : '1 créneau PR par cycle'} pour tester de vrais records.`,
     duree,
     sessions,
     phases: { adaptation: [], progression: [], specialisation: [] },
@@ -1286,6 +1313,18 @@ function assessPowerliftingLevel(weight: number, sex: string, squat: number, ben
   if (glPoints < 40) return 'debutant';
   if (glPoints < 70) return 'intermediaire';
   return 'avance';
+}
+
+// Progression entre cycles calibrée par niveau : un débutant progresse naturellement plus vite
+// qu'un lifter avancé — on ne peut pas ajouter les mêmes kg à tout le monde indéfiniment.
+// Partagé par tous les types de séance (normale, SBD, PR) pour ne calculer ça qu'à un seul endroit.
+function computeCycleMaxes(cycle: number, level: PowerliftingLevel, maxSquat: number, maxBench: number, maxDeadlift: number) {
+  const cycleBump = level === 'debutant' ? 5 : level === 'intermediaire' ? 2.5 : 1.25;
+  return {
+    rmSquat: Math.round(maxSquat + (cycle - 1) * cycleBump * 2),
+    rmBench: Math.round(maxBench + (cycle - 1) * cycleBump),
+    rmDeadlift: Math.round(maxDeadlift + (cycle - 1) * cycleBump * 2),
+  };
 }
 
 // Standards approximatifs (x poids de corps) pour un lifter raw intermédiaire — sert uniquement à
@@ -1448,12 +1487,7 @@ function createPowerliftingSession(
   const cycle = Math.ceil(semaine / 4);
   const bodyweight = user.weight || 75;
 
-  // Progression entre cycles calibrée par niveau : un débutant progresse naturellement plus vite
-  // qu'un lifter avancé — on ne peut pas ajouter les mêmes kg à tout le monde indéfiniment.
-  const cycleBump = level === 'debutant' ? 5 : level === 'intermediaire' ? 2.5 : 1.25;
-  const rmSquat = Math.round(maxSquat + (cycle - 1) * cycleBump * 2);
-  const rmBench = Math.round(maxBench + (cycle - 1) * cycleBump);
-  const rmDeadlift = Math.round(maxDeadlift + (cycle - 1) * cycleBump * 2);
+  const { rmSquat, rmBench, rmDeadlift } = computeCycleMaxes(cycle, level, maxSquat, maxBench, maxDeadlift);
 
   const scheme = getWaveScheme(level, semaineDansCycle, estDeload);
 
@@ -1520,10 +1554,7 @@ function createSBDComboSession(
 ) {
   // Le jour SBD ne tombe jamais sur la semaine de deload (cf. generatePowerliftingProgramme).
   const cycle = Math.ceil(semaine / 4);
-  const cycleBump = level === 'debutant' ? 5 : level === 'intermediaire' ? 2.5 : 1.25;
-  const rmSquat = Math.round(maxSquat + (cycle - 1) * cycleBump * 2);
-  const rmBench = Math.round(maxBench + (cycle - 1) * cycleBump);
-  const rmDeadlift = Math.round(maxDeadlift + (cycle - 1) * cycleBump * 2);
+  const { rmSquat, rmBench, rmDeadlift } = computeCycleMaxes(cycle, level, maxSquat, maxBench, maxDeadlift);
 
   const scheme = [{ reps: 3, pct: 0.8 }, { reps: 2, pct: 0.87 }];
 
@@ -1550,6 +1581,101 @@ function createSBDComboSession(
     duration: exercices.length * 10,
     exercises: exercices,
     notes: `Séance SBD combinée — simulation de passage de compétition, sans accessoires (Cycle ${cycle}).`,
+    equipment: ['Barre', 'Disques', 'Rack']
+  };
+}
+
+// Pourcentage visé pour le 3e essai ("tentative de record") selon le niveau — un débutant peut
+// viser un peu plus large (progrès rapides, marge de sécurité technique moins critique) qu'un
+// lifter avancé où chaque kg en plus est plus dur à aller chercher.
+const prAttemptPct = (level: PowerliftingLevel) =>
+  level === 'debutant' ? 1.05 : level === 'intermediaire' ? 1.03 : 1.02;
+
+// Une séance PR = échauffement puis DIRECTEMENT la tentative de record (pas d'ouverture ni de 2e
+// essai façon compétition) — sans accessoires ni volume derrière, tester un vrai max suffit.
+function createPRSession(
+  semaine: number,
+  jour: number,
+  maxRm: number,
+  level: PowerliftingLevel,
+  mainLift: MainLift,
+  nomPrincipal: string,
+  dayName?: string
+) {
+  const cycle = Math.ceil(semaine / 4);
+  const pct = prAttemptPct(level);
+  const prWeight = roundToPlates(maxRm * pct);
+
+  const warmup = buildWarmupSets(nomPrincipal, prWeight, WARMUP_RAMPS[mainLift]);
+  const recordAttempt = {
+    nom: `${nomPrincipal} (tentative de record)`,
+    type: 'travail',
+    series: 1,
+    reps: 1,
+    poids: prWeight,
+    pourcentage: Math.round(pct * 100),
+    repos: '5 min',
+  };
+
+  const exercices = [...warmup, recordAttempt];
+
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (PR)`,
+    day: dayName || `Jour ${jour}`,
+    phase: 'Spécialisation',
+    intensity: 'Maximale',
+    duration: exercices.length * 12,
+    exercises: exercices,
+    notes: `Séance PR — tentative de record sur ${nomPrincipal.toLowerCase()}, sans accessoires (Cycle ${cycle}).`,
+    equipment: ['Barre', 'Disques', 'Rack']
+  };
+}
+
+// Séance PR en SBD : les 3 mouvements, chacun échauffement + tentative de record directe — la
+// version "mock meet" complète, plus exigeante que le combo SBD sous-maximal (createSBDComboSession).
+function createPRSBDSession(
+  semaine: number,
+  jour: number,
+  maxSquat: number,
+  maxBench: number,
+  maxDeadlift: number,
+  level: PowerliftingLevel,
+  dayName?: string
+) {
+  const cycle = Math.ceil(semaine / 4);
+  const pct = prAttemptPct(level);
+
+  const lifts: Array<{ key: MainLift; nom: string; rm: number; repos: string; skipWarmupSteps: number }> = [
+    { key: 'squat', nom: 'Squat', rm: maxSquat, repos: '5 min', skipWarmupSteps: 0 },
+    { key: 'bench', nom: 'Développé Couché', rm: maxBench, repos: '4 min', skipWarmupSteps: 1 },
+    { key: 'deadlift', nom: 'Soulevé de Terre', rm: maxDeadlift, repos: '5 min', skipWarmupSteps: 1 },
+  ];
+
+  const exercices = lifts.flatMap(({ key, nom, rm, repos, skipWarmupSteps }) => {
+    const prWeight = roundToPlates(rm * pct);
+    const warmup = buildWarmupSets(nom, prWeight, WARMUP_RAMPS[key].slice(skipWarmupSteps));
+    const recordAttempt = {
+      nom: `${nom} (tentative de record)`,
+      type: 'travail',
+      series: 1,
+      reps: 1,
+      poids: prWeight,
+      pourcentage: Math.round(pct * 100),
+      repos,
+    };
+    return [...warmup, recordAttempt];
+  });
+
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (PR SBD)`,
+    day: dayName || `Jour ${jour}`,
+    phase: 'Spécialisation',
+    intensity: 'Maximale',
+    duration: exercices.length * 12,
+    exercises: exercices,
+    notes: `Séance PR SBD — tentative de record sur les 3 mouvements, simulation complète de jour de compétition (Cycle ${cycle}).`,
     equipment: ['Barre', 'Disques', 'Rack']
   };
 }

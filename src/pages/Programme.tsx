@@ -290,9 +290,11 @@ export const Programme: React.FC = () => {
   };
 
   // Libellé court et lisible du contenu d'une séance (au lieu du nom "Semaine X - Jour" qui ne dit
-  // rien sur le contenu réel) : le mouvement principal du jour, ou "SBD" / "Repos".
+  // rien sur le contenu réel) : le mouvement principal du jour, "PR" / "PR SBD" / "SBD", ou "Repos".
   const getSessionFocusLabel = (session: any): string => {
     if (!session || session.isRestDay) return 'Repos';
+    if (session.notes?.includes('PR SBD')) return 'PR SBD 🏆';
+    if (session.notes?.includes('Séance PR')) return 'PR 🏆';
     if (session.notes?.includes('SBD combinée')) return 'SBD';
     const mainExercise = session.exercises?.find((e: any) => e.type === 'travail');
     if (mainExercise) return mainExercise.nom;

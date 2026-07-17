@@ -105,7 +105,9 @@ describe('generateProgramme — powerlifting', () => {
     ]);
     const advancedProgramme = generateProgramme({ ...baseUser, weight: 83 } as any);
 
-    expect(beginnerProgramme.sessions[0].notes).toContain('progression linéaire');
+    // sessions[0] (semaine1/jour1 = squat) est un créneau PR pour un débutant (rotation squat en
+    // premier) : on vérifie plutôt sur le jour bench (sessions[1]), pas concerné ce cycle-ci.
+    expect(beginnerProgramme.sessions[1].notes).toContain('progression linéaire');
     expect(advancedProgramme.sessions[0].notes).toContain('intensification');
   });
 
@@ -177,5 +179,68 @@ describe('generateProgramme — powerlifting', () => {
     const deadliftDay = programme.sessions.find((s: any) => s.exercises.some((e: any) => e.nom === 'Soulevé de Terre'));
     const deadliftAccessoryNames = deadliftDay.exercises.filter((e: any) => e.type === 'accessoire').map((e: any) => e.nom);
     expect(deadliftAccessoryNames).toContain('Tractions Lestées'); // niveau intermédiaire/avancé -> lestées, pas assistées
+  });
+});
+
+describe('generateProgramme — powerlifting PR sessions (fréquence adaptée au niveau)', () => {
+  it('gives an intermediate/advanced lifter exactly 1 PR session per cycle', () => {
+    setPerformances([
+      { discipline: 'squat', value: 140 },
+      { discipline: 'bench', value: 90 },
+      { discipline: 'deadlift', value: 170 },
+    ]);
+    const programme = generateProgramme({ ...baseUser, weight: 83 } as any); // intermédiaire
+
+    const prSessions = programme.sessions.filter((s: any) => s.notes.includes('Séance PR'));
+    expect(prSessions.length).toBe(2); // 1 par cycle x 2 cycles
+    // Jamais de PR SBD complet pour un non-débutant, seulement des PR simples
+    expect(prSessions.every((s: any) => !s.notes.includes('PR SBD'))).toBe(true);
+  });
+
+  it('gives a beginner 2 PR sessions per cycle: one single-lift, one full PR SBD', () => {
+    setPerformances([
+      { discipline: 'squat', value: 60 },
+      { discipline: 'bench', value: 40 },
+      { discipline: 'deadlift', value: 80 },
+    ]);
+    const programme = generateProgramme({ ...baseUser, weight: 75 } as any); // débutant
+
+    const prSessions = programme.sessions.filter((s: any) => s.notes.includes('Séance PR'));
+    expect(prSessions.length).toBe(4); // 2 par cycle x 2 cycles
+
+    const prSbdSessions = prSessions.filter((s: any) => s.notes.includes('PR SBD'));
+    const prSingleSessions = prSessions.filter((s: any) => !s.notes.includes('PR SBD'));
+    expect(prSbdSessions.length).toBe(2); // 1 par cycle
+    expect(prSingleSessions.length).toBe(2); // 1 par cycle
+  });
+
+  it('structures a PR session as warm-up + a single direct record attempt, no openers, no accessories', () => {
+    setPerformances([
+      { discipline: 'squat', value: 140 },
+      { discipline: 'bench', value: 90 },
+      { discipline: 'deadlift', value: 170 },
+    ]);
+    const programme = generateProgramme({ ...baseUser, weight: 83 } as any);
+
+    const prSession = programme.sessions.find((s: any) => s.notes.includes('Séance PR') && !s.notes.includes('PR SBD'));
+    const workingSets = prSession.exercises.filter((e: any) => e.type === 'travail');
+    const accessories = prSession.exercises.filter((e: any) => e.type === 'accessoire');
+
+    expect(workingSets.length).toBe(1); // directement la tentative de record, pas d'ouverture/2e essai
+    expect(accessories.length).toBe(0); // pas d'accessoires un jour de PR
+    expect(workingSets[0].nom).toContain('tentative de record');
+  });
+
+  it('pushes the record attempt above the current logged max', () => {
+    setPerformances([
+      { discipline: 'squat', value: 140 },
+      { discipline: 'bench', value: 90 },
+      { discipline: 'deadlift', value: 170 },
+    ]);
+    const programme = generateProgramme({ ...baseUser, weight: 83 } as any);
+
+    const prSession = programme.sessions.find((s: any) => s.notes.includes('Séance PR') && !s.notes.includes('PR SBD'));
+    const recordAttempt = prSession.exercises.find((e: any) => e.nom.includes('tentative de record'));
+    expect((recordAttempt as any).pourcentage).toBeGreaterThan(100);
   });
 });

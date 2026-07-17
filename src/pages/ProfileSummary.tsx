@@ -13,6 +13,7 @@ import {
   CheckCircle, ArrowUp, ArrowDown, Minus, Plus, Focus, UserCheck, Zap as Lightning,
   Clock, Timer
 } from 'lucide-react';
+import { RankBadge } from '@/components/RankBadge';
 
 export const ProfileSummary: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -54,7 +55,7 @@ export const ProfileSummary: React.FC = () => {
         try {
           const performancesList = JSON.parse(savedPerformances);
           const realRank = scoringEngine.calculateUserRank(user, performancesList);
-          updateUser({ rank: realRank.rank, globalScore: realRank.globalScore });
+          updateUser({ rank: realRank.rank, globalScore: realRank.globalScore, scoreLabel: realRank.scoreLabel });
         } catch (error) {
           console.error('Erreur lors du calcul du rang:', error);
         }
@@ -75,7 +76,7 @@ export const ProfileSummary: React.FC = () => {
         try {
           const performancesList = JSON.parse(savedPerformances);
           const realRank = scoringEngine.calculateUserRank(updatedUser, performancesList);
-          updateUser({ rank: realRank.rank, globalScore: realRank.globalScore });
+          updateUser({ rank: realRank.rank, globalScore: realRank.globalScore, scoreLabel: realRank.scoreLabel });
         } catch (error) {
           console.error('Erreur lors du recalcul du rang:', error);
         }
@@ -376,7 +377,7 @@ export const ProfileSummary: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-[50vh] flex items-center justify-center">
         <Card className="w-full max-w-md glass-card border-primary/20">
           <CardContent className="p-8 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
@@ -389,7 +390,7 @@ export const ProfileSummary: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-8">
           {/* Header Principal */}
@@ -414,13 +415,13 @@ export const ProfileSummary: React.FC = () => {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4">
-                    <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
-                      <Trophy className="w-5 h-5" />
-                      <span>Rang {user.rank || "D"}</span>
-                </div>
+                    <div className="inline-flex items-center gap-3">
+                      <RankBadge rank={user.rank || 'D'} size="sm" />
+                      <span className="font-semibold text-white">Rang {user.rank || "D"}</span>
+                    </div>
                     <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/20 text-white font-semibold shadow-lg backdrop-blur-sm">
                       <Flame className="w-5 h-5" />
-                      <span>{user.globalScore || 0}/1000</span>
+                      <span>{user.globalScore || 0} {user.scoreLabel || 'pts'}</span>
                     </div>
                   </div>
                 </div>
@@ -431,7 +432,7 @@ export const ProfileSummary: React.FC = () => {
                     {user.globalScore || 0}
                   </div>
                   <div className="text-sm text-white/80">
-                    sur 1000 points
+                    {user.scoreLabel || 'points'}
                   </div>
                 </div>
               </div>
@@ -1391,6 +1392,7 @@ export const ProfileSummary: React.FC = () => {
                       <div className="text-sm font-medium text-secondary uppercase tracking-wide">Score global</div>
                   </div>
                     <div className="text-3xl font-bold text-secondary">{user.globalScore || 0}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{user.scoreLabel || 'points'}</div>
             </div>
 
                   <div className="p-6 surface-accent rounded-2xl border border-primary/30 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">

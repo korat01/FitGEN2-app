@@ -7,12 +7,14 @@ interface StatsOverviewEmptyProps {
   onAddPerformance: () => void;
   rank?: string;
   globalScore?: number;
+  scoreLabel?: string;
 }
 
 export const StatsOverviewEmpty: React.FC<StatsOverviewEmptyProps> = ({
   onAddPerformance,
   rank = 'D',
   globalScore = 0,
+  scoreLabel = 'pts',
 }) => (
   <Card className="glass-card border-primary/20">
     <CardContent className="p-6 md:p-8 text-center space-y-5">
@@ -30,7 +32,7 @@ export const StatsOverviewEmpty: React.FC<StatsOverviewEmptyProps> = ({
           Rang actuel : <strong className="text-foreground">{rank}</strong>
         </span>
         <span className="surface-panel-sm px-3 py-1.5 rounded-full text-muted-foreground">
-          Score : <strong className="text-foreground">{globalScore}</strong> / 1000
+          Score : <strong className="text-foreground">{globalScore}</strong> {scoreLabel}
         </span>
       </div>
       <Button onClick={onAddPerformance} className="gradient-primary text-white font-semibold">

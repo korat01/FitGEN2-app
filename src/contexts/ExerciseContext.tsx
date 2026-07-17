@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuests } from './QuestContext';
 import { SoundManager } from '../utils/sounds';
 import { getTodayLocalKey } from '../utils/weeklyProgress';
@@ -91,7 +91,7 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     localStorage.setItem('xpData', JSON.stringify(xpData));
   }, [xpData]);
 
-  const addValidation = (exerciseId: string, sessionId: string, success: boolean) => {
+  const addValidation = useCallback((exerciseId: string, sessionId: string, success: boolean) => {
     const today = getTodayLocalKey();
     const xp = success ? 50 : 10;
     
@@ -104,28 +104,24 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     };
 
     setValidations(prev => {
-      // Supprimer l'ancienne validation pour le même exercice le même jour
       const filtered = prev.filter(v => 
         !(v.exerciseId === exerciseId && v.sessionId === sessionId && v.date === today)
       );
       return [...filtered, newValidation];
     });
 
-    // Mettre à jour l'XP
     setXpData(prev => {
       const newTotalXP = prev.totalXP + xp;
       let newCurrentXP = prev.currentXP + xp;
       
-      // Calculer le niveau
       let newLevel = prev.level;
       let newXPToNextLevel = prev.xpToNextLevel;
       
       if (newCurrentXP >= prev.xpToNextLevel) {
         newLevel += 1;
         newCurrentXP = newCurrentXP - prev.xpToNextLevel;
-        newXPToNextLevel = newLevel * 100; // 100 XP par niveau
+        newXPToNextLevel = newLevel * 100;
         
-        // Jouer le son de level-up
         const soundManager = SoundManager.getInstance();
         soundManager.playNotification();
       }
@@ -138,22 +134,16 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
       };
     });
 
-    // Mettre à jour les quêtes si le contexte est disponible
     if (questsContext) {
-      // Progression des quêtes d'exercices
       questsContext.addQuestProgress('exercise', 1);
-      
-      // Progression des quêtes d'XP
       questsContext.addQuestProgress('xp', xp);
-      
-      // Vérifier si c'est un exercice réussi pour les quêtes de session
       if (success) {
         questsContext.addQuestProgress('session', 1);
       }
     }
-  };
+  }, [questsContext]);
 
-  const getSessionStatus = (sessionId: string, date: string): 'completed' | 'partial' | 'failed' | 'not-started' => {
+  const getSessionStatus = useCallback((sessionId: string, date: string): 'completed' | 'partial' | 'failed' | 'not-started' => {
     const sessionValidations = validations.filter(v => v.sessionId === sessionId && v.date === date);
     
     if (sessionValidations.length === 0) return 'not-started';
@@ -164,32 +154,29 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     if (successCount === totalCount && totalCount > 0) return 'completed';
     if (successCount === 0 && totalCount > 0) return 'failed';
     return 'partial';
-  };
+  }, [validations]);
 
-  const getExerciseStatus = (exerciseId: string, sessionId: string, date: string): 'success' | 'failed' | 'not-completed' => {
+  const getExerciseStatus = useCallback((exerciseId: string, sessionId: string, date: string): 'success' | 'failed' | 'not-completed' => {
     const validation = validations.find(v => 
       v.exerciseId === exerciseId && v.sessionId === sessionId && v.date === date
     );
     
     if (!validation) return 'not-completed';
     return validation.success ? 'success' : 'failed';
-  };
+  }, [validations]);
 
-  const getSessionXP = (sessionId: string, date: string): number => {
+  const getSessionXP = useCallback((sessionId: string, date: string): number => {
     const sessionValidations = validations.filter(v => v.sessionId === sessionId && v.date === date);
     return sessionValidations.reduce((total, v) => total + v.xp, 0);
-  };
+  }, [validations]);
 
-  const getTotalSessionXP = (sessionId: string, date: string): number => {
-    // Calculer l'XP total possible pour cette session (supposons 3 exercices par session)
+  const getTotalSessionXP = useCallback((sessionId: string, date: string): number => {
     const sessionValidations = validations.filter(v => v.sessionId === sessionId && v.date === date);
     const completedExercises = sessionValidations.length;
-    const totalPossibleExercises = 3; // À adapter selon votre logique
-    
-    return completedExercises * 50; // XP maximum possible
-  };
+    return completedExercises * 50;
+  }, [validations]);
 
-  const value: ExerciseContextType = {
+  const value = useMemo<ExerciseContextType>(() => ({
     validations,
     xpData,
     addValidation,
@@ -197,7 +184,15 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     getExerciseStatus,
     getSessionXP,
     getTotalSessionXP
-  };
+  }), [
+    validations,
+    xpData,
+    addValidation,
+    getSessionStatus,
+    getExerciseStatus,
+    getSessionXP,
+    getTotalSessionXP
+  ]);
 
   return (
     <ExerciseContext.Provider value={value}>

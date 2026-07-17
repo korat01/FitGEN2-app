@@ -42,6 +42,7 @@ export const DashboardAnalyticsSections: React.FC<DashboardAnalyticsSectionsProp
       <StatsOverviewEmpty
         rank={userRank?.rank || user?.rank || 'D'}
         globalScore={userRank?.globalScore || user?.globalScore || 0}
+        scoreLabel={userRank?.scoreLabel || user?.scoreLabel || 'pts'}
         onAddPerformance={() => navigate('/stats')}
       />
     );

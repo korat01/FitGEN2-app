@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 interface ParticleInstance {
   id: number;
@@ -7,27 +7,41 @@ interface ParticleInstance {
   type: 'click' | 'success' | 'levelup' | 'error';
 }
 
+const MAX_ACTIVE_PARTICLES = 8;
+
 export const useParticles = () => {
   const [particles, setParticles] = useState<ParticleInstance[]>([]);
-  const [nextId, setNextId] = useState(0);
+  const nextIdRef = useRef(0);
+  const lastClickTsRef = useRef(0);
 
   const spawnParticles = useCallback(
     (x: number, y: number, type: 'click' | 'success' | 'levelup' | 'error' = 'click') => {
-      const id = nextId;
-      setNextId(id + 1);
-      
-      setParticles((prev) => [...prev, { id, x, y, type }]);
+      if (typeof window !== 'undefined' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
 
-      // Auto-remove after animation
-      setTimeout(() => {
+      const id = nextIdRef.current++;
+      setParticles((prev) => {
+        const next = [...prev, { id, x, y, type }];
+        return next.length > MAX_ACTIVE_PARTICLES
+          ? next.slice(next.length - MAX_ACTIVE_PARTICLES)
+          : next;
+      });
+
+      window.setTimeout(() => {
         setParticles((prev) => prev.filter((p) => p.id !== id));
-      }, 2500);
+      }, 1800);
     },
-    [nextId]
+    []
   );
 
   const spawnClickParticles = useCallback(
-    (event: React.MouseEvent) => {
+    (event: { clientX: number; clientY: number }) => {
+      const now = performance.now();
+      // Évite une rafale de particles à chaque re-render/clic rapide
+      if (now - lastClickTsRef.current < 90) return;
+      lastClickTsRef.current = now;
       spawnParticles(event.clientX, event.clientY, 'click');
     },
     [spawnParticles]
@@ -36,9 +50,7 @@ export const useParticles = () => {
   const spawnSuccessParticles = useCallback(
     (element: HTMLElement) => {
       const rect = element.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      spawnParticles(x, y, 'success');
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 'success');
     },
     [spawnParticles]
   );
@@ -46,9 +58,7 @@ export const useParticles = () => {
   const spawnLevelUpParticles = useCallback(
     (element: HTMLElement) => {
       const rect = element.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      spawnParticles(x, y, 'levelup');
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 'levelup');
     },
     [spawnParticles]
   );
@@ -56,9 +66,7 @@ export const useParticles = () => {
   const spawnErrorParticles = useCallback(
     (element: HTMLElement) => {
       const rect = element.getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
-      spawnParticles(x, y, 'error');
+      spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, 'error');
     },
     [spawnParticles]
   );

@@ -27,8 +27,6 @@ const Nutrition = lazy(() => import('./pages/Nutrition'));
 const AlimentDetail = lazy(() => import('./pages/AlimentDetail'));
 const RepasDetail = lazy(() => import('./pages/RepasDetail'));
 const DailyQuests = lazy(() => import('./components/DailyQuests'));
-const UITestPage = lazy(() => import('./pages/UITestPage'));
-const UICustomizer = lazy(() => import('./pages/UICustomizer'));
 
 // Composant de chargement
 const LoadingSpinner = () => (
@@ -70,9 +68,12 @@ const AppContent: React.FC = () => {
 
   // Effet de clic global sur les éléments interactifs
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Ne déclencher que sur les boutons et éléments interactifs
       if (
         target.tagName === 'BUTTON' ||
         target.closest('button') ||
@@ -83,7 +84,7 @@ const AppContent: React.FC = () => {
       }
     };
 
-    document.addEventListener('click', handleClick);
+    document.addEventListener('click', handleClick, { passive: true });
     return () => document.removeEventListener('click', handleClick);
   }, [spawnClickParticles]);
   
@@ -182,20 +183,6 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
 
-          {/* Route de test UI/DA */}
-          <Route path="/ui-test" element={
-            <ProtectedRoute>
-              <UITestPage />
-            </ProtectedRoute>
-          } />
-
-          {/* Route de personnalisation UI/DA */}
-          <Route path="/ui-customizer" element={
-            <ProtectedRoute>
-              <UICustomizer />
-            </ProtectedRoute>
-          } />
-          
           {/* Ancienne page démo VitalForce — redirection vers l'accueil */}
           <Route path="/vitalforce" element={<Navigate to="/dashboard" replace />} />
           
@@ -219,7 +206,7 @@ const App: React.FC = () => {
       <LanguageProvider>
         <QuestProvider>
           <ExerciseProvider>
-            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" attribute="class">
               <AppContent />
             </ThemeProvider>
           </ExerciseProvider>

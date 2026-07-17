@@ -1,19 +1,7 @@
-﻿import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Trophy, Star, Crown, Sparkles, Zap } from 'lucide-react';
 import { Achievement } from '@/types/stats';
 import { useSounds } from '@/utils/sounds';
-
-interface Confetti {
-  id: number;
-  x: number;
-  y: number;
-  rotation: number;
-  color: string;
-  size: number;
-  velocity: { x: number; y: number };
-  rotationSpeed: number;
-  emoji?: string;
-}
 
 interface AchievementCelebrationProps {
   achievement: Achievement;
@@ -47,100 +35,87 @@ const CELEBRATION_MESSAGES = {
   ]
 };
 
+type ConfettiPiece = {
+  id: number;
+  left: number;
+  top: number;
+  color: string;
+  size: number;
+  cx: number;
+  cy: number;
+  rot: number;
+  duration: number;
+  delay: number;
+  emoji?: string;
+};
+
 export const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
   achievement,
   onComplete,
 }) => {
-  const [confetti, setConfetti] = useState<Confetti[]>([]);
   const [showMessage, setShowMessage] = useState(true);
   const [messageText, setMessageText] = useState('');
   const { playNotification } = useSounds();
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
-  useEffect(() => {
-    // Jouer le son d'achievement
-    playNotification();
-    
-    // Choisir un message aléatoire selon la rareté
-    const messages = CELEBRATION_MESSAGES[achievement.rarity];
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    setMessageText(randomMessage);
-
-    // Générer les confettis
+  const confetti = useMemo<ConfettiPiece[]>(() => {
     const confettiCount = {
-      common: 30,
-      rare: 50,
-      epic: 80,
-      legendary: 120
+      common: 18,
+      rare: 24,
+      epic: 32,
+      legendary: 40,
     }[achievement.rarity];
 
     const colors = {
       common: ['#9CA3AF', '#6B7280', '#4B5563'],
       rare: ['#3B82F6', '#60A5FA', '#93C5FD'],
       epic: ['#A855F7', '#C084FC', '#E9D5FF'],
-      legendary: ['#FBBF24', '#FCD34D', '#FDE68A', '#F59E0B']
+      legendary: ['#FBBF24', '#FCD34D', '#FDE68A', '#F59E0B'],
     }[achievement.rarity];
 
     const emojis = {
       common: ['⭐', '✨'],
       rare: ['💎', '🌟', '✨'],
       epic: ['👑', '🏆', '💜', '✨'],
-      legendary: ['🔥', '💎', '👑', '🏆', '⚡', '🌟']
+      legendary: ['🔥', '💎', '👑', '🏆', '⚡', '🌟'],
     }[achievement.rarity];
 
-    const newConfetti: Confetti[] = [];
-    for (let i = 0; i < confettiCount; i++) {
-      const useEmoji = Math.random() > 0.6;
-      newConfetti.push({
+    const width = typeof window !== 'undefined' ? window.innerWidth : 400;
+    const height = typeof window !== 'undefined' ? window.innerHeight : 800;
+
+    return Array.from({ length: confettiCount }, (_, i) => {
+      const useEmoji = Math.random() > 0.65;
+      return {
         id: i,
-        x: Math.random() * window.innerWidth,
-        y: -20 - Math.random() * 100,
-        rotation: Math.random() * 360,
+        left: Math.random() * width,
+        top: -20 - Math.random() * 80,
         color: colors[Math.floor(Math.random() * colors.length)],
-        size: 8 + Math.random() * 12,
-        velocity: {
-          x: (Math.random() - 0.5) * 3,
-          y: 2 + Math.random() * 3
-        },
-        rotationSpeed: (Math.random() - 0.5) * 10,
-        emoji: useEmoji ? emojis[Math.floor(Math.random() * emojis.length)] : undefined
-      });
-    }
-    setConfetti(newConfetti);
+        size: 8 + Math.random() * 10,
+        cx: (Math.random() - 0.5) * 120,
+        cy: height * 0.7 + Math.random() * 200,
+        rot: (Math.random() - 0.5) * 720,
+        duration: 2200 + Math.random() * 1600,
+        delay: Math.random() * 400,
+        emoji: useEmoji ? emojis[Math.floor(Math.random() * emojis.length)] : undefined,
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [achievement.id, achievement.rarity]);
 
-    // Animation des confettis
-    const animationInterval = setInterval(() => {
-      setConfetti(prev =>
-        prev
-          .map(c => ({
-            ...c,
-            x: c.x + c.velocity.x,
-            y: c.y + c.velocity.y,
-            rotation: c.rotation + c.rotationSpeed,
-            velocity: {
-              x: c.velocity.x * 0.99,
-              y: c.velocity.y + 0.1 // Gravité
-            }
-          }))
-          .filter(c => c.y < window.innerHeight + 50)
-      );
-    }, 16);
+  useEffect(() => {
+    playNotification();
+    const messages = CELEBRATION_MESSAGES[achievement.rarity];
+    setMessageText(messages[Math.floor(Math.random() * messages.length)]);
 
-    // Masquer le message après un moment
-    const messageTimeout = setTimeout(() => {
-      setShowMessage(false);
-    }, 3000);
-
-    // Terminer l'animation
-    const completeTimeout = setTimeout(() => {
-      onComplete?.();
-    }, 5000);
+    const messageTimeout = window.setTimeout(() => setShowMessage(false), 3000);
+    const completeTimeout = window.setTimeout(() => onCompleteRef.current?.(), 4500);
 
     return () => {
-      clearInterval(animationInterval);
-      clearTimeout(messageTimeout);
-      clearTimeout(completeTimeout);
+      window.clearTimeout(messageTimeout);
+      window.clearTimeout(completeTimeout);
     };
-  }, [achievement, onComplete]);
+  }, [achievement.rarity, playNotification]);
 
   const getRarityIcon = () => {
     switch (achievement.rarity) {
@@ -161,80 +136,55 @@ export const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] pointer-events-none">
-      {/* Confettis */}
-      {confetti.map(c => (
-        c.emoji ? (
-          <div
-            key={c.id}
-            className="absolute text-2xl"
-            style={{
-              left: c.x,
-              top: c.y,
-              transform: `rotate(${c.rotation}deg)`,
-              fontSize: `${c.size * 1.5}px`,
-              textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-            }}
-          >
+    <div className="fixed inset-0 z-[10000] pointer-events-none" aria-hidden>
+      {confetti.map((c) => {
+        const style: React.CSSProperties = {
+          left: c.left,
+          top: c.top,
+          ['--cx' as string]: `${c.cx}px`,
+          ['--cy' as string]: `${c.cy}px`,
+          ['--rot' as string]: `${c.rot}deg`,
+          animationDuration: `${c.duration}ms`,
+          animationDelay: `${c.delay}ms`,
+          fontSize: c.emoji ? `${c.size * 1.5}px` : undefined,
+          width: c.emoji ? undefined : c.size,
+          height: c.emoji ? undefined : c.size,
+          backgroundColor: c.emoji ? undefined : c.color,
+          boxShadow: c.emoji ? undefined : `0 0 ${c.size}px ${c.color}`,
+        };
+
+        return c.emoji ? (
+          <div key={c.id} className="vf-confetti absolute" style={style}>
             {c.emoji}
           </div>
         ) : (
-          <div
-            key={c.id}
-            className="absolute rounded-sm"
-            style={{
-              left: c.x,
-              top: c.y,
-              width: c.size,
-              height: c.size,
-              backgroundColor: c.color,
-              transform: `rotate(${c.rotation}deg)`,
-              boxShadow: `0 0 ${c.size}px ${c.color}`,
-            }}
-          />
-        )
-      ))}
+          <div key={c.id} className="vf-confetti absolute rounded-sm" style={style} />
+        );
+      })}
 
-      {/* Message de célébration */}
       {showMessage && (
         <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-scale-in">
           <div className={`bg-gradient-to-r ${getRarityColors()} p-8 rounded-3xl shadow-2xl text-white text-center max-w-md`}>
-            {/* Icône de l'achievement avec animation */}
             <div className="relative mb-6">
-              <div className="absolute inset-0 animate-ping opacity-75">
-                <div className={`w-24 h-24 bg-gradient-to-r ${getRarityColors()} rounded-full mx-auto`}></div>
-              </div>
-              <div className={`relative w-24 h-24 bg-gradient-to-r ${getRarityColors()} rounded-full flex items-center justify-center mx-auto shadow-xl animate-bounce`}>
+              <div className={`relative w-24 h-24 bg-gradient-to-r ${getRarityColors()} rounded-full flex items-center justify-center mx-auto shadow-xl`}>
                 <span className="text-5xl">{achievement.icon}</span>
               </div>
             </div>
 
-            {/* Titre achievement */}
             <h2 className="text-3xl font-black mb-3 uppercase tracking-wide drop-shadow-lg">
               {achievement.title}
             </h2>
 
-            {/* Message de félicitations */}
             <p className="text-xl font-bold mb-4 drop-shadow">
               {messageText}
             </p>
 
-            {/* XP Reward avec animation */}
-            <div className="flex items-center justify-center gap-2 bg-white/20 rounded-full px-6 py-3 backdrop-blur-sm">
-              <Zap className="w-6 h-6 animate-pulse" />
+            <div className="flex items-center justify-center gap-2 bg-white/20 rounded-full px-6 py-3">
+              <Zap className="w-6 h-6" />
               <span className="text-2xl font-black">+{achievement.xpReward} XP</span>
-            </div>
-
-            {/* Étoiles décoratives */}
-            <div className="flex justify-center gap-4 mt-4">
-              <Star className="w-6 h-6 animate-pulse" style={{ animationDelay: '0ms' }} />
-              <Star className="w-8 h-8 animate-pulse" style={{ animationDelay: '150ms' }} />
-              <Star className="w-6 h-6 animate-pulse" style={{ animationDelay: '300ms' }} />
+              <span className="sr-only">{getRarityIcon()}</span>
             </div>
           </div>
-
-          {/* Effet de lumière rayonnante */}
-          <div className={`absolute inset-0 bg-gradient-to-r ${getRarityColors()} rounded-3xl blur-3xl opacity-50 animate-pulse -z-10`}></div>
         </div>
       )}
     </div>

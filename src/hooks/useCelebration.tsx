@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Achievement } from '@/types/stats';
 
 interface CelebrationInstance {
@@ -8,22 +8,24 @@ interface CelebrationInstance {
 
 export const useCelebration = () => {
   const [celebrations, setCelebrations] = useState<CelebrationInstance[]>([]);
-  const [nextId, setNextId] = useState(0);
+  const nextIdRef = useRef(0);
 
   const celebrate = useCallback((achievement: Achievement) => {
-    const id = nextId;
-    setNextId(id + 1);
-    
-    setCelebrations(prev => [...prev, { id, achievement }]);
+    if (typeof window !== 'undefined' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
 
-    // Auto-remove après l'animation
-    setTimeout(() => {
-      setCelebrations(prev => prev.filter(c => c.id !== id));
-    }, 5500);
-  }, [nextId]);
+    const id = nextIdRef.current++;
+    setCelebrations((prev) => [...prev, { id, achievement }]);
+
+    window.setTimeout(() => {
+      setCelebrations((prev) => prev.filter((c) => c.id !== id));
+    }, 4800);
+  }, []);
 
   const removeCelebration = useCallback((id: number) => {
-    setCelebrations(prev => prev.filter(c => c.id !== id));
+    setCelebrations((prev) => prev.filter((c) => c.id !== id));
   }, []);
 
   return {

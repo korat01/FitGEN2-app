@@ -9,6 +9,8 @@ interface StatsPageHeaderProps {
   rankIcon: string;
   rankColorClass: string;
   globalScore: number;
+  scoreLabel?: string;
+  rankProgressPercent?: number;
   onRefresh: () => void;
 }
 
@@ -18,9 +20,11 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
   rankIcon,
   rankColorClass,
   globalScore,
+  scoreLabel = 'Score',
+  rankProgressPercent = 0,
   onRefresh,
 }) => {
-  const progress = Math.min(Math.max(globalScore / 10, 0), 100);
+  const progress = Math.min(Math.max(rankProgressPercent, 0), 100);
 
   return (
     <div className="glass-card border border-primary/25 overflow-hidden rounded-2xl md:rounded-3xl">
@@ -63,7 +67,7 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 md:p-4 text-center">
               <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-1">Score</p>
               <p className="text-xl md:text-2xl font-bold text-white tabular-nums">{globalScore}</p>
-              <p className="text-[10px] text-white/50">/ 1000</p>
+              <p className="text-[10px] text-white/50 truncate">{scoreLabel}</p>
             </div>
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 md:p-4">
               <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-2 text-center">Progression</p>

@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '../contexts/AuthContext';
-import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { 
   Dumbbell, 
   Clock, 
@@ -2138,8 +2137,7 @@ export const BlocsEntrainement: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <VitalForceBackground intensity="medium" />
+    <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="space-y-8">
           {/* Header Principal - VitalForce DA */}

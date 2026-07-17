@@ -153,8 +153,8 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
-      <VitalForceBackground intensity="low" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative bg-transparent">
+      <VitalForceBackground intensity="high" />
       
       <Card className="w-full max-w-md bg-card/90 border border-primary/30 shadow-[var(--shadow-glow-purple)] backdrop-blur-xl relative z-10">
         <CardHeader className="text-center space-y-4 border-b border-primary/20">

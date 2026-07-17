@@ -155,7 +155,7 @@ export const StatsRankingPanel: React.FC<StatsRankingPanelProps> = ({
                 {userRank?.globalScore || 0}
               </div>
               <div className="text-lg font-semibold text-foreground">Votre score</div>
-              <div className="text-sm text-muted-foreground">sur 1000 points</div>
+              <div className="text-sm text-muted-foreground">{userRank?.scoreLabel || 'points'}</div>
             </div>
             <div className="text-center p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl">
               <div className="text-2xl md:text-3xl font-bold text-green-400 mb-2">

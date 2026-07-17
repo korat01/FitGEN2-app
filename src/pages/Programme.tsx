@@ -8,7 +8,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { ExerciseValidation } from '../components/ExerciseValidation';
-import { VitalForceBackground } from '@/components/VitalForceBackground';
 import { 
   Dumbbell, 
   Play, 
@@ -375,8 +374,7 @@ export const Programme: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 overflow-x-hidden relative">
-      <VitalForceBackground intensity="medium" />
+    <div className="p-4 md:p-6 overflow-x-hidden relative">
       <div className="mx-auto max-w-7xl space-y-4 md:space-y-8 relative z-10 page-transition stagger-animation">
         
         {/* Header Principal - VitalForce DA */}

@@ -19,7 +19,6 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { VitalForceBackground } from '@/components/VitalForceBackground';
 
 const Nutrition: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +27,7 @@ const Nutrition: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [favorites, setFavorites] = useState<string[]>([]);
   
-  // Ajouter le VitalForceBackground en début de return
+  // Fond géré par PageLayout (VitalForceBackground)
 
   // Données des aliments - AJOUT DE 20 NOUVEAUX ALIMENTS
   const aliments = [
@@ -2759,8 +2758,7 @@ const Nutrition: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <VitalForceBackground intensity="low" />
+    <div className="relative">
       <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6 relative z-10 page-transition">
         <div className="stagger-animation">
       {/* Header VitalForce DA */}

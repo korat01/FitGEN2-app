@@ -5,6 +5,21 @@ import {
   calculateActivityStreak,
 } from './weeklyProgress';
 
+// Convertit les performances brutes (stockage local) au format PerformanceRecord attendu
+// par les fonctions de stats/streak ci-dessous.
+export function toPerformanceRecords(rawPerformances: any[], userId: string): PerformanceRecord[] {
+  return rawPerformances.map((p) => ({
+    id: p.id || Math.random().toString(),
+    userId,
+    discipline: { id: p.discipline, name: p.discipline, category: 'force', units: p.units || 'kg' },
+    value: parseFloat(p.value) || 0,
+    units: p.units || 'kg',
+    date: new Date(p.date),
+    context: 'raw',
+    verified: true,
+  }));
+}
+
 // Calcul du score Wilks/IPF pour la force
 export function calculateWilksScore(weight: number, total: number, isMale: boolean = true): number {
   const a = isMale ? -216.0475144 : 594.31747775582;
@@ -16,6 +31,19 @@ export function calculateWilksScore(weight: number, total: number, isMale: boole
 
   const coefficient = 500 / (a + b * weight + c * Math.pow(weight, 2) + d * Math.pow(weight, 3) + e * Math.pow(weight, 4) + f * Math.pow(weight, 5));
   return Math.round(total * coefficient);
+}
+
+// Calcul des IPF GL Points (formule officielle IPF depuis 2020, remplace le Wilks classique)
+// Coefficients Raw/Classic (SBD) — source : calculateur officiel OpenPowerlifting.
+export function calculateIPFGLPoints(weight: number, total: number, isMale: boolean = true): number {
+  const A = isMale ? 1199.72839 : 610.32796;
+  const B = isMale ? 1025.18162 : 1045.59282;
+  const C = isMale ? 0.00921 : 0.03048;
+
+  const denominator = A - B * Math.exp(-C * weight);
+  if (denominator <= 0) return 0;
+
+  return Math.round(Math.max(0, (total * 100) / denominator));
 }
 
 // Calcul du VO₂max estimé basé sur les performances

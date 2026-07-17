@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { scoringEngine } from '../utils/scoring';
 
 export interface User {
@@ -12,6 +12,8 @@ export interface User {
   sportClass: string;
   rank?: string;
   globalScore?: number;
+  /** Nom de l'unité de globalScore (ex: "IPF GL Points" vs "Score") — l'échelle diffère selon la méthode de calcul. */
+  scoreLabel?: string;
   
   // Optional fields
   focus_trapezes?: any;
@@ -63,79 +65,71 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Charger l'utilisateur depuis le localStorage au démarrage
   useEffect(() => {
-    console.log('🔄 Chargement de l\'utilisateur depuis localStorage...');
     const savedUser = localStorage.getItem('userData');
     if (savedUser) {
       try {
         const userData = JSON.parse(savedUser);
-        setUser(userData);
-        console.log('✅ Utilisateur chargé:', userData);
-        
-        // Recalculer le rang au chargement
         const savedPerformances = localStorage.getItem('userPerformances');
         if (savedPerformances) {
           const performancesList = JSON.parse(savedPerformances);
-          console.log('📊 Performances chargées:', performancesList);
-          
           const realRank = scoringEngine.calculateUserRank(userData, performancesList);
-          
-          // Mettre à jour avec le vrai rang
           const updatedUser = {
             ...userData,
             rank: realRank.rank,
-            globalScore: realRank.globalScore
+            globalScore: realRank.globalScore,
+            scoreLabel: realRank.scoreLabel,
           };
-          
           setUser(updatedUser);
           localStorage.setItem('userData', JSON.stringify(updatedUser));
-          
-          console.log('✅ Rang recalculé au chargement:', realRank);
         } else {
-          console.log('⚠️ Aucune performance trouvée');
+          setUser(userData);
         }
       } catch (error) {
-        console.error('❌ Erreur lors du chargement des données utilisateur:', error);
+        console.error('Erreur chargement utilisateur:', error);
       }
     }
     setIsLoading(false);
   }, []);
 
-  // Sauvegarder automatiquement les changements d'utilisateur
   useEffect(() => {
     if (user) {
-      console.log('💾 Sauvegarde de l\'utilisateur:', user);
       localStorage.setItem('userData', JSON.stringify(user));
     }
   }, [user]);
 
-  const login = (userData: User) => {
-    console.log('🔐 Fonction login appelée avec:', userData);
+  const login = useCallback((userData: User) => {
     setUser(userData);
     localStorage.setItem('userData', JSON.stringify(userData));
-    console.log('✅ Utilisateur connecté et sauvegardé');
-  };
+  }, []);
 
-  const logout = () => {
-    console.log('🚪 Déconnexion de l\'utilisateur');
+  const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem('userData');
     localStorage.removeItem('userPerformances');
-  };
+  }, []);
 
-  const updateUser = (updatedUser: Partial<User>) => {
-    console.log('🔄 Mise à jour de l\'utilisateur:', updatedUser);
-    setUser(prev => {
+  const updateUser = useCallback((updatedUser: Partial<User>) => {
+    setUser((prev) => {
       if (!prev) return null;
-      const newUser = { ...prev, ...updatedUser };
-      console.log('✅ Utilisateur mis à jour:', newUser);
-      return newUser;
+
+      // Évite un re-render + boucle si rien n'a changé (ex. rank/score)
+      const hasChange = (Object.keys(updatedUser) as Array<keyof User>).some(
+        (key) => prev[key] !== updatedUser[key]
+      );
+      if (!hasChange) return prev;
+
+      return { ...prev, ...updatedUser };
     });
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, login, logout, updateUser, isLoading }),
+    [user, login, logout, updateUser, isLoading]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser, isLoading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -132,7 +132,7 @@ All colors MUST be HSL.
   }
   body {
     @apply text-foreground font-sans;
-    background: #0A0E1F;
+    background: #070b18;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     font-variation-settings: 'opsz' 32;
@@ -275,6 +275,214 @@ All colors MUST be HSL.
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+  }
+
+  /* Particles: animation GPU-friendly (pas de setState/frame) */
+  @keyframes vf-particle-fly {
+    0% {
+      transform: translate(-50%, -50%) translate(0, 0) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(var(--dx, 0), var(--dy, 0)) scale(0.2);
+      opacity: 0;
+    }
+  }
+
+  .vf-particle {
+    left: 0;
+    top: 0;
+    will-change: transform, opacity;
+    animation-name: vf-particle-fly;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes vf-confetti-fall {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(var(--cx, 0), var(--cy, 100vh), 0) rotate(var(--rot, 360deg));
+      opacity: 0;
+    }
+  }
+
+  .vf-confetti {
+    will-change: transform, opacity;
+    animation-name: vf-confetti-fall;
+    animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+    animation-fill-mode: forwards;
+  }
+
+  /* Fond VitalForce — atmosphère DA */
+  @keyframes vf-aurora {
+    0%, 100% { transform: translate3d(-2%, 0, 0) scaleX(1); opacity: 0.35; }
+    50% { transform: translate3d(2%, -6px, 0) scaleX(1.04); opacity: 0.55; }
+  }
+  @keyframes vf-orb {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+    50% { transform: translate3d(12px, -28px, 0) scale(1.08); opacity: 0.85; }
+  }
+  @keyframes vf-dust {
+    0%, 100% { opacity: 0.15; transform: translate3d(0, 0, 0); }
+    50% { opacity: 0.55; transform: translate3d(4px, -10px, 0); }
+  }
+  @keyframes vf-mesh-shift {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 1; }
+  }
+
+  .vf-aurora { animation: vf-aurora 18s ease-in-out infinite; }
+  .vf-orb { animation: vf-orb 22s ease-in-out infinite; }
+
+  .vf-bg-base {
+    background: #070b18;
+  }
+
+  .vf-bg-mesh {
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(107, 42, 255, 0.28) 0%, transparent 55%),
+      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(0, 194, 255, 0.18) 0%, transparent 50%),
+      radial-gradient(ellipse 70% 55% at 0% 85%, rgba(0, 100, 255, 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse 50% 40% at 70% 40%, rgba(255, 107, 157, 0.06) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0e1f 0%, #070b18 45%, #050814 100%);
+    animation: vf-mesh-shift 16s ease-in-out infinite;
+  }
+
+  .vf-bg-glow {
+    border-radius: 50%;
+    filter: blur(80px);
+    will-change: transform, opacity;
+  }
+
+  .vf-bg-glow-top {
+    top: -12%;
+    left: 15%;
+    width: 70%;
+    height: 42%;
+    background: radial-gradient(circle, rgba(107, 42, 255, 0.45) 0%, transparent 70%);
+    animation: vf-orb 26s ease-in-out infinite;
+  }
+
+  .vf-bg-glow-br {
+    right: -15%;
+    bottom: -10%;
+    width: 55%;
+    height: 45%;
+    background: radial-gradient(circle, rgba(0, 194, 255, 0.32) 0%, transparent 70%);
+    animation: vf-orb 24s ease-in-out infinite reverse;
+  }
+
+  .vf-bg-glow-bl {
+    left: -18%;
+    bottom: 5%;
+    width: 45%;
+    height: 35%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+    animation: vf-orb 28s ease-in-out infinite;
+    animation-delay: -6s;
+  }
+
+  .vf-bg-aurora {
+    top: 18%;
+    left: -10%;
+    width: 120%;
+    height: 140px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 224, 255, 0.08) 20%,
+      rgba(107, 42, 255, 0.2) 50%,
+      rgba(255, 107, 157, 0.1) 75%,
+      transparent 100%
+    );
+    filter: blur(28px);
+  }
+
+  .vf-bg-aurora-2 {
+    top: 52%;
+    animation-delay: -8s;
+    opacity: 0.7;
+  }
+
+  .vf-bg-orb {
+    border-radius: 50%;
+    filter: blur(40px);
+    will-change: transform, opacity;
+  }
+
+  .vf-bg-orb-a {
+    top: 28%;
+    left: 12%;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(107, 42, 255, 0.35) 0%, transparent 70%);
+  }
+
+  .vf-bg-orb-b {
+    top: 58%;
+    right: 8%;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(0, 194, 255, 0.28) 0%, transparent 70%);
+    animation-delay: -5s;
+  }
+
+  .vf-bg-orb-c {
+    top: 40%;
+    left: 48%;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255, 107, 157, 0.22) 0%, transparent 70%);
+    animation-delay: -11s;
+  }
+
+  .vf-bg-dust {
+    background: #00c2ff;
+    box-shadow: 0 0 6px rgba(0, 194, 255, 0.8);
+    animation-name: vf-dust;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
+  .vf-bg-dust:nth-child(odd) {
+    background: #6b2aff;
+    box-shadow: 0 0 6px rgba(107, 42, 255, 0.8);
+  }
+
+  .vf-bg-grid {
+    opacity: 0.035;
+    background-image:
+      linear-gradient(rgba(0, 194, 255, 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 194, 255, 0.5) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 20%, transparent 75%);
+  }
+
+  .vf-bg-noise {
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    mix-blend-mode: overlay;
+  }
+
+  .vf-bg-vignette {
+    background: radial-gradient(ellipse 75% 65% at 50% 40%, transparent 30%, rgba(3, 5, 12, 0.75) 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vf-particle,
+    .vf-confetti,
+    .vf-aurora,
+    .vf-orb,
+    .vf-bg-dust,
+    .vf-bg-mesh,
+    .vf-bg-glow,
+    .vitalforce-progress-bar-glow::after {
+      animation: none !important;
+    }
   }
   
   .animate-fade-in {
@@ -464,6 +672,19 @@ All colors MUST be HSL.
   50% {
     transform: translateY(-10px);
   }
+}
+
+@keyframes badge-breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-badge-breathe {
+  animation: badge-breathe 3.5s ease-in-out infinite;
 }
 
 @keyframes glow-pulse {

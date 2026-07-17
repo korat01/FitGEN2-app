@@ -40,7 +40,7 @@ export const ProgressionPreviewCard: React.FC<ProgressionPreviewCardProps> = ({
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${getRangColor(userRank.rank || 'D')} text-white text-sm font-semibold`}>
               <span>{getRangIcon(userRank.rank || 'D')}</span>
               <span>Rang {userRank.rank || 'D'}</span>
-              <span className="opacity-80">· {userRank.globalScore || 0}/1000</span>
+              <span className="opacity-80">· {userRank.globalScore || 0} {userRank.scoreLabel || 'pts'}</span>
               <span className="opacity-80">· {performancesCount} perf.</span>
             </div>
           )}

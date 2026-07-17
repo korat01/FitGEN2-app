@@ -110,6 +110,11 @@ export const PerformanceManager: React.FC<PerformanceManagerProps> = ({
               </div>
             ))}
           </div>
+          {typeof userRank?.wilksScore === 'number' && (
+            <p className="text-xs text-muted-foreground mt-3 text-center">
+              Score Wilks (référence) : <span className="font-semibold text-foreground">{userRank.wilksScore}</span> pts
+            </p>
+          )}
         </CardContent>
       </Card>
 

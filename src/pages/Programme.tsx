@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useAuth } from '../contexts/AuthContext';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
-import { ExerciseValidation } from '../components/ExerciseValidation';
 import { ExerciseCard } from '../components/programme/ExerciseCard';
 import { 
   Dumbbell, 
@@ -28,7 +27,7 @@ import {
   XCircle
 } from 'lucide-react';
 // Import direct du générateur (pas de lazy loading pour les fonctions utilitaires)
-import { generateProgramme } from '../utils/programmeGenerator';
+import { generateProgramme, adaptSessionToRecentFailure, adaptSessionToRecentDifficulty } from '../utils/programmeGenerator';
 
 // Fonction pour récupérer les 1RM réels de l'utilisateur (le programme travaille directement
 // par rapport à ces maxs, il n'y a plus de "Training Max" intermédiaire)
@@ -60,7 +59,10 @@ const getUserMaxes = () => {
 export const Programme: React.FC = () => {
   const { user } = useAuth();
   const { isMobile } = useMobileDetection();
-  const { addValidation, getExerciseStatus, getSessionStatus, getSessionXP } = useExerciseValidation();
+  const { addValidation, getExerciseStatus, getSessionStatus, getSessionXP, validations, sessionRatings, addSessionRating, getSessionRating } = useExerciseValidation();
+  const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
+  const [difficultyRpe, setDifficultyRpe] = useState(5);
+  const [ratedSessionId, setRatedSessionId] = useState<string | null>(null);
   const [programme, setProgramme] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTab, setCurrentTab] = useState<'today' | 'weekly' | 'planning'>('today');
@@ -172,18 +174,6 @@ export const Programme: React.FC = () => {
     }
   };
 
-  // Obtenir la session d'aujourd'hui
-  const getTodaysSession = () => {
-    if (!programme) return null;
-    
-    const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-    const today = days[new Date().getDay()];
-    
-    return programme.sessions.find((session: any) => session.day === today);
-  };
-
-  const todaySession = getTodaysSession();
-
   // Un programme généré avant l'ajout des types d'exercice (échauffement/travail/accessoire)
   // n'aura pas ce champ — sans ça on ne peut pas distinguer "pas d'accessoires" d'un vieux format.
   const isStaleProgramme = !!programme && programme.sessions?.[0]?.exercises?.[0]?.type === undefined;
@@ -285,8 +275,55 @@ export const Programme: React.FC = () => {
         isRestDay: true
       };
     }
-    
-    return session;
+
+    // Allège la séance à la volée si le dernier passage sur ce même mouvement a échoué — sans
+    // jamais modifier le programme stocké, juste la version affichée. Si aucun échec ne déclenche
+    // cet allègement, on regarde plutôt la note de difficulté (RPE) laissée par l'utilisateur.
+    const afterFailureCheck = adaptSessionToRecentFailure(session, programme.sessions, validations);
+    if (afterFailureCheck !== session) return afterFailureCheck;
+    return adaptSessionToRecentDifficulty(session, programme.sessions, sessionRatings);
+  };
+
+  // Session d'aujourd'hui — résolue via getSessionForDate pour retomber sur la BONNE semaine
+  // (et pas toujours la semaine 1, cf. bug historique de l'ancien getTodaysSession()).
+  const todaySession = getSessionForDate(new Date());
+
+  const [dismissedForSessionId, setDismissedForSessionId] = useState<string | null>(null);
+
+  // Dès que TOUS les exercices notables (hors échauffement) de la séance du jour sont validés ET
+  // qu'aucun n'est raté, on propose de noter la difficulté (RPE 1-10) pour ajuster la prochaine
+  // séance sur ce mouvement. Un échec ne déclenche jamais ce popup : ce n'est pas une séance
+  // "validée", et l'allègement automatique (adaptSessionToRecentFailure) s'en charge déjà.
+  useEffect(() => {
+    if (!todaySession || todaySession.isRestDay) return;
+    const notable = todaySession.exercises.filter((e: any) => e.type !== 'echauffement');
+    if (notable.length === 0) return;
+    if (dismissedForSessionId === todaySession.id) return;
+    if (getSessionRating(todaySession.id) != null) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    const statuses = notable.map((e: any) => getExerciseStatus(e.id || e.nom, todaySession.id, today));
+    const allCompleted = statuses.every((s: string) => s !== 'not-completed');
+    const anyFailed = statuses.some((s: string) => s === 'failed');
+
+    if (allCompleted && !anyFailed) {
+      setDifficultyRpe(5);
+      setIsDifficultyModalOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [validations, todaySession?.id, dismissedForSessionId]);
+
+  const handleSubmitDifficultyRating = () => {
+    if (todaySession) {
+      addSessionRating(todaySession.id, difficultyRpe);
+      setDismissedForSessionId(todaySession.id);
+    }
+    setIsDifficultyModalOpen(false);
+  };
+
+  const handleDismissDifficultyRating = () => {
+    if (todaySession) setDismissedForSessionId(todaySession.id);
+    setIsDifficultyModalOpen(false);
   };
 
   // Libellé court et lisible du contenu d'une séance (au lieu du nom "Semaine X - Jour" qui ne dit
@@ -308,18 +345,9 @@ export const Programme: React.FC = () => {
 
   // Fonction pour valider un exercice
   const handleExerciseValidation = (exerciseId: string, success: boolean) => {
-    const today = new Date().toISOString().split('T')[0];
-    const todaySession = programme?.sessions.find((s: any) => s.day === getCurrentDay());
-    
     if (todaySession) {
       addValidation(exerciseId, todaySession.id, success);
     }
-  };
-
-  // Fonction pour obtenir le jour actuel
-  const getCurrentDay = () => {
-    const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-    return days[new Date().getDay()];
   };
 
   // Fonction pour ouvrir le modal de session
@@ -611,33 +639,20 @@ export const Programme: React.FC = () => {
                           const exerciseStatus = getExerciseStatus(exercise.id || exercise.nom, todaySession.id, today);
                           const isCompleted = exerciseStatus !== 'not-completed';
                           const isSuccess = exerciseStatus === 'success';
-                          
-                          return (
-                            <div key={exercise.id || index} className="space-y-3">
-                              <ExerciseCard
-                                exercise={exercise}
-                                isCompleted={isCompleted}
-                                isSuccess={isSuccess}
-                                statusIcon={
-                                  isCompleted ? (
-                                    isSuccess ? (
-                                      <CheckCircle className="w-5 h-5 text-green-500" />
-                                    ) : (
-                                      <XCircle className="w-5 h-5 text-red-500" />
-                                    )
-                                  ) : null
-                                }
-                              />
+                          const isWarmupExercise = exercise.type === 'echauffement' || (typeof exercise.nom === 'string' && exercise.nom.includes('(échauffement)'));
 
-                              {/* Composant de validation */}
-                              <ExerciseValidation
-                                exercise={exercise}
-                                onValidation={handleExerciseValidation}
-                                isCompleted={isCompleted}
-                                isSuccess={isSuccess}
-                                isRestDay={false}
-                              />
-                            </div>
+                          return (
+                            <ExerciseCard
+                              key={exercise.id || index}
+                              exercise={exercise}
+                              isCompleted={isCompleted}
+                              isSuccess={isSuccess}
+                              onValidate={
+                                isWarmupExercise
+                                  ? undefined
+                                  : (success: boolean) => handleExerciseValidation(exercise.id || exercise.nom, success)
+                              }
+                            />
                           );
                         })}
                       </div>
@@ -673,30 +688,22 @@ export const Programme: React.FC = () => {
                 <CardContent>
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-4`}>
                     {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map(day => {
-                      // Semaine réelle en cours (pas juste la 1ère occurrence de ce jour dans tout
-                      // le programme, qui resterait figée sur la semaine 1 pour toujours).
-                      const currentWeekNumber = getWeekNumberForDate(new Date());
-                      const daySession = programme.sessions.find((s: any) => {
-                        if (s.day !== day) return false;
-                        const semaineMatch = s.nom.match(/Semaine (\d+)/);
-                        return semaineMatch ? parseInt(semaineMatch[1]) === currentWeekNumber : false;
-                      });
+                      // Date réelle de ce jour dans la semaine EN COURS (pas juste la 1ère occurrence
+                      // de ce jour dans tout le programme, qui resterait figée sur la semaine 1 pour
+                      // toujours) — passe par getSessionForDate pour bénéficier aussi de l'allègement
+                      // automatique en cas d'échec au dernier passage sur le même mouvement.
+                      const dayIndex: Record<string, number> = { dimanche: 0, lundi: 1, mardi: 2, mercredi: 3, jeudi: 4, vendredi: 5, samedi: 6 };
+                      const now = new Date();
+                      const startOfWeek = new Date(now);
+                      startOfWeek.setHours(0, 0, 0, 0);
+                      startOfWeek.setDate(now.getDate() - now.getDay());
+                      const dateForDay = new Date(startOfWeek);
+                      dateForDay.setDate(startOfWeek.getDate() + dayIndex[day]);
+
+                      const resolvedSession = getSessionForDate(dateForDay);
+                      const daySession = resolvedSession?.isRestDay ? null : resolvedSession;
                       const today = new Date().toISOString().split('T')[0];
-                      
-                      // Créer une session de repos si pas de session trouvée
-                      const sessionToDisplay = daySession || {
-                        id: `repos-${day}`,
-                        nom: `Repos - ${day}`,
-                        day: day,
-                        phase: 'Repos',
-                        intensity: 'Repos',
-                        duration: 0,
-                        exercises: [],
-                        notes: 'Jour de récupération',
-                        equipment: [],
-                        isRestDay: true
-                      };
-                      
+
                       const sessionStatus = daySession ? getSessionStatus(daySession.id, today) : 'not-started';
                       
                       return (
@@ -1080,6 +1087,57 @@ export const Programme: React.FC = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Popup de notation de difficulté (RPE) — proposé une fois la séance du jour entièrement
+            validée sans aucun échec. La note ajuste la charge de la prochaine séance sur ce mouvement. */}
+        <Dialog open={isDifficultyModalOpen} onOpenChange={(open) => { if (!open) handleDismissDifficultyRating(); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Zap className="w-5 h-5 text-secondary" />
+                Séance terminée — c'était comment ?
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Notez la difficulté de <strong>{todaySession?.nom}</strong> : ça sert à ajuster la charge de votre prochaine séance sur ce mouvement.
+              </p>
+
+              <div className="grid grid-cols-5 gap-2">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setDifficultyRpe(n)}
+                    className={`h-11 rounded-xl font-bold text-sm transition-all duration-150 ${
+                      difficultyRpe === n
+                        ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg scale-105'
+                        : 'bg-white/5 text-muted-foreground border border-white/10 hover:border-primary/40 hover:text-foreground'
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                <span>1 · Très facile</span>
+                <span>10 · Hardcore</span>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  onClick={handleSubmitDifficultyRating}
+                  className="flex-1 bg-gradient-to-r from-primary to-secondary text-white"
+                >
+                  Valider ma note
+                </Button>
+                <Button variant="outline" onClick={handleDismissDifficultyRating} className="border-2 border-white/15">
+                  Passer
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Flame, Dumbbell, Sparkles } from 'lucide-react';
+import { Flame, Dumbbell, Sparkles, Check, X } from 'lucide-react';
+import { useSounds } from '@/utils/sounds';
 
 type ExerciseType = 'echauffement' | 'travail' | 'accessoire';
 
@@ -42,14 +43,16 @@ interface ExerciseCardProps {
   exercise: any;
   isCompleted?: boolean;
   isSuccess?: boolean;
-  statusIcon?: React.ReactNode;
+  /** Si fourni, affiche les boutons de validation compacts (jamais sur l'échauffement). */
+  onValidate?: (success: boolean) => void;
 }
 
-export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isCompleted, isSuccess, statusIcon }) => {
+export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isCompleted, isSuccess, onValidate }) => {
   const type = inferType(exercise);
   const meta = type ? TYPE_META[type] : null;
   const isWarmup = type === 'echauffement';
   const isMainLift = type === 'travail';
+  const { playSuccess, playError } = useSounds();
 
   const sets = exercise.progression?.sets ?? exercise.series;
   const reps = exercise.progression?.reps ?? exercise.reps;
@@ -60,6 +63,13 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
 
   const hasMuscles = Array.isArray(exercise.muscles) && exercise.muscles.length > 0;
   const hasEquipement = Array.isArray(exercise.equipement) && exercise.equipement.length > 0;
+
+  const canValidate = !!onValidate && !isWarmup;
+
+  const handleValidate = (success: boolean) => {
+    if (success) playSuccess(); else playError();
+    onValidate?.(success);
+  };
 
   return (
     <Card
@@ -93,7 +103,6 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
                   <h4 className={`truncate font-semibold ${isWarmup ? 'text-sm text-muted-foreground' : 'text-base text-foreground'}`}>
                     {nomAffiche}
                   </h4>
-                  {statusIcon}
                 </div>
                 {meta && !isWarmup && (
                   <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{meta.label}</span>
@@ -140,6 +149,42 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
             {exercise.conseils && (
               <div className="mt-3 ml-14 p-3 rounded-lg bg-accent/10 border border-accent/25">
                 <p className="text-sm text-foreground"><strong className="text-accent">Conseil :</strong> {exercise.conseils}</p>
+              </div>
+            )}
+
+            {/* Validation compacte — un seul rang de boutons, jamais une carte dupliquée en dessous.
+                Les deux boutons restent cliquables même après validation pour corriger un mauvais clic. */}
+            {canValidate && (
+              <div className={`flex items-center justify-end gap-2 ${isMainLift ? 'mt-3 pl-14' : 'mt-3 pl-14'}`}>
+                {isCompleted && (
+                  <span className={`text-[11px] font-medium mr-auto ${isSuccess ? 'text-green-400' : 'text-destructive'}`}>
+                    {isSuccess ? '+50 XP' : '+10 XP'}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleValidate(true)}
+                  className={`inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-xs font-medium transition-all duration-150 ${
+                    isCompleted && isSuccess
+                      ? 'bg-green-500 text-white'
+                      : 'bg-white/5 text-muted-foreground hover:bg-green-500/15 hover:text-green-400 border border-white/10'
+                  }`}
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  Réussi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleValidate(false)}
+                  className={`inline-flex items-center gap-1 h-7 px-2.5 rounded-full text-xs font-medium transition-all duration-150 ${
+                    isCompleted && !isSuccess
+                      ? 'bg-destructive text-white'
+                      : 'bg-white/5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive border border-white/10'
+                  }`}
+                >
+                  <X className="w-3.5 h-3.5" />
+                  Raté
+                </button>
               </div>
             )}
           </CardContent>

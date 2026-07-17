@@ -11,6 +11,12 @@ interface ExerciseValidation {
   xp: number;
 }
 
+interface SessionDifficultyRating {
+  sessionId: string;
+  date: string;
+  rpe: number; // 1 (très facile) à 10 (hardcore)
+}
+
 interface XPData {
   currentXP: number;
   totalXP: number;
@@ -20,12 +26,15 @@ interface XPData {
 
 interface ExerciseContextType {
   validations: ExerciseValidation[];
+  sessionRatings: SessionDifficultyRating[];
   xpData: XPData;
   addValidation: (exerciseId: string, sessionId: string, success: boolean) => void;
   getSessionStatus: (sessionId: string, date: string) => 'completed' | 'partial' | 'failed' | 'not-started';
   getExerciseStatus: (exerciseId: string, sessionId: string, date: string) => 'success' | 'failed' | 'not-completed';
   getSessionXP: (sessionId: string, date: string) => number;
   getTotalSessionXP: (sessionId: string, date: string) => number;
+  addSessionRating: (sessionId: string, rpe: number) => void;
+  getSessionRating: (sessionId: string) => number | null;
 }
 
 const ExerciseContext = createContext<ExerciseContextType | undefined>(undefined);
@@ -44,6 +53,7 @@ interface ExerciseProviderProps {
 
 export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) => {
   const [validations, setValidations] = useState<ExerciseValidation[]>([]);
+  const [sessionRatings, setSessionRatings] = useState<SessionDifficultyRating[]>([]);
   const [xpData, setXpData] = useState<XPData>({
     currentXP: 0,
     totalXP: 0,
@@ -62,8 +72,9 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
   // Charger les données depuis localStorage
   useEffect(() => {
     const savedValidations = localStorage.getItem('exerciseValidations');
+    const savedRatings = localStorage.getItem('sessionDifficultyRatings');
     const savedXP = localStorage.getItem('xpData');
-    
+
     if (savedValidations) {
       try {
         setValidations(JSON.parse(savedValidations));
@@ -71,7 +82,15 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
         console.error('Erreur lors du chargement des validations:', error);
       }
     }
-    
+
+    if (savedRatings) {
+      try {
+        setSessionRatings(JSON.parse(savedRatings));
+      } catch (error) {
+        console.error('Erreur lors du chargement des notes de difficulté:', error);
+      }
+    }
+
     if (savedXP) {
       try {
         setXpData(JSON.parse(savedXP));
@@ -85,6 +104,11 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
   useEffect(() => {
     localStorage.setItem('exerciseValidations', JSON.stringify(validations));
   }, [validations]);
+
+  // Sauvegarder les notes de difficulté (RPE) par séance
+  useEffect(() => {
+    localStorage.setItem('sessionDifficultyRatings', JSON.stringify(sessionRatings));
+  }, [sessionRatings]);
 
   // Sauvegarder les données XP
   useEffect(() => {
@@ -176,22 +200,44 @@ export const ExerciseProvider: React.FC<ExerciseProviderProps> = ({ children }) 
     return completedExercises * 50;
   }, [validations]);
 
+  const addSessionRating = useCallback((sessionId: string, rpe: number) => {
+    const today = getTodayLocalKey();
+    const clamped = Math.max(1, Math.min(10, Math.round(rpe)));
+
+    setSessionRatings(prev => {
+      const filtered = prev.filter(r => !(r.sessionId === sessionId && r.date === today));
+      return [...filtered, { sessionId, date: today, rpe: clamped }];
+    });
+  }, []);
+
+  const getSessionRating = useCallback((sessionId: string): number | null => {
+    // Une séance n'est notée qu'une fois : peu importe la date exacte, on cherche par id de séance.
+    const rating = sessionRatings.find(r => r.sessionId === sessionId);
+    return rating ? rating.rpe : null;
+  }, [sessionRatings]);
+
   const value = useMemo<ExerciseContextType>(() => ({
     validations,
+    sessionRatings,
     xpData,
     addValidation,
     getSessionStatus,
     getExerciseStatus,
     getSessionXP,
-    getTotalSessionXP
+    getTotalSessionXP,
+    addSessionRating,
+    getSessionRating
   }), [
     validations,
+    sessionRatings,
     xpData,
     addValidation,
     getSessionStatus,
     getExerciseStatus,
     getSessionXP,
-    getTotalSessionXP
+    getTotalSessionXP,
+    addSessionRating,
+    getSessionRating
   ]);
 
   return (

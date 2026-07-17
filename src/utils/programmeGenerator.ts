@@ -1036,35 +1036,58 @@ export const applyProgression = (exercise: Exercise, phase: string, level: strin
 };
 
 // Fonction principale de génération de programme - AMÉLIORÉE
+// Donne un id STABLE et UNIQUE à chaque exercice d'une séance (index dans la séance), au lieu de
+// retomber sur exercise.nom comme c'était le cas partout en aval (ExerciseContext/Programme.tsx font
+// `exercise.id || exercise.nom`). Sans ça, les 3 séries de travail d'un même mouvement partagent
+// TOUTES le même nom ("Squat" x3) donc le même id : valider "Raté" sur une seule série marquait les
+// 3 comme ratées d'un coup (même chose pour les paliers d'échauffement).
+function assignExerciseIds(sessionId: string, exercises: any[]): any[] {
+  return exercises.map((ex, idx) => ({ ...ex, id: ex.id || `${sessionId}-ex${idx}` }));
+}
+
+// Appliqué une seule fois ici, sur le résultat final, pour couvrir tous les sports sans dupliquer
+// la logique dans chaque générateur.
+function withUniqueExerciseIds(programme: Programme): Programme {
+  programme.sessions?.forEach((session: any) => {
+    if (!Array.isArray(session.exercises)) return;
+    session.exercises = assignExerciseIds(session.id, session.exercises);
+  });
+  return programme;
+}
+
 export const generateProgramme = (user: UserProfile): Programme => {
   console.log('=== GENERATE PROGRAMME ===');
   console.log('User sportClass:', user.sportClass);
-  
+
+  let programme: Programme;
+
   if (user.sportClass === 'sprint') {
     console.log('✅ Génération programme sprint');
-    return generateSprintProgramme(user);
+    programme = generateSprintProgramme(user);
   } else if (user.sportClass === 'power' || user.sportClass === 'powerlifter') {
     console.log('✅ Génération programme powerlifting');
-    return generatePowerliftingProgramme(user); // Utiliser la fonction spécifique powerlifting
+    programme = generatePowerliftingProgramme(user); // Utiliser la fonction spécifique powerlifting
   } else if (user.sportClass === 'streetlifting') {
     console.log('✅ Génération programme street lifting');
-    return generateStreetLiftingProgramme(user);
+    programme = generateStreetLiftingProgramme(user);
   } else if (user.sportClass === 'calisthenics') {
     console.log('✅ Génération programme calisthenics');
-    return generateCalisthenicsProgramme(user);
+    programme = generateCalisthenicsProgramme(user);
   } else if (user.sportClass === 'marathon' || user.sportClass === 'runner') {
     console.log('✅ Génération programme marathon');
-    return generateMarathonProgramme(user);
+    programme = generateMarathonProgramme(user);
   } else if (user.sportClass === 'classique' || user.sportClass === 'allround') {
     console.log('✅ Génération programme musculation classique');
-    return generateMusculationClassiqueProgramme(user);
+    programme = generateMusculationClassiqueProgramme(user);
   } else if (user.sportClass === 'crossfit') {
     console.log('✅ Génération programme crossfit');
-    return generateCrossfitProgramme(user);
+    programme = generateCrossfitProgramme(user);
   } else {
     console.log('❌ Classe non supportée:', user.sportClass);
-    return generateMusculationClassiqueProgramme(user); // Par défaut
+    programme = generateMusculationClassiqueProgramme(user); // Par défaut
   }
+
+  return withUniqueExerciseIds(programme);
 };
 
 // Nouvelle fonction pour le sprint
@@ -1177,6 +1200,69 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
 }
 
 // Nouvelle fonction pour le Powerlifting
+// Le mouvement principal qu'un jour logique représente normalement (avant remplacement éventuel
+// par une séance TEST) — même correspondance que dans createPowerliftingSession.
+function mainLiftForLogicalDay(logicalJour: number): MainLift {
+  if (logicalJour === 2 || logicalJour === 4) return 'bench';
+  if (logicalJour === 3) return 'deadlift';
+  return 'squat';
+}
+
+const MAIN_LIFT_NOM: Record<MainLift, string> = { squat: 'Squat', bench: 'Développé Couché', deadlift: 'Soulevé de Terre' };
+
+// Ratios poids de corps prudents pour estimer un point de départ de rampe SANS aucune perf connue —
+// juste un point d'ancrage pour l'échauffement, pas une prédiction de charge réelle (d'où le message
+// dans les conseils invitant à ajuster selon le ressenti).
+const NOVICE_TEST_RATIOS: Record<MainLift, { male: number; female: number }> = {
+  squat: { male: 0.5, female: 0.4 },
+  bench: { male: 0.4, female: 0.25 },
+  deadlift: { male: 0.75, female: 0.6 },
+};
+
+// Séance TEST — pour un mouvement dont on ne connaît aucune vraie perf : au lieu de faire tourner
+// tout un programme sur un max inventé, on fait d'abord monter progressivement jusqu'à un top set de
+// 3-5 répétitions difficile mais propre, à enregistrer ensuite comme performance réelle. Le poids de
+// départ n'est qu'une estimation prudente basée sur le poids de corps, pas une vraie prescription %1RM.
+function createMaxTestSession(
+  semaine: number,
+  jour: number,
+  lift: MainLift,
+  bodyweight: number,
+  sex: string,
+  dayName?: string
+) {
+  const nomPrincipal = MAIN_LIFT_NOM[lift];
+  const ratio = NOVICE_TEST_RATIOS[lift][sex === 'female' ? 'female' : 'male'];
+  const estimatedTop = roundToPlates(bodyweight * ratio);
+
+  const ramp: WarmupStep[] = [{ pct: 0.4, reps: 8 }, { pct: 0.6, reps: 5 }, { pct: 0.8, reps: 3 }];
+  const warmup = buildWarmupSets(nomPrincipal, estimatedTop, ramp);
+
+  const testSet = {
+    nom: `${nomPrincipal} (test — trouvez votre charge de référence)`,
+    type: 'travail',
+    series: 1,
+    reps: '3-5',
+    poids: estimatedTop,
+    pourcentage: 0,
+    repos: '3-4 min',
+  };
+
+  const exercices = [...warmup, testSet];
+
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (TEST)`,
+    day: dayName || `Jour ${jour}`,
+    phase: 'Adaptation',
+    intensity: 'Modérée',
+    duration: exercices.length * 10,
+    exercises: exercices,
+    notes: `Séance TEST — vous n'avez pas encore de ${nomPrincipal.toLowerCase()} enregistré. Montez progressivement (le poids affiché n'est qu'une estimation de départ) et arrêtez-vous sur un set de 3 à 5 répétitions difficile mais techniquement propre — pas la peine de chercher un vrai max aujourd'hui. Enregistrez ensuite ce poids dans vos performances : le programme se recalibrera automatiquement dessus.`,
+    equipment: ['Barre', 'Disques', 'Rack']
+  };
+}
+
 function generatePowerliftingProgramme(user: UserProfile): Programme {
   const seancesParSemaine = user.trainingDays?.length || 3;
   // 2 cycles de 4 semaines générés d'un coup : la progression entre cycles (cf. cycleBump dans
@@ -1187,7 +1273,7 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
   const bodyweight = user.weight || 75;
   const sex = user.sex || 'male';
 
-  const { maxSquat, maxBench, maxDeadlift } = getUserSBDMaxes();
+  const { maxSquat, maxBench, maxDeadlift, hasRealMax } = getUserSBDMaxes();
 
   const level = assessPowerliftingLevel(bodyweight, sex, maxSquat, maxBench, maxDeadlift);
   const weakestLift = findWeakestLift(bodyweight, sex, maxSquat, maxBench, maxDeadlift);
@@ -1215,8 +1301,13 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
         : jour + 1;
 
       let session;
+      const dayMainLift = mainLiftForLogicalDay(logicalJour);
 
-      if (logicalJour === specialJour && semaineDansCycle === 3) {
+      if (semaine === 1 && !hasRealMax[dayMainLift]) {
+        // Pas de vraie perf connue sur ce mouvement : priorité absolue à la séance TEST, avant
+        // même les créneaux spéciaux (pas de PR/SBD sur un max qu'on n'a jamais mesuré).
+        session = createMaxTestSession(semaine, logicalJour, dayMainLift, bodyweight, sex, trainingDays[jour]);
+      } else if (logicalJour === specialJour && semaineDansCycle === 3) {
         // Combo SBD sous-maximal (simulation) : UNE SEULE fois par cycle, juste avant le deload.
         session = createSBDComboSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, trainingDays[jour]);
       } else if (logicalJour === specialJour && semaineDansCycle === 2) {
@@ -1268,14 +1359,21 @@ function generatePowerliftingProgramme(user: UserProfile): Programme {
   return programme;
 }
 
-// Récupère les 1RM réels de l'utilisateur depuis le stockage local (valeurs par défaut prudentes sinon)
-function getUserSBDMaxes(): { maxSquat: number; maxBench: number; maxDeadlift: number } {
+// Récupère les 1RM réels de l'utilisateur depuis le stockage local (valeurs par défaut prudentes
+// sinon) — et signale, par mouvement, si cette valeur est une VRAIE perf enregistrée ou juste le
+// défaut de secours, pour pouvoir déclencher une séance TEST plutôt que de faire tourner tout un
+// programme sur des maxs inventés.
+function getUserSBDMaxes(): {
+  maxSquat: number; maxBench: number; maxDeadlift: number;
+  hasRealMax: Record<MainLift, boolean>;
+} {
   let maxSquat = 100;
   let maxBench = 70;
   let maxDeadlift = 120;
+  const hasRealMax: Record<MainLift, boolean> = { squat: false, bench: false, deadlift: false };
 
   const savedPerformances = localStorage.getItem('userPerformances');
-  if (!savedPerformances) return { maxSquat, maxBench, maxDeadlift };
+  if (!savedPerformances) return { maxSquat, maxBench, maxDeadlift, hasRealMax };
 
   try {
     const performancesList = JSON.parse(savedPerformances);
@@ -1292,14 +1390,14 @@ function getUserSBDMaxes(): { maxSquat: number; maxBench: number; maxDeadlift: n
       p.discipline?.toLowerCase().includes('terre')
     );
 
-    if (squatPerformances.length > 0) maxSquat = Math.max(...squatPerformances.map((p: any) => p.value || 0));
-    if (benchPerformances.length > 0) maxBench = Math.max(...benchPerformances.map((p: any) => p.value || 0));
-    if (deadliftPerformances.length > 0) maxDeadlift = Math.max(...deadliftPerformances.map((p: any) => p.value || 0));
+    if (squatPerformances.length > 0) { maxSquat = Math.max(...squatPerformances.map((p: any) => p.value || 0)); hasRealMax.squat = true; }
+    if (benchPerformances.length > 0) { maxBench = Math.max(...benchPerformances.map((p: any) => p.value || 0)); hasRealMax.bench = true; }
+    if (deadliftPerformances.length > 0) { maxDeadlift = Math.max(...deadliftPerformances.map((p: any) => p.value || 0)); hasRealMax.deadlift = true; }
   } catch (error) {
     console.error('Erreur lors du chargement des performances:', error);
   }
 
-  return { maxSquat, maxBench, maxDeadlift };
+  return { maxSquat, maxBench, maxDeadlift, hasRealMax };
 }
 
 type PowerliftingLevel = 'debutant' | 'intermediaire' | 'avance';
@@ -1357,6 +1455,11 @@ function findWeakestLift(weight: number, sex: string, squat: number, bench: numb
 // Arrondit au multiple de 2.5kg le plus proche (charges réalistes avec des disques standards)
 const roundToPlates = (weight: number) => Math.max(20, Math.round(weight / 2.5) * 2.5);
 
+// Le % affiché doit refléter le poids RÉELLEMENT prescrit (après arrondi aux disques), pas le ratio
+// théorique visé avant arrondi — sinon on affiche "70%" pour une charge qui vaut en réalité 68% ou
+// 72% du max une fois arrondie à 2.5kg près.
+const pctOf = (poids: number, reference: number) => (reference > 0 ? Math.round((poids / reference) * 100) : 0);
+
 interface WarmupStep { pct: number; reps: number; }
 
 // Rampes d'échauffement calibrées par mouvement : le squat demande la rampe la plus longue
@@ -1369,25 +1472,57 @@ const WARMUP_RAMPS: Record<MainLift, WarmupStep[]> = {
 };
 
 function buildWarmupSets(nom: string, topWeight: number, ramp: WarmupStep[]) {
-  return ramp.map((step) => ({
-    nom: `${nom} (échauffement)`,
-    type: 'echauffement',
-    series: 1,
-    reps: step.reps,
-    poids: roundToPlates(topWeight * step.pct),
-    pourcentage: Math.round(step.pct * 100),
-    repos: '60-90s',
-  }));
+  return ramp.map((step) => {
+    const poids = roundToPlates(topWeight * step.pct);
+    return {
+      nom: `${nom} (échauffement)`,
+      type: 'echauffement',
+      series: 1,
+      reps: step.reps,
+      poids,
+      pourcentage: pctOf(poids, topWeight),
+      repos: '60-90s',
+    };
+  });
 }
 
-// Schéma séries/reps/%1RM par niveau et semaine du cycle — vague progressive façon 5/3/1 pour
-// l'intermédiaire, adoucie (pas de singles proches du max) pour le débutant, resserrée et plus
-// intense pour l'avancé (bloc d'intensification façon pic de compétition).
-function getWaveScheme(level: PowerliftingLevel, semaineDansCycle: number, estDeload: boolean): Array<{ reps: number | string; pct: number }> {
+type BlockType = 'intensite' | 'volume';
+
+// Un cycle sur deux bascule en bloc "volume" (plus de reps, %1RM plus modéré, pas de singles) au
+// lieu de rejouer indéfiniment la même vague d'intensification — sans ça, le lifter ne voit jamais
+// de vrai travail de volume dans le programme.
+const getBlockType = (cycle: number): BlockType => (cycle % 2 === 1 ? 'intensite' : 'volume');
+
+// Schéma séries/reps/%1RM par niveau, semaine du cycle et type de bloc — vague progressive façon
+// 5/3/1 pour l'intermédiaire en bloc intensité (adoucie pour le débutant, resserrée et plus intense
+// pour l'avancé façon pic de compétition), et un vrai bloc volume (plus de reps, %1RM modéré,
+// jamais de singles) sur les cycles pairs pour varier le stimulus d'un cycle à l'autre.
+function getWaveScheme(
+  level: PowerliftingLevel,
+  semaineDansCycle: number,
+  estDeload: boolean,
+  blockType: BlockType = 'intensite'
+): Array<{ reps: number | string; pct: number }> {
   if (estDeload) {
     return level === 'avance'
       ? [{ reps: 5, pct: 0.55 }, { reps: 5, pct: 0.6 }]
       : [{ reps: 5, pct: 0.5 }, { reps: 5, pct: 0.55 }, { reps: 5, pct: 0.6 }];
+  }
+
+  if (blockType === 'volume') {
+    if (level === 'debutant') {
+      const pct = [0.6, 0.63, 0.66][semaineDansCycle - 1] ?? 0.66;
+      return [{ reps: 8, pct }, { reps: 8, pct }, { reps: 8, pct }];
+    }
+    if (level === 'avance') {
+      if (semaineDansCycle === 1) return [{ reps: 6, pct: 0.65 }, { reps: 6, pct: 0.7 }, { reps: 6, pct: 0.72 }];
+      if (semaineDansCycle === 2) return [{ reps: 5, pct: 0.68 }, { reps: 5, pct: 0.73 }, { reps: 5, pct: 0.75 }];
+      return [{ reps: 5, pct: 0.7 }, { reps: 5, pct: 0.75 }, { reps: '5+', pct: 0.78 }];
+    }
+    // Intermédiaire : volume plus haut, jamais au-delà de 80%
+    if (semaineDansCycle === 1) return [{ reps: 8, pct: 0.6 }, { reps: 8, pct: 0.65 }, { reps: '8+', pct: 0.7 }];
+    if (semaineDansCycle === 2) return [{ reps: 6, pct: 0.65 }, { reps: 6, pct: 0.7 }, { reps: '6+', pct: 0.75 }];
+    return [{ reps: 6, pct: 0.7 }, { reps: 5, pct: 0.75 }, { reps: '5+', pct: 0.8 }];
   }
 
   if (level === 'debutant') {
@@ -1408,20 +1543,43 @@ function getWaveScheme(level: PowerliftingLevel, semaineDansCycle: number, estDe
 }
 
 function buildMainLiftSets(nom: string, rm: number, scheme: Array<{ reps: number | string; pct: number }>, repos: string) {
-  return scheme.map((set) => ({
-    nom,
-    type: 'travail',
-    series: 1,
-    reps: set.reps,
-    poids: roundToPlates(rm * set.pct),
-    pourcentage: Math.round(set.pct * 100),
-    repos,
-  }));
+  return scheme.map((set) => {
+    const poids = roundToPlates(rm * set.pct);
+    return {
+      nom,
+      type: 'travail',
+      series: 1,
+      reps: set.reps,
+      poids,
+      pourcentage: pctOf(poids, rm),
+      repos,
+    };
+  });
 }
 
-// Accessoires par mouvement principal — la liste complète est TOUJOURS présente (le premier est
-// un exercice de spécificité compétition comme la pause, jamais sauté). Sur le jour du point
-// faible, l'exercice de spécificité prend une série de plus pour appuyer un peu plus fort.
+type AccessoryDef = { nom: string; series: number; reps: number; poids: number; pourcentage: number; repos: string; type: string };
+
+// Variantes de l'exercice de spécificité par mouvement — alterne d'un cycle à l'autre plutôt que de
+// rejouer indéfiniment la pause : sur un programme de 2 cycles, le lifter voit les deux variantes.
+const SPECIFICITY_VARIANTS: Record<MainLift, Array<{ nom: string; ratio: number; reps: number }>> = {
+  squat: [
+    { nom: 'Squat Pause (3ct)', ratio: 0.54, reps: 5 },
+    { nom: 'Squat Tempo (3-2-1)', ratio: 0.6, reps: 5 },
+  ],
+  bench: [
+    { nom: 'Développé Couché Pause (3ct)', ratio: 0.63, reps: 5 },
+    { nom: 'Développé Couché Tempo (3-2-1)', ratio: 0.6, reps: 5 },
+  ],
+  deadlift: [
+    { nom: 'Soulevé de Terre Déficit', ratio: 0.63, reps: 5 },
+    { nom: 'Soulevé de Terre Pause (2ct)', ratio: 0.58, reps: 5 },
+  ],
+};
+
+// Accessoires par mouvement principal — la liste complète est TOUJOURS présente. Le premier est
+// l'exercice de spécificité compétition, dont la variante change de cycle en cycle (pause, tempo...)
+// pour ne pas rejouer indéfiniment le même mouvement. Sur le jour du point faible, il prend une
+// série de plus pour appuyer un peu plus fort.
 function getAccessoriesForDay(
   mainLift: MainLift,
   weakestLift: MainLift,
@@ -1429,7 +1587,8 @@ function getAccessoriesForDay(
   rmSquat: number,
   rmBench: number,
   rmDeadlift: number,
-  bodyweight: number
+  bodyweight: number,
+  cycle: number
 ) {
   const isWeakDay = mainLift === weakestLift;
   const specificitySeries = isWeakDay ? 4 : 3;
@@ -1438,33 +1597,59 @@ function getAccessoriesForDay(
   const useWeightedPullups = level !== 'debutant';
   const weightedPullupLoad = level === 'avance' ? bodyweight * 0.25 : bodyweight * 0.15;
 
-  type AccessoryDef = { nom: string; series: number; reps: number; poids: number; pourcentage: number; repos: string; type: string };
+  const rmByLift: Record<MainLift, number> = { squat: rmSquat, bench: rmBench, deadlift: rmDeadlift };
+
+  const specificityFor = (lift: MainLift): AccessoryDef => {
+    const variants = SPECIFICITY_VARIANTS[lift];
+    const variant = variants[(cycle - 1) % variants.length];
+    const rm = rmByLift[lift];
+    const poids = roundToPlates(rm * variant.ratio);
+    return {
+      nom: variant.nom,
+      type: 'accessoire',
+      series: specificitySeries,
+      reps: variant.reps,
+      poids,
+      pourcentage: pctOf(poids, rm),
+      repos: lift === 'deadlift' ? '2-3 min' : '2 min',
+    };
+  };
+
+  const withPct = (nom: string, series: number, reps: number, poids: number, rm: number, repos: string): AccessoryDef => ({
+    nom,
+    type: 'accessoire',
+    series,
+    reps,
+    poids,
+    pourcentage: pctOf(poids, rm),
+    repos,
+  });
 
   const pools: Record<MainLift, AccessoryDef[]> = {
     squat: [
-      { nom: 'Squat Pause (3ct)', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmSquat * 0.54), pourcentage: 54, repos: '2 min' },
-      { nom: 'Fentes lestées', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmSquat * 0.135), pourcentage: 14, repos: '2 min' },
-      { nom: 'Presse à Jambes', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(rmSquat * 1.08), pourcentage: 108, repos: '2 min' },
-      { nom: 'Extensions de Jambes', type: 'accessoire', series: 3, reps: 15, poids: roundToPlates(rmSquat * 0.36), pourcentage: 36, repos: '1.5 min' },
+      specificityFor('squat'),
+      withPct('Fentes lestées', 3, 8, roundToPlates(rmSquat * 0.135), rmSquat, '2 min'),
+      withPct('Presse à Jambes', 3, 12, roundToPlates(rmSquat * 1.08), rmSquat, '2 min'),
+      withPct('Extensions de Jambes', 3, 15, roundToPlates(rmSquat * 0.36), rmSquat, '1.5 min'),
     ],
     bench: [
-      { nom: 'Développé Couché Pause (3ct)', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmBench * 0.63), pourcentage: 63, repos: '2 min' },
-      { nom: 'Développé Prise Serrée', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmBench * 0.585), pourcentage: 59, repos: '2 min' },
-      { nom: 'Développé Incliné', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmBench * 0.54), pourcentage: 54, repos: '2 min' },
+      specificityFor('bench'),
+      withPct('Développé Prise Serrée', 3, 8, roundToPlates(rmBench * 0.585), rmBench, '2 min'),
+      withPct('Développé Incliné', 3, 8, roundToPlates(rmBench * 0.54), rmBench, '2 min'),
       level === 'debutant'
         ? { nom: 'Dips', type: 'accessoire', series: 3, reps: 10, poids: 0, pourcentage: 0, repos: '1.5 min' }
         : { nom: 'Dips lestés', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(bodyweight * (level === 'avance' ? 0.35 : 0.2)), pourcentage: 0, repos: '1.5 min' },
-      { nom: 'Extensions Triceps', type: 'accessoire', series: 3, reps: 15, poids: roundToPlates(rmBench * 0.135), pourcentage: 14, repos: '1.5 min' },
+      withPct('Extensions Triceps', 3, 15, roundToPlates(rmBench * 0.135), rmBench, '1.5 min'),
       { nom: 'Curls Biceps', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(bodyweight * 0.25), pourcentage: 0, repos: '1 min' },
     ],
     deadlift: [
-      { nom: 'Soulevé de Terre Déficit', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmDeadlift * 0.63), pourcentage: 63, repos: '2-3 min' },
-      { nom: 'Soulevé de Terre Roumain', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmDeadlift * 0.45), pourcentage: 45, repos: '2 min' },
-      { nom: 'Rowing Barre', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmDeadlift * 0.45), pourcentage: 45, repos: '2 min' },
+      specificityFor('deadlift'),
+      withPct('Soulevé de Terre Roumain', 3, 8, roundToPlates(rmDeadlift * 0.45), rmDeadlift, '2 min'),
+      withPct('Rowing Barre', 3, 8, roundToPlates(rmDeadlift * 0.45), rmDeadlift, '2 min'),
       useWeightedPullups
         ? { nom: 'Tractions Lestées', type: 'accessoire', series: 3, reps: 6, poids: roundToPlates(weightedPullupLoad), pourcentage: 0, repos: '2 min' }
         : { nom: 'Tractions Assistées', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(bodyweight * 0.3), pourcentage: 0, repos: '2 min' },
-      { nom: 'Shrugs Barre', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(rmDeadlift * 0.36), pourcentage: 36, repos: '1.5 min' },
+      withPct('Shrugs Barre', 3, 12, roundToPlates(rmDeadlift * 0.36), rmDeadlift, '1.5 min'),
     ],
   };
 
@@ -1489,7 +1674,8 @@ function createPowerliftingSession(
 
   const { rmSquat, rmBench, rmDeadlift } = computeCycleMaxes(cycle, level, maxSquat, maxBench, maxDeadlift);
 
-  const scheme = getWaveScheme(level, semaineDansCycle, estDeload);
+  const blockType = getBlockType(cycle);
+  const scheme = getWaveScheme(level, semaineDansCycle, estDeload, blockType);
 
   let mainLift: MainLift = 'squat';
   let rm = rmSquat;
@@ -1512,12 +1698,13 @@ function createPowerliftingSession(
   const warmup = buildWarmupSets(nomPrincipal, firstWorkingWeight, WARMUP_RAMPS[mainLift]);
   const mainSets = buildMainLiftSets(nomPrincipal, rm, scheme, reposPrincipal);
 
-  let accessories = getAccessoriesForDay(mainLift, weakestLift, level, rmSquat, rmBench, rmDeadlift, bodyweight);
+  let accessories = getAccessoriesForDay(mainLift, weakestLift, level, rmSquat, rmBench, rmDeadlift, bodyweight, cycle);
 
   if (jour === 4) {
     const rmPress = Math.round(rmBench * 0.65);
+    const militairePoids = roundToPlates(rmPress * (estDeload ? 0.55 : 0.7));
     accessories = [
-      { nom: 'Développé Militaire', type: 'accessoire', series: 3, reps: 6, poids: roundToPlates(rmPress * (estDeload ? 0.55 : 0.7)), pourcentage: estDeload ? 55 : 70, repos: '2 min' },
+      { nom: 'Développé Militaire', type: 'accessoire', series: 3, reps: 6, poids: militairePoids, pourcentage: pctOf(militairePoids, rmPress), repos: '2 min' },
       ...accessories,
     ];
   }
@@ -1534,7 +1721,7 @@ function createPowerliftingSession(
     exercises: exercices,
     notes: estDeload
       ? 'Semaine de récupération active : intensité réduite, gardez 3-4 répétitions en réserve sur chaque série.'
-      : `Programme ${level === 'debutant' ? 'progression linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'} — Cycle ${cycle}${mainLift === weakestLift ? ' — jour prioritaire (point faible)' : ''}`,
+      : `Bloc ${blockType === 'volume' ? 'Volume' : 'Intensité'} (${level === 'debutant' ? 'progression linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'}) — Cycle ${cycle}${mainLift === weakestLift ? ' — jour prioritaire (point faible)' : ''}`,
     equipment: ['Barre', 'Disques', 'Rack', 'Haltères']
   };
 }
@@ -1613,7 +1800,7 @@ function createPRSession(
     series: 1,
     reps: 1,
     poids: prWeight,
-    pourcentage: Math.round(pct * 100),
+    pourcentage: pctOf(prWeight, maxRm),
     repos: '5 min',
   };
 
@@ -1661,7 +1848,7 @@ function createPRSBDSession(
       series: 1,
       reps: 1,
       poids: prWeight,
-      pourcentage: Math.round(pct * 100),
+      pourcentage: pctOf(prWeight, rm),
       repos,
     };
     return [...warmup, recordAttempt];
@@ -1677,6 +1864,184 @@ function createPRSBDSession(
     exercises: exercices,
     notes: `Séance PR SBD — tentative de record sur les 3 mouvements, simulation complète de jour de compétition (Cycle ${cycle}).`,
     equipment: ['Barre', 'Disques', 'Rack']
+  };
+}
+
+// Détecte le mouvement principal d'une séance à partir de son exercice de type 'travail'
+// (le nom du 4e jour bench "Développé Couché (technique)" matche bien le préfixe "Développé Couché").
+function detectSessionMainLift(session: any): { lift: MainLift; nom: string } | null {
+  const mainEx = session?.exercises?.find((e: any) => e.type === 'travail');
+  if (!mainEx) return null;
+  if (mainEx.nom.startsWith('Squat')) return { lift: 'squat', nom: mainEx.nom };
+  if (mainEx.nom.startsWith('Développé Couché')) return { lift: 'bench', nom: mainEx.nom };
+  if (mainEx.nom.startsWith('Soulevé de Terre')) return { lift: 'deadlift', nom: mainEx.nom };
+  return null;
+}
+
+const isTestSession = (session: any): boolean =>
+  !!session?.notes && (
+    session.notes.includes('Séance PR') ||
+    session.notes.includes('PR SBD') ||
+    session.notes.includes('SBD combinée') ||
+    session.notes.includes('Séance TEST')
+  );
+
+// Réajuste une séance de travail normale si le dernier passage sur le MÊME mouvement s'est soldé
+// par un échec (validation marquée "non réussie") : au lieu d'enchaîner sur le %1RM prévu par la
+// vague (qui peut grimper à 90-95%), on retombe sur un bloc technique modéré et contrôlé en tempo,
+// le temps de refiabiliser le mouvement. Ne touche jamais aux séances PR / SBD (jours de test).
+// N'altère pas le programme stocké : s'applique à la volée quand une séance est affichée.
+export function adaptSessionToRecentFailure(
+  session: any,
+  allSessions: any[],
+  validations: Array<{ exerciseId: string; sessionId: string; success: boolean }>
+): any {
+  if (!session || session.isRestDay || isTestSession(session)) return session;
+
+  const current = detectSessionMainLift(session);
+  if (!current) return session;
+
+  const semaineMatch = session.nom?.match(/Semaine (\d+)/);
+  const currentWeek = semaineMatch ? parseInt(semaineMatch[1]) : null;
+  if (currentWeek == null) return session;
+
+  // Le dernier passage antérieur (semaine strictement inférieure) sur le même mouvement, hors
+  // séances de test — c'est la seule référence qui compte pour décider d'un éventuel allègement.
+  const priorSession = allSessions
+    .filter((s) => {
+      if (s === session || isTestSession(s)) return false;
+      const match = s.nom?.match(/Semaine (\d+)/);
+      const week = match ? parseInt(match[1]) : null;
+      if (week == null || currentWeek == null || week >= currentWeek) return false;
+      const detected = detectSessionMainLift(s);
+      return detected?.lift === current.lift;
+    })
+    .sort((a, b) => {
+      const wa = parseInt(a.nom.match(/Semaine (\d+)/)[1]);
+      const wb = parseInt(b.nom.match(/Semaine (\d+)/)[1]);
+      return wb - wa;
+    })[0];
+
+  if (!priorSession) return session;
+
+  const priorMain = detectSessionMainLift(priorSession);
+  if (!priorMain) return session;
+
+  // Chaque série de travail a maintenant son propre id unique (cf. assignExerciseIds) — on
+  // considère la séance précédente en échec si N'IMPORTE LAQUELLE de ses séries de travail sur ce
+  // mouvement a été marquée ratée (le id ne colle plus au nom depuis la correction du bug de
+  // validations partagées entre séries).
+  const priorMainSetIds = new Set(
+    (priorSession.exercises || [])
+      .filter((e: any) => e.type === 'travail' && e.nom === priorMain.nom)
+      .map((e: any) => e.id)
+  );
+  const failedLastTime = validations.some(
+    (v) => v.sessionId === priorSession.id && priorMainSetIds.has(v.exerciseId) && v.success === false
+  );
+  if (!failedLastTime) return session;
+
+  // Récupère le RM de travail utilisé pour CETTE séance à partir de son propre top set déjà généré
+  // (poids / %), pour rester cohérent avec la progression de cycle déjà appliquée à cette séance.
+  const mainSets = session.exercises.filter((e: any) => e.type === 'travail');
+  const topSet = mainSets.reduce((max: any, e: any) => (e.pourcentage > (max?.pourcentage || 0) ? e : max), null);
+  if (!topSet || !topSet.pourcentage) return session;
+  const estimatedRm = topSet.poids / (topSet.pourcentage / 100);
+
+  const recoveryScheme = [{ reps: 5, pct: 0.6 }, { reps: 5, pct: 0.65 }, { reps: 5, pct: 0.7 }];
+  const adaptedNom = `${current.nom} (tempo contrôlé)`;
+  const newMainSets = buildMainLiftSets(adaptedNom, estimatedRm, recoveryScheme, mainSets[0].repos);
+  const newFirstWeight = roundToPlates(estimatedRm * recoveryScheme[0].pct);
+  const newWarmup = buildWarmupSets(current.nom, newFirstWeight, WARMUP_RAMPS[current.lift]);
+
+  const oldWarmupName = `${current.nom} (échauffement)`;
+  const keptExercises = session.exercises.filter(
+    (e: any) => !(e.nom === oldWarmupName && e.type === 'echauffement') && !(e.nom === current.nom && e.type === 'travail')
+  );
+
+  return {
+    ...session,
+    exercises: assignExerciseIds(session.id, [...newWarmup, ...newMainSets, ...keptExercises]),
+    notes: `⚠️ Séance adaptée : échec du dernier passage sur ${current.nom.toLowerCase()} → charge réduite, travail en tempo contrôlé pour refiabiliser la technique avant de reprendre la progression.\n${session.notes || ''}`.trim(),
+  };
+}
+
+// RPE (1 = très facile, 10 = hardcore) déclaré après une séance entièrement réussie -> ajustement du
+// %1RM appliqué à la PROCHAINE séance sur le même mouvement. Trop facile pousse plus fort que prévu
+// par la vague ; hardcore/quasi-max fait lever le pied pour gérer la fatigue. Entre les deux (5-8),
+// la séance s'est déroulée comme prévu, on ne touche à rien.
+function difficultyAdjustment(rpe: number): number {
+  if (rpe <= 2) return 0.08;
+  if (rpe <= 4) return 0.04;
+  if (rpe <= 8) return 0;
+  if (rpe === 9) return -0.03;
+  return -0.06; // 10 : hardcore
+}
+
+// Réajuste une séance en fonction de la note de difficulté (RPE) donnée par l'utilisateur après le
+// dernier passage sur le MÊME mouvement — un curseur qui monte ou baisse le %1RM prévu, pas un
+// remplacement de schéma comme adaptSessionToRecentFailure. Ne s'applique jamais aux séances PR/SBD/
+// TEST. N'altère pas le programme stocké : s'applique à la volée quand une séance est affichée.
+export function adaptSessionToRecentDifficulty(
+  session: any,
+  allSessions: any[],
+  sessionRatings: Array<{ sessionId: string; rpe: number }>
+): any {
+  if (!session || session.isRestDay || isTestSession(session) || !sessionRatings.length) return session;
+
+  const current = detectSessionMainLift(session);
+  if (!current) return session;
+
+  const semaineMatch = session.nom?.match(/Semaine (\d+)/);
+  const currentWeek = semaineMatch ? parseInt(semaineMatch[1]) : null;
+  if (currentWeek == null) return session;
+
+  const priorSession = allSessions
+    .filter((s) => {
+      if (s === session || isTestSession(s)) return false;
+      const match = s.nom?.match(/Semaine (\d+)/);
+      const week = match ? parseInt(match[1]) : null;
+      if (week == null || week >= currentWeek) return false;
+      const detected = detectSessionMainLift(s);
+      return detected?.lift === current.lift;
+    })
+    .sort((a, b) => parseInt(b.nom.match(/Semaine (\d+)/)[1]) - parseInt(a.nom.match(/Semaine (\d+)/)[1]))[0];
+
+  if (!priorSession) return session;
+
+  const rating = sessionRatings.find((r) => r.sessionId === priorSession.id);
+  if (!rating) return session;
+
+  const delta = difficultyAdjustment(rating.rpe);
+  if (delta === 0) return session;
+
+  const mainSets = session.exercises.filter((e: any) => e.type === 'travail');
+  if (!mainSets.length) return session;
+
+  // On ajuste chaque set de travail à partir de son propre %/poids d'origine (garde les mêmes reps),
+  // pas un remplacement complet du schéma comme pour un échec — juste un curseur qui monte ou baisse.
+  const adjustedMainSets = mainSets.map((set: any) => {
+    if (!set.pourcentage) return set;
+    const rm = set.poids / (set.pourcentage / 100);
+    const newPct = Math.max(0.3, Math.min(0.98, set.pourcentage / 100 + delta));
+    const poids = roundToPlates(rm * newPct);
+    return { ...set, poids, pourcentage: pctOf(poids, rm) };
+  });
+
+  const oldWarmupName = `${current.nom} (échauffement)`;
+  const newWarmup = buildWarmupSets(current.nom, adjustedMainSets[0].poids, WARMUP_RAMPS[current.lift]);
+  const keptExercises = session.exercises.filter(
+    (e: any) => !(e.nom === oldWarmupName && e.type === 'echauffement') && e.type !== 'travail'
+  );
+
+  const message = delta > 0
+    ? `💪 Séance ajustée : la dernière séance sur ${current.nom.toLowerCase()} était jugée trop facile (${rating.rpe}/10) → charge augmentée par rapport au programme initial.`
+    : `🧊 Séance ajustée : la dernière séance sur ${current.nom.toLowerCase()} était très dure (${rating.rpe}/10) → charge légèrement réduite pour gérer la fatigue.`;
+
+  return {
+    ...session,
+    exercises: assignExerciseIds(session.id, [...newWarmup, ...adjustedMainSets, ...keptExercises]),
+    notes: `${message}\n${session.notes || ''}`.trim(),
   };
 }
 

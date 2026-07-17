@@ -15,6 +15,7 @@ import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
 import { DailyActivityWidget } from '@/components/DailyActivityWidget';
+import { OneRepMaxCalculator } from '@/components/OneRepMaxCalculator';
 import { HexagonBadgeRow } from '@/components/HexagonBadge';
 import { RankBadge } from '@/components/RankBadge';
 import { ProgressionPreviewCard } from '@/components/stats/ProgressionPreviewCard';
@@ -352,6 +353,9 @@ export const Dashboard: React.FC = () => {
 
         {/* Activité du jour : pas, distance, calories */}
         <DailyActivityWidget weightKg={user.weight} />
+
+        {/* Calculateur de 1RM — réservé aux powerlifters */}
+        {user.sportClass === 'power' && <OneRepMaxCalculator />}
 
         {/* Widget Quêtes */}
         <QuestWidget />

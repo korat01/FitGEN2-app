@@ -136,14 +136,22 @@ export class ScoringEngine {
       const wilksScore = calculateWilksScore(userWeight, totalWeight, isMale);
       const progress = computeRankProgress(glPoints, GL_RANK_BANDS);
 
+      // Le total squat+bench+deadlift pilote le rang global, mais les AUTRES disciplines
+      // (course, tractions, pompes...) restent prises en compte dans la décomposition —
+      // sinon les ajouter n'avait visiblement aucun effet.
+      const otherPerfs = bestPerformances.filter(
+        (p) => p.discipline !== 'squat' && p.discipline !== 'bench' && p.discipline !== 'deadlift'
+      );
+      const otherBreakdown = this.scoreOtherDisciplines(otherPerfs, userWeight, userSex, userSportClass, ageMultiplier);
+
       return {
         rank: this.determineRankFromGLPoints(glPoints),
         globalScore: glPoints,
         breakdown: {
           force: glPoints,
-          endurance: 0,
-          explosivite: 0,
-          calisthenics: 0
+          endurance: otherBreakdown.endurance,
+          explosivite: otherBreakdown.explosivite,
+          calisthenics: otherBreakdown.calisthenics
         },
         wilksScore,
         reason: `IPF GL : ${glPoints} pts (total ${totalWeight}kg à ${userWeight}kg, ${userSex})`,
@@ -153,124 +161,14 @@ export class ScoringEngine {
       };
     }
 
-    // FALLBACK: Système de scoring classique si pas de références FFForce
+    // FALLBACK: Système de scoring classique si pas de squat+bench+deadlift complet
     bestPerformances.forEach((perf) => {
-      if (!perf.discipline || !perf.value || isNaN(perf.value)) {
-        return;
-      }
+      const scored = this.scoreDiscipline(perf, userWeight, userSex, userSportClass, ageMultiplier);
+      if (!scored) return;
 
-      let score = 0;
-      let category = '';
-
-      switch (perf.discipline) {
-        case 'bench': {
-          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
-          const benchRefs = this.getBenchReferences(userWeight, userSex, userSportClass);
-
-          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
-          benchRefs.A *= ageMultiplier;
-          benchRefs.S *= ageMultiplier;
-          benchRefs.World *= ageMultiplier;
-
-          if (perf.value >= benchRefs.A) {
-            score = 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300;
-          } else {
-            score = (perf.value / benchRefs.A) * 600;
-          }
-
-          // BONUS POUR PERFORMANCES EXCEPTIONNELLES DANS LES DOMAINES NON-SPÉCIALISÉS
-          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, benchRefs);
-
-          category = 'force';
-          break;
-        }
-
-        case 'squat': {
-          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
-          const squatRefs = this.getSquatReferences(userWeight, userSex, userSportClass);
-
-          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
-          squatRefs.A *= ageMultiplier;
-          squatRefs.S *= ageMultiplier;
-          squatRefs.World *= ageMultiplier;
-
-          if (perf.value >= squatRefs.A) {
-            score = 600 + (perf.value - squatRefs.A) / (squatRefs.S - squatRefs.A) * 300;
-          } else {
-            score = (perf.value / squatRefs.A) * 600;
-          }
-
-          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, squatRefs);
-
-          category = 'force';
-          break;
-        }
-
-        case 'deadlift': {
-          // RÉFÉRENCES AVEC AJUSTEMENT SEXE + ÂGE + CLASSE DE SPORT
-          const deadliftRefs = this.getDeadliftReferences(userWeight, userSex, userSportClass);
-
-          // APPLIQUER LE MULTIPLICATEUR D'ÂGE
-          deadliftRefs.A *= ageMultiplier;
-          deadliftRefs.S *= ageMultiplier;
-          deadliftRefs.World *= ageMultiplier;
-
-          if (perf.value >= deadliftRefs.A) {
-            score = 600 + (perf.value - deadliftRefs.A) / (deadliftRefs.S - deadliftRefs.A) * 300;
-          } else {
-            score = (perf.value / deadliftRefs.A) * 600;
-          }
-
-          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, deadliftRefs);
-
-          category = 'force';
-          break;
-        }
-
-        case '5k': {
-          // RÉFÉRENCES POUR LE 5KM AVEC SEXE + CLASSE DE SPORT
-          const runRefs = this.getRunReferences(userSex, userSportClass);
-
-          if (perf.value <= runRefs.A) {
-            score = 600 + (runRefs.A - perf.value) / (runRefs.A - runRefs.S) * 300;
-          } else {
-            score = (runRefs.A / perf.value) * 600;
-          }
-
-          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, runRefs);
-
-          category = 'endurance';
-          break;
-        }
-
-        case 'pullups': {
-          // RÉFÉRENCES POUR LES TRACTIONS AVEC SEXE + CLASSE DE SPORT
-          const pullupRefs = this.getPullupReferences(userSex, userSportClass);
-
-          // APPLIQUER LE MULTIPLICATEUR D'ÂGE (comme bench/squat/deadlift/5k)
-          pullupRefs.A *= ageMultiplier;
-          pullupRefs.S *= ageMultiplier;
-          pullupRefs.World *= ageMultiplier;
-
-          if (perf.value >= pullupRefs.A) {
-            score = 600 + (perf.value - pullupRefs.A) / (pullupRefs.S - pullupRefs.A) * 300;
-          } else {
-            score = (perf.value / pullupRefs.A) * 600;
-          }
-
-          score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, pullupRefs);
-
-          category = 'calisthenics';
-          break;
-        }
-
-        default:
-          break;
-      }
-
-      totalScore += score;
+      totalScore += scored.score;
       performanceCount++;
-      breakdown[category] += score;
+      breakdown[scored.category] += scored.score;
     });
 
     if (performanceCount === 0) {
@@ -647,6 +545,193 @@ export class ScoringEngine {
     }
   }
 
+  // RÉFÉRENCES POMPES PAR CLASSE DE SPORT
+  private getPushupReferences(sex: string, sportClass: string) {
+    const baseRefs = sex === 'male' ?
+      { A: 25, S: 45, World: 70 } :  // Hommes
+      { A: 12, S: 25, World: 45 };  // Femmes
+
+    // AJUSTEMENTS PAR CLASSE DE SPORT (même logique que les tractions)
+    switch (sportClass) {
+      case 'calisthenics':
+        return baseRefs;
+      case 'streetlifting':
+        return { A: baseRefs.A * 1.1, S: baseRefs.S * 1.1, World: baseRefs.World * 1.1 };
+      case 'crossfit':
+        return { A: baseRefs.A * 1.15, S: baseRefs.S * 1.15, World: baseRefs.World * 1.15 };
+      case 'power':
+        return { A: baseRefs.A * 1.3, S: baseRefs.S * 1.3, World: baseRefs.World * 1.3 };
+      case 'marathon':
+        return { A: baseRefs.A * 1.25, S: baseRefs.S * 1.25, World: baseRefs.World * 1.25 };
+      case 'sprint':
+        return { A: baseRefs.A * 1.2, S: baseRefs.S * 1.2, World: baseRefs.World * 1.2 };
+      default:
+        return baseRefs;
+    }
+  }
+
+  // RÉFÉRENCES DE VITESSE (km/h) POUR LA COURSE À DISTANCE/TEMPS LIBRES.
+  // Dérivées des références de temps sur 5km : mêmes ajustements par classe de sport,
+  // mais exprimées en vitesse pour accepter n'importe quelle distance/temps.
+  private getRunSpeedReferences(sex: string, sportClass: string) {
+    const timeRefs = this.getRunReferences(sex, sportClass); // minutes, calibré sur 5km
+    const speedFromTime = (minutes: number) => 5 / (minutes / 60);
+    return {
+      A: speedFromTime(timeRefs.A),
+      S: speedFromTime(timeRefs.S),
+      World: speedFromTime(timeRefs.World),
+    };
+  }
+
+  // Calcule score + catégorie pour UNE performance. Utilisé par le fallback complet, et par
+  // scoreOtherDisciplines pour compléter la décomposition quand le total squat+bench+deadlift
+  // pilote déjà le rang global (voir calculateUserRank).
+  private scoreDiscipline(
+    perf: PerformanceRecord,
+    userWeight: number,
+    userSex: string,
+    userSportClass: string,
+    ageMultiplier: number
+  ): { score: number; category: string } | null {
+    if (!perf.discipline || !perf.value || isNaN(perf.value)) {
+      return null;
+    }
+
+    let score = 0;
+    let category = '';
+
+    switch (perf.discipline) {
+      case 'bench': {
+        const benchRefs = this.getBenchReferences(userWeight, userSex, userSportClass);
+        benchRefs.A *= ageMultiplier;
+        benchRefs.S *= ageMultiplier;
+        benchRefs.World *= ageMultiplier;
+
+        score = perf.value >= benchRefs.A
+          ? 600 + (perf.value - benchRefs.A) / (benchRefs.S - benchRefs.A) * 300
+          : (perf.value / benchRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, benchRefs);
+        category = 'force';
+        break;
+      }
+
+      case 'squat': {
+        const squatRefs = this.getSquatReferences(userWeight, userSex, userSportClass);
+        squatRefs.A *= ageMultiplier;
+        squatRefs.S *= ageMultiplier;
+        squatRefs.World *= ageMultiplier;
+
+        score = perf.value >= squatRefs.A
+          ? 600 + (perf.value - squatRefs.A) / (squatRefs.S - squatRefs.A) * 300
+          : (perf.value / squatRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, squatRefs);
+        category = 'force';
+        break;
+      }
+
+      case 'deadlift': {
+        const deadliftRefs = this.getDeadliftReferences(userWeight, userSex, userSportClass);
+        deadliftRefs.A *= ageMultiplier;
+        deadliftRefs.S *= ageMultiplier;
+        deadliftRefs.World *= ageMultiplier;
+
+        score = perf.value >= deadliftRefs.A
+          ? 600 + (perf.value - deadliftRefs.A) / (deadliftRefs.S - deadliftRefs.A) * 300
+          : (perf.value / deadliftRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, deadliftRefs);
+        category = 'force';
+        break;
+      }
+
+      case '5k': {
+        // Temps fixe sur 5km (ancien format, conservé pour les performances déjà enregistrées)
+        const runRefs = this.getRunReferences(userSex, userSportClass);
+
+        score = perf.value <= runRefs.A
+          ? 600 + (runRefs.A - perf.value) / (runRefs.A - runRefs.S) * 300
+          : (runRefs.A / perf.value) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, runRefs);
+        category = 'endurance';
+        break;
+      }
+
+      case 'course': {
+        // Course à distance/temps libres : perf.value est une VITESSE (km/h),
+        // calculée par le formulaire à partir de la distance et du temps saisis.
+        const speedRefs = this.getRunSpeedReferences(userSex, userSportClass);
+        speedRefs.A *= ageMultiplier;
+        speedRefs.S *= ageMultiplier;
+        speedRefs.World *= ageMultiplier;
+
+        score = perf.value >= speedRefs.A
+          ? 600 + (perf.value - speedRefs.A) / (speedRefs.S - speedRefs.A) * 300
+          : (perf.value / speedRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, speedRefs);
+        category = 'endurance';
+        break;
+      }
+
+      case 'pullups': {
+        const pullupRefs = this.getPullupReferences(userSex, userSportClass);
+        pullupRefs.A *= ageMultiplier;
+        pullupRefs.S *= ageMultiplier;
+        pullupRefs.World *= ageMultiplier;
+
+        score = perf.value >= pullupRefs.A
+          ? 600 + (perf.value - pullupRefs.A) / (pullupRefs.S - pullupRefs.A) * 300
+          : (perf.value / pullupRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, pullupRefs);
+        category = 'calisthenics';
+        break;
+      }
+
+      case 'pushups': {
+        const pushupRefs = this.getPushupReferences(userSex, userSportClass);
+        pushupRefs.A *= ageMultiplier;
+        pushupRefs.S *= ageMultiplier;
+        pushupRefs.World *= ageMultiplier;
+
+        score = perf.value >= pushupRefs.A
+          ? 600 + (perf.value - pushupRefs.A) / (pushupRefs.S - pushupRefs.A) * 300
+          : (perf.value / pushupRefs.A) * 600;
+        score = this.applyCrossTrainingBonus(score, perf.discipline, userSportClass, perf.value, pushupRefs);
+        category = 'calisthenics';
+        break;
+      }
+
+      default:
+        return null;
+    }
+
+    return { score, category };
+  }
+
+  // Décomposition (endurance/explosivité/calisthénie) à partir de performances déjà filtrées
+  // (sans squat/bench/deadlift, qui sont comptés séparément via les IPF GL Points).
+  private scoreOtherDisciplines(
+    perfs: PerformanceRecord[],
+    userWeight: number,
+    userSex: string,
+    userSportClass: string,
+    ageMultiplier: number
+  ): { endurance: number; explosivite: number; calisthenics: number } {
+    const totals = { endurance: 0, explosivite: 0, calisthenics: 0 };
+    const counts = { endurance: 0, explosivite: 0, calisthenics: 0 };
+
+    perfs.forEach((perf) => {
+      const scored = this.scoreDiscipline(perf, userWeight, userSex, userSportClass, ageMultiplier);
+      if (!scored || scored.category === 'force' || !(scored.category in totals)) return;
+      totals[scored.category as keyof typeof totals] += scored.score;
+      counts[scored.category as keyof typeof counts] += 1;
+    });
+
+    return {
+      endurance: counts.endurance > 0 ? Math.round(totals.endurance / counts.endurance) : 0,
+      explosivite: counts.explosivite > 0 ? Math.round(totals.explosivite / counts.explosivite) : 0,
+      calisthenics: counts.calisthenics > 0 ? Math.round(totals.calisthenics / counts.calisthenics) : 0,
+    };
+  }
+
   // RÉFÉRENCES DE BASE POUR LE DÉVELOPPÉ COUCHÉ
   private getBaseBenchReferences(weight: number, sex: string) {
     if (sex === 'male') {
@@ -712,11 +797,11 @@ export class ScoringEngine {
     // Définir les domaines de spécialisation par classe de sport
     const specializations = {
       'power': ['bench', 'squat', 'deadlift'],
-      'marathon': ['5k'],
-      'calisthenics': ['pullups'],
-      'crossfit': ['bench', 'squat', 'deadlift', '5k', 'pullups'],
-      'streetlifting': ['bench', 'squat', 'deadlift', 'pullups'],
-      'sprint': ['5k'],
+      'marathon': ['5k', 'course'],
+      'calisthenics': ['pullups', 'pushups'],
+      'crossfit': ['bench', 'squat', 'deadlift', '5k', 'course', 'pullups', 'pushups'],
+      'streetlifting': ['bench', 'squat', 'deadlift', 'pullups', 'pushups'],
+      'sprint': ['5k', 'course'],
       'classique': []
     };
 

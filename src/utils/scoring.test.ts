@@ -73,6 +73,56 @@ describe('scoringEngine.calculateUserRank — scoreLabel / progress (regression 
   });
 });
 
+describe('scoringEngine.calculateUserRank — other disciplines still count when squat+bench+deadlift are present', () => {
+  it('still updates the calisthenics breakdown when pullups are logged alongside a full SBD total', () => {
+    const user = { ...baseUser, sportClass: 'power', weight: 83 };
+    const performances = [
+      { id: '1', userId: 'u1', discipline: 'squat', value: 200, units: 'kg', date: new Date() },
+      { id: '2', userId: 'u1', discipline: 'bench', value: 120, units: 'kg', date: new Date() },
+      { id: '3', userId: 'u1', discipline: 'deadlift', value: 180, units: 'kg', date: new Date() },
+      { id: '4', userId: 'u1', discipline: 'pullups', value: 20, units: 'reps', date: new Date() },
+    ];
+
+    const result = scoringEngine.calculateUserRank(user, performances);
+
+    // Le rang global reste piloté par le total SBD (IPF GL)...
+    expect(result.globalScore).toBe(69);
+    expect(result.rank).toBe('C');
+    // ...mais les tractions ne sont plus ignorées dans la décomposition.
+    expect(result.breakdown.calisthenics).toBe(612);
+    expect(result.breakdown.endurance).toBe(0);
+  });
+});
+
+describe('scoringEngine.calculateUserRank — nouvelles disciplines (pompes, course à distance/temps libres)', () => {
+  it('scores pushups into the calisthenics category', () => {
+    const user = { ...baseUser, sportClass: 'calisthenics' };
+    const performances = [
+      { id: '1', userId: 'u1', discipline: 'pushups', value: 30, units: 'reps', date: new Date() },
+    ];
+
+    const result = scoringEngine.calculateUserRank(user, performances);
+
+    expect(result.breakdown.calisthenics).toBe(675);
+    expect(result.globalScore).toBe(203);
+    expect(result.rank).toBe('D');
+  });
+
+  it('scores a free-distance run (speed-based) into the endurance category', () => {
+    const user = { ...baseUser, sportClass: 'marathon', weight: 65 };
+    const speedKmh = 10 / (45 / 60); // 10km en 45 minutes
+    const performances = [
+      { id: '1', userId: 'u1', discipline: 'course', value: speedKmh, units: 'km/h', date: new Date() },
+    ];
+
+    const result = scoringEngine.calculateUserRank(user, performances);
+
+    expect(result.breakdown.endurance).toBe(373);
+    expect(result.globalScore).toBe(37);
+    expect(result.rank).toBe('E');
+  });
+});
+
 describe('scoringEngine.calculateUserRank — fallback scoring (no squat+bench+deadlift trio)', () => {
   it('locks in the current score for a beginner-level performance', () => {
     const { user, performances } = pullupsPerf(15);

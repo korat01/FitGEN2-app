@@ -12,6 +12,28 @@ interface PerformanceManagerProps {
   onDelete: (id: string) => void;
 }
 
+const isFreeRun = (discipline: string) => discipline === 'course';
+
+const DISCIPLINE_LABELS: Record<string, string> = {
+  bench: 'Développé couché',
+  squat: 'Squat',
+  deadlift: 'Soulevé de terre',
+  '5k': '5 km',
+  course: 'Course',
+  pullups: 'Tractions',
+  pushups: 'Pompes',
+};
+
+const DISCIPLINE_UNITS: Record<string, string> = {
+  bench: 'kg',
+  squat: 'kg',
+  deadlift: 'kg',
+  '5k': 'min',
+  course: 'km/h',
+  pullups: 'reps',
+  pushups: 'reps',
+};
+
 export const PerformanceManager: React.FC<PerformanceManagerProps> = ({
   performances,
   userRank,
@@ -21,13 +43,30 @@ export const PerformanceManager: React.FC<PerformanceManagerProps> = ({
   const [form, setForm] = useState({
     discipline: '',
     value: '',
+    distanceKm: '',
+    timeMin: '',
     date: new Date().toISOString().split('T')[0],
   });
 
+  const resetForm = () =>
+    setForm({ discipline: '', value: '', distanceKm: '', timeMin: '', date: new Date().toISOString().split('T')[0] });
+
   const handleSubmit = () => {
-    if (!form.discipline || !form.value) return;
-    onAdd(form);
-    setForm({ discipline: '', value: '', date: new Date().toISOString().split('T')[0] });
+    if (!form.discipline) return;
+
+    if (isFreeRun(form.discipline)) {
+      const distance = parseFloat(form.distanceKm);
+      const time = parseFloat(form.timeMin);
+      if (!distance || !time) return;
+      const speedKmh = distance / (time / 60);
+      onAdd({ discipline: form.discipline, value: String(speedKmh), date: form.date });
+      resetForm();
+      return;
+    }
+
+    if (!form.value) return;
+    onAdd({ discipline: form.discipline, value: form.value, date: form.date });
+    resetForm();
   };
 
   return (
@@ -53,21 +92,49 @@ export const PerformanceManager: React.FC<PerformanceManagerProps> = ({
                 <option value="bench">Développé couché</option>
                 <option value="squat">Squat</option>
                 <option value="deadlift">Soulevé de terre</option>
-                <option value="5k">5km</option>
+                <option value="course">Course (distance libre)</option>
                 <option value="pullups">Tractions</option>
+                <option value="pushups">Pompes</option>
               </select>
             </div>
-            <div className="space-y-2">
-              <label htmlFor="value" className="text-sm font-medium text-muted-foreground">Valeur</label>
-              <Input
-                type="number"
-                id="value"
-                value={form.value}
-                onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))}
-                className={statsInputClass}
-                placeholder="Ex: 100, 4, 10"
-              />
-            </div>
+            {isFreeRun(form.discipline) ? (
+              <>
+                <div className="space-y-2">
+                  <label htmlFor="distanceKm" className="text-sm font-medium text-muted-foreground">Distance (km)</label>
+                  <Input
+                    type="number"
+                    id="distanceKm"
+                    value={form.distanceKm}
+                    onChange={(e) => setForm((prev) => ({ ...prev, distanceKm: e.target.value }))}
+                    className={statsInputClass}
+                    placeholder="Ex: 5, 10, 21.1"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="timeMin" className="text-sm font-medium text-muted-foreground">Temps (min)</label>
+                  <Input
+                    type="number"
+                    id="timeMin"
+                    value={form.timeMin}
+                    onChange={(e) => setForm((prev) => ({ ...prev, timeMin: e.target.value }))}
+                    className={statsInputClass}
+                    placeholder="Ex: 25, 45, 90"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <label htmlFor="value" className="text-sm font-medium text-muted-foreground">Valeur</label>
+                <Input
+                  type="number"
+                  id="value"
+                  value={form.value}
+                  onChange={(e) => setForm((prev) => ({ ...prev, value: e.target.value }))}
+                  className={statsInputClass}
+                  placeholder="Ex: 100, 4, 10"
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <label htmlFor="date" className="text-sm font-medium text-muted-foreground">Date</label>
               <Input
@@ -141,14 +208,10 @@ export const PerformanceManager: React.FC<PerformanceManagerProps> = ({
                 >
                   <div className="min-w-0">
                     <div className="font-medium text-foreground truncate">
-                      {perf.discipline === 'bench' ? 'Développé couché' :
-                       perf.discipline === 'squat' ? 'Squat' :
-                       perf.discipline === 'deadlift' ? 'Soulevé de terre' :
-                       perf.discipline === '5k' ? '5 km' :
-                       perf.discipline === 'pullups' ? 'Tractions' : perf.discipline}
+                      {DISCIPLINE_LABELS[perf.discipline] || perf.discipline}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {perf.value} {perf.discipline === '5k' ? 'min' : 'kg'} · {new Date(perf.date).toLocaleDateString('fr-FR')}
+                      {isFreeRun(perf.discipline) ? Number(perf.value).toFixed(1) : perf.value} {DISCIPLINE_UNITS[perf.discipline] || 'kg'} · {new Date(perf.date).toLocaleDateString('fr-FR')}
                     </div>
                   </div>
                   <Button

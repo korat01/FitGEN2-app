@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMobileDetection } from '../hooks/useMobileDetection';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { ExerciseValidation } from '../components/ExerciseValidation';
+import { ExerciseCard } from '../components/programme/ExerciseCard';
 import { 
   Dumbbell, 
   Play, 
@@ -29,97 +30,29 @@ import {
 // Import direct du générateur (pas de lazy loading pour les fonctions utilitaires)
 import { generateProgramme } from '../utils/programmeGenerator';
 
-// Fonction pour récupérer les informations de Training Max
-const getTrainingMaxInfo = () => {
+// Fonction pour récupérer les 1RM réels de l'utilisateur (le programme travaille directement
+// par rapport à ces maxs, il n'y a plus de "Training Max" intermédiaire)
+const getUserMaxes = () => {
   const userPerformances = localStorage.getItem('userPerformances');
   if (!userPerformances) return null;
-  
-  try {
-    const performances = JSON.parse(userPerformances);
-    
-    const getBestPerformance = (discipline: string) => {
-      const perf = performances.filter((p: any) => p.discipline === discipline);
-      return perf.length > 0 ? Math.max(...perf.map((p: any) => p.value)) : null;
-    };
-    
-    const maxSquat = getBestPerformance('squat');
-    const maxBench = getBestPerformance('bench');
-    const maxDeadlift = getBestPerformance('deadlift');
-    
-    if (!maxSquat || !maxBench || !maxDeadlift) return null;
-    
-    // Calculer les Training Max (Cycle 1)
-    const tmSquat = Math.round(maxSquat * 0.9);
-    const tmBench = Math.round(maxBench * 0.9);
-    const tmDeadlift = Math.round(maxDeadlift * 0.9);
-    
-    return {
-      maxSquat, maxBench, maxDeadlift,
-      tmSquat, tmBench, tmDeadlift
-    };
-  } catch (error) {
-    console.error('Erreur lors du calcul des Training Max:', error);
-    return null;
-  }
-};
 
-// Fonction pour calculer le pourcentage d'un exercice principal
-const calculatePercentage = (exerciseName: string, weight: number, notes: string) => {
-  if (typeof weight !== 'number') return null;
-  
-  // Récupérer les vraies performances de l'utilisateur depuis localStorage
-  const userPerformances = localStorage.getItem('userPerformances');
-  if (!userPerformances) return null;
-  
   try {
     const performances = JSON.parse(userPerformances);
-    
-    // Trouver les meilleures performances pour chaque exercice
+
     const getBestPerformance = (discipline: string) => {
       const perf = performances.filter((p: any) => p.discipline === discipline);
       return perf.length > 0 ? Math.max(...perf.map((p: any) => p.value)) : null;
     };
-    
+
     const maxSquat = getBestPerformance('squat');
     const maxBench = getBestPerformance('bench');
     const maxDeadlift = getBestPerformance('deadlift');
-    
+
     if (!maxSquat || !maxBench || !maxDeadlift) return null;
-    
-    // Extraire le cycle depuis les notes
-    let cycle = 1;
-    if (notes && notes.includes('Cycle')) {
-      const cycleMatch = notes.match(/Cycle (\d+)/);
-      if (cycleMatch) {
-        cycle = parseInt(cycleMatch[1]);
-      }
-    }
-    
-    // Calculer les Training Max exactement comme dans le programme
-    const progressionCycle = (cycle - 1) * 2.5; // +2.5kg par cycle pour haut du corps
-    const progressionCycleBas = (cycle - 1) * 5; // +5kg par cycle pour bas du corps
-    
-    const tmSquat = Math.round((maxSquat * 0.9) + progressionCycleBas);
-    const tmBench = Math.round((maxBench * 0.9) + progressionCycle);
-    const tmDeadlift = Math.round((maxDeadlift * 0.9) + progressionCycleBas);
-    
-    // Calculer le pourcentage selon l'exercice
-    switch (exerciseName) {
-      case 'Squat':
-        return Math.round((weight / tmSquat) * 100);
-      case 'Développé Couché':
-        return Math.round((weight / tmBench) * 100);
-      case 'Soulevé de Terre':
-        return Math.round((weight / tmDeadlift) * 100);
-      case 'Développé Militaire':
-        // Estimation du TM Press basé sur le Bench (environ 60-70%)
-        const tmPress = Math.round((maxBench * 0.9 * 0.65) + progressionCycle);
-        return Math.round((weight / tmPress) * 100);
-      default:
-        return null;
-    }
+
+    return { maxSquat, maxBench, maxDeadlift };
   } catch (error) {
-    console.error('Erreur lors du calcul du pourcentage:', error);
+    console.error('Erreur lors du calcul des maxs:', error);
     return null;
   }
 };
@@ -188,6 +121,7 @@ export const Programme: React.FC = () => {
       const adaptedProgramme = {
         id: generatedProgramme.id,
         nom: generatedProgramme.nom,
+        dateDebut: new Date().toISOString(),
         sessions: generatedProgramme.sessions.map((session: any) => ({
           id: session.id,
           nom: session.nom,
@@ -250,6 +184,10 @@ export const Programme: React.FC = () => {
 
   const todaySession = getTodaysSession();
 
+  // Un programme généré avant l'ajout des types d'exercice (échauffement/travail/accessoire)
+  // n'aura pas ce champ — sans ça on ne peut pas distinguer "pas d'accessoires" d'un vieux format.
+  const isStaleProgramme = !!programme && programme.sessions?.[0]?.exercises?.[0]?.type === undefined;
+
   // Fonction pour générer le calendrier
   const generateCalendar = () => {
     const year = currentMonth.getFullYear();
@@ -294,28 +232,42 @@ export const Programme: React.FC = () => {
     return date.getMonth() === currentMonth.getMonth();
   };
 
-  // Fonction pour obtenir la session d'une date
-  const getSessionForDate = (date: Date) => {
-    if (!programme) return null;
-    
-    const dayName = getDayName(date.getDay());
-    
-    // Calculer la semaine du mois (1-4)
+  // Numéro de semaine du programme (1, 2, 3...) calculé à partir de la vraie date de début —
+  // continue de progresser d'un mois sur l'autre pour un programme de plusieurs semaines/cycles.
+  // Fallback sur l'ancien calcul (semaine du mois, 1-5) pour les programmes générés avant l'ajout
+  // de dateDebut, encore présents dans le localStorage de certains utilisateurs.
+  const getWeekNumberForDate = (date: Date): number => {
+    if (programme?.dateDebut) {
+      const start = new Date(programme.dateDebut);
+      start.setHours(0, 0, 0, 0);
+      const startOfWeek = new Date(start);
+      startOfWeek.setDate(start.getDate() - start.getDay());
+      const diffDays = Math.floor((date.getTime() - startOfWeek.getTime()) / (1000 * 60 * 60 * 24));
+      return Math.floor(diffDays / 7) + 1;
+    }
     const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     const firstWeekday = firstDayOfMonth.getDay();
     const dayOfMonth = date.getDate();
-    const weekOfMonth = Math.ceil((dayOfMonth + firstWeekday) / 7);
-    
+    return Math.ceil((dayOfMonth + firstWeekday) / 7);
+  };
+
+  // Fonction pour obtenir la session d'une date
+  const getSessionForDate = (date: Date) => {
+    if (!programme) return null;
+
+    const dayName = getDayName(date.getDay());
+    const weekNumber = getWeekNumberForDate(date);
+
     // Trouver la session correspondant au jour ET à la semaine
     const session = programme.sessions.find((session: any) => {
       if (session.day !== dayName) return false;
-      
+
       // Extraire le numéro de semaine du nom de la session
       const semaineMatch = session.nom.match(/Semaine (\d+)/);
       if (!semaineMatch) return false;
-      
+
       const sessionWeek = parseInt(semaineMatch[1]);
-      return sessionWeek === weekOfMonth;
+      return sessionWeek === weekNumber;
     });
     
     // Si pas de session trouvée, créer une session de repos
@@ -335,6 +287,16 @@ export const Programme: React.FC = () => {
     }
     
     return session;
+  };
+
+  // Libellé court et lisible du contenu d'une séance (au lieu du nom "Semaine X - Jour" qui ne dit
+  // rien sur le contenu réel) : le mouvement principal du jour, ou "SBD" / "Repos".
+  const getSessionFocusLabel = (session: any): string => {
+    if (!session || session.isRestDay) return 'Repos';
+    if (session.notes?.includes('SBD combinée')) return 'SBD';
+    const mainExercise = session.exercises?.find((e: any) => e.type === 'travail');
+    if (mainExercise) return mainExercise.nom;
+    return session.exercises?.[0]?.nom || session.phase || 'Séance';
   };
 
   // Fonction pour obtenir le nom du mois
@@ -447,6 +409,26 @@ export const Programme: React.FC = () => {
           </div>
             </div>
 
+        {/* Programme obsolète : généré avant les dernières améliorations (accessoires, échauffement...) */}
+        {isStaleProgramme && (
+          <Card className="glass-card border-accent/30 bg-accent/5 rounded-2xl">
+            <CardContent className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">Ton programme actuel date d'avant les dernières améliorations</p>
+                <p className="text-sm text-muted-foreground mt-1">Régénère-le pour avoir l'échauffement, tous les accessoires (renfos) et la séance SBD à jour.</p>
+              </div>
+              <Button
+                onClick={handleRegenerateProgramme}
+                disabled={isGenerating}
+                className="w-full md:w-auto gradient-primary text-white font-semibold shrink-0"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
+                Régénérer maintenant
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Message si pas de programme */}
         {!programme && (
           <Card className="border-0 shadow-xl glass-card border-primary/20 backdrop-blur-md border border-white/20 rounded-2xl">
@@ -507,44 +489,41 @@ export const Programme: React.FC = () => {
         {/* Programme Généré */}
         {programme && (
           <>
-            {/* Informations Training Max */}
+            {/* Informations 1RM */}
             {(() => {
-              const tmInfo = getTrainingMaxInfo();
-              return tmInfo ? (
-                <Card className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-200 shadow-lg rounded-2xl mb-6">
+              const maxes = getUserMaxes();
+              return maxes ? (
+                <Card className="glass-card border-primary/20 rounded-2xl mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-blue-500/100 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                         <Target className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-foreground">Vos Training Max (Cycle 1)</h3>
+                      <h3 className="text-lg font-bold text-foreground">Vos 1RM actuels</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
+                      <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Squat</p>
-                          <p className="text-lg font-bold text-foreground">{tmInfo.maxSquat}kg</p>
-                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmSquat}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.maxSquat}kg</p>
                         </div>
                       </div>
-                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
+                      <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Bench</p>
-                          <p className="text-lg font-bold text-foreground">{tmInfo.maxBench}kg</p>
-                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmBench}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.maxBench}kg</p>
                         </div>
                       </div>
-                      <div className="glass-card border-primary/20 rounded-lg p-4 border border-blue-100">
+                      <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Deadlift</p>
-                          <p className="text-lg font-bold text-foreground">{tmInfo.maxDeadlift}kg</p>
-                          <p className="text-sm text-blue-400 font-medium">TM: {tmInfo.tmDeadlift}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.maxDeadlift}kg</p>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 p-3 bg-blue-500/15 border border-blue-500/25 rounded-lg">
-                      <p className="text-sm text-blue-300">
-                        <strong>💡 Note :</strong> Les pourcentages affichés sont calculés sur le Training Max (90% du 1RM) + progression du cycle.
+                    <div className="mt-4 p-3 rounded-lg surface-accent">
+                      <p className="text-sm text-foreground/90">
+                        <strong className="text-secondary">💡 Note :</strong> tous les pourcentages du programme sont calculés directement sur ces maxs (pas de Training Max intermédiaire), avec une petite progression à chaque nouveau cycle.
                       </p>
                     </div>
                   </CardContent>
@@ -633,74 +612,21 @@ export const Programme: React.FC = () => {
                           
                           return (
                             <div key={exercise.id || index} className="space-y-3">
-                              {/* Informations de l'exercice */}
-                              <Card className={`glass-card border-primary/20 bg-white/5 backdrop-blur-sm border-2 rounded-xl transition-all duration-200 ${
-                                isCompleted 
-                                  ? isSuccess 
-                                    ? 'border-green-300 bg-green-50/70 shadow-green-200' 
-                                    : 'border-red-300 bg-red-50/70 shadow-red-200'
-                                  : 'border-white/10 hover:border-indigo-300 hover:shadow-lg'
-                              }`}>
-                                <CardHeader className="pb-3">
-                                  <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg flex items-center gap-2">
-                                      {exercise.nom}
-                                      {isCompleted && (
-                                        isSuccess ? (
-                                          <CheckCircle className="w-5 h-5 text-green-500" />
-                                        ) : (
-                                          <XCircle className="w-5 h-5 text-red-500" />
-                                        )
-                                      )}
-                                    </CardTitle>
-                                    <Badge variant="outline">{exercise.categorie}</Badge>
-                                  </div>
-                                </CardHeader>
-                                <CardContent>
-                                  <div className="space-y-3">
-                                    <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
-                                      <div className="text-center p-2 bg-white/5 rounded">
-                                        <p className="text-sm text-muted-foreground">Séries</p>
-                                        <p className="font-bold text-foreground">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
-                                      </div>
-                                      <div className="text-center p-2 bg-white/5 rounded">
-                                        <p className="text-sm text-muted-foreground">Reps</p>
-                                        <p className="font-bold text-foreground">{exercise.progression?.reps || exercise.reps}</p>
-                                      </div>
-                                      <div className="text-center p-2 bg-white/5 rounded">
-                                        <p className="text-sm text-muted-foreground">Poids</p>
-                                        <div className="flex flex-col items-center gap-1">
-                                          <p className="font-bold text-foreground">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
-                                          {(() => {
-                                            const percentage = calculatePercentage(exercise.nom, exercise.poids, todaySession.notes);
-                                            return percentage ? (
-                                              <span className="text-xs font-medium text-blue-400 bg-blue-500/15 border border-blue-500/25 px-2 py-1 rounded-md">
-                                                {percentage}% du TM
-                                              </span>
-                                            ) : null;
-                                          })()}
-                                        </div>
-                                      </div>
-                                      <div className="text-center p-2 bg-white/5 rounded">
-                                        <p className="text-sm text-muted-foreground">Repos</p>
-                                        <p className="font-bold text-foreground">{exercise.progression?.repos || exercise.repos}</p>
-                                      </div>
-                                    </div>
+                              <ExerciseCard
+                                exercise={exercise}
+                                isCompleted={isCompleted}
+                                isSuccess={isSuccess}
+                                statusIcon={
+                                  isCompleted ? (
+                                    isSuccess ? (
+                                      <CheckCircle className="w-5 h-5 text-green-500" />
+                                    ) : (
+                                      <XCircle className="w-5 h-5 text-red-500" />
+                                    )
+                                  ) : null
+                                }
+                              />
 
-                                    <div className="text-sm text-muted-foreground">
-                                      <p><strong>Muscles:</strong> {exercise.muscles?.join(', ') || 'Non spécifié'}</p>
-                                      <p><strong>Équipement:</strong> {exercise.equipement?.join(', ') || 'Non spécifié'}</p>
-                                    </div>
-                                    
-                                    {exercise.conseils && (
-                                      <div className="p-3 bg-yellow-50 rounded-lg">
-                                        <p className="text-sm text-yellow-800"><strong>Conseil:</strong> {exercise.conseils}</p>
-                                      </div>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                              
                               {/* Composant de validation */}
                               <ExerciseValidation
                                 exercise={exercise}
@@ -745,7 +671,14 @@ export const Programme: React.FC = () => {
                 <CardContent>
                   <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-4`}>
                     {['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'].map(day => {
-                      const daySession = programme.sessions.find((s: any) => s.day === day);
+                      // Semaine réelle en cours (pas juste la 1ère occurrence de ce jour dans tout
+                      // le programme, qui resterait figée sur la semaine 1 pour toujours).
+                      const currentWeekNumber = getWeekNumberForDate(new Date());
+                      const daySession = programme.sessions.find((s: any) => {
+                        if (s.day !== day) return false;
+                        const semaineMatch = s.nom.match(/Semaine (\d+)/);
+                        return semaineMatch ? parseInt(semaineMatch[1]) === currentWeekNumber : false;
+                      });
                       const today = new Date().toISOString().split('T')[0];
                       
                       // Créer une session de repos si pas de session trouvée
@@ -765,19 +698,19 @@ export const Programme: React.FC = () => {
                       const sessionStatus = daySession ? getSessionStatus(daySession.id, today) : 'not-started';
                       
                       return (
-                        <Card 
-                          key={day} 
-                          className={`${
-                            daySession 
+                        <Card
+                          key={day}
+                          className={`glass-card ${
+                            daySession
                               ? sessionStatus === 'completed'
-                                ? 'bg-green-50/80 border-green-300 shadow-green-200'
+                                ? 'border-green-500/40 bg-green-500/5'
                                 : sessionStatus === 'failed'
-                                ? 'bg-red-50/80 border-red-300 shadow-red-200'
+                                ? 'border-destructive/40 bg-destructive/5'
                                 : sessionStatus === 'partial'
-                                ? 'bg-yellow-50/80 border-yellow-300 shadow-yellow-200'
-                                : 'bg-blue-500/10/80 border-blue-200 shadow-blue-200'
-                              : 'bg-gradient-to-br from-white/5 to-white/10 border-white/15 shadow-gray-200'
-                          } border-2 ${daySession ? 'cursor-pointer hover:shadow-lg transition-all duration-200' : 'cursor-default'}`}
+                                ? 'border-yellow-500/40 bg-yellow-500/5'
+                                : 'border-primary/20'
+                              : 'border-white/10'
+                          } border-2 ${daySession ? 'cursor-pointer hover:border-primary/40 hover:shadow-lg transition-all duration-200' : 'cursor-default'}`}
                           onClick={() => daySession && handleSessionClick(daySession)}
                         >
                           <CardHeader className="pb-3">
@@ -796,10 +729,10 @@ export const Programme: React.FC = () => {
                             {daySession ? (
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800">
+                                  <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-400">
                                     {daySession.intensity}
                                   </Badge>
-                                  <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
+                                  <Badge variant="secondary" className="bg-secondary/15 border border-secondary/25 text-secondary">
                                     {daySession.duration}min
                                   </Badge>
                                 </div>
@@ -811,38 +744,35 @@ export const Programme: React.FC = () => {
                                 </p>
                                 {sessionStatus !== 'not-started' && (
                                   <div className="flex items-center justify-between">
-                                    <Badge 
-                                      variant="outline" 
+                                    <Badge
+                                      variant="outline"
                                       className={
-                                        sessionStatus === 'completed' 
-                                          ? 'bg-green-500/15 border border-green-500/25 text-green-800'
+                                        sessionStatus === 'completed'
+                                          ? 'bg-green-500/15 border border-green-500/25 text-green-400'
                                           : sessionStatus === 'failed'
-                                          ? 'bg-red-500/15 border border-red-500/25 text-red-800'
-                                          : 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800'
+                                          ? 'bg-destructive/15 border border-destructive/25 text-destructive'
+                                          : 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-400'
                                       }
                                     >
                                       {sessionStatus === 'completed' && 'Terminé'}
                                       {sessionStatus === 'failed' && 'Échoué'}
                                       {sessionStatus === 'partial' && 'En cours'}
                                     </Badge>
-                                    <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800">
+                                    <Badge variant="outline" className="bg-primary/15 border border-primary/25 text-primary">
                                       <Zap className="w-3 h-3 mr-1" />
                                       +{getSessionXP(daySession.id, today)} XP
                                     </Badge>
                                   </div>
                                 )}
                                 <div className="text-xs text-muted-foreground">
-                                  {daySession.exercises?.slice(0, 2).map((ex: any) => {
-                                    const percentage = calculatePercentage(ex.nom, ex.poids, daySession.notes);
-                                    return (
-                                      <div key={ex.nom} className="flex items-center gap-1 mb-1">
-                                        <span>{ex.nom}</span>
-                                        {percentage && (
-                                          <span className="text-blue-400 font-medium">({percentage}% TM)</span>
-                                        )}
-                                      </div>
-                                    );
-                                  }) || 'Aucun exercice'}
+                                  {daySession.exercises?.slice(0, 2).map((ex: any) => (
+                                    <div key={ex.nom} className="flex items-center gap-1 mb-1">
+                                      <span>{ex.nom}</span>
+                                      {typeof ex.pourcentage === 'number' && ex.pourcentage > 0 && (
+                                        <span className="text-secondary font-medium">({ex.pourcentage}% max)</span>
+                                      )}
+                                    </div>
+                                  )) || 'Aucun exercice'}
                                   {daySession.exercises?.length > 2 && '...'}
                                 </div>
                               </div>
@@ -967,52 +897,52 @@ export const Programme: React.FC = () => {
                             const isCurrentMonthDay = isCurrentMonth(date);
                             const isTodayDate = isToday(date);
                             
+                            const focusLabel = sessionForDate ? getSessionFocusLabel(sessionForDate) : null;
+                            const phaseStyle: Record<string, string> = {
+                              Progression: 'bg-secondary/15 text-secondary border-secondary/30',
+                              Deload: 'bg-white/10 text-muted-foreground border-white/15',
+                              Adaptation: 'bg-green-500/15 text-green-400 border-green-500/30',
+                              'Spécialisation': 'bg-accent/15 text-accent border-accent/30',
+                            };
+
                             return (
                               <div
                                 key={`${weekIndex}-${dayIndex}`}
                                 className={`
-                                  min-h-[60px] md:min-h-[120px] p-1 md:p-3 rounded-lg md:rounded-xl border transition-all duration-200
-                                  ${isCurrentMonthDay ? 'glass-card border-primary/20 border-white/10 hover:border-indigo-300 hover:shadow-md' : 'bg-white/5/50 border-gray-100'}
-                                  ${isTodayDate ? 'ring-2 ring-blue-400 bg-blue-500/10 border-blue-300 shadow-md' : ''}
+                                  min-h-[64px] md:min-h-[130px] p-1 md:p-3 rounded-lg md:rounded-xl border-2 transition-all duration-200
+                                  ${isCurrentMonthDay ? 'glass-card border-white/10 hover:border-primary/40 hover:shadow-md' : 'bg-white/[0.02] border-white/5'}
+                                  ${isTodayDate ? 'ring-2 ring-secondary border-secondary/40' : ''}
                                 `}
                               >
                                 {/* Numéro du jour */}
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className={`text-xs md:text-base font-bold ${isCurrentMonthDay ? 'text-foreground' : 'text-muted-foreground/70'}`}>
+                                  <span className={`text-xs md:text-base font-bold ${isCurrentMonthDay ? 'text-foreground' : 'text-muted-foreground/50'}`}>
                                     {date.getDate()}
                                   </span>
                                   {isTodayDate && (
-                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500/100 rounded-full animate-pulse"></div>
+                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-secondary rounded-full animate-pulse"></div>
                                   )}
                                 </div>
-                                
-                                {/* Session du jour - Compact */}
+
+                                {/* Session du jour */}
                                 <div className="space-y-0.5 md:space-y-1">
-                                  {sessionForDate ? (
+                                  {sessionForDate && !sessionForDate.isRestDay ? (
                                     <div
-                                      className={`
-                                        text-[8px] md:text-xs p-1 md:p-2 rounded md:rounded-lg font-medium cursor-pointer border
-                                        ${sessionForDate.phase === 'Progression' ? 'bg-blue-500/10 text-blue-300 border-blue-200' : 
-                                          sessionForDate.phase === 'Deload' ? 'bg-white/5 text-foreground/90 border-white/10' :
-                                          sessionForDate.phase === 'Adaptation' ? 'bg-green-50 text-green-800 border-green-200' :
-                                          sessionForDate.phase === 'Spécialisation' ? 'bg-orange-50 text-orange-300 border-orange-500/30' :
-                                          'bg-purple-50 text-purple-800 border-purple-200'}
-                                        hover:scale-105 transition-all duration-200
-                                      `}
+                                      className={`text-[9px] md:text-sm p-1 md:p-2 rounded md:rounded-lg font-semibold cursor-pointer border hover:scale-[1.03] transition-all duration-200 ${
+                                        phaseStyle[sessionForDate.phase] || 'bg-primary/15 text-primary border-primary/30'
+                                      }`}
                                       onClick={() => handleSessionClick(sessionForDate)}
                                     >
-                                      <div className="truncate font-semibold mb-0.5">{sessionForDate.nom.split('-')[0]}</div>
-                                      <div className="text-[7px] md:text-[10px] opacity-80 space-y-0.5">
-                                        <div className="flex items-center gap-0.5 truncate">
-                                          <Timer className="w-2 h-2 md:w-2.5 md:h-2.5 flex-shrink-0" />
-                                          <span className="truncate">{sessionForDate.duration}min</span>
-                                        </div>
+                                      <div className="truncate">{focusLabel}</div>
+                                      <div className="hidden md:flex items-center gap-1 text-[10px] font-normal opacity-75 mt-0.5">
+                                        <Timer className="w-2.5 h-2.5 flex-shrink-0" />
+                                        <span className="truncate">{sessionForDate.duration}min</span>
                                       </div>
                                     </div>
                                   ) : (
                                     isCurrentMonthDay && (
-                                      <div className="text-[8px] md:text-xs text-muted-foreground/50 text-center py-1 bg-white/5/30 rounded border border-gray-50">
-                                        <RefreshCw className="w-2 h-2 md:w-3 md:h-3 text-gray-200 mx-auto" />
+                                      <div className="text-[9px] md:text-xs text-muted-foreground/40 text-center py-1 md:py-2 bg-white/[0.02] rounded border border-white/5">
+                                        <RefreshCw className="w-2.5 h-2.5 md:w-3 md:h-3 mx-auto" />
                                       </div>
                                     )
                                   )}
@@ -1023,31 +953,31 @@ export const Programme: React.FC = () => {
                         )}
                       </div>
                       
-                      {/* Légende avec couleurs spécifiques */}
+                      {/* Légende — couleurs alignées sur les cellules du calendrier */}
                       <div className="mt-8 pt-6 border-t border-white/10">
-                        <div className="flex flex-wrap items-center justify-center gap-4">
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
-                            <div className="w-3 h-3 bg-blue-500/100 rounded"></div>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
+                            <div className="w-3 h-3 bg-secondary rounded"></div>
                             <span className="text-sm font-medium text-foreground/90">Progression</span>
                           </div>
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
-                            <div className="w-3 h-3 bg-gray-400 rounded"></div>
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
+                            <div className="w-3 h-3 bg-white/30 rounded"></div>
                             <span className="text-sm font-medium text-foreground/90">Deload</span>
                           </div>
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
-                            <div className="w-3 h-3 bg-green-500 rounded"></div>
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
+                            <div className="w-3 h-3 bg-green-400 rounded"></div>
                             <span className="text-sm font-medium text-foreground/90">Adaptation</span>
                           </div>
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
-                            <div className="w-3 h-3 bg-orange-500 rounded"></div>
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
+                            <div className="w-3 h-3 bg-accent rounded"></div>
                             <span className="text-sm font-medium text-foreground/90">Spécialisation</span>
                           </div>
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-white/10 rounded"></div>
                             <span className="text-sm font-medium text-foreground/90">Repos</span>
                           </div>
-                          <div className="flex items-center gap-2 glass-card border-primary/20 rounded-lg px-3 py-2 shadow-sm border border-white/10">
-                            <div className="w-3 h-3 bg-blue-500/100 rounded animate-pulse"></div>
+                          <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
+                            <div className="w-3 h-3 bg-secondary rounded animate-pulse"></div>
                             <span className="text-sm font-medium text-foreground/90">Aujourd'hui</span>
                           </div>
                         </div>
@@ -1143,57 +1073,7 @@ export const Programme: React.FC = () => {
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-foreground">Exercices ({selectedSession.exercises?.length || 0})</h4>
                   {selectedSession.exercises?.map((exercise: any, index: number) => (
-                    <Card key={exercise.id || index} className="bg-white/10 backdrop-blur-sm border border-white/10">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{exercise.nom}</CardTitle>
-                          <Badge variant="outline">{exercise.categorie}</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'} gap-4`}>
-                            <div className="text-center p-2 bg-white/5 rounded">
-                              <p className="text-sm text-muted-foreground">Séries</p>
-                              <p className="font-bold text-foreground">{formatNumber(exercise.progression?.sets || exercise.series)}</p>
-                            </div>
-                            <div className="text-center p-2 bg-white/5 rounded">
-                              <p className="text-sm text-muted-foreground">Reps</p>
-                              <p className="font-bold text-foreground">{exercise.progression?.reps || exercise.reps}</p>
-                            </div>
-                            <div className="text-center p-2 bg-white/5 rounded">
-                              <p className="text-sm text-muted-foreground">Poids</p>
-                              <div className="flex flex-col items-center gap-1">
-                                <p className="font-bold text-foreground">{formatNumber(exercise.progression?.poids || exercise.poids)}</p>
-                                {(() => {
-                                  const percentage = calculatePercentage(exercise.nom, exercise.poids, selectedSession.notes);
-                                  return percentage ? (
-                                    <span className="text-xs font-medium text-blue-400 bg-blue-500/15 border border-blue-500/25 px-2 py-1 rounded-md">
-                                      {percentage}% du TM
-                                    </span>
-                                  ) : null;
-                                })()}
-                              </div>
-                            </div>
-                            <div className="text-center p-2 bg-white/5 rounded">
-                              <p className="text-sm text-muted-foreground">Repos</p>
-                              <p className="font-bold text-foreground">{exercise.progression?.repos || exercise.repos}</p>
-                            </div>
-                          </div>
-
-                          <div className="text-sm text-muted-foreground">
-                            <p><strong>Muscles:</strong> {exercise.muscles?.join(', ') || 'Non spécifié'}</p>
-                            <p><strong>Équipement:</strong> {exercise.equipement?.join(', ') || 'Non spécifié'}</p>
-                          </div>
-                          
-                          {exercise.conseils && (
-                            <div className="p-3 bg-yellow-50 rounded-lg">
-                              <p className="text-sm text-yellow-800"><strong>Conseil:</strong> {exercise.conseils}</p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <ExerciseCard key={exercise.id || index} exercise={exercise} />
                   ))}
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { UserProfile } from '../types/profile';
+import { calculateIPFGLPoints } from './statsCalculator';
 
 // Types pour le générateur de programme
 export interface Exercise {
@@ -1177,552 +1178,380 @@ function createSprintSession(semaine: number, jour: number, user: UserProfile, d
 
 // Nouvelle fonction pour le Powerlifting
 function generatePowerliftingProgramme(user: UserProfile): Programme {
-  console.log('=== GENERATE POWERLIFTING PROGRAMME ===');
-  console.log('User:', user);
-  
-  const sessions = [];
   const seancesParSemaine = user.trainingDays?.length || 3;
-  const duree = 4;
-  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi']; // 3 séances par semaine
-  
-  // Récupérer les vraies performances utilisateur depuis localStorage
-  const savedPerformances = localStorage.getItem('userPerformances');
-  let maxSquat = 150; // Valeurs par défaut
-  let maxBench = 120;
-  let maxDeadlift = 180;
-  
-  if (savedPerformances) {
-    try {
-      const performancesList = JSON.parse(savedPerformances);
-      console.log('📊 Performances utilisateur trouvées:', performancesList);
-      
-      // Debug : afficher toutes les disciplines disponibles
-      console.log('🔍 Disciplines disponibles:', performancesList.map((p: any) => p.discipline));
-      
-      // Chercher les MEILLEURES performances pour chaque discipline
-      const squatPerformances = performancesList.filter((p: any) => 
-        p.discipline?.toLowerCase().includes('squat')
-      );
-      const benchPerformances = performancesList.filter((p: any) => 
-        p.discipline?.toLowerCase().includes('bench') || 
-        p.discipline?.toLowerCase().includes('développé') ||
-        p.discipline?.toLowerCase().includes('couché')
-      );
-      const deadliftPerformances = performancesList.filter((p: any) => 
-        p.discipline?.toLowerCase().includes('deadlift') || 
-        p.discipline?.toLowerCase().includes('soulevé') ||
-        p.discipline?.toLowerCase().includes('terre')
-      );
-      
-      // Prendre la MEILLEURE performance (valeur maximale)
-      if (squatPerformances.length > 0) {
-        maxSquat = Math.max(...squatPerformances.map((p: any) => p.value || 0));
-      }
-      if (benchPerformances.length > 0) {
-        maxBench = Math.max(...benchPerformances.map((p: any) => p.value || 0));
-      }
-      if (deadliftPerformances.length > 0) {
-        maxDeadlift = Math.max(...deadliftPerformances.map((p: any) => p.value || 0));
-      }
-      
-      console.log('🏋️ 1RM utilisateur:', { maxSquat, maxBench, maxDeadlift });
-    } catch (error) {
-      console.error('❌ Erreur lors du chargement des performances:', error);
-    }
-  } else {
-    console.log('⚠️ Aucune performance trouvée, utilisation des valeurs par défaut');
-  }
-  
-  console.log('Charges max calculées:', { maxSquat, maxBench, maxDeadlift });
-  
+  // 2 cycles de 4 semaines générés d'un coup : la progression entre cycles (cf. cycleBump dans
+  // createPowerliftingSession) est ainsi visible dans UN seul programme généré, sans avoir besoin
+  // de regénérer pour "voir" le cycle suivant.
+  const duree = 8;
+  const trainingDays = user.trainingDays || ['lundi', 'mercredi', 'vendredi'];
+  const bodyweight = user.weight || 75;
+  const sex = user.sex || 'male';
+
+  const { maxSquat, maxBench, maxDeadlift } = getUserSBDMaxes();
+
+  const level = assessPowerliftingLevel(bodyweight, sex, maxSquat, maxBench, maxDeadlift);
+  const weakestLift = findWeakestLift(bodyweight, sex, maxSquat, maxBench, maxDeadlift);
+  const hauteFrequence = trainingDays.length >= 4;
+
+  const sessions = [];
+
   for (let semaine = 1; semaine <= duree; semaine++) {
+    // Position dans le cycle de 4 semaines (1-4, se répète à chaque cycle) : le placement du jour
+    // SBD est calé sur cette position relative, pas sur le numéro de semaine absolu, pour se
+    // répéter identiquement à chaque cycle plutôt que de n'apparaître que dans le tout premier.
+    const semaineDansCycle = ((semaine - 1) % 4) + 1;
+
     for (let jour = 0; jour < trainingDays.length; jour++) {
-      // Échange mardi (jour 2) et vendredi (jour 4) AU NIVEAU CONTENU en conservant les labels de jour
-      const logicalJour = (jour + 1 === 2) ? 4 : (jour + 1 === 4 ? 2 : jour + 1);
-      const session = createPowerliftingSession(
-        semaine,
-        logicalJour,
-        user,
-        maxSquat,
-        maxBench,
-        maxDeadlift,
-        trainingDays[jour]
-      );
+      // Échange jour 2 et jour 4 AU NIVEAU CONTENU (pour espacer les 2 séances bench) — uniquement
+      // pertinent sur une semaine à 4 séances ; sur 3 séances ou moins ça priverait l'utilisateur
+      // de sa séance bench principale (jour 2) au profit du seul jour technique (jour 4).
+      const logicalJour = trainingDays.length === 4
+        ? ((jour + 1 === 2) ? 4 : (jour + 1 === 4 ? 2 : jour + 1))
+        : jour + 1;
+
+      // Séance SBD combinée (simulation de passage) : UNE SEULE fois par cycle de 4 semaines
+      // (semaine 3, juste avant le deload) — pas plus, sinon ça donne l'impression que la moitié
+      // du bloc n'est que ça. Remplace le jour deadlift en basse fréquence, le jour 4 (bench
+      // technique) en haute fréquence.
+      const estSBD = hauteFrequence
+        ? (logicalJour === 4 && semaineDansCycle === 3)
+        : (logicalJour === 3 && semaineDansCycle === 3);
+
+      const session = estSBD
+        ? createSBDComboSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, trainingDays[jour])
+        : createPowerliftingSession(semaine, logicalJour, user, maxSquat, maxBench, maxDeadlift, level, weakestLift, trainingDays[jour]);
+
       sessions.push(session);
-      console.log(`Session Powerlifting créée: ${semaine}-${logicalJour} (${trainingDays[jour]})`);
     }
   }
-  
+
+  const levelLabel = level === 'debutant' ? 'Débutant' : level === 'intermediaire' ? 'Intermédiaire' : 'Avancé';
+  const weakLabel = weakestLift === 'squat' ? 'squat' : weakestLift === 'bench' ? 'développé couché' : 'soulevé de terre';
+
   const programme: Programme = {
     id: Date.now().toString(),
-    nom: `Programme Powerlifting - Basé sur vos 1RM`,
-    description: 'Programme d\'entraînement Powerlifting avec progression 5-3-1 hybride : 80% RM (exercices principaux) + 20% TM (exercices d\'assistance)',
+    nom: `Programme Powerlifting - Niveau ${levelLabel}`,
+    description: `Basé sur vos 1RM réels (Squat ${maxSquat}kg / Bench ${maxBench}kg / Deadlift ${maxDeadlift}kg) et votre poids de corps (${bodyweight}kg). Échauffement progressif avant chaque mouvement principal, vague de charge ${level === 'debutant' ? 'linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'}, accessoires ciblés sur votre point faible estimé (${weakLabel}), et une séance SBD combinée une fois par cycle (semaine 3, avant le deload) pour simuler un passage de compétition.`,
     duree,
     sessions,
     phases: { adaptation: [], progression: [], specialisation: [] },
-    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 90 }
+    progression: { totalSessions: sessions.length, sessionsParSemaine: seancesParSemaine, dureeMoyenne: 75 }
   };
-  
-  console.log('Programme Powerlifting final:', programme);
-  console.log('Nombre de sessions:', programme.sessions.length);
-  
+
   return programme;
 }
 
-function createPowerliftingSession(semaine: number, jour: number, user: UserProfile, maxSquat: number, maxBench: number, maxDeadlift: number, dayName?: string) {
+// Récupère les 1RM réels de l'utilisateur depuis le stockage local (valeurs par défaut prudentes sinon)
+function getUserSBDMaxes(): { maxSquat: number; maxBench: number; maxDeadlift: number } {
+  let maxSquat = 100;
+  let maxBench = 70;
+  let maxDeadlift = 120;
+
+  const savedPerformances = localStorage.getItem('userPerformances');
+  if (!savedPerformances) return { maxSquat, maxBench, maxDeadlift };
+
+  try {
+    const performancesList = JSON.parse(savedPerformances);
+
+    const squatPerformances = performancesList.filter((p: any) => p.discipline?.toLowerCase().includes('squat'));
+    const benchPerformances = performancesList.filter((p: any) =>
+      p.discipline?.toLowerCase().includes('bench') ||
+      p.discipline?.toLowerCase().includes('développé') ||
+      p.discipline?.toLowerCase().includes('couché')
+    );
+    const deadliftPerformances = performancesList.filter((p: any) =>
+      p.discipline?.toLowerCase().includes('deadlift') ||
+      p.discipline?.toLowerCase().includes('soulevé') ||
+      p.discipline?.toLowerCase().includes('terre')
+    );
+
+    if (squatPerformances.length > 0) maxSquat = Math.max(...squatPerformances.map((p: any) => p.value || 0));
+    if (benchPerformances.length > 0) maxBench = Math.max(...benchPerformances.map((p: any) => p.value || 0));
+    if (deadliftPerformances.length > 0) maxDeadlift = Math.max(...deadliftPerformances.map((p: any) => p.value || 0));
+  } catch (error) {
+    console.error('Erreur lors du chargement des performances:', error);
+  }
+
+  return { maxSquat, maxBench, maxDeadlift };
+}
+
+type PowerliftingLevel = 'debutant' | 'intermediaire' | 'avance';
+type MainLift = 'squat' | 'bench' | 'deadlift';
+
+// Niveau estimé à partir des IPF GL Points (référence officielle IPF, cf. src/utils/statsCalculator.ts)
+// calculés sur le total SBD réel et le poids de corps — pas juste un champ "niveau" déclaratif.
+function assessPowerliftingLevel(weight: number, sex: string, squat: number, bench: number, deadlift: number): PowerliftingLevel {
+  const total = squat + bench + deadlift;
+  const glPoints = calculateIPFGLPoints(weight, total, sex === 'male');
+  if (glPoints < 40) return 'debutant';
+  if (glPoints < 70) return 'intermediaire';
+  return 'avance';
+}
+
+// Standards approximatifs (x poids de corps) pour un lifter raw intermédiaire — sert uniquement à
+// repérer lequel des 3 mouvements est proportionnellement en retard par rapport aux 2 autres et au
+// poids de corps de l'utilisateur (et pas juste en valeur absolue).
+const BODYWEIGHT_STANDARDS = {
+  male: { squat: 1.5, bench: 1.0, deadlift: 1.8 },
+  female: { squat: 1.2, bench: 0.6, deadlift: 1.5 },
+};
+
+function findWeakestLift(weight: number, sex: string, squat: number, bench: number, deadlift: number): MainLift {
+  const standards = sex === 'male' ? BODYWEIGHT_STANDARDS.male : BODYWEIGHT_STANDARDS.female;
+  const ratios: Record<MainLift, number> = {
+    squat: (squat / weight) / standards.squat,
+    bench: (bench / weight) / standards.bench,
+    deadlift: (deadlift / weight) / standards.deadlift,
+  };
+
+  let weakest: MainLift = 'squat';
+  let lowest = ratios.squat;
+  (['bench', 'deadlift'] as MainLift[]).forEach((lift) => {
+    if (ratios[lift] < lowest) {
+      lowest = ratios[lift];
+      weakest = lift;
+    }
+  });
+  return weakest;
+}
+
+// Arrondit au multiple de 2.5kg le plus proche (charges réalistes avec des disques standards)
+const roundToPlates = (weight: number) => Math.max(20, Math.round(weight / 2.5) * 2.5);
+
+interface WarmupStep { pct: number; reps: number; }
+
+// Rampes d'échauffement calibrées par mouvement : le squat demande la rampe la plus longue
+// (amplitude/mobilité/gainage à régler), le développé couché une rampe plus courte, et le soulevé
+// de terre démarre plus lourd d'entrée (peu utile de tirer très léger à la barre).
+const WARMUP_RAMPS: Record<MainLift, WarmupStep[]> = {
+  squat: [{ pct: 0.4, reps: 8 }, { pct: 0.55, reps: 5 }, { pct: 0.7, reps: 3 }, { pct: 0.85, reps: 1 }],
+  bench: [{ pct: 0.5, reps: 5 }, { pct: 0.7, reps: 3 }, { pct: 0.85, reps: 1 }],
+  deadlift: [{ pct: 0.5, reps: 5 }, { pct: 0.75, reps: 2 }],
+};
+
+function buildWarmupSets(nom: string, topWeight: number, ramp: WarmupStep[]) {
+  return ramp.map((step) => ({
+    nom: `${nom} (échauffement)`,
+    type: 'echauffement',
+    series: 1,
+    reps: step.reps,
+    poids: roundToPlates(topWeight * step.pct),
+    pourcentage: Math.round(step.pct * 100),
+    repos: '60-90s',
+  }));
+}
+
+// Schéma séries/reps/%1RM par niveau et semaine du cycle — vague progressive façon 5/3/1 pour
+// l'intermédiaire, adoucie (pas de singles proches du max) pour le débutant, resserrée et plus
+// intense pour l'avancé (bloc d'intensification façon pic de compétition).
+function getWaveScheme(level: PowerliftingLevel, semaineDansCycle: number, estDeload: boolean): Array<{ reps: number | string; pct: number }> {
+  if (estDeload) {
+    return level === 'avance'
+      ? [{ reps: 5, pct: 0.55 }, { reps: 5, pct: 0.6 }]
+      : [{ reps: 5, pct: 0.5 }, { reps: 5, pct: 0.55 }, { reps: 5, pct: 0.6 }];
+  }
+
+  if (level === 'debutant') {
+    const pct = [0.65, 0.7, 0.75][semaineDansCycle - 1] ?? 0.75;
+    return [{ reps: 5, pct }, { reps: 5, pct }, { reps: 5, pct }];
+  }
+
+  if (level === 'avance') {
+    if (semaineDansCycle === 1) return [{ reps: 3, pct: 0.75 }, { reps: 3, pct: 0.82 }, { reps: 3, pct: 0.88 }];
+    if (semaineDansCycle === 2) return [{ reps: 3, pct: 0.8 }, { reps: 2, pct: 0.87 }, { reps: 2, pct: 0.93 }];
+    return [{ reps: 2, pct: 0.85 }, { reps: 1, pct: 0.92 }, { reps: '1+', pct: 0.97 }];
+  }
+
+  // Intermédiaire : vague 5/3/1 classique
+  if (semaineDansCycle === 1) return [{ reps: 5, pct: 0.7 }, { reps: 5, pct: 0.8 }, { reps: '5+', pct: 0.9 }];
+  if (semaineDansCycle === 2) return [{ reps: 3, pct: 0.75 }, { reps: 3, pct: 0.85 }, { reps: '3+', pct: 0.92 }];
+  return [{ reps: 5, pct: 0.8 }, { reps: 3, pct: 0.9 }, { reps: '1+', pct: 0.95 }];
+}
+
+function buildMainLiftSets(nom: string, rm: number, scheme: Array<{ reps: number | string; pct: number }>, repos: string) {
+  return scheme.map((set) => ({
+    nom,
+    type: 'travail',
+    series: 1,
+    reps: set.reps,
+    poids: roundToPlates(rm * set.pct),
+    pourcentage: Math.round(set.pct * 100),
+    repos,
+  }));
+}
+
+// Accessoires par mouvement principal — la liste complète est TOUJOURS présente (le premier est
+// un exercice de spécificité compétition comme la pause, jamais sauté). Sur le jour du point
+// faible, l'exercice de spécificité prend une série de plus pour appuyer un peu plus fort.
+function getAccessoriesForDay(
+  mainLift: MainLift,
+  weakestLift: MainLift,
+  level: PowerliftingLevel,
+  rmSquat: number,
+  rmBench: number,
+  rmDeadlift: number,
+  bodyweight: number
+) {
+  const isWeakDay = mainLift === weakestLift;
+  const specificitySeries = isWeakDay ? 4 : 3;
+  // Un débutant n'est généralement pas encore capable de faire des tractions lestées :
+  // on lui garde des tractions assistées, les niveaux au-dessus passent au lest.
+  const useWeightedPullups = level !== 'debutant';
+  const weightedPullupLoad = level === 'avance' ? bodyweight * 0.25 : bodyweight * 0.15;
+
+  type AccessoryDef = { nom: string; series: number; reps: number; poids: number; pourcentage: number; repos: string; type: string };
+
+  const pools: Record<MainLift, AccessoryDef[]> = {
+    squat: [
+      { nom: 'Squat Pause (3ct)', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmSquat * 0.54), pourcentage: 54, repos: '2 min' },
+      { nom: 'Fentes lestées', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmSquat * 0.135), pourcentage: 14, repos: '2 min' },
+      { nom: 'Presse à Jambes', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(rmSquat * 1.08), pourcentage: 108, repos: '2 min' },
+      { nom: 'Extensions de Jambes', type: 'accessoire', series: 3, reps: 15, poids: roundToPlates(rmSquat * 0.36), pourcentage: 36, repos: '1.5 min' },
+    ],
+    bench: [
+      { nom: 'Développé Couché Pause (3ct)', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmBench * 0.63), pourcentage: 63, repos: '2 min' },
+      { nom: 'Développé Prise Serrée', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmBench * 0.585), pourcentage: 59, repos: '2 min' },
+      { nom: 'Développé Incliné', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmBench * 0.54), pourcentage: 54, repos: '2 min' },
+      level === 'debutant'
+        ? { nom: 'Dips', type: 'accessoire', series: 3, reps: 10, poids: 0, pourcentage: 0, repos: '1.5 min' }
+        : { nom: 'Dips lestés', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(bodyweight * (level === 'avance' ? 0.35 : 0.2)), pourcentage: 0, repos: '1.5 min' },
+      { nom: 'Extensions Triceps', type: 'accessoire', series: 3, reps: 15, poids: roundToPlates(rmBench * 0.135), pourcentage: 14, repos: '1.5 min' },
+      { nom: 'Curls Biceps', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(bodyweight * 0.25), pourcentage: 0, repos: '1 min' },
+    ],
+    deadlift: [
+      { nom: 'Soulevé de Terre Déficit', type: 'accessoire', series: specificitySeries, reps: 5, poids: roundToPlates(rmDeadlift * 0.63), pourcentage: 63, repos: '2-3 min' },
+      { nom: 'Soulevé de Terre Roumain', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmDeadlift * 0.45), pourcentage: 45, repos: '2 min' },
+      { nom: 'Rowing Barre', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(rmDeadlift * 0.45), pourcentage: 45, repos: '2 min' },
+      useWeightedPullups
+        ? { nom: 'Tractions Lestées', type: 'accessoire', series: 3, reps: 6, poids: roundToPlates(weightedPullupLoad), pourcentage: 0, repos: '2 min' }
+        : { nom: 'Tractions Assistées', type: 'accessoire', series: 3, reps: 8, poids: roundToPlates(bodyweight * 0.3), pourcentage: 0, repos: '2 min' },
+      { nom: 'Shrugs Barre', type: 'accessoire', series: 3, reps: 12, poids: roundToPlates(rmDeadlift * 0.36), pourcentage: 36, repos: '1.5 min' },
+    ],
+  };
+
+  return pools[mainLift];
+}
+
+function createPowerliftingSession(
+  semaine: number,
+  jour: number,
+  user: UserProfile,
+  maxSquat: number,
+  maxBench: number,
+  maxDeadlift: number,
+  level: PowerliftingLevel,
+  weakestLift: MainLift,
+  dayName?: string
+) {
   const estDeload = semaine === 4;
   const semaineDansCycle = ((semaine - 1) % 4) + 1;
   const cycle = Math.ceil(semaine / 4);
-  
-  // Vérifier si c'est un utilisateur expert
-  const isExpert = user.niveau === 'expert' || user.niveau === 'avance' || 
-                   user.generalLevel === 'Expert' || user.generalLevel === 'Avancé';
-  const trainingDays = user.trainingDays?.length || 4;
-  
-  console.log(`🔄 Cycle ${cycle}, Semaine ${semaineDansCycle} - Expert: ${isExpert}, Niveau: ${user.niveau}, GeneralLevel: ${user.generalLevel}, Jours: ${trainingDays}`);
-  
-  // Utilisation hybride : 80% RM + 20% TM pour équilibrer agressivité et sécurité
-  // Le RM (Rep Max) est utilisé pour les exercices principaux (80%)
-  // Le TM (Training Max = 90% du 1RM) est utilisé pour les exercices d'assistance (20%)
-  const progressionCycle = (cycle - 1) * 2.5; // +2.5kg par cycle pour haut du corps
-  const progressionCycleBas = (cycle - 1) * 5; // +5kg par cycle pour bas du corps
-  
-  // Calcul des charges principales basées sur le 1RM + progression (80% du programme)
-  const rmSquat = Math.round(maxSquat + progressionCycleBas);
-  const rmBench = Math.round(maxBench + progressionCycle);
-  const rmDeadlift = Math.round(maxDeadlift + progressionCycleBas);
-  
-  // Calcul des charges d'assistance basées sur le TM + progression (20% du programme)
-  const tmSquat = Math.round((maxSquat * 0.9) + progressionCycleBas);
-  const tmBench = Math.round((maxBench * 0.9) + progressionCycle);
-  const tmDeadlift = Math.round((maxDeadlift * 0.9) + progressionCycleBas);
-  
-  let exercices = [];
-  
-  if (isExpert) {
-    // SYSTÈME EXPERT : Programme de base + exercice SBD supplémentaire
-    exercices = createClassic531Session(semaineDansCycle, jour, rmSquat, rmBench, rmDeadlift, estDeload, user);
-    
-    // Ajouter un exercice SBD supplémentaire selon le jour
-    const exerciceSupplementaire = getAdditionalSBDExercise(jour, rmSquat, rmBench, rmDeadlift, semaineDansCycle, estDeload);
-    if (exerciceSupplementaire) {
-      exercices.push(exerciceSupplementaire);
-      console.log(`✅ Exercice expert ajouté: ${exerciceSupplementaire.nom} - ${exerciceSupplementaire.series}x${exerciceSupplementaire.reps} @ ${exerciceSupplementaire.poids}kg`);
-    }
-  } else {
-    // SYSTÈME CLASSIQUE 5/3/1 pour débutants/intermédiaires
-    exercices = createClassic531Session(semaineDansCycle, jour, rmSquat, rmBench, rmDeadlift, estDeload, user);
+  const bodyweight = user.weight || 75;
+
+  // Progression entre cycles calibrée par niveau : un débutant progresse naturellement plus vite
+  // qu'un lifter avancé — on ne peut pas ajouter les mêmes kg à tout le monde indéfiniment.
+  const cycleBump = level === 'debutant' ? 5 : level === 'intermediaire' ? 2.5 : 1.25;
+  const rmSquat = Math.round(maxSquat + (cycle - 1) * cycleBump * 2);
+  const rmBench = Math.round(maxBench + (cycle - 1) * cycleBump);
+  const rmDeadlift = Math.round(maxDeadlift + (cycle - 1) * cycleBump * 2);
+
+  const scheme = getWaveScheme(level, semaineDansCycle, estDeload);
+
+  let mainLift: MainLift = 'squat';
+  let rm = rmSquat;
+  let nomPrincipal = 'Squat';
+  let reposPrincipal = '3-4 min';
+
+  if (jour === 2) {
+    mainLift = 'bench'; rm = rmBench; nomPrincipal = 'Développé Couché'; reposPrincipal = '3 min';
+  } else if (jour === 3) {
+    mainLift = 'deadlift'; rm = rmDeadlift; nomPrincipal = 'Soulevé de Terre'; reposPrincipal = '3-4 min';
+  } else if (jour === 4) {
+    // 4e jour : développé couché technique/volume — fréquence bench plus élevée façon programmes
+    // pro (ex: thepanash va jusqu'à 4 séances bench/semaine), avec l'overhead press en accessoire.
+    mainLift = 'bench'; rm = rmBench; nomPrincipal = 'Développé Couché (technique)'; reposPrincipal = '2-3 min';
   }
-  
+
+  // La rampe d'échauffement monte vers le PREMIER set de travail (pas le dernier) : elle doit
+  // toujours rester plus légère que le premier set, quelle que soit la forme de la vague ensuite.
+  const firstWorkingWeight = roundToPlates(rm * scheme[0].pct);
+  const warmup = buildWarmupSets(nomPrincipal, firstWorkingWeight, WARMUP_RAMPS[mainLift]);
+  const mainSets = buildMainLiftSets(nomPrincipal, rm, scheme, reposPrincipal);
+
+  let accessories = getAccessoriesForDay(mainLift, weakestLift, level, rmSquat, rmBench, rmDeadlift, bodyweight);
+
+  if (jour === 4) {
+    const rmPress = Math.round(rmBench * 0.65);
+    accessories = [
+      { nom: 'Développé Militaire', type: 'accessoire', series: 3, reps: 6, poids: roundToPlates(rmPress * (estDeload ? 0.55 : 0.7)), pourcentage: estDeload ? 55 : 70, repos: '2 min' },
+      ...accessories,
+    ];
+  }
+
+  const exercices = [...warmup, ...mainSets, ...accessories];
+
   return {
     id: `${semaine}-${jour}`,
     nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`}`,
     day: dayName || `Jour ${jour}`,
     phase: estDeload ? 'Deload' : (semaineDansCycle === 1 ? 'Adaptation' : (semaineDansCycle === 2 ? 'Progression' : 'Spécialisation')),
     intensity: estDeload ? 'Faible' : (semaineDansCycle === 1 ? 'Modérée' : (semaineDansCycle === 2 ? 'Élevée' : 'Maximale')),
-    duration: exercices.length * 12,
+    duration: exercices.length * 10,
     exercises: exercices,
-    notes: estDeload ? 'Semaine de récupération active' : `Programme ${isExpert ? 'Expert Modulable' : '5/3/1'} - Cycle ${cycle}`,
+    notes: estDeload
+      ? 'Semaine de récupération active : intensité réduite, gardez 3-4 répétitions en réserve sur chaque série.'
+      : `Programme ${level === 'debutant' ? 'progression linéaire' : level === 'avance' ? "d'intensification" : '5/3/1'} — Cycle ${cycle}${mainLift === weakestLift ? ' — jour prioritaire (point faible)' : ''}`,
     equipment: ['Barre', 'Disques', 'Rack', 'Haltères']
   };
 }
 
-// Fonction pour ajouter un exercice SBD supplémentaire pour les experts
-function getAdditionalSBDExercise(jour: number, rmSquat: number, rmBench: number, rmDeadlift: number, semaineDansCycle: number, estDeload: boolean) {
-  // Calculer les charges TM pour les exercices supplémentaires (20% du programme)
-  const tmSquat = Math.round(rmSquat * 0.9);
-  const tmBench = Math.round(rmBench * 0.9);
-  const tmDeadlift = Math.round(rmDeadlift * 0.9);
-  
-  // Calculer les pourcentages pour l'exercice supplémentaire - BASÉS SUR TM (20% du programme)
-  let pourcentageSupplementaire;
-  if (estDeload) {
-    pourcentageSupplementaire = 0.5; // 50% du TM pour deload
-  } else if (semaineDansCycle === 1) {
-    pourcentageSupplementaire = 0.6; // 60% du TM pour semaine 1
-  } else if (semaineDansCycle === 2) {
-    pourcentageSupplementaire = 0.65; // 65% du TM pour semaine 2
-  } else {
-    pourcentageSupplementaire = 0.7; // 70% du TM pour semaine 3
-  }
-  
-  // Ajouter un exercice SBD différent selon le jour
-  if (jour === 1) {
-    // Jour Squat : ajouter Deadlift léger
-    return {
-      nom: 'Soulevé de Terre',
-      series: 3,
-      reps: 5,
-      poids: Math.round(tmDeadlift * pourcentageSupplementaire),
-      repos: '2-3 min'
-    };
-  } else if (jour === 2) {
-    // Jour Bench : ajouter Squat léger
-    return {
-      nom: 'Squat',
-      series: 3,
-      reps: 5,
-      poids: Math.round(tmSquat * pourcentageSupplementaire),
-      repos: '2-3 min'
-    };
-  } else if (jour === 3) {
-    // Jour Deadlift : ajouter Bench léger
-    return {
-      nom: 'Développé Couché',
-      series: 3,
-      reps: 5,
-      poids: Math.round(tmBench * pourcentageSupplementaire),
-      repos: '2-3 min'
-    };
-  } else if (jour === 4) {
-    // Jour Press : ajouter Squat léger
-    return {
-      nom: 'Squat',
-      series: 3,
-      reps: 5,
-      poids: Math.round(tmSquat * pourcentageSupplementaire),
-      repos: '2-3 min'
-    };
-  }
-  
-  return null;
-}
+// Séance SBD combinée : les 3 mouvements dans la même séance, façon simulation de passage de
+// compétition — intensité modérée-haute, pas d'accessoires, rampe d'échauffement raccourcie sur
+// les 2ᵉ/3ᵉ mouvements (déjà chaud grâce aux précédents).
+function createSBDComboSession(
+  semaine: number,
+  jour: number,
+  user: UserProfile,
+  maxSquat: number,
+  maxBench: number,
+  maxDeadlift: number,
+  level: PowerliftingLevel,
+  dayName?: string
+) {
+  // Le jour SBD ne tombe jamais sur la semaine de deload (cf. generatePowerliftingProgramme).
+  const cycle = Math.ceil(semaine / 4);
+  const cycleBump = level === 'debutant' ? 5 : level === 'intermediaire' ? 2.5 : 1.25;
+  const rmSquat = Math.round(maxSquat + (cycle - 1) * cycleBump * 2);
+  const rmBench = Math.round(maxBench + (cycle - 1) * cycleBump);
+  const rmDeadlift = Math.round(maxDeadlift + (cycle - 1) * cycleBump * 2);
 
-// SYSTÈME EXPERT MODULABLE - Dual SBD Adaptatif (ANCIEN - GARDÉ POUR RÉFÉRENCE)
-function createExpertPowerliftingSession(semaineDansCycle: number, jour: number, trainingDays: number, rmSquat: number, rmBench: number, rmDeadlift: number, estDeload: boolean, user: UserProfile) {
-  let exercices = [];
-  
-  // Calculer les charges TM pour les exercices d'assistance (20% du programme)
-  const tmSquat = Math.round(rmSquat * 0.9);
-  const tmBench = Math.round(rmBench * 0.9);
-  const tmDeadlift = Math.round(rmDeadlift * 0.9);
-  
-  // Calculer les pourcentages selon la semaine - HYBRIDE : RM pour principaux (80%) + TM pour assistance (20%)
-  let hardPercent, modPercent;
-  if (estDeload) {
-    hardPercent = [0.85, 0.9, 0.95]; // Pourcentages RM pour exercices principaux
-    modPercent = [0.7, 0.75, 0.8]; // Pourcentages TM pour exercices d'assistance
-  } else if (semaineDansCycle === 1) {
-    hardPercent = [0.9, 0.95, 0.95]; // Pourcentages RM pour exercices principaux
-    modPercent = [0.75, 0.8, 0.8]; // Pourcentages TM pour exercices d'assistance
-  } else if (semaineDansCycle === 2) {
-    hardPercent = [0.95, 0.975, 0.975]; // Pourcentages RM pour exercices principaux
-    modPercent = [0.8, 0.825, 0.825]; // Pourcentages TM pour exercices d'assistance
-  } else {
-    hardPercent = [0.975, 1.0, 1.0]; // Pourcentages RM pour exercices principaux
-    modPercent = [0.825, 0.85, 0.85]; // Pourcentages TM pour exercices d'assistance
-  }
-  
-  if (trainingDays === 3) {
-    // 3 JOURS - SBD Rotation
-    if (jour === 1) {
-      exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' }
-      ];
-    } else if (jour === 2) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 3, reps: 8, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-      ];
-    } else if (jour === 3) {
-      exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
-      ];
-    }
-  } else if (trainingDays === 4) {
-    // 4 JOURS - Upper/Lower Alterné
-    if (jour === 1) {
-      exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
-      ];
-    } else if (jour === 2) {
-      exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
-      ];
-    } else if (jour === 3) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' }
-      ];
-    } else if (jour === 4) {
-      exercices = [
-        { nom: 'Développé Couché', series: 4, reps: 5, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 1, reps: 5, poids: Math.round(rmBench * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-      ];
-    }
-  } else if (trainingDays === 5) {
-    // 5 JOURS - Dual SBD Standard Compétiteur
-    if (jour === 1) {
-      exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
-      ];
-    } else if (jour === 2) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-      ];
-    } else if (jour === 3) {
-      exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
-      ];
-    } else if (jour === 4) {
-      exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
-      ];
-    } else if (jour === 5) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(rmDeadlift * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-        { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(tmSquat * 0.4), repos: '1.5 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-      ];
-    }
-  } else if (trainingDays === 6) {
-    // 6 JOURS - Haute Fréquence Élite
-    if (jour === 1) {
-      exercices = [
-        { nom: 'Squat', series: 5, reps: 3, poids: Math.round(rmSquat * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Squat', series: 1, reps: 3, poids: Math.round(rmSquat * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 4, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-        { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' }
-      ];
-    } else if (jour === 2) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 5, poids: Math.round(rmDeadlift * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Squat', series: 3, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
-      ];
-    } else if (jour === 3) {
-      exercices = [
-        { nom: 'Développé Couché', series: 5, reps: 4, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 4, poids: Math.round(rmBench * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 3, reps: 5, poids: Math.round(rmDeadlift * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-        { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' }
-      ];
-    } else if (jour === 4) {
-      // Jour de mobilité/préparation nerveuse
-      exercices = [
-        { nom: 'Mobilité Épaules', series: 3, reps: '10 min', poids: 'Corps', repos: '1 min' },
-        { nom: 'Étirements Dynamiques', series: 2, reps: '15 min', poids: 'Corps', repos: '1 min' },
-        { nom: 'Cardio Léger', series: 1, reps: '20 min', poids: 'Corps', repos: '1 min' }
-      ];
-    } else if (jour === 5) {
-      exercices = [
-        { nom: 'Squat', series: 4, reps: 5, poids: Math.round(rmSquat * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Squat', series: 1, reps: 5, poids: Math.round(rmSquat * modPercent[1]), repos: '2-3 min' },
-        { nom: 'Développé Couché', series: 5, reps: 3, poids: Math.round(rmBench * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 1, reps: 3, poids: Math.round(rmBench * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' },
-        { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(tmBench * 0.1), repos: '1 min' }
-      ];
-    } else if (jour === 6) {
-      exercices = [
-        { nom: 'Soulevé de Terre', series: 4, reps: 3, poids: Math.round(rmDeadlift * hardPercent[0]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[1]), repos: '3-4 min' },
-        { nom: 'Soulevé de Terre', series: 1, reps: 3, poids: Math.round(rmDeadlift * hardPercent[2]), repos: '3-4 min' },
-        { nom: 'Développé Couché', series: 3, reps: 6, poids: Math.round(rmBench * modPercent[0]), repos: '2-3 min' },
-        { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-        { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-      ];
-    }
-  }
-  
-  return exercices;
-}
+  const scheme = [{ reps: 3, pct: 0.8 }, { reps: 2, pct: 0.87 }];
 
-// SYSTÈME CLASSIQUE 5/3/1 pour débutants/intermédiaires
-function createClassic531Session(semaineDansCycle: number, jour: number, rmSquat: number, rmBench: number, rmDeadlift: number, estDeload: boolean, user: UserProfile) {
-  let exercices = [];
-  
-  // Calculer les charges TM pour les exercices d'assistance (20% du programme)
-  const tmSquat = Math.round(rmSquat * 0.9);
-  const tmBench = Math.round(rmBench * 0.9);
-  const tmDeadlift = Math.round(rmDeadlift * 0.9);
-  
-  // Système 5/3/1 hybride : RM pour exercices principaux (80%) + TM pour assistance (20%)
-  if (jour === 1) {
-    // Jour 1 : Squat
-    let seriesPrincipales, repsPrincipales, pourcentages;
-    
-    if (estDeload) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.45, 0.55, 0.65]; // Ajustés pour 1RM
-    } else if (semaineDansCycle === 1) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.72, 0.82, 0.92]; // Ajustés pour 1RM (au lieu de 65%, 75%, 85%)
-    } else if (semaineDansCycle === 2) {
-      seriesPrincipales = 3;
-      repsPrincipales = 3;
-      pourcentages = [0.77, 0.87, 0.97]; // Ajustés pour 1RM (au lieu de 70%, 80%, 90%)
-    } else {
-      seriesPrincipales = 3;
-      repsPrincipales = 1;
-      pourcentages = [0.82, 0.92, 1.02]; // Ajustés pour 1RM (au lieu de 75%, 85%, 95%)
-    }
-    
-    exercices = [
-      { nom: 'Squat', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmSquat * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmSquat * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Squat', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmSquat * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Fentes lestées', series: 3, reps: 8, poids: Math.round(tmSquat * 0.15), repos: '2 min' },
-      { nom: 'Presse à Jambes', series: 3, reps: 12, poids: Math.round(tmSquat * 1.2), repos: '2 min' },
-      { nom: 'Extensions de Jambes', series: 3, reps: 15, poids: Math.round(tmSquat * 0.4), repos: '1.5 min' }
-    ];
-  } else if (jour === 2) {
-    // Jour 2 : Bench Press
-    let seriesPrincipales, repsPrincipales, pourcentages;
-    
-    if (estDeload) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.45, 0.55, 0.65]; // Ajustés pour 1RM
-    } else if (semaineDansCycle === 1) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.72, 0.82, 0.92]; // Ajustés pour 1RM (au lieu de 65%, 75%, 85%)
-    } else if (semaineDansCycle === 2) {
-      seriesPrincipales = 3;
-      repsPrincipales = 3;
-      pourcentages = [0.77, 0.87, 0.97]; // Ajustés pour 1RM (au lieu de 70%, 80%, 90%)
-    } else {
-      seriesPrincipales = 3;
-      repsPrincipales = 1;
-      pourcentages = [0.82, 0.92, 1.02]; // Ajustés pour 1RM (au lieu de 75%, 85%, 95%)
-    }
-    
-    exercices = [
-      { nom: 'Développé Couché', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmBench * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmBench * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Développé Couché', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmBench * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
-      { nom: 'Curls Biceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1 min' }
-    ];
-  } else if (jour === 3) {
-    // Jour 3 : Deadlift
-    let seriesPrincipales, repsPrincipales, pourcentages;
-    
-    if (estDeload) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.45, 0.55, 0.65]; // Ajustés pour 1RM
-    } else if (semaineDansCycle === 1) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.72, 0.82, 0.92]; // Ajustés pour 1RM (au lieu de 65%, 75%, 85%)
-    } else if (semaineDansCycle === 2) {
-      seriesPrincipales = 3;
-      repsPrincipales = 3;
-      pourcentages = [0.77, 0.87, 0.97]; // Ajustés pour 1RM (au lieu de 70%, 80%, 90%)
-    } else {
-      seriesPrincipales = 3;
-      repsPrincipales = 1;
-      pourcentages = [0.82, 0.92, 1.02]; // Ajustés pour 1RM (au lieu de 75%, 85%, 95%)
-    }
-    
-    exercices = [
-      { nom: 'Soulevé de Terre', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Soulevé de Terre', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmDeadlift * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Rowing Barre', series: 3, reps: 8, poids: Math.round(tmDeadlift * 0.5), repos: '2 min' },
-      { nom: 'Tractions Assistées', series: 3, reps: 8, poids: Math.round(user.weight * 0.3), repos: '2 min' },
-      { nom: 'Shrugs Barre', series: 3, reps: 12, poids: Math.round(tmDeadlift * 0.4), repos: '1.5 min' }
-    ];
-  } else if (jour === 4) {
-    // Jour 4 : Overhead Press
-    let seriesPrincipales, repsPrincipales, pourcentages;
-    const rmPress = Math.round(rmBench * 0.7); // Calcul basé sur le RM Bench
-    
-    if (estDeload) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.45, 0.55, 0.65]; // Ajustés pour 1RM
-    } else if (semaineDansCycle === 1) {
-      seriesPrincipales = 3;
-      repsPrincipales = 5;
-      pourcentages = [0.72, 0.82, 0.92]; // Ajustés pour 1RM (au lieu de 65%, 75%, 85%)
-    } else if (semaineDansCycle === 2) {
-      seriesPrincipales = 3;
-      repsPrincipales = 3;
-      pourcentages = [0.77, 0.87, 0.97]; // Ajustés pour 1RM (au lieu de 70%, 80%, 90%)
-    } else {
-      seriesPrincipales = 3;
-      repsPrincipales = 1;
-      pourcentages = [0.82, 0.92, 1.02]; // Ajustés pour 1RM (au lieu de 75%, 85%, 95%)
-    }
-    
-    exercices = [
-      { nom: 'Développé Militaire', series: seriesPrincipales, reps: repsPrincipales, poids: Math.round(rmPress * pourcentages[0]), repos: '3-4 min' },
-      { nom: 'Développé Militaire', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmPress * pourcentages[1]), repos: '3-4 min' },
-      { nom: 'Développé Militaire', series: 1, reps: repsPrincipales === 1 ? '1+' : repsPrincipales, poids: Math.round(rmPress * pourcentages[2]), repos: '3-4 min' },
-      { nom: 'Développé Incliné', series: 3, reps: 8, poids: Math.round(tmBench * 0.6), repos: '2 min' },
-      { nom: 'Extensions Triceps', series: 3, reps: 15, poids: Math.round(tmBench * 0.15), repos: '1.5 min' },
-      { nom: 'Face Pulls', series: 3, reps: 15, poids: Math.round(rmPress * 0.1), repos: '1 min' }
-    ];
-  }
-  
-  return exercices;
+  const lifts: Array<{ key: MainLift; nom: string; rm: number; repos: string; skipWarmupSteps: number }> = [
+    { key: 'squat', nom: 'Squat', rm: rmSquat, repos: '3-4 min', skipWarmupSteps: 0 },
+    { key: 'bench', nom: 'Développé Couché', rm: rmBench, repos: '3 min', skipWarmupSteps: 1 },
+    { key: 'deadlift', nom: 'Soulevé de Terre', rm: rmDeadlift, repos: '3-4 min', skipWarmupSteps: 1 },
+  ];
+
+  const exercices = lifts.flatMap(({ key, nom, rm, repos, skipWarmupSteps }) => {
+    const firstWorkingWeight = roundToPlates(rm * scheme[0].pct);
+    // Déjà chaud grâce au(x) mouvement(s) précédent(s) : on saute les 1ers échelons les plus légers.
+    const warmup = buildWarmupSets(nom, firstWorkingWeight, WARMUP_RAMPS[key].slice(skipWarmupSteps));
+    const work = buildMainLiftSets(nom, rm, scheme, repos);
+    return [...warmup, ...work];
+  });
+
+  return {
+    id: `${semaine}-${jour}`,
+    nom: `Semaine ${semaine} - ${dayName || `Jour ${jour}`} (SBD)`,
+    day: dayName || `Jour ${jour}`,
+    phase: 'Spécialisation',
+    intensity: 'Élevée',
+    duration: exercices.length * 10,
+    exercises: exercices,
+    notes: `Séance SBD combinée — simulation de passage de compétition, sans accessoires (Cycle ${cycle}).`,
+    equipment: ['Barre', 'Disques', 'Rack']
+  };
 }
 
 // Nouvelle fonction pour le Street Lifting

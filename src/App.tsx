@@ -25,7 +25,7 @@ const BlocsEntrainement = lazy(() => import('./pages/BlocsEntrainement'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Nutrition = lazy(() => import('./pages/Nutrition'));
 const AlimentDetail = lazy(() => import('./pages/AlimentDetail'));
-const RepasDetail = lazy(() => import('./pages/RepasDetail'));
+const RecetteDetail = lazy(() => import('./pages/RecetteDetail'));
 const DailyQuests = lazy(() => import('./components/DailyQuests'));
 
 // Composant de chargement
@@ -167,10 +167,10 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
           
-          <Route path="/repas/:id" element={
+          <Route path="/recette/:id" element={
             <ProtectedRoute>
               <PageLayout>
-                <RepasDetail />
+                <RecetteDetail />
               </PageLayout>
             </ProtectedRoute>
           } />

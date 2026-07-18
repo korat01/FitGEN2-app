@@ -1,14 +1,15 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Heart, Plus, Star, Target, Zap } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useNutritionFavorites } from '@/hooks/useNutritionFavorites';
 
 const AlimentDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const { isFavorite, toggleFavorite } = useNutritionFavorites();
 
   // Base de données complète des aliments
   const alimentsDatabase = {
@@ -2996,9 +2997,9 @@ const AlimentDetail: React.FC = () => {
 
   const getIGColor = (ig: string) => {
     switch (ig) {
-      case 'Bas': return 'bg-green-500/15 border border-green-500/25 text-green-800';
-      case 'Modéré': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800';
-      case 'Élevé': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      case 'Bas': return 'bg-green-500/15 border border-green-500/25 text-green-300';
+      case 'Modéré': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-300';
+      case 'Élevé': return 'bg-red-500/15 border border-red-500/25 text-red-300';
       default: return 'bg-white/5 text-foreground';
     }
   };
@@ -3006,10 +3007,10 @@ const AlimentDetail: React.FC = () => {
   const getClasseColor = (classe: string) => {
     switch (classe) {
       case 'Prise de masse': return 'bg-blue-500/15 border border-blue-500/25 text-blue-300';
-      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-800';
-      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-800';
-      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-800';
-      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-800';
+      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-300';
+      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-300';
+      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-300';
+      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-300';
       default: return 'bg-white/5 text-foreground';
     }
   };
@@ -3035,14 +3036,14 @@ const AlimentDetail: React.FC = () => {
         </div>
         <Button
           variant="ghost"
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={() => toggleFavorite(aliment.id)}
           className={`p-2 ${
-            isFavorite 
-              ? 'text-red-500' 
+            isFavorite(aliment.id)
+              ? 'text-red-500'
               : 'text-muted-foreground/70 hover:text-red-500'
           }`}
         >
-          <Heart className={`h-6 w-6 ${isFavorite ? 'fill-current' : ''}`} />
+          <Heart className={`h-6 w-6 ${isFavorite(aliment.id) ? 'fill-current' : ''}`} />
         </Button>
       </div>
 
@@ -3060,8 +3061,8 @@ const AlimentDetail: React.FC = () => {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-gradient-to-br from-orange-500/10 to-orange-500/15 rounded-lg">
-                  <div className="text-2xl md:text-3xl font-bold text-orange-600">{aliment.calories}</div>
-                  <div className="text-sm text-orange-700">Calories</div>
+                  <div className="text-2xl md:text-3xl font-bold text-orange-400">{aliment.calories}</div>
+                  <div className="text-sm text-orange-300">Calories</div>
                   </div>
                 <div className="text-center p-4 bg-gradient-to-br from-blue-500/10 to-blue-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-blue-400">{aliment.proteines}g</div>
@@ -3069,11 +3070,11 @@ const AlimentDetail: React.FC = () => {
                 </div>
                 <div className="text-center p-4 bg-gradient-to-br from-green-500/10 to-green-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-green-400">{aliment.glucides}g</div>
-                  <div className="text-sm text-green-700">Glucides</div>
+                  <div className="text-sm text-green-300">Glucides</div>
               </div>
                 <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-purple-500/15 rounded-lg">
                   <div className="text-2xl md:text-3xl font-bold text-purple-400">{aliment.lipides}g</div>
-                  <div className="text-sm text-purple-700">Lipides</div>
+                  <div className="text-sm text-purple-300">Lipides</div>
                 </div>
                 </div>
               <div className="mt-4 text-center p-3 surface-panel-sm">
@@ -3193,9 +3194,9 @@ const AlimentDetail: React.FC = () => {
                 <Plus className="h-4 w-4 mr-2" />
                   Ajouter à un repas
           </Button>
-                <Button variant="outline" className="w-full">
-                <Heart className="h-4 w-4 mr-2" />
-            Ajouter aux favoris
+                <Button variant="outline" className="w-full" onClick={() => toggleFavorite(aliment.id)}>
+                <Heart className={`h-4 w-4 mr-2 ${isFavorite(aliment.id) ? 'fill-current text-red-500' : ''}`} />
+            {isFavorite(aliment.id) ? 'Retirer des favoris' : 'Ajouter aux favoris'}
           </Button>
         </div>
           </CardContent>

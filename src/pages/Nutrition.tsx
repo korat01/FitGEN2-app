@@ -1,32 +1,78 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, Suspense, lazy } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Apple, 
-  Utensils, 
-  Search, 
+import {
+  Apple,
+  Search,
   Plus,
   Heart,
   Star,
-  Filter,
   Target,
   Zap,
+  Droplet,
   Clock,
   ChefHat,
-  ArrowLeft
+  ScanLine,
+  Camera,
+  ImagePlus,
+  Scale,
+  X,
+  Loader2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { MacroStatsGrid } from '@/components/nutrition/MacroStatsGrid';
+import { FilterChipRow } from '@/components/nutrition/FilterChipRow';
+import { MealPhotoModal } from '@/components/nutrition/MealPhotoModal';
+import { useNutritionFavorites } from '@/hooks/useNutritionFavorites';
+import { useScannedAliments } from '@/hooks/useScannedAliments';
+import { useMealPhotoLog } from '@/hooks/useMealPhotoLog';
+import { RECETTES, calculerMacrosRecette } from '@/utils/nutritionData';
+
+// Chargé à la demande : embarque la lib ZXing (décodage code-barres), assez lourde pour ne pas
+// vouloir l'inclure dans le chunk partagé des pages tant que l'utilisateur n'a pas cliqué "Scanner".
+const BarcodeScannerModal = lazy(() => import('@/components/nutrition/BarcodeScannerModal'));
+import { fetchProductByBarcode, ProductNotFoundError } from '@/utils/openFoodFacts';
 
 const Nutrition: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('aliments');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('all');
-  const [favorites, setFavorites] = useState<string[]>([]);
-  
+  // Filtre séparé par onglet : partager un seul état entre onglets faisait qu'une sélection sur un
+  // onglet (ex: "Protéines") ne matchait plus rien en changeant d'onglet, sans aucune indication
+  // visuelle de pourquoi la liste se retrouvait vide.
+  const [alimentFilter, setAlimentFilter] = useState('all');
+  const [recetteFilter, setRecetteFilter] = useState('all');
+  const [momentFilter, setMomentFilter] = useState('all');
+  const { favorites, toggleFavorite } = useNutritionFavorites();
+  const { scannedAliments, addScannedProduct, removeScannedAliment } = useScannedAliments();
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scanStatus, setScanStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [scanError, setScanError] = useState<string | null>(null);
+  const { entries: photoEntries, addEntry: addPhotoEntry, removeEntry: removePhotoEntry } = useMealPhotoLog();
+  const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+
+  const handleBarcodeDetected = async (barcode: string) => {
+    setIsScannerOpen(false);
+    setScanStatus('loading');
+    setScanError(null);
+    try {
+      const product = await fetchProductByBarcode(barcode);
+      addScannedProduct(product);
+      setScanStatus('idle');
+      setActiveTab('aliments');
+    } catch (error) {
+      setScanStatus('error');
+      setScanError(
+        error instanceof ProductNotFoundError
+          ? 'Produit non reconnu — il n\'est pas encore référencé dans la base Open Food Facts.'
+          : 'Erreur réseau pendant la recherche du produit. Réessayez.'
+      );
+    }
+  };
+
   // Fond géré par PageLayout (VitalForceBackground)
 
   // Données des aliments - AJOUT DE 20 NOUVEAUX ALIMENTS
@@ -722,51 +768,6 @@ const Nutrition: React.FC = () => {
       emoji: '🥥'
     },
     {
-      id: '47',
-      nom: 'Avocat',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 160,
-      proteines: 2,
-      glucides: 9,
-      lipides: 15,
-      fibres: 7,
-      micronutriments: ['Vitamine K', 'Folates', 'Potassium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥑'
-    },
-    {
-      id: '48',
-      nom: 'Saumon',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 208,
-      proteines: 25,
-      glucides: 0,
-      lipides: 12,
-      fibres: 0,
-      micronutriments: ['Oméga-3', 'B12', 'Sélénium'],
-      classe: 'Anti-inflammatoire',
-      tags: [],
-      emoji: '🐟'
-    },
-    {
-      id: '49',
-      nom: 'Quinoa',
-      categorie: 'Glucides',
-      ig: 'Bas',
-      calories: 120,
-      proteines: 4.4,
-      glucides: 22,
-      lipides: 1.9,
-      fibres: 2.8,
-      micronutriments: ['Fer', 'Magnésium', 'Lysine'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌾'
-    },
-    {
       id: '50',
       nom: 'Myrtilles',
       categorie: 'Micronutriments',
@@ -782,36 +783,6 @@ const Nutrition: React.FC = () => {
       emoji: '🫐'
     },
     {
-      id: '51',
-      nom: 'Amandes',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 579,
-      proteines: 21,
-      glucides: 22,
-      lipides: 50,
-      fibres: 12,
-      micronutriments: ['Vitamine E', 'Magnésium', 'Calcium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥜'
-    },
-    {
-      id: '52',
-      nom: 'Patate douce',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 86,
-      proteines: 1.6,
-      glucides: 20,
-      lipides: 0.1,
-      fibres: 3,
-      micronutriments: ['Bêta-carotène', 'Vitamine A', 'Potassium'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍠'
-    },
-    {
       id: '53',
       nom: 'Thon',
       categorie: 'Protéines',
@@ -825,36 +796,6 @@ const Nutrition: React.FC = () => {
       classe: 'Sèche',
       tags: [],
       emoji: '🐟'
-    },
-    {
-      id: '54',
-      nom: 'Chou kale',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 49,
-      proteines: 4.3,
-      glucides: 9,
-      lipides: 0.9,
-      fibres: 3.6,
-      micronutriments: ['Vitamine K', 'Vitamine C', 'Calcium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥬'
-    },
-    {
-      id: '55',
-      nom: 'Noix de cajou',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 553,
-      proteines: 18,
-      glucides: 30,
-      lipides: 44,
-      fibres: 3.3,
-      micronutriments: ['Magnésium', 'Zinc', 'Cuivre'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥜'
     },
     {
       id: '56',
@@ -932,21 +873,6 @@ const Nutrition: React.FC = () => {
       emoji: '🫘'
     },
     {
-      id: '61',
-      nom: 'Brocoli',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 34,
-      proteines: 2.8,
-      glucides: 7,
-      lipides: 0.4,
-      fibres: 2.6,
-      micronutriments: ['Vitamine C', 'Vitamine K', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥦'
-    },
-    {
       id: '62',
       nom: 'Noix',
       categorie: 'Lipides',
@@ -975,21 +901,6 @@ const Nutrition: React.FC = () => {
       classe: 'Récupération',
       tags: ['Vegan', 'Sans gluten'],
       emoji: '🥔'
-    },
-    {
-      id: '64',
-      nom: 'Épinards',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 23,
-      proteines: 2.9,
-      glucides: 3.6,
-      lipides: 0.4,
-      fibres: 2.2,
-      micronutriments: ['Fer', 'Vitamine K', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥬'
     },
     {
       id: '65',
@@ -1112,21 +1023,6 @@ const Nutrition: React.FC = () => {
       emoji: '🥒'
     },
     {
-      id: '73',
-      nom: 'Crevettes',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 99,
-      proteines: 24,
-      glucides: 0,
-      lipides: 0.3,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'B12', 'Phosphore'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🦐'
-    },
-    {
       id: '74',
       nom: 'Avoine',
       categorie: 'Glucides',
@@ -1170,36 +1066,6 @@ const Nutrition: React.FC = () => {
       classe: 'Anti-inflammatoire',
       tags: ['Vegan', 'Sans gluten'],
       emoji: '🌱'
-    },
-    {
-      id: '77',
-      nom: 'Poivron rouge',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 31,
-      proteines: 1,
-      glucides: 7,
-      lipides: 0.3,
-      fibres: 2.5,
-      micronutriments: ['Vitamine C', 'Bêta-carotène', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫑'
-    },
-    {
-      id: '78',
-      nom: 'Dinde',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 189,
-      proteines: 29,
-      glucides: 0,
-      lipides: 7,
-      fibres: 0,
-      micronutriments: ['Sélénium', 'B3', 'B6'],
-      classe: 'Sèche',
-      tags: [],
-      emoji: '🦃'
     },
     {
       id: '79',
@@ -1623,1124 +1489,58 @@ const Nutrition: React.FC = () => {
     }
   ];
 
-  // Données des repas - AJOUT DE 10 NOUVEAUX REPAS
-  const repas = [
-    {
-      id: '1',
-      nom: 'Bowl Poulet Riz Légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Poulet grillé', quantite: '150g' },
-        { nom: 'Riz basmati', quantite: '200g' },
-        { nom: 'Brocolis vapeur', quantite: '100g' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 550,
-      proteines: 42,
-      glucides: 60,
-      lipides: 15,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Cuire le riz basmati',
-        'Griller le poulet avec épices',
-        'Cuire les brocolis à la vapeur',
-        'Assaisonner avec huile d\'olive'
-      ],
-      emoji: '🍲'
-    },
-    {
-      id: '2',
-      nom: 'Smoothie Protéiné',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Protéine en poudre', quantite: '30g' },
-        { nom: 'Lait d\'amande', quantite: '250ml' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 35,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Mixer tous les ingrédients',
-        'Ajouter des glaçons',
-        'Servir immédiatement'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '3',
-      nom: 'Salade de Saumon',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Saumon grillé', quantite: '150g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Salade verte', quantite: '100g' },
-        { nom: 'Tomates cerises', quantite: '50g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 15,
-      lipides: 25,
-      objectif: 'Sèche',
-      etapes: [
-        'Griller le saumon',
-        'Préparer la salade verte',
-        'Ajouter avocat et tomates',
-        'Arroser de vinaigrette légère'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '4',
-      nom: 'Omelette aux épinards',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs entiers', quantite: '3 unités' },
-        { nom: 'Épinards frais', quantite: '50g' },
-        { nom: 'Fromage râpé', quantite: '20g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 320,
-      proteines: 25,
-      glucides: 8,
-      lipides: 22,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Battre les œufs avec sel et poivre',
-        'Faire revenir les épinards dans l\'huile',
-        'Verser les œufs battus',
-        'Ajouter le fromage râpé',
-        'Plier l\'omelette en deux'
-      ],
-      emoji: '🍳'
-    },
-    {
-      id: '5',
-      nom: 'Bowl de quinoa aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Quinoa', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Carottes', quantite: '80g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 18,
-      glucides: 65,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire le quinoa dans de l\'eau salée',
-        'Cuire les brocolis et carottes à la vapeur',
-        'Couper l\'avocat en dés',
-        'Mélanger tous les ingrédients',
-        'Saupoudrer de graines de chia'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '6',
-      nom: 'Smoothie protéiné aux myrtilles',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Myrtilles', quantite: '100g' },
-        { nom: 'Yaourt grec', quantite: '200g' },
-        { nom: 'Protéine vanille', quantite: '30g' },
-        { nom: 'Amandes', quantite: '15g' },
-        { nom: 'Lait d\'amande', quantite: '200ml' }
-      ],
-      calories: 380,
-      proteines: 42,
-      glucides: 28,
-      lipides: 12,
-      objectif: 'Récupération',
-      etapes: [
-        'Mixer les myrtilles avec le lait',
-        'Ajouter le yaourt grec',
-        'Incorporer la protéine en poudre',
-        'Mixer jusqu\'à obtenir une texture lisse',
-        'Saupoudrer d\'amandes concassées'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '7',
-      nom: 'Salade de thon aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Thon en conserve', quantite: '150g' },
-        { nom: 'Tomates cerises', quantite: '100g' },
-        { nom: 'Concombre', quantite: '80g' },
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Vinaigrette légère', quantite: '15g' }
-      ],
-      calories: 280,
-      proteines: 35,
-      glucides: 12,
-      lipides: 8,
-      objectif: 'Sèche',
-      etapes: [
-        'Égoutter le thon en conserve',
-        'Couper les tomates en deux',
-        'Émincer le concombre',
-        'Mélanger tous les légumes',
-        'Arroser de vinaigrette légère'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '8',
-      nom: 'Patates douces rôties au poulet',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Patates douces', quantite: '200g' },
-        { nom: 'Poulet', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Huile d\'olive', quantite: '10g' },
-        { nom: 'Herbes de Provence', quantite: '5g' }
-      ],
-      calories: 480,
-      proteines: 38,
-      glucides: 45,
-      lipides: 16,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper les patates douces en dés',
-        'Assaisonner le poulet avec les herbes',
-        'Enfourner 25 minutes',
-        'Ajouter les brocolis les 10 dernières minutes'
-      ],
-      emoji: '🍗'
-    },
-    {
-      id: '9',
-      nom: 'Pancakes protéinés',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs', quantite: '2 unités' },
-        { nom: 'Protéine vanille', quantite: '30g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '100g' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 450,
-      proteines: 35,
-      glucides: 35,
-      lipides: 18,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Écraser la banane',
-        'Mélanger avec les œufs et yaourt',
-        'Ajouter la protéine en poudre',
-        'Incorporer les graines de chia',
-        'Cuire à la poêle 3-4 min par côté'
-      ],
-      emoji: '🥞'
-    },
-    {
-      id: '10',
-      nom: 'Bowl d\'énergie pré-entraînement',
-      categorie: 'Pre-workout',
-      ingredients: [
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Myrtilles', quantite: '50g' },
-        { nom: 'Amandes', quantite: '20g' },
-        { nom: 'Chocolat noir 85%', quantite: '15g' },
-        { nom: 'Lait d\'amande', quantite: '100ml' }
-      ],
-      calories: 320,
-      proteines: 8,
-      glucides: 45,
-      lipides: 14,
-      objectif: 'Boost performance',
-      etapes: [
-        'Couper la banane en rondelles',
-        'Mélanger avec les myrtilles',
-        'Ajouter les amandes concassées',
-        'Râper le chocolat noir',
-        'Arroser de lait d\'amande'
-      ],
-      emoji: '⚡'
-    },
-    {
-      id: '11',
-      nom: 'Wrap protéiné aux légumes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Tortilla complète', quantite: '1 unité' },
-        { nom: 'Poulet grillé', quantite: '120g' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Épinards', quantite: '30g' },
-        { nom: 'Tomates', quantite: '50g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 35,
-      lipides: 18,
-      objectif: 'Équilibre',
-      etapes: [
-        'Chauffer la tortilla',
-        'Étaler l\'avocat écrasé',
-        'Ajouter le poulet en lamelles',
-        'Garnir avec épinards et tomates',
-        'Rouler et couper en deux'
-      ],
-      emoji: '🌯'
-    },
-    {
-      id: '12',
-      nom: 'Soupe de légumes minceur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Brocolis', quantite: '150g' },
-        { nom: 'Épinards', quantite: '100g' },
-        { nom: 'Carottes', quantite: '100g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Bouillon de légumes', quantite: '300ml' }
-      ],
-      calories: 120,
-      proteines: 8,
-      glucides: 20,
-      lipides: 2,
-      objectif: 'Sèche',
-      etapes: [
-        'Couper tous les légumes en dés',
-        'Faire revenir dans une casserole',
-        'Ajouter le bouillon de légumes',
-        'Laisser mijoter 20 minutes',
-        'Mixer jusqu\'à obtenir une texture lisse'
-      ],
-      emoji: '🍲'
-    },
-    {
-      id: '13',
-      nom: 'Energy balls aux amandes',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Amandes', quantite: '50g' },
-        { nom: 'Dattes', quantite: '80g' },
-        { nom: 'Graines de chia', quantite: '15g' },
-        { nom: 'Chocolat noir 85%', quantite: '20g' },
-        { nom: 'Cacao en poudre', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 8,
-      glucides: 35,
-      lipides: 14,
-      objectif: 'Performance',
-      etapes: [
-        'Mixer les amandes et dattes',
-        'Ajouter les graines de chia',
-        'Incorporer le chocolat râpé',
-        'Former des boules avec les mains',
-        'Rouler dans le cacao en poudre'
-      ],
-      emoji: '🥧'
-    },
-    {
-      id: '14',
-      nom: 'Porridge protéiné',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Flocons d\'avoine', quantite: '50g' },
-        { nom: 'Protéine vanille', quantite: '25g' },
-        { nom: 'Banane', quantite: '1/2 unité' },
-        { nom: 'Amandes', quantite: '10g' },
-        { nom: 'Lait d\'amande', quantite: '200ml' }
-      ],
-      calories: 380,
-      proteines: 32,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Faire chauffer le lait d\'amande',
-        'Ajouter les flocons d\'avoine',
-        'Cuire 5 minutes en remuant',
-        'Incorporer la protéine en poudre',
-        'Garnir de banane et amandes'
-      ],
-      emoji: '🥣'
-    },
-    {
-      id: '15',
-      nom: 'Salade de lentilles',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Lentilles', quantite: '150g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Concombre', quantite: '80g' },
-        { nom: 'Poivron rouge', quantite: '50g' },
-        { nom: 'Vinaigrette', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 18,
-      glucides: 55,
-      lipides: 6,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire les lentilles dans l\'eau salée',
-        'Couper tous les légumes en dés',
-        'Mélanger les lentilles refroidies',
-        'Ajouter les légumes',
-        'Arroser de vinaigrette'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '16',
-      nom: 'Fromage blanc aux fruits',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Fromage blanc', quantite: '200g' },
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Mangue', quantite: '50g' },
-        { nom: 'Noix de cajou', quantite: '15g' },
-        { nom: 'Miel', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 25,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Couper la pomme et la mangue en dés',
-        'Mélanger avec le fromage blanc',
-        'Ajouter le miel',
-        'Saupoudrer de noix de cajou',
-        'Servir frais'
-      ],
-      emoji: '🍯'
-    },
-    {
-      id: '17',
-      nom: 'Crevettes aux légumes sautés',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Crevettes', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Poivron rouge', quantite: '80g' },
-        { nom: 'Chou kale', quantite: '50g' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 35,
-      glucides: 15,
-      lipides: 12,
-      objectif: 'Sèche',
-      etapes: [
-        'Décortiquer les crevettes',
-        'Couper les légumes en morceaux',
-        'Faire chauffer l\'huile de coco',
-        'Sauter les crevettes 3 minutes',
-        'Ajouter les légumes et cuire 5 min'
-      ],
-      emoji: '🍤'
-    },
-    {
-      id: '18',
-      nom: 'Smoothie tropical',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Mangue', quantite: '100g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '150g' },
-        { nom: 'Lait de coco', quantite: '100ml' },
-        { nom: 'Graines de chia', quantite: '10g' }
-      ],
-      calories: 350,
-      proteines: 18,
-      glucides: 55,
-      lipides: 12,
-      objectif: 'Récupération',
-      etapes: [
-        'Couper la mangue et banane',
-        'Ajouter tous les ingrédients',
-        'Mixer jusqu\'à texture lisse',
-        'Ajouter des glaçons',
-        'Servir immédiatement'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '19',
-      nom: 'Bowl de légumes rôtis',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Patates douces', quantite: '150g' },
-        { nom: 'Brocolis', quantite: '100g' },
-        { nom: 'Poivron rouge', quantite: '80g' },
-        { nom: 'Chou kale', quantite: '50g' },
-        { nom: 'Huile d\'olive', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 12,
-      glucides: 55,
-      lipides: 10,
-      objectif: 'Équilibre',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper tous les légumes',
-        'Mélanger avec l\'huile d\'olive',
-        'Enfourner 25 minutes',
-        'Servir chaud'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '20',
-      nom: 'Omelette aux légumes',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Œufs', quantite: '3 unités' },
-        { nom: 'Poivron rouge', quantite: '50g' },
-        { nom: 'Chou kale', quantite: '30g' },
-        { nom: 'Fromage râpé', quantite: '20g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 28,
-      glucides: 12,
-      lipides: 26,
-      objectif: 'Prise de masse',
-      etapes: [
-        'Couper les légumes finement',
-        'Battre les œufs',
-        'Faire revenir les légumes',
-        'Verser les œufs battus',
-        'Ajouter le fromage et plier'
-      ],
-      emoji: '🍳'
-    },
-    {
-      id: '21',
-      nom: 'Salade de fruits énergétique',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Mangue', quantite: '80g' },
-        { nom: 'Banane', quantite: '1/2 unité' },
-        { nom: 'Myrtilles', quantite: '50g' },
-        { nom: 'Noix de cajou', quantite: '15g' }
-      ],
-      calories: 220,
-      proteines: 4,
-      glucides: 45,
-      lipides: 6,
-      objectif: 'Performance',
-      etapes: [
-        'Couper tous les fruits en dés',
-        'Mélanger dans un bol',
-        'Ajouter les myrtilles',
-        'Saupoudrer de noix de cajou',
-        'Servir frais'
-      ],
-      emoji: '🍓'
-    },
-    {
-      id: '22',
-      nom: 'Curry de lentilles',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Lentilles', quantite: '200g' },
-        { nom: 'Tomates', quantite: '150g' },
-        { nom: 'Oignons', quantite: '50g' },
-        { nom: 'Épices curry', quantite: '10g' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 25,
-      glucides: 70,
-      lipides: 8,
-      objectif: 'Équilibre',
-      etapes: [
-        'Faire revenir les oignons',
-        'Ajouter les épices curry',
-        'Incorporer les tomates',
-        'Ajouter les lentilles et eau',
-        'Laisser mijoter 30 minutes'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '23',
-      nom: 'Granola maison',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Flocons d\'avoine', quantite: '100g' },
-        { nom: 'Amandes', quantite: '30g' },
-        { nom: 'Noix de cajou', quantite: '20g' },
-        { nom: 'Graines de chia', quantite: '15g' },
-        { nom: 'Huile de coco', quantite: '20g' }
-      ],
-      calories: 580,
-      proteines: 18,
-      glucides: 65,
-      lipides: 28,
-      objectif: 'Performance',
-      etapes: [
-        'Mélanger tous les ingrédients',
-        'Ajouter l\'huile de coco fondue',
-        'Étaler sur une plaque',
-        'Enfourner 20 min à 180°C',
-        'Laisser refroidir avant de servir'
-      ],
-      emoji: '🥣'
-    },
-    {
-      id: '24',
-      nom: 'Haricots verts vapeur au saumon',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Saumon', quantite: '150g' },
-        { nom: 'Haricots verts', quantite: '200g' },
-        { nom: 'Pomme de terre', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 450,
-      proteines: 35,
-      glucides: 35,
-      lipides: 20,
-      objectif: 'Récupération',
-      etapes: [
-        'Cuire les pommes de terre à l\'eau',
-        'Cuire les haricots verts à la vapeur',
-        'Griller le saumon avec l\'ail',
-        'Assaisonner avec huile d\'olive',
-        'Servir chaud'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '25',
-      nom: 'Salade de dinde aux noix',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Dinde', quantite: '120g' },
-        { nom: 'Salade verte', quantite: '100g' },
-        { nom: 'Noix de Grenoble', quantite: '20g' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Vinaigrette', quantite: '15g' }
-      ],
-      calories: 320,
-      proteines: 28,
-      glucides: 15,
-      lipides: 18,
-      objectif: 'Sèche',
-      etapes: [
-        'Griller la dinde et la découper',
-        'Préparer la salade verte',
-        'Couper le kiwi en rondelles',
-        'Mélanger tous les ingrédients',
-        'Arroser de vinaigrette'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '26',
-      nom: 'Smoothie vert détox',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Gingembre', quantite: '5g' },
-        { nom: 'Miel', quantite: '10g' },
-        { nom: 'Eau de coco', quantite: '200ml' }
-      ],
-      calories: 120,
-      proteines: 3,
-      glucides: 25,
-      lipides: 2,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Laver les épinards',
-        'Éplucher et couper le kiwi',
-        'Râper le gingembre',
-        'Mixer tous les ingrédients',
-        'Filtrer et servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '27',
-      nom: 'Curry de légumes aux épices',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '150g' },
-        { nom: 'Tomates', quantite: '100g' },
-        { nom: 'Ail', quantite: '3 gousses' },
-        { nom: 'Épices curry', quantite: '15g' }
-      ],
-      calories: 280,
-      proteines: 8,
-      glucides: 55,
-      lipides: 4,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper les légumes en morceaux',
-        'Faire revenir l\'ail et les épices',
-        'Ajouter les légumes',
-        'Laisser mijoter 25 minutes',
-        'Servir avec du riz'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '28',
-      nom: 'Toast à l\'avocat et œuf',
-      categorie: 'Petit-déjeuner',
-      ingredients: [
-        { nom: 'Pain complet', quantite: '2 tranches' },
-        { nom: 'Avocat', quantite: '1/2 unité' },
-        { nom: 'Œuf', quantite: '1 unité' },
-        { nom: 'Gingembre', quantite: '3g' },
-        { nom: 'Huile d\'olive', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 18,
-      glucides: 35,
-      lipides: 22,
-      objectif: 'Performance',
-      etapes: [
-        'Griller le pain complet',
-        'Écraser l\'avocat avec le gingembre',
-        'Cuire l\'œuf au plat',
-        'Étaler l\'avocat sur le pain',
-        'Ajouter l\'œuf et servir'
-      ],
-      emoji: '🥑'
-    },
-    {
-      id: '29',
-      nom: 'Thé vert aux fruits',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Thé vert', quantite: '250ml' },
-        { nom: 'Kiwi', quantite: '1 unité' },
-        { nom: 'Miel', quantite: '5g' },
-        { nom: 'Gingembre', quantite: '2g' },
-        { nom: 'Citron', quantite: '1/2 unité' }
-      ],
-      calories: 80,
-      proteines: 1,
-      glucides: 18,
-      lipides: 0.5,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Infuser le thé vert 3 minutes',
-        'Couper le kiwi en dés',
-        'Ajouter le gingembre râpé',
-        'Mélanger avec le miel',
-        'Ajouter le citron et servir'
-      ],
-      emoji: '🍵'
-    },
-    {
-      id: '30',
-      nom: 'Bowl de légumes rôtis aux herbes',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Ail', quantite: '4 gousses' },
-        { nom: 'Herbes de Provence', quantite: '10g' },
-        { nom: 'Huile d\'olive', quantite: '15g' }
-      ],
-      calories: 350,
-      proteines: 8,
-      glucides: 55,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Préchauffer le four à 200°C',
-        'Couper les légumes en morceaux',
-        'Mélanger avec l\'ail et les herbes',
-        'Arroser d\'huile d\'olive',
-        'Enfourner 30 minutes'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '31',
-      nom: 'Café protéiné',
-      categorie: 'Pre-workout',
-      ingredients: [
-        { nom: 'Café', quantite: '200ml' },
-        { nom: 'Protéine vanille', quantite: '20g' },
-        { nom: 'Miel', quantite: '10g' },
-        { nom: 'Lait d\'amande', quantite: '50ml' },
-        { nom: 'Cannelle', quantite: '2g' }
-      ],
-      calories: 150,
-      proteines: 18,
-      glucides: 15,
-      lipides: 2,
-      objectif: 'Boost performance',
-      etapes: [
-        'Préparer le café',
-        'Ajouter la protéine en poudre',
-        'Mélanger avec le miel',
-        'Ajouter le lait d\'amande',
-        'Saupoudrer de cannelle'
-      ],
-      emoji: '☕'
-    },
-    {
-      id: '32',
-      nom: 'Salade de fruits aux noix',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Kiwi', quantite: '2 unités' },
-        { nom: 'Pomme', quantite: '1 unité' },
-        { nom: 'Noix de Grenoble', quantite: '25g' },
-        { nom: 'Miel', quantite: '8g' },
-        { nom: 'Gingembre', quantite: '3g' }
-      ],
-      calories: 280,
-      proteines: 6,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Performance',
-      etapes: [
-        'Couper tous les fruits en dés',
-        'Concasser les noix',
-        'Mélanger avec le miel',
-        'Ajouter le gingembre râpé',
-        'Servir frais'
-      ],
-      emoji: '🍓'
-    },
-    {
-      id: '33',
-      nom: 'Dinde aux légumes vapeur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Dinde', quantite: '150g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Pommes de terre', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Herbes', quantite: '5g' }
-      ],
-      calories: 380,
-      proteines: 35,
-      glucides: 35,
-      lipides: 12,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner la dinde avec l\'ail',
-        'Cuire les légumes à la vapeur',
-        'Griller la dinde 8-10 minutes',
-        'Ajouter les herbes fraîches',
-        'Servir chaud'
-      ],
-      emoji: '🦃'
-    },
-    {
-      id: '34',
-      nom: 'Soupe de céleri détox',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Céleri', quantite: '200g' },
-        { nom: 'Pommes de terre', quantite: '100g' },
-        { nom: 'Oignons', quantite: '50g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Bouillon de légumes', quantite: '300ml' }
-      ],
-      calories: 180,
-      proteines: 6,
-      glucides: 35,
-      lipides: 2,
-      objectif: 'Sèche',
-      etapes: [
-        'Couper tous les légumes en dés',
-        'Faire revenir l\'oignon et l\'ail',
-        'Ajouter les légumes et le bouillon',
-        'Laisser mijoter 20 minutes',
-        'Mixer et servir chaud'
-      ],
-      emoji: '🍲'
-    },
-    {
-      id: '35',
-      nom: 'Cabillaud aux pistaches',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Cabillaud', quantite: '150g' },
-        { nom: 'Pistaches', quantite: '25g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Citron', quantite: '1/2 unité' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 32,
-      glucides: 12,
-      lipides: 18,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner le cabillaud',
-        'Cuire à la vapeur 8 minutes',
-        'Faire griller les pistaches',
-        'Cuire les haricots verts',
-        'Servir avec citron et huile'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '36',
-      nom: 'Pâtes complètes au tofu',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Pâtes complètes', quantite: '100g' },
-        { nom: 'Tofu', quantite: '100g' },
-        { nom: 'Tomates', quantite: '150g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Basilic', quantite: '10g' }
-      ],
-      calories: 420,
-      proteines: 22,
-      glucides: 65,
-      lipides: 12,
-      objectif: 'Équilibre',
-      etapes: [
-        'Cuire les pâtes al dente',
-        'Faire revenir le tofu',
-        'Ajouter tomates et ail',
-        'Mélanger avec les pâtes',
-        'Garnir de basilic frais'
-      ],
-      emoji: '🍝'
-    },
-    {
-      id: '37',
-      nom: 'Smoothie aux framboises',
-      categorie: 'Post-training',
-      ingredients: [
-        { nom: 'Framboises', quantite: '100g' },
-        { nom: 'Banane', quantite: '1 unité' },
-        { nom: 'Yaourt grec', quantite: '150g' },
-        { nom: 'Lait de coco', quantite: '100ml' },
-        { nom: 'Miel', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 18,
-      glucides: 45,
-      lipides: 8,
-      objectif: 'Récupération',
-      etapes: [
-        'Laver les framboises',
-        'Éplucher la banane',
-        'Mixer tous les ingrédients',
-        'Ajouter le miel',
-        'Servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '38',
-      nom: 'Curry de légumes au curcuma',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Pommes de terre', quantite: '200g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Tofu', quantite: '80g' },
-        { nom: 'Curcuma', quantite: '5g' },
-        { nom: 'Lait de coco', quantite: '100ml' }
-      ],
-      calories: 350,
-      proteines: 15,
-      glucides: 45,
-      lipides: 12,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Couper les légumes en morceaux',
-        'Faire revenir avec le curcuma',
-        'Ajouter le lait de coco',
-        'Incorporer le tofu',
-        'Laisser mijoter 20 minutes'
-      ],
-      emoji: '🍛'
-    },
-    {
-      id: '39',
-      nom: 'Salade d\'oranges aux pistaches',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Oranges', quantite: '2 unités' },
-        { nom: 'Pistaches', quantite: '20g' },
-        { nom: 'Menthe', quantite: '5g' },
-        { nom: 'Miel', quantite: '8g' },
-        { nom: 'Cumin', quantite: '2g' }
-      ],
-      calories: 220,
-      proteines: 6,
-      glucides: 35,
-      lipides: 8,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Éplucher et couper les oranges',
-        'Concasser les pistaches',
-        'Mélanger avec le miel',
-        'Ajouter la menthe et cumin',
-        'Servir frais'
-      ],
-      emoji: '🍊'
-    },
-    {
-      id: '40',
-      nom: 'Bowl de légumes aux épices',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Céleri', quantite: '100g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Tofu', quantite: '80g' },
-        { nom: 'Cumin', quantite: '5g' },
-        { nom: 'Huile d\'olive', quantite: '10g' }
-      ],
-      calories: 280,
-      proteines: 18,
-      glucides: 25,
-      lipides: 14,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper tous les légumes',
-        'Faire revenir avec cumin',
-        'Ajouter le tofu en dés',
-        'Assaisonner avec huile',
-        'Servir chaud'
-      ],
-      emoji: '🥗'
-    },
-    {
-      id: '41',
-      nom: 'Cabillaud aux légumes vapeur',
-      categorie: 'Dîner',
-      ingredients: [
-        { nom: 'Cabillaud', quantite: '150g' },
-        { nom: 'Céleri', quantite: '80g' },
-        { nom: 'Haricots verts', quantite: '80g' },
-        { nom: 'Citron', quantite: '1 unité' },
-        { nom: 'Herbes', quantite: '5g' }
-      ],
-      calories: 250,
-      proteines: 28,
-      glucides: 15,
-      lipides: 8,
-      objectif: 'Sèche',
-      etapes: [
-        'Assaisonner le cabillaud',
-        'Cuire les légumes à la vapeur',
-        'Griller le poisson 8 minutes',
-        'Arroser de citron',
-        'Garnir d\'herbes fraîches'
-      ],
-      emoji: '🐟'
-    },
-    {
-      id: '42',
-      nom: 'Smoothie vert aux épices',
-      categorie: 'Collation',
-      ingredients: [
-        { nom: 'Épinards', quantite: '50g' },
-        { nom: 'Céleri', quantite: '50g' },
-        { nom: 'Curcuma', quantite: '3g' },
-        { nom: 'Gingembre', quantite: '5g' },
-        { nom: 'Lait de coco', quantite: '150ml' }
-      ],
-      calories: 150,
-      proteines: 4,
-      glucides: 12,
-      lipides: 10,
-      objectif: 'Anti-inflammatoire',
-      etapes: [
-        'Laver les légumes verts',
-        'Ajouter les épices',
-        'Mixer avec le lait de coco',
-        'Filtrer si nécessaire',
-        'Servir frais'
-      ],
-      emoji: '🥤'
-    },
-    {
-      id: '43',
-      nom: 'Tofu aux légumes sautés',
-      categorie: 'Déjeuner',
-      ingredients: [
-        { nom: 'Tofu', quantite: '120g' },
-        { nom: 'Haricots verts', quantite: '100g' },
-        { nom: 'Céleri', quantite: '80g' },
-        { nom: 'Ail', quantite: '2 gousses' },
-        { nom: 'Huile de coco', quantite: '10g' }
-      ],
-      calories: 320,
-      proteines: 20,
-      glucides: 18,
-      lipides: 18,
-      objectif: 'Équilibre',
-      etapes: [
-        'Couper le tofu en dés',
-        'Faire revenir dans l\'huile',
-        'Ajouter les légumes',
-        'Assaisonner avec ail',
-        'Servir chaud'
-      ],
-      emoji: '🧀'
-    }
-  ];
-
   // Filtres pour aliments
   const alimentFilters = [
     { value: 'all', label: 'Tous', icon: Apple },
     { value: 'protéines', label: 'Protéines', icon: Target },
     { value: 'glucides', label: 'Glucides', icon: Zap },
-    { value: 'lipides', label: 'Lipides', icon: Target },
+    { value: 'lipides', label: 'Lipides', icon: Droplet },
     { value: 'micronutriments', label: 'Micronutriments', icon: Star }
   ];
 
-  // Filtres pour repas
-  const repasFilters = [
-    { value: 'all', label: 'Tous', icon: Utensils },
+  // Filtres pour recettes (par objectif nutritionnel)
+  const recetteFilters = [
+    { value: 'all', label: 'Toutes', icon: ChefHat },
+    { value: 'prise de masse', label: 'Prise de masse', icon: Target },
+    { value: 'sèche', label: 'Sèche', icon: Zap },
+    { value: 'récupération', label: 'Récupération', icon: Heart },
+    { value: 'anti-inflammatoire', label: 'Anti-inflammatoire', icon: Star },
+    { value: 'équilibre', label: 'Équilibre', icon: Scale }
+  ];
+
+  // Filtres par moment de la journée (tags) — ce que l'onglet "Repas" offrait avant sa fusion avec
+  // les recettes, pour ne pas perdre la possibilité de parcourir par petit-déj/déjeuner/dîner/collation.
+  const momentFilters = [
+    { value: 'all', label: 'Tous les moments', icon: Clock },
     { value: 'petit-déjeuner', label: 'Petit-déjeuner', icon: Clock },
     { value: 'déjeuner', label: 'Déjeuner', icon: ChefHat },
-    { value: 'dîner', label: 'Dîner', icon: Utensils },
+    { value: 'dîner', label: 'Dîner', icon: ChefHat },
+    { value: 'collation', label: 'Collation', icon: Apple },
     { value: 'post-training', label: 'Post-training', icon: Zap }
   ];
 
-  // Filtrer les aliments
-  const filteredAliments = aliments.filter(aliment => {
+  // Filtrer les aliments (base + ceux ajoutés via le scanner de code-barres)
+  const allAliments = [...scannedAliments, ...aliments];
+  const filteredAliments = allAliments.filter(aliment => {
     const matchesSearch = aliment.nom.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || aliment.categorie.toLowerCase() === selectedFilter;
+    const matchesFilter = alimentFilter === 'all' || aliment.categorie.toLowerCase() === alimentFilter;
     return matchesSearch && matchesFilter;
   });
 
-  // Filtrer les repas
-  const filteredRepas = repas.filter(repas => {
-    const matchesSearch = repas.nom.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'all' || repas.categorie.toLowerCase() === selectedFilter;
-    return matchesSearch && matchesFilter;
+  // Filtrer les recettes
+  const filteredRecettes = RECETTES.filter((recette) => {
+    const matchesSearch = recette.nom.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = recetteFilter === 'all' || recette.classe.toLowerCase() === recetteFilter;
+    const matchesMoment = momentFilter === 'all' || recette.tags.includes(momentFilter);
+    return matchesSearch && matchesFilter && matchesMoment;
   });
-
-  // Toggle favori
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) 
-        ? prev.filter(fav => fav !== id)
-        : [...prev, id]
-    );
-  };
 
   // Couleur pour l'index glycémique
   const getIGColor = (ig: string) => {
     switch (ig) {
-      case 'Bas': return 'bg-green-500/15 border border-green-500/25 text-green-800';
-      case 'Modéré': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-800';
-      case 'Élevé': return 'bg-red-500/15 border border-red-500/25 text-red-800';
+      case 'Bas': return 'bg-green-500/15 border border-green-500/25 text-green-300';
+      case 'Modéré': return 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-300';
+      case 'Élevé': return 'bg-red-500/15 border border-red-500/25 text-red-300';
       default: return 'bg-white/5 text-foreground';
     }
   };
@@ -2749,10 +1549,10 @@ const Nutrition: React.FC = () => {
   const getClasseColor = (classe: string) => {
     switch (classe) {
       case 'Prise de masse': return 'bg-blue-500/15 border border-blue-500/25 text-blue-300';
-      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-800';
-      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-800';
-      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-800';
-      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-800';
+      case 'Sèche': return 'bg-red-500/15 border border-red-500/25 text-red-300';
+      case 'Récupération': return 'bg-green-500/15 border border-green-500/25 text-green-300';
+      case 'Anti-inflammatoire': return 'bg-purple-500/15 border border-purple-500/25 text-purple-300';
+      case 'Boost performance': return 'bg-orange-500/15 border border-orange-500/25 text-orange-300';
       default: return 'bg-white/5 text-foreground';
     }
   };
@@ -2798,6 +1598,45 @@ const Nutrition: React.FC = () => {
           </CardContent>
         </Card>
 
+      {/* Journal photo — aide-mémoire visuel, pas d'estimation automatique (voir MealPhotoModal) */}
+      <Card className="glass-card border-primary/20 border-0 shadow-lg">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Camera className="h-5 w-5 text-secondary" />
+              Journal photo des repas
+            </CardTitle>
+            <Button onClick={() => setIsPhotoModalOpen(true)} variant="outline" size="sm">
+              <ImagePlus className="h-4 w-4 mr-2" />
+              Ajouter une photo
+            </Button>
+          </div>
+        </CardHeader>
+        {photoEntries.length > 0 && (
+          <CardContent>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {photoEntries.map((entry) => (
+                <div key={entry.id} className="relative shrink-0 w-32">
+                  <img src={entry.imageDataUrl} alt={entry.nom} className="w-32 h-32 object-cover rounded-xl" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removePhotoEntry(entry.id)}
+                    className="absolute top-1 right-1 p-1 h-7 w-7 bg-black/50 text-white hover:bg-black/70"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                  <p className="text-xs font-medium text-foreground truncate mt-1">{entry.nom}</p>
+                  {entry.calories != null && (
+                    <p className="text-[10px] text-muted-foreground">{entry.calories} kcal</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
       {/* Onglets */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -2805,90 +1644,103 @@ const Nutrition: React.FC = () => {
             <Apple className="h-4 w-4" />
             Aliments ({filteredAliments.length})
             </TabsTrigger>
-          <TabsTrigger value="repas" className="flex items-center gap-2">
-            <Utensils className="h-4 w-4" />
-            Repas ({filteredRepas.length})
+          <TabsTrigger value="recettes" className="flex items-center gap-2">
+            <ChefHat className="h-4 w-4" />
+            Recettes ({filteredRecettes.length})
           </TabsTrigger>
           </TabsList>
 
         {/* Onglet Aliments */}
         <TabsContent value="aliments" className="space-y-6">
-          {/* Filtres */}
-          <div className="flex flex-wrap gap-2">
-            {alimentFilters.map((filter) => (
-              <Button
-                key={filter.value}
-                variant={selectedFilter === filter.value ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedFilter(filter.value)}
-                className={`flex items-center gap-2 ${
-                  selectedFilter === filter.value 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                    : 'border-white/10 hover:border-white/15 glass-card border-primary/20 text-foreground/90'
-                }`}
-              >
-                <filter.icon className="h-4 w-4" />
-                {filter.label}
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <FilterChipRow filters={alimentFilters} selected={alimentFilter} onSelect={setAlimentFilter} />
+            <Button
+              onClick={() => setIsScannerOpen(true)}
+              disabled={scanStatus === 'loading'}
+              className="bg-gradient-to-r from-primary to-secondary text-white shrink-0"
+            >
+              {scanStatus === 'loading' ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <ScanLine className="h-4 w-4 mr-2" />
+              )}
+              Scanner un aliment
+            </Button>
+          </div>
+
+          {scanStatus === 'error' && scanError && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/25 text-sm text-destructive flex items-center justify-between gap-3">
+              <span>{scanError}</span>
+              <Button variant="ghost" size="sm" onClick={() => setScanStatus('idle')} className="h-7 px-2 text-destructive">
+                <X className="h-4 w-4" />
               </Button>
-            ))}
-                        </div>
+            </div>
+          )}
 
           {/* Liste des aliments */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAliments.map((aliment) => (
-              <Card 
-                key={aliment.id} 
+            {filteredAliments.map((aliment) => {
+              const isScanned = 'scanne' in aliment && aliment.scanne;
+              return (
+              <Card
+                key={aliment.id}
                 className="glass-card border-primary/20 border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => navigate(`/aliment/${aliment.id}`)}
+                onClick={() => { if (!isScanned) navigate(`/aliment/${aliment.id}`); }}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="text-3xl md:text-4xl mb-2">{aliment.emoji}</div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleFavorite(aliment.id)}
-                      className={`p-2 ${
-                        favorites.includes(aliment.id) 
-                          ? 'text-red-500' 
-                          : 'text-muted-foreground/70 hover:text-red-500'
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 ${favorites.includes(aliment.id) ? 'fill-current' : ''}`} />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      {isScanned && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); removeScannedAliment(aliment.id); }}
+                          className="p-2 text-muted-foreground/70 hover:text-destructive"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(aliment.id); }}
+                        className={`p-2 ${
+                          favorites.includes(aliment.id)
+                            ? 'text-red-500'
+                            : 'text-muted-foreground/70 hover:text-red-500'
+                        }`}
+                      >
+                        <Heart className={`h-4 w-4 ${favorites.includes(aliment.id) ? 'fill-current' : ''}`} />
+                      </Button>
+                    </div>
                   </div>
                   <CardTitle className="text-foreground text-xl">{aliment.nom}</CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="border-blue-300 text-blue-300 bg-blue-500/10">
                       {aliment.categorie}
                       </Badge>
-                    <Badge className={getIGColor(aliment.ig)}>
-                      IG {aliment.ig}
-                    </Badge>
+                    {isScanned ? (
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        <ScanLine className="h-3 w-3 mr-1" />
+                        Scanné
+                      </Badge>
+                    ) : (
+                      <Badge className={getIGColor(aliment.ig)}>
+                        IG {aliment.ig}
+                      </Badge>
+                    )}
                       </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Valeurs nutritionnelles */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{aliment.calories}</div>
-                        <div className="text-sm text-muted-foreground">Calories</div>
-                        </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{aliment.proteines}g</div>
-                        <div className="text-sm text-muted-foreground">Protéines</div>
-                        </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{aliment.glucides}g</div>
-                        <div className="text-sm text-muted-foreground">Glucides</div>
-                      </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{aliment.lipides}g</div>
-                        <div className="text-sm text-muted-foreground">Lipides</div>
-                      </div>
-                    </div>
-                    
+                    <MacroStatsGrid
+                      calories={aliment.calories}
+                      proteines={aliment.proteines}
+                      glucides={aliment.glucides}
+                      lipides={aliment.lipides}
+                    />
+
                     {/* Classe nutritionnelle */}
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Classe</span>
@@ -2896,7 +1748,7 @@ const Nutrition: React.FC = () => {
                         {aliment.classe}
                         </Badge>
                     </div>
-                    
+
                     {/* Tags */}
                     {aliment.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1">
@@ -2929,113 +1781,115 @@ const Nutrition: React.FC = () => {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+              );
+            })}
               </div>
           </TabsContent>
 
-        {/* Onglet Repas */}
-        <TabsContent value="repas" className="space-y-6">
-          {/* Filtres */}
-          <div className="flex flex-wrap gap-2">
-            {repasFilters.map((filter) => (
-              <Button
-                key={filter.value}
-                variant={selectedFilter === filter.value ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedFilter(filter.value)}
-                className={`flex items-center gap-2 ${
-                  selectedFilter === filter.value 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                    : 'border-white/10 hover:border-white/15 glass-card border-primary/20 text-foreground/90'
-                }`}
-              >
-                <filter.icon className="h-4 w-4" />
-                {filter.label}
-              </Button>
-            ))}
-          </div>
+        {/* Onglet Recettes */}
+        <TabsContent value="recettes" className="space-y-4">
+          <FilterChipRow filters={recetteFilters} selected={recetteFilter} onSelect={setRecetteFilter} />
+          <FilterChipRow filters={momentFilters} selected={momentFilter} onSelect={setMomentFilter} />
 
-          {/* Liste des repas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredRepas.map((repas) => (
-              <Card 
-                key={repas.id} 
-                className="glass-card border-primary/20 border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                onClick={() => navigate(`/repas/${repas.id}`)}
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="text-3xl md:text-4xl mb-2">{repas.emoji}</div>
-                    <Badge variant="outline" className="border-green-300 text-green-700 bg-green-50">
-                      {repas.categorie}
-                    </Badge>
+            {filteredRecettes.map((recette) => {
+              const macros = calculerMacrosRecette(recette);
+              return (
+                <Card
+                  key={recette.id}
+                  className="glass-card border-primary/20 border-0 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  onClick={() => navigate(`/recette/${recette.id}`)}
+                >
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="text-3xl md:text-4xl mb-2">{recette.emoji}</div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); toggleFavorite(recette.id); }}
+                        className={`p-2 ${
+                          favorites.includes(recette.id)
+                            ? 'text-red-500'
+                            : 'text-muted-foreground/70 hover:text-red-500'
+                        }`}
+                      >
+                        <Heart className={`h-4 w-4 ${favorites.includes(recette.id) ? 'fill-current' : ''}`} />
+                      </Button>
                     </div>
-                  <CardTitle className="text-foreground text-xl">{repas.nom}</CardTitle>
-                  <Badge className={getClasseColor(repas.objectif)}>
-                    {repas.objectif}
-                  </Badge>
-                    </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Valeurs nutritionnelles */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{repas.calories}</div>
-                        <div className="text-sm text-muted-foreground">Calories</div>
-                      </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{repas.proteines}g</div>
-                        <div className="text-sm text-muted-foreground">Protéines</div>
-                        </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{repas.glucides}g</div>
-                        <div className="text-sm text-muted-foreground">Glucides</div>
-                        </div>
-                      <div className="text-center p-3 surface-panel-sm">
-                        <div className="text-2xl font-bold text-foreground">{repas.lipides}g</div>
-                        <div className="text-sm text-muted-foreground">Lipides</div>
-                        </div>
+                    <CardTitle className="text-foreground text-xl">{recette.nom}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{recette.description}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge className={getClasseColor(recette.classe)}>{recette.classe}</Badge>
+                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {recette.tempsPreparation} min
+                      </Badge>
+                      <Badge variant="outline" className="text-xs text-muted-foreground capitalize">
+                        {recette.difficulte}
+                      </Badge>
                     </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <MacroStatsGrid
+                        calories={macros.calories}
+                        proteines={macros.proteines}
+                        glucides={macros.glucides}
+                        lipides={macros.lipides}
+                      />
 
-                    {/* Ingrédients */}
-                    <div>
-                      <p className="text-sm font-medium text-foreground/90 mb-2">Ingrédients :</p>
-                      <div className="space-y-1">
-                        {repas.ingredients.map((ingredient, index) => (
-                          <div key={index} className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">{ingredient.nom}</span>
-                            <span className="font-medium text-foreground">{ingredient.quantite}</span>
-                          </div>
-                        ))}
+                      <div>
+                        <p className="text-sm font-medium text-foreground/90 mb-2">Ingrédients :</p>
+                        <div className="space-y-1">
+                          {recette.ingredients.map((ing, index) => (
+                            <div key={index} className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">{ing.aliment.nom}</span>
+                              <span className="font-medium text-foreground">{ing.quantite}{ing.unite}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
-                    {/* Étapes */}
-                    <div>
-                      <p className="text-sm font-medium text-foreground/90 mb-2">Préparation :</p>
-                      <ol className="text-sm text-muted-foreground space-y-1">
-                        {repas.etapes.map((etape, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-green-400 font-bold">{index + 1}.</span>
-                            <span>{etape}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
+                      {recette.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {recette.tags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs text-muted-foreground">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
 
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ajouter au planning
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-          </TabsContent>
+                      <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
+                        <ChefHat className="h-4 w-4 mr-2" />
+                        Voir la recette
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </TabsContent>
         </Tabs>
         </div>
       </div>
+
+      {isScannerOpen && (
+        <Suspense fallback={null}>
+          <BarcodeScannerModal
+            onClose={() => setIsScannerOpen(false)}
+            onDetected={handleBarcodeDetected}
+          />
+        </Suspense>
+      )}
+
+      {isPhotoModalOpen && (
+        <MealPhotoModal
+          onClose={() => setIsPhotoModalOpen(false)}
+          onSave={addPhotoEntry}
+        />
+      )}
     </div>
   );
 };

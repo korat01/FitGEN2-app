@@ -72,6 +72,16 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ rank, level, size = 'md', 
         style={{ filter: `drop-shadow(0 0 12px ${secondary}99)` }}
         title={label}
       >
+        {/* Halo ambiant teinté par rang — donne au badge une vraie identité de couleur, même
+            avant de regarder les particules (utile en un coup d'œil sur des petites tailles). */}
+        <div
+          className={cn('absolute rounded-full blur-xl', animated && 'animate-badge-glow-pulse')}
+          style={{
+            inset: '-18%',
+            background: `radial-gradient(circle, ${secondary}66 0%, ${primary}40 45%, transparent 75%)`,
+            zIndex: 0,
+          }}
+        />
         {animated && <RankBadgeAura rank={key} size={size} />}
         <img
           src={src}

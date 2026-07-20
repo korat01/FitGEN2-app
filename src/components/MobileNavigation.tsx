@@ -63,12 +63,12 @@ const MobileNavigation: React.FC = () => {
                 active ? 'scale-110' : ''
               }`}>
                 {Icon && (
-                  <Icon 
+                  <Icon
                     className={`w-5 h-5 transition-all duration-300 ${
-                      active 
-                        ? 'stroke-[2.5] drop-shadow-[0_0_10px_rgba(0,194,255,0.8)]' 
+                      active
+                        ? 'stroke-[2.5] drop-shadow-[0_0_10px_rgba(0,194,255,0.8)]'
                         : 'stroke-2'
-                    }`} 
+                    }`}
                   />
                 )}
               </div>

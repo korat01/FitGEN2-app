@@ -6,7 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
-import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple } from 'lucide-react';
+import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple, Feather, Crown } from 'lucide-react';
+import { getRankColors, type RankLevel } from '@/config/rankTheme';
 
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
@@ -25,6 +26,20 @@ import { getWeekKey } from '@/utils/weeklyProgress';
 // Utilitaires pour les calculs
 import { calculateXPData, generateDailyQuests, calculateStreakData, toPerformanceRecords } from '@/utils/statsCalculator';
 import { XPData, DailyQuest, StreakData } from '@/types/stats';
+
+// Icône par rang — reflète la même escalade visuelle que les effets d'aura du RankBadge
+// (dust/embers/shine/flame/lightning/energy/shadow-flame), pour rester cohérent d'un composant à l'autre.
+const RANK_ICONS: Record<RankLevel, React.ComponentType<{ className?: string }>> = {
+  E: Feather,
+  D: Flame,
+  C: Sparkles,
+  B: Zap,
+  A: Zap,
+  S: Flame,
+  Nation: Sparkles,
+  World: Crown,
+};
+
 export const Dashboard: React.FC = () => {
   const {
     user,
@@ -85,50 +100,6 @@ export const Dashboard: React.FC = () => {
       window.clearInterval(interval);
     };
   }, [weekKey, refreshFromStorage]);
-
-  // Fonction pour obtenir la couleur du rang
-  const getRangColor = (rang: string) => {
-    switch (rang) {
-      case 'World':
-        return 'from-yellow-400 to-yellow-600';
-      case 'Nation':
-        return 'from-purple-500 to-purple-700';
-      case 'S':
-        return 'from-purple-600 to-purple-800';
-      case 'A':
-        return 'from-red-500 to-red-700';
-      case 'B':
-        return 'from-blue-500 to-blue-700';
-      case 'C':
-        return 'from-green-500 to-green-700';
-      case 'D':
-        return 'from-yellow-500 to-yellow-700';
-      default:
-        return 'from-gray-500 to-gray-700';
-    }
-  };
-
-  // Fonction pour obtenir l'icône du rang
-  const getRangIcon = (rang: string) => {
-    switch (rang) {
-      case 'World':
-        return '🏆';
-      case 'Nation':
-        return '🏆';
-      case 'S':
-        return '🥇';
-      case 'A':
-        return '🥈';
-      case 'B':
-        return '🥉';
-      case 'C':
-        return '⭐';
-      case 'D':
-        return '🔰';
-      default:
-        return '⭐';
-    }
-  };
 
   // Fonction pour obtenir la statistique principale selon la classe de sport
   const getMainStatForSportClass = (sportClass: string, performances: any[]) => {
@@ -268,6 +239,11 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>;
   }
+
+  const rankKey = (userRank?.rank || 'D') as RankLevel;
+  const rankColors = getRankColors(rankKey);
+  const RankIcon = RANK_ICONS[rankKey] || Star;
+
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
@@ -280,14 +256,14 @@ export const Dashboard: React.FC = () => {
             <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
-            
+
           <div className="relative z-10">
               <div className="flex flex-col lg:flex-row gap-6">
                 {/* Left: User Info */}
                 <div className="flex-1 space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
                     {/* Identité : badge de rang + niveau en petite bulle */}
-                    <RankBadge rank={userRank?.rank || 'D'} level={xpData?.level || 1} size="lg" animated className="shrink-0" />
+                    <RankBadge rank={rankKey} level={xpData?.level || 1} size="xl" animated className="shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
                         VitalForce
@@ -314,9 +290,16 @@ export const Dashboard: React.FC = () => {
                       <span>{mainStat.label}: {mainStat.value}</span>
                     </div>
                     
-                    {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
-                    <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-purple)] text-sm md:text-base">
-                      <span>Rang {userRank?.rank || 'D'}</span>
+                    {/* RANG CALCULÉ AVEC LES PERFORMANCES — teinté dynamiquement selon le rang atteint */}
+                    <div
+                      className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full text-white font-semibold text-sm md:text-base"
+                      style={{
+                        background: `linear-gradient(135deg, ${rankColors.primary} 0%, ${rankColors.secondary} 100%)`,
+                        boxShadow: `0 0 18px ${rankColors.secondary}66`,
+                      }}
+                    >
+                      <RankIcon className="w-4 h-4 md:w-5 md:h-5" />
+                      <span>Rang {rankKey}</span>
                     </div>
                 
                     <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">

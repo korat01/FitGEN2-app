@@ -1041,7 +1041,7 @@ export const applyProgression = (exercise: Exercise, phase: string, level: strin
 // `exercise.id || exercise.nom`). Sans ça, les 3 séries de travail d'un même mouvement partagent
 // TOUTES le même nom ("Squat" x3) donc le même id : valider "Raté" sur une seule série marquait les
 // 3 comme ratées d'un coup (même chose pour les paliers d'échauffement).
-function assignExerciseIds(sessionId: string, exercises: any[]): any[] {
+export function assignExerciseIds(sessionId: string, exercises: any[]): any[] {
   return exercises.map((ex, idx) => ({ ...ex, id: ex.id || `${sessionId}-ex${idx}` }));
 }
 
@@ -1400,8 +1400,8 @@ function getUserSBDMaxes(): {
   return { maxSquat, maxBench, maxDeadlift, hasRealMax };
 }
 
-type PowerliftingLevel = 'debutant' | 'intermediaire' | 'avance';
-type MainLift = 'squat' | 'bench' | 'deadlift';
+export type PowerliftingLevel = 'debutant' | 'intermediaire' | 'avance';
+export type MainLift = 'squat' | 'bench' | 'deadlift';
 
 // Niveau estimé à partir des IPF GL Points (référence officielle IPF, cf. src/utils/statsCalculator.ts)
 // calculés sur le total SBD réel et le poids de corps — pas juste un champ "niveau" déclaratif.
@@ -1453,14 +1453,14 @@ function findWeakestLift(weight: number, sex: string, squat: number, bench: numb
 }
 
 // Arrondit au multiple de 2.5kg le plus proche (charges réalistes avec des disques standards)
-const roundToPlates = (weight: number) => Math.max(20, Math.round(weight / 2.5) * 2.5);
+export const roundToPlates = (weight: number) => Math.max(20, Math.round(weight / 2.5) * 2.5);
 
 // Le % affiché doit refléter le poids RÉELLEMENT prescrit (après arrondi aux disques), pas le ratio
 // théorique visé avant arrondi — sinon on affiche "70%" pour une charge qui vaut en réalité 68% ou
 // 72% du max une fois arrondie à 2.5kg près.
-const pctOf = (poids: number, reference: number) => (reference > 0 ? Math.round((poids / reference) * 100) : 0);
+export const pctOf = (poids: number, reference: number) => (reference > 0 ? Math.round((poids / reference) * 100) : 0);
 
-interface WarmupStep { pct: number; reps: number; }
+export interface WarmupStep { pct: number; reps: number; }
 
 // Rampes d'échauffement calibrées par mouvement : le squat demande la rampe la plus longue
 // (amplitude/mobilité/gainage à régler), le développé couché une rampe plus courte, et le soulevé
@@ -1471,7 +1471,7 @@ const WARMUP_RAMPS: Record<MainLift, WarmupStep[]> = {
   deadlift: [{ pct: 0.5, reps: 5 }, { pct: 0.75, reps: 2 }],
 };
 
-function buildWarmupSets(nom: string, topWeight: number, ramp: WarmupStep[]) {
+export function buildWarmupSets(nom: string, topWeight: number, ramp: WarmupStep[]) {
   return ramp.map((step) => {
     const poids = roundToPlates(topWeight * step.pct);
     return {
@@ -1542,7 +1542,7 @@ function getWaveScheme(
   return [{ reps: 5, pct: 0.8 }, { reps: 3, pct: 0.9 }, { reps: '1+', pct: 0.95 }];
 }
 
-function buildMainLiftSets(nom: string, rm: number, scheme: Array<{ reps: number | string; pct: number }>, repos: string) {
+export function buildMainLiftSets(nom: string, rm: number, scheme: Array<{ reps: number | string; pct: number }>, repos: string) {
   return scheme.map((set) => {
     const poids = roundToPlates(rm * set.pct);
     return {

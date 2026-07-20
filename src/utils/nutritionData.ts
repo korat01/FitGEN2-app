@@ -63,8 +63,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 3.6,
     fibres: 0,
     sodium: 74,
-    description: 'Viande maigre riche en protéines'
-  },
+    description: 'Viande maigre riche en protéines' },
   {
     id: '2',
     nom: 'Saumon',
@@ -75,8 +74,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 12,
     fibres: 0,
     sodium: 44,
-    description: 'Poisson riche en oméga-3'
-  },
+    description: 'Poisson riche en oméga-3' },
   {
     id: '3',
     nom: 'Œufs',
@@ -87,8 +85,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 11,
     fibres: 0,
     sodium: 124,
-    description: 'Protéines complètes et vitamines'
-  },
+    description: 'Protéines complètes et vitamines' },
   {
     id: '4',
     nom: 'Fromage blanc 0%',
@@ -99,8 +96,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.1,
     fibres: 0,
     sodium: 50,
-    description: 'Protéines maigres et calcium'
-  },
+    description: 'Protéines maigres et calcium' },
 
   // Glucides
   {
@@ -113,8 +109,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.9,
     fibres: 1.8,
     sodium: 5,
-    description: 'Glucides complexes et fibres'
-  },
+    description: 'Glucides complexes et fibres' },
   {
     id: '6',
     nom: 'Avoine',
@@ -125,8 +120,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 7,
     fibres: 11,
     sodium: 2,
-    description: 'Céréale complète riche en fibres'
-  },
+    description: 'Céréale complète riche en fibres' },
   {
     id: '7',
     nom: 'Patate douce',
@@ -137,8 +131,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.1,
     fibres: 3,
     sodium: 4,
-    description: 'Glucides complexes et bêta-carotène'
-  },
+    description: 'Glucides complexes et bêta-carotène' },
   {
     id: '8',
     nom: 'Banane',
@@ -149,8 +142,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 2.6,
     sodium: 1,
-    description: 'Fruit riche en potassium'
-  },
+    description: 'Fruit riche en potassium' },
 
   // Lipides
   {
@@ -163,8 +155,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 15,
     fibres: 7,
     sodium: 7,
-    description: 'Fruit riche en acides gras monoinsaturés'
-  },
+    description: 'Fruit riche en acides gras monoinsaturés' },
   {
     id: '10',
     nom: 'Amandes',
@@ -175,8 +166,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 50,
     fibres: 12,
     sodium: 1,
-    description: 'Noix riches en vitamine E'
-  },
+    description: 'Noix riches en vitamine E' },
   {
     id: '11',
     nom: 'Huile d\'olive',
@@ -187,8 +177,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 100,
     fibres: 0,
     sodium: 2,
-    description: 'Huile riche en acides gras monoinsaturés'
-  },
+    description: 'Huile riche en acides gras monoinsaturés' },
 
   // Légumes
   {
@@ -201,8 +190,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.4,
     fibres: 2.6,
     sodium: 33,
-    description: 'Légume crucifère riche en vitamines'
-  },
+    description: 'Légume crucifère riche en vitamines' },
   {
     id: '13',
     nom: 'Épinards',
@@ -213,8 +201,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.4,
     fibres: 2.2,
     sodium: 79,
-    description: 'Légume vert riche en fer et folates'
-  },
+    description: 'Légume vert riche en fer et folates' },
   {
     id: '14',
     nom: 'Tomate',
@@ -225,8 +212,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.2,
     fibres: 1.2,
     sodium: 5,
-    description: 'Fruit-légume riche en lycopène'
-  },
+    description: 'Fruit-légume riche en lycopène' },
 
   // Compléments et ingrédients pour recettes (petit-déjeuner, post-training, etc.)
   {
@@ -239,8 +225,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 0.4,
     sodium: 1,
-    description: 'Riz long grain parfumé, digestion rapide'
-  },
+    description: 'Riz long grain parfumé, digestion rapide' },
   {
     id: '16',
     nom: 'Pâtes complètes',
@@ -251,8 +236,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 1.1,
     fibres: 3.5,
     sodium: 2,
-    description: 'Pâtes complètes cuites, glucides à index modéré'
-  },
+    description: 'Pâtes complètes cuites, glucides à index modéré' },
   {
     id: '17',
     nom: 'Thon en conserve',
@@ -263,8 +247,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.8,
     fibres: 0,
     sodium: 247,
-    description: 'Poisson maigre riche en protéines'
-  },
+    description: 'Poisson maigre riche en protéines' },
   {
     id: '18',
     nom: 'Dinde (blanc)',
@@ -275,8 +258,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 1,
     fibres: 0,
     sodium: 70,
-    description: 'Viande blanche très maigre et riche en protéines'
-  },
+    description: 'Viande blanche très maigre et riche en protéines' },
   {
     id: '19',
     nom: 'Protéine en poudre (whey)',
@@ -287,8 +269,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 4,
     fibres: 0,
     sodium: 150,
-    description: 'Concentré protéique, pratique post-entraînement'
-  },
+    description: 'Concentré protéique, pratique post-entraînement' },
   {
     id: '20',
     nom: 'Lait d\'amande',
@@ -299,8 +280,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 1.1,
     fibres: 0.3,
     sodium: 36,
-    description: 'Boisson végétale peu calorique'
-  },
+    description: 'Boisson végétale peu calorique' },
   {
     id: '21',
     nom: 'Graines de chia',
@@ -311,8 +291,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 31,
     fibres: 34,
     sodium: 16,
-    description: 'Petites graines très riches en fibres et oméga-3'
-  },
+    description: 'Petites graines très riches en fibres et oméga-3' },
   {
     id: '22',
     nom: 'Yaourt grec nature',
@@ -323,8 +302,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.4,
     fibres: 0,
     sodium: 36,
-    description: 'Laitage épais riche en protéines'
-  },
+    description: 'Laitage épais riche en protéines' },
   {
     id: '23',
     nom: 'Beurre de cacahuète',
@@ -335,8 +313,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 50,
     fibres: 6,
     sodium: 17,
-    description: 'Purée d\'arachides, calorique et rassasiante'
-  },
+    description: 'Purée d\'arachides, calorique et rassasiante' },
   {
     id: '24',
     nom: 'Miel',
@@ -347,8 +324,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0,
     fibres: 0.2,
     sodium: 4,
-    description: 'Sucre naturel à index glycémique élevé'
-  },
+    description: 'Sucre naturel à index glycémique élevé' },
   {
     id: '25',
     nom: 'Fromage cottage',
@@ -359,8 +335,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 4.3,
     fibres: 0,
     sodium: 364,
-    description: 'Fromage frais riche en caséine (protéines lentes)'
-  },
+    description: 'Fromage frais riche en caséine (protéines lentes)' },
   {
     id: '26',
     nom: 'Lentilles cuites',
@@ -371,8 +346,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.4,
     fibres: 7.9,
     sodium: 2,
-    description: 'Légumineuse riche en protéines végétales et fibres'
-  },
+    description: 'Légumineuse riche en protéines végétales et fibres' },
 
   // Encore plus d'ingrédients, pour varier davantage les recettes
   {
@@ -385,8 +359,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 4.2,
     fibres: 7,
     sodium: 490,
-    description: 'Pain à base de farine complète, riche en fibres'
-  },
+    description: 'Pain à base de farine complète, riche en fibres' },
   {
     id: '28',
     nom: 'Quinoa cuit',
@@ -397,8 +370,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 1.9,
     fibres: 2.8,
     sodium: 7,
-    description: 'Pseudo-céréale complète, sans gluten'
-  },
+    description: 'Pseudo-céréale complète, sans gluten' },
   {
     id: '29',
     nom: 'Bœuf haché 5% MG',
@@ -409,8 +381,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 5,
     fibres: 0,
     sodium: 65,
-    description: 'Viande rouge maigre, riche en fer et B12'
-  },
+    description: 'Viande rouge maigre, riche en fer et B12' },
   {
     id: '30',
     nom: 'Crevettes',
@@ -421,8 +392,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 0,
     sodium: 111,
-    description: 'Fruit de mer très maigre, riche en protéines'
-  },
+    description: 'Fruit de mer très maigre, riche en protéines' },
   {
     id: '31',
     nom: 'Poivron rouge',
@@ -433,8 +403,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 2.5,
     sodium: 4,
-    description: 'Légume croquant très riche en vitamine C'
-  },
+    description: 'Légume croquant très riche en vitamine C' },
   {
     id: '32',
     nom: 'Courgette',
@@ -445,8 +414,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 1,
     sodium: 8,
-    description: 'Légume léger et peu calorique'
-  },
+    description: 'Légume léger et peu calorique' },
   {
     id: '33',
     nom: 'Myrtilles',
@@ -457,8 +425,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.3,
     fibres: 2.4,
     sodium: 1,
-    description: 'Petit fruit riche en antioxydants'
-  },
+    description: 'Petit fruit riche en antioxydants' },
   {
     id: '34',
     nom: 'Riz blanc',
@@ -469,8 +436,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.2,
     fibres: 0.4,
     sodium: 1,
-    description: 'Glucide simple, digestion rapide'
-  },
+    description: 'Glucide simple, digestion rapide' },
   {
     id: '35',
     nom: 'Houmous',
@@ -481,8 +447,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 10,
     fibres: 6,
     sodium: 380,
-    description: 'Purée de pois chiches, riche en fibres et bons gras'
-  },
+    description: 'Purée de pois chiches, riche en fibres et bons gras' },
   {
     id: '36',
     nom: 'Kiwi',
@@ -493,8 +458,7 @@ export const ALIMENTS: Aliment[] = [
     lipides: 0.5,
     fibres: 3,
     sodium: 3,
-    description: 'Fruit riche en vitamine C'
-  },
+    description: 'Fruit riche en vitamine C' },
 
   // Ingrédients supplémentaires (pour atteindre 100 recettes avec une vraie variété)
   { id: '37', nom: 'Tofu ferme', categorie: 'proteines', calories: 145, proteines: 15, glucides: 4, lipides: 9, fibres: 2, sodium: 10, description: 'Protéine végétale à base de soja' },

@@ -168,20 +168,20 @@ All colors MUST be HSL.
     background: linear-gradient(135deg, rgba(21, 25, 40, 0.9) 0%, rgba(11, 13, 26, 0.95) 100%);
     border-color: rgba(0, 194, 255, 0.15);
   }
-  
+
   /* Glassmorphism premium - style VitalForce */
   .glass-card {
     @apply rounded-xl backdrop-blur-xl;
     background: rgba(30, 35, 53, 0.6);
     border: 1px solid rgba(107, 42, 255, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 0 0 0 1px rgba(0, 194, 255, 0.1);
   }
-  
+
   .glass-card:hover {
     border-color: rgba(107, 42, 255, 0.4);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
                 inset 0 1px 0 rgba(255, 255, 255, 0.15),
                 0 0 30px rgba(107, 42, 255, 0.2);
   }
@@ -210,30 +210,30 @@ All colors MUST be HSL.
     background: rgba(107, 42, 255, 0.15);
     border-color: rgba(107, 42, 255, 0.3);
   }
-  
+
   .gradient-primary {
     background: var(--gradient-primary);
   }
-  
+
   .gradient-secondary {
     background: var(--gradient-secondary);
   }
-  
+
   .gradient-success {
     background: var(--gradient-success);
   }
-  
+
   .gradient-cyan-purple {
     background: var(--gradient-cyan-purple);
   }
-  
+
   /* Barres de progression — lisibles, contrastées, sans surcharge visuelle */
   .vitalforce-progress {
     @apply rounded-full overflow-hidden relative w-full;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
   }
-  
+
   .vitalforce-progress-bar {
     @apply h-full rounded-full transition-all duration-700 ease-out relative;
     background: var(--gradient-progress);
@@ -685,6 +685,21 @@ All colors MUST be HSL.
 
 .animate-badge-breathe {
   animation: badge-breathe 3.5s ease-in-out infinite;
+}
+
+@keyframes badge-glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+.animate-badge-glow-pulse {
+  animation: badge-glow-pulse 3.5s ease-in-out infinite;
 }
 
 /* ---- Effets d'aura par rang (RankBadge) ---- */

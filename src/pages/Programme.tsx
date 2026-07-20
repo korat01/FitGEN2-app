@@ -28,6 +28,14 @@ import {
 } from 'lucide-react';
 // Import direct du générateur (pas de lazy loading pour les fonctions utilitaires)
 import { generateProgramme, adaptSessionToRecentFailure, adaptSessionToRecentDifficulty } from '../utils/programmeGenerator';
+import { NewProgramModal } from '../components/programme/NewProgramModal';
+import {
+  createNewPowerliftingProgram,
+  continueAfterTestWeek,
+  type ProgramType,
+  type PowerliftingProgramConfig,
+  type GeneratedPowerliftingProgram,
+} from '../utils/powerlifting';
 
 // Fonction pour récupérer les 1RM réels de l'utilisateur (le programme travaille directement
 // par rapport à ces maxs, il n'y a plus de "Training Max" intermédiaire)
@@ -69,6 +77,8 @@ export const Programme: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isNewProgramModalOpen, setIsNewProgramModalOpen] = useState(false);
+  const isPowerlifting = user?.sportClass === 'power';
 
   // Charger le programme existant
   useEffect(() => {
@@ -172,6 +182,88 @@ export const Programme: React.FC = () => {
     if (confirmRegenerate) {
       handleGenerateProgramme();
     }
+  };
+
+  // Adapte un GeneratedPowerliftingProgram (nouveau système modulaire) au format déjà utilisé par
+  // cette page (mêmes clés que l'ancien generateProgramme) — pour ne rien casser côté affichage.
+  const toStoredProgramme = (
+    generated: GeneratedPowerliftingProgram,
+    config: PowerliftingProgramConfig,
+    existingDateDebut?: string
+  ) => ({
+    id: generated.id,
+    nom: generated.nom,
+    dateDebut: existingDateDebut || new Date().toISOString(),
+    sessions: generated.sessions,
+    isTestWeek: !!generated.isTestWeek,
+    powerliftingConfig: config,
+    userProfile: {
+      sportClass: 'power',
+      trainingDays: config.trainingDays,
+    },
+  });
+
+  // Nouveau système de création de programme powerlifting (type + jours choisis dans le modal) —
+  // vérifie les perfs existantes, génère une semaine de test si besoin, sinon le programme complet.
+  const handleNewPowerliftingProgram = (type: ProgramType, trainingDays: string[]) => {
+    if (!user) return;
+    setIsNewProgramModalOpen(false);
+    setIsGenerating(true);
+
+    try {
+      const config: PowerliftingProgramConfig = {
+        type,
+        trainingDays,
+        bodyweight: user.weight || 75,
+        sex: user.sex === 'female' ? 'female' : 'male',
+      };
+
+      const { program, missingLifts } = createNewPowerliftingProgram(config);
+      const stored = toStoredProgramme(program, config);
+
+      localStorage.setItem('userProgramme', JSON.stringify(stored));
+      setProgramme(stored);
+      setIsGenerating(false);
+
+      if (missingLifts.length > 0) {
+        alert(
+          `📋 Aucune performance connue pour : ${missingLifts.join(', ')}.\n\nUne semaine de test a été générée pour estimer vos charges. Une fois vos résultats saisis dans "Stats", revenez ici et cliquez sur "Générer la suite du programme".`
+        );
+      } else {
+        alert(`🎉 Programme "${program.nom}" généré avec succès !\n\n📅 ${stored.sessions.length} séances sur ${trainingDays.length} jours/semaine.`);
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de la génération du programme powerlifting:', error);
+      setIsGenerating(false);
+      alert('❌ Erreur lors de la génération du programme');
+    }
+  };
+
+  // Une fois la semaine de test complétée et les performances saisies dans Stats, génère le vrai
+  // programme et le rattache à la suite (numérotation "Semaine 2", cf. spec) sans perdre la semaine 1.
+  const handleContinueAfterTestWeek = () => {
+    if (!programme?.powerliftingConfig) return;
+
+    const testAsGenerated: GeneratedPowerliftingProgram = {
+      id: programme.id,
+      nom: programme.nom,
+      description: '',
+      duree: 1,
+      sessions: programme.sessions,
+      type: 'test',
+      isTestWeek: true,
+    };
+
+    const result = continueAfterTestWeek(programme.powerliftingConfig, testAsGenerated);
+    if (!result) {
+      alert("⏳ Il manque encore au moins une performance (Squat, Bench ou Deadlift). Rendez-vous dans l'onglet Stats pour la renseigner, puis revenez ici.");
+      return;
+    }
+
+    const stored = toStoredProgramme(result, programme.powerliftingConfig, programme.dateDebut);
+    localStorage.setItem('userProgramme', JSON.stringify(stored));
+    setProgramme(stored);
+    alert('🎉 Votre programme complet est prêt, à partir de la Semaine 2 !');
   };
 
   // Un programme généré avant l'ajout des types d'exercice (échauffement/travail/accessoire)
@@ -399,8 +491,8 @@ export const Programme: React.FC = () => {
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
                 {programme && (
-                  <Button 
-                    onClick={handleRegenerateProgramme}
+                  <Button
+                    onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleRegenerateProgramme()}
                     disabled={isGenerating}
                     className="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white border-white/30"
                   >
@@ -408,6 +500,11 @@ export const Programme: React.FC = () => {
                       <>
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                         Mise à jour...
+                      </>
+                    ) : isPowerlifting ? (
+                      <>
+                        <Dumbbell className="w-4 h-4 mr-2" />
+                        Nouveau programme
                       </>
                     ) : (
                       <>
@@ -417,8 +514,8 @@ export const Programme: React.FC = () => {
                     )}
                   </Button>
                 )}
-                <Button 
-                  onClick={handleGenerateProgramme}
+                <Button
+                  onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                   disabled={isGenerating}
                   className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
                 >
@@ -459,6 +556,28 @@ export const Programme: React.FC = () => {
           </Card>
         )}
 
+        {/* Semaine de test : les 3 maxes ne sont pas encore connus, on attend leur saisie dans Stats */}
+        {programme?.isTestWeek && (
+          <Card className="glass-card border-primary/30 bg-primary/5 rounded-2xl">
+            <CardContent className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+              <div className="flex-1">
+                <p className="font-semibold text-foreground">📋 Semaine de test en cours</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Complétez cette semaine puis enregistrez vos résultats (Squat, Développé Couché, Soulevé de Terre) dans l'onglet Stats.
+                  Votre programme complet se génère ensuite automatiquement à partir de la Semaine 2.
+                </p>
+              </div>
+              <Button
+                onClick={handleContinueAfterTestWeek}
+                className="w-full md:w-auto gradient-primary text-white font-semibold shrink-0"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Générer la suite du programme
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Message si pas de programme */}
         {!programme && (
           <Card className="border-0 shadow-xl glass-card border-primary/20 backdrop-blur-md border border-white/20 rounded-2xl">
@@ -466,8 +585,8 @@ export const Programme: React.FC = () => {
               <div className="text-6xl mb-4">🏋️</div>
               <h3 className="text-xl font-semibold text-foreground/90 mb-2">Aucun Programme Généré</h3>
               <p className="text-muted-foreground mb-6">Générez votre programme personnalisé pour commencer votre entraînement !</p>
-              <Button 
-                onClick={handleGenerateProgramme}
+              <Button
+                onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                 disabled={isGenerating}
                 className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
               >
@@ -479,7 +598,7 @@ export const Programme: React.FC = () => {
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Générer Mon Programme
+                    {isPowerlifting ? 'Nouveau programme' : 'Générer Mon Programme'}
                   </>
                 )}
               </Button>
@@ -666,7 +785,7 @@ export const Programme: React.FC = () => {
                       <p className="text-muted-foreground mb-6">Profitez de cette journée pour récupérer et vous détendre.</p>
                       <div className="p-4 bg-blue-500/10 rounded-lg">
                         <p className="text-sm text-blue-300">
-                          💡 <strong>Conseil:</strong> La récupération est essentielle pour progresser. 
+                          💡 <strong>Conseil:</strong> La récupération est essentielle pour progresser.
                           Vous pouvez faire des étirements légers ou une marche.
                         </p>
                 </div>
@@ -1004,8 +1123,8 @@ export const Programme: React.FC = () => {
                         <p className="text-muted-foreground mb-10 max-w-lg mx-auto text-lg leading-relaxed">
                           Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions organisées.
                         </p>
-                        <Button 
-                          onClick={handleGenerateProgramme} 
+                        <Button
+                          onClick={handleGenerateProgramme}
                           disabled={isGenerating}
                           className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                         >
@@ -1040,7 +1159,7 @@ export const Programme: React.FC = () => {
                 {selectedSession?.nom}
               </DialogTitle>
             </DialogHeader>
-            
+
             {selectedSession && (
               <div className="space-y-6">
                 {/* Informations de la session */}
@@ -1059,7 +1178,7 @@ export const Programme: React.FC = () => {
                       </Badge>
                     </div>
                   </div>
-                  
+
                   {selectedSession.notes && (
                     <div className="p-3 bg-blue-500/10 rounded-lg mb-4">
                       <p className="text-sm text-blue-300"><strong>Notes:</strong> {selectedSession.notes}</p>
@@ -1140,6 +1259,14 @@ export const Programme: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Wizard de création de programme powerlifting (type + jours) — nouveau système modulaire */}
+        {isNewProgramModalOpen && (
+          <NewProgramModal
+            onClose={() => setIsNewProgramModalOpen(false)}
+            onConfirm={handleNewPowerliftingProgram}
+          />
+        )}
       </div>
     </div>
   );

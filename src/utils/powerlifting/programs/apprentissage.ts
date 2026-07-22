@@ -28,14 +28,25 @@ const STARTING_PCT: Record<MainLift, number> = { squat: 0.7, bench: 0.65, deadli
 const SESSION_INCREMENT_KG: Record<MainLift, number> = { squat: 2.5, bench: 2.5, deadlift: 2.5 };
 const BENCH_INCREMENT_EVERY_N_SESSIONS = 2;
 
-const ACCESSORY_POOL: Record<MainLift, { nom: string; ratio: number; reps: number }> = {
-  squat: { nom: 'Extensions de Jambes', ratio: 0.3, reps: 15 },
-  bench: { nom: 'Extensions Triceps', ratio: 0.15, reps: 15 },
-  deadlift: { nom: 'Tractions Assistées', ratio: 0, reps: 8 },
+// 2 options par mouvement, alternées d'une séance sur l'autre (pas le même accessoire à chaque
+// séance pendant 6 semaines) — reste simple et sûr pour un débutant, sans ajouter de volume.
+const ACCESSORY_POOL: Record<MainLift, Array<{ nom: string; ratio: number; reps: number }>> = {
+  squat: [
+    { nom: 'Extensions de Jambes', ratio: 0.3, reps: 15 },
+    { nom: 'Presse à Jambes', ratio: 1.1, reps: 12 },
+  ],
+  bench: [
+    { nom: 'Extensions Triceps', ratio: 0.15, reps: 15 },
+    { nom: 'Dips (assistés si besoin)', ratio: 0, reps: 8 },
+  ],
+  deadlift: [
+    { nom: 'Tractions Assistées', ratio: 0, reps: 8 },
+    { nom: 'Fentes Bulgares', ratio: 0.2, reps: 10 },
+  ],
 };
 
-function buildAccessory(lift: MainLift, rm: number): GeneratedExercise {
-  const accessory = ACCESSORY_POOL[lift];
+function buildAccessory(lift: MainLift, rm: number, sessionIndex: number): GeneratedExercise {
+  const accessory = ACCESSORY_POOL[lift][sessionIndex % 2];
   const poids = accessory.ratio > 0 ? roundToPlates(rm * accessory.ratio) : 0;
   return {
     nom: accessory.nom,
@@ -48,7 +59,7 @@ function buildAccessory(lift: MainLift, rm: number): GeneratedExercise {
   };
 }
 
-function createLiftBlock(lift: MainLift, weight: number): GeneratedExercise[] {
+function createLiftBlock(lift: MainLift, weight: number, sessionIndex: number): GeneratedExercise[] {
   const nom = MAIN_LIFT_NOM[lift];
   const warmup = buildWarmupSets(nom, weight, [
     { pct: 0.5, reps: 5 },
@@ -66,7 +77,7 @@ function createLiftBlock(lift: MainLift, weight: number): GeneratedExercise[] {
     repos: lift === 'deadlift' ? '3 min' : '2-3 min',
   }));
 
-  return [...warmup, ...mainSets, buildAccessory(lift, weight)];
+  return [...warmup, ...mainSets, buildAccessory(lift, weight, sessionIndex)];
 }
 
 // Génère le programme Apprentissage. `startWeek` permet de reprendre après une semaine de test.
@@ -110,10 +121,10 @@ export function generateApprentissage(
       const isSessionA = globalSessionIndex % 2 === 0;
       const secondLift: MainLift = isSessionA ? 'bench' : 'deadlift';
 
-      const squatBlock = createLiftBlock('squat', currentWeight.squat).map((ex) =>
+      const squatBlock = createLiftBlock('squat', currentWeight.squat, globalSessionIndex).map((ex) =>
         ex.type === 'travail' ? { ...ex, pourcentage: pctOf(ex.poids, maxes.squat) } : ex
       );
-      const secondBlock = createLiftBlock(secondLift, currentWeight[secondLift]).map((ex) =>
+      const secondBlock = createLiftBlock(secondLift, currentWeight[secondLift], globalSessionIndex).map((ex) =>
         ex.type === 'travail' ? { ...ex, pourcentage: pctOf(ex.poids, maxes[secondLift]) } : ex
       );
 

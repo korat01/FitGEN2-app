@@ -97,7 +97,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="Votre nom"
             required
             disabled={isLoading}
@@ -117,7 +117,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="votre@email.com"
             required
             disabled={isLoading}
@@ -137,7 +137,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="pl-10 pr-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 pr-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="Votre mot de passe"
             required
             disabled={isLoading}
@@ -165,7 +165,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             type={showPassword ? 'text' : 'password'}
             value={formData.confirmPassword}
             onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="Confirmez votre mot de passe"
             required
             disabled={isLoading}
@@ -188,7 +188,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
               type="number"
               value={formData.weight}
               onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-primary focus:ring-primary"
               placeholder="75"
               min="30"
               max="200"
@@ -215,7 +215,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
                   age: newBirthDate ? calculateAge(newBirthDate) : null
                 }));
               }}
-              className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {formData.age && (
               <p className="text-sm text-muted-foreground">
@@ -256,7 +256,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
           <select
             value={formData.sportClass}
             onChange={(e) => setFormData({ ...formData, sportClass: e.target.value })}
-            className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-primary focus:ring-primary"
             disabled={isLoading}
           >
             <option value="classique">Classique</option>
@@ -282,7 +282,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
               type="number"
               value={formData.vma || 15}
               onChange={(e) => setFormData({ ...formData, vma: Number(e.target.value) })}
-              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-primary focus:ring-primary"
               placeholder="15"
               min="10"
               max="25"
@@ -295,7 +295,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onCancel 
             <select
               value={formData.objectif || '10k'}
               onChange={(e) => setFormData({ ...formData, objectif: e.target.value })}
-              className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+              className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-primary focus:ring-primary"
               disabled={isLoading}
             >
               <option value="10k">10 km</option>

@@ -3108,7 +3108,7 @@ const AlimentDetail: React.FC = () => {
           <Card className="glass-card border-primary/20 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-blue-400" />
+                <Zap className="h-5 w-5 text-secondary" />
                 Conseils d'utilisation
               </CardTitle>
             </CardHeader>
@@ -3116,7 +3116,7 @@ const AlimentDetail: React.FC = () => {
               <ol className="space-y-2">
                 {aliment.conseils.map((conseil, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <span className="text-blue-400 font-bold">{index + 1}.</span>
+                    <span className="text-secondary font-bold">{index + 1}.</span>
                     <span className="text-foreground/90">{conseil}</span>
                   </li>
                 ))}
@@ -3135,7 +3135,7 @@ const AlimentDetail: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Catégorie</span>
-                <Badge variant="outline" className="border-blue-300 text-blue-300 bg-blue-500/10">
+                <Badge variant="outline" className="border-secondary text-secondary bg-secondary/10">
                   {aliment.categorie}
                 </Badge>
               </div>
@@ -3190,7 +3190,7 @@ const AlimentDetail: React.FC = () => {
         <Card className="glass-card border-primary/20 border-0 shadow-lg">
           <CardContent className="p-6">
               <div className="space-y-3">
-                <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
+                <Button className="w-full gradient-primary text-white font-semibold">
                 <Plus className="h-4 w-4 mr-2" />
                   Ajouter à un repas
           </Button>

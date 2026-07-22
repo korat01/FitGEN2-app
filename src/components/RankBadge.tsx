@@ -59,7 +59,9 @@ const RANK_SRC: Record<RankLevel, string> = {
   World: rankWorld,
 };
 
-export const RankBadge: React.FC<RankBadgeProps> = ({ rank, level, size = 'md', animated = true, className }) => {
+// Mémorisé pour la même raison que RankBadgeAura : évite que des re-renders du parent sans lien
+// (XP, quêtes, streak...) ne fassent redémarrer par à-coups l'animation de respiration/glow.
+export const RankBadge: React.FC<RankBadgeProps> = React.memo(({ rank, level, size = 'md', animated = true, className }) => {
   const key = (rank in RANK_SRC ? rank : 'D') as RankLevel;
   const src = RANK_SRC[key];
   const label = RANK_LABELS[key];
@@ -109,6 +111,7 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ rank, level, size = 'md', 
       )}
     </div>
   );
-};
+});
+RankBadge.displayName = 'RankBadge';
 
 export default RankBadge;

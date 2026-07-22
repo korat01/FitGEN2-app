@@ -40,10 +40,10 @@ export const Progression: React.FC = () => {
         <div className="space-y-5 md:space-y-6 max-w-6xl mx-auto">
           <StatsPageHeader
             userName={user?.name}
-            rank={userRank?.rank || 'D'}
-            rankIcon={getRangIcon(userRank?.rank || 'D')}
-            rankColorClass={getRangColor(userRank?.rank || 'D')}
-            globalScore={userRank?.globalScore || 0}
+            rank={user?.rank || userRank?.rank || 'D'}
+            rankIcon={getRangIcon(user?.rank || userRank?.rank || 'D')}
+            rankColorClass={getRangColor(user?.rank || userRank?.rank || 'D')}
+            globalScore={user?.globalScore ?? userRank?.globalScore ?? 0}
             onRefresh={refreshFromStorage}
           />
 

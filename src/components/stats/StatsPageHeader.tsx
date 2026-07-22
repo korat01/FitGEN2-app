@@ -2,6 +2,7 @@ import React from 'react';
 import { BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useHunterMode } from '@/hooks/useHunterMode';
 
 interface StatsPageHeaderProps {
   userName?: string;
@@ -25,11 +26,12 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
   onRefresh,
 }) => {
   const progress = Math.min(Math.max(rankProgressPercent, 0), 100);
+  const { hunterPanelClass } = useHunterMode();
 
   return (
-    <div className="glass-card border border-primary/25 overflow-hidden rounded-2xl md:rounded-3xl">
+    <div className={`glass-card border border-primary/25 overflow-hidden rounded-2xl md:rounded-3xl ${hunterPanelClass}`}>
       <div className="relative p-4 md:p-6">
-        <div className="absolute inset-0 gradient-primary opacity-70" />
+        <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]" />
         <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/15 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
 
         <div className="relative z-10 space-y-5">

@@ -4,7 +4,7 @@ export const STATS_CHART = {
   tick: '#B8B9C3',
   tooltipStyle: {
     backgroundColor: 'rgba(30, 35, 53, 0.96)',
-    border: '1px solid rgba(107, 42, 255, 0.35)',
+    border: '1px solid hsl(var(--primary) / 0.35)',
     borderRadius: '12px',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
     color: '#FFFFFF',

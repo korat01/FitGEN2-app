@@ -110,9 +110,9 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ streakData }) => {
 
         {/* Conseils pour maintenir le streak */}
         {currentStreak > 0 && (
-          <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4">
-            <h4 className="font-semibold text-blue-300 mb-2">💡 Conseil</h4>
-            <p className="text-sm text-blue-300">
+          <div className="rounded-xl bg-secondary/10 border border-secondary/20 p-4">
+            <h4 className="font-semibold text-secondary mb-2">💡 Conseil</h4>
+            <p className="text-sm text-secondary">
               {currentStreak < 7 
                 ? "Continue comme ça ! Chaque jour compte pour construire une habitude solide."
                 : currentStreak < 30

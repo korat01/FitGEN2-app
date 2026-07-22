@@ -144,7 +144,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
       <Card className="glass-card border-primary/20">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
               <UserIcon className="w-6 h-6 text-white" />
             </div>
             Modifier le Profil
@@ -155,7 +155,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
             {/* Informations de base */}
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <UserIcon className="w-5 h-5 text-blue-500" />
+                <UserIcon className="w-5 h-5 text-secondary" />
                 Informations Personnelles
               </h3>
               
@@ -209,7 +209,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
                         age: newBirthDate ? calculateAge(newBirthDate) : null
                       }));
                     }}
-                    className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-white/15 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                   {formData.age && (
                     <p className="text-sm text-muted-foreground">
@@ -392,7 +392,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onClose }) => {
                   Annuler
                 </Button>
               )}
-              <Button type="submit" disabled={isLoading} className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white">
+              <Button type="submit" disabled={isLoading} className="gradient-primary text-white">
                 {isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

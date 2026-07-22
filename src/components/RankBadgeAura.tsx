@@ -65,7 +65,13 @@ interface RankBadgeAuraProps {
   size: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const RankBadgeAura: React.FC<RankBadgeAuraProps> = ({ rank, size }) => {
+// Mémorisé : sans ça, chaque re-render du parent (XP, quêtes, streak... plein de choses bougent
+// sur le Dashboard) recrée les objets `style` des particules avec des valeurs identiques mais une
+// référence neuve — certains navigateurs redémarrent alors l'animation CSS en cours au lieu de la
+// laisser filer, ce qui donnait cet effet de "saut"/redémarrage par à-coups au lieu d'une boucle
+// fluide. Avec React.memo, tant que `rank`/`size` ne changent pas, ce composant ne se re-rend pas
+// du tout et l'animation continue tranquillement en arrière-plan.
+export const RankBadgeAura: React.FC<RankBadgeAuraProps> = React.memo(({ rank, size }) => {
   const kind = RANK_EFFECTS[rank];
   const scale = SIZE_SCALE[size];
 
@@ -208,8 +214,12 @@ export const RankBadgeAura: React.FC<RankBadgeAuraProps> = ({ rank, size }) => {
 
   const energy = () => (
     <>
+      {/* Pas de blur() ici : un filtre flouté animé EN CONTINU par une rotation force une
+          re-rasterisation à chaque frame (au lieu d'une simple recomposition de calque) — sur
+          certains appareils, ça finit par décrocher et geler l'anim en plein milieu du tour. Le
+          dégradé conique a déjà des transitions douces intégrées, pas besoin de flou en plus. */}
       <div
-        className="absolute animate-rank-energy-spin rounded-full blur-sm"
+        className="absolute animate-rank-energy-spin rounded-full"
         style={{
           inset: '-18%',
           background: 'conic-gradient(from 0deg, transparent, rgba(107,42,255,0.55) 25%, rgba(255,215,0,0.5) 45%, transparent 65%)',
@@ -329,6 +339,7 @@ export const RankBadgeAura: React.FC<RankBadgeAuraProps> = ({ rank, size }) => {
       {kind === 'shadow-flame' && shadowFlame()}
     </div>
   );
-};
+});
+RankBadgeAura.displayName = 'RankBadgeAura';
 
 export default RankBadgeAura;

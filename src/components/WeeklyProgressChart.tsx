@@ -17,7 +17,7 @@ interface WeeklyProgressChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[rgba(21,25,40,0.95)] border border-[rgba(0,194,255,0.3)] rounded-lg p-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+      <div className="bg-[rgba(21,25,40,0.95)] border border-[hsl(var(--secondary)/0.3)] rounded-lg p-3 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
         <p className="text-white font-semibold mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
@@ -40,7 +40,7 @@ const SummaryBlock: React.FC<{ summary: WeeklyProgressSummary }> = ({ summary })
 
   const changeColor =
     summary.weekChangePercent > 0
-      ? 'from-[#2ECC71] to-[#00C2FF]'
+      ? 'from-[#2ECC71] to-[hsl(var(--secondary))]'
       : summary.weekChangePercent < 0
         ? 'from-[#ef4444] to-[#f97316]'
         : 'from-[#A0AEC0] to-[#718096]';
@@ -48,7 +48,7 @@ const SummaryBlock: React.FC<{ summary: WeeklyProgressSummary }> = ({ summary })
   return (
     <div className="flex items-center justify-between mt-4 pt-4 border-t border-primary/15">
       <div className="text-center flex-1">
-        <p className="text-2xl font-bold bg-gradient-to-r from-[#6B2AFF] to-[#00C2FF] bg-clip-text text-transparent tabular-nums">
+        <p className="text-2xl font-bold bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--secondary))] bg-clip-text text-transparent tabular-nums">
           {summary.totalPoints}
         </p>
         <p className="text-xs text-muted-foreground">Points cette semaine</p>
@@ -60,7 +60,7 @@ const SummaryBlock: React.FC<{ summary: WeeklyProgressSummary }> = ({ summary })
         <p className="text-xs text-muted-foreground">vs semaine dernière</p>
       </div>
       <div className="text-center flex-1">
-        <p className="text-2xl font-bold bg-gradient-to-r from-[#2ECC71] to-[#00C2FF] bg-clip-text text-transparent tabular-nums">
+        <p className="text-2xl font-bold bg-gradient-to-r from-[#2ECC71] to-[hsl(var(--secondary))] bg-clip-text text-transparent tabular-nums">
           {summary.activeDays}/7
         </p>
         <p className="text-xs text-muted-foreground">Jours actifs</p>
@@ -98,11 +98,11 @@ export const WeeklyProgressChart: React.FC<WeeklyProgressChartProps> = ({
           </div>
           <div className="flex items-center gap-3 text-xs shrink-0">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-r from-[#6B2AFF] to-[#00C2FF]" />
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--secondary))]" />
               <span className="text-muted-foreground">Jour</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-r from-[#00C2FF] to-[#00E0FF]" />
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-r from-[hsl(var(--secondary))] to-[hsl(var(--secondary)/0.6)]" />
               <span className="text-muted-foreground">Cumul</span>
             </div>
           </div>
@@ -121,14 +121,14 @@ export const WeeklyProgressChart: React.FC<WeeklyProgressChartProps> = ({
             <AreaChart data={summary.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="gradientStats" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6B2AFF" stopOpacity={0.8} />
-                    <stop offset="50%" stopColor="#00C2FF" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#00C2FF" stopOpacity={0.1} />
+                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
+                    <stop offset="50%" stopColor="hsl(var(--secondary))" stopOpacity={0.4} />
+                    <stop offset="100%" stopColor="hsl(var(--secondary))" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="gradientRank" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00C2FF" stopOpacity={0.6} />
-                    <stop offset="50%" stopColor="#6B2AFF" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#6B2AFF" stopOpacity={0.05} />
+                    <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity={0.6} />
+                    <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -150,7 +150,7 @@ export const WeeklyProgressChart: React.FC<WeeklyProgressChartProps> = ({
                   type="monotone"
                   dataKey="rank"
                   name="Cumul"
-                  stroke="#00C2FF"
+                  stroke="hsl(var(--secondary))"
                   strokeWidth={2}
                   fill="url(#gradientRank)"
                   animationDuration={800}
@@ -159,7 +159,7 @@ export const WeeklyProgressChart: React.FC<WeeklyProgressChartProps> = ({
                   type="monotone"
                   dataKey="stats"
                   name="Activité"
-                  stroke="#6B2AFF"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={2}
                   fill="url(#gradientStats)"
                   animationDuration={800}

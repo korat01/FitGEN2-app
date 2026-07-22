@@ -21,7 +21,7 @@ const TYPE_META: Record<ExerciseType, {
     label: 'Travail',
     icon: <Dumbbell className="w-5 h-5" />,
     accentClass: 'gradient-primary',
-    iconWrapClass: 'bg-primary/15 text-primary border-primary/30 shadow-[0_0_16px_rgba(107,42,255,0.35)]',
+    iconWrapClass: 'bg-primary/15 text-primary border-primary/30 shadow-[0_0_16px_hsl(var(--primary)/0.35)]',
   },
   accessoire: {
     label: 'Accessoire',
@@ -81,7 +81,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
           : isWarmup
           ? 'border-white/10'
           : isMainLift
-          ? 'border-primary/30 hover:border-primary/50 hover:shadow-[0_0_24px_rgba(107,42,255,0.15)]'
+          ? 'border-primary/30 hover:border-primary/50 hover:shadow-[0_0_24px_hsl(var(--primary)/0.15)]'
           : 'border-white/10 hover:border-secondary/30'
       }`}
     >

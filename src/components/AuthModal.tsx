@@ -26,7 +26,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 gradient-primary rounded-xl flex items-center justify-center">
                 <Dumbbell className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-foreground">

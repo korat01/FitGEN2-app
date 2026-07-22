@@ -24,15 +24,15 @@ export const VitalForceLogo: React.FC<VitalForceLogoProps> = ({
         width: size,
         height: size,
         filter: glow
-          ? 'drop-shadow(0 0 5px rgba(107, 42, 255, 0.7)) drop-shadow(0 0 5px rgba(0, 194, 255, 0.6))'
+          ? 'drop-shadow(0 0 5px hsl(var(--primary) / 0.7)) drop-shadow(0 0 5px hsl(var(--secondary) / 0.6))'
           : 'none',
       }}
     >
       <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
         <defs>
           <linearGradient id={`${gradientId}-outer`} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6B2AFF" />
-            <stop offset="100%" stopColor="#00C2FF" />
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--secondary))" />
           </linearGradient>
           <linearGradient id={`${gradientId}-inner`} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#1A1F3A" />

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '../contexts/AuthContext';
 import { useMobileDetection } from '../hooks/useMobileDetection';
+import { useHunterMode } from '../hooks/useHunterMode';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { ExerciseCard } from '../components/programme/ExerciseCard';
 import { 
@@ -35,6 +36,7 @@ import {
   type ProgramType,
   type PowerliftingProgramConfig,
   type GeneratedPowerliftingProgram,
+  type MainLift,
 } from '../utils/powerlifting';
 
 // Fonction pour récupérer les 1RM réels de l'utilisateur (le programme travaille directement
@@ -205,7 +207,7 @@ export const Programme: React.FC = () => {
 
   // Nouveau système de création de programme powerlifting (type + jours choisis dans le modal) —
   // vérifie les perfs existantes, génère une semaine de test si besoin, sinon le programme complet.
-  const handleNewPowerliftingProgram = (type: ProgramType, trainingDays: string[]) => {
+  const handleNewPowerliftingProgram = (type: ProgramType, trainingDays: string[], speTargets?: MainLift[]) => {
     if (!user) return;
     setIsNewProgramModalOpen(false);
     setIsGenerating(true);
@@ -216,6 +218,7 @@ export const Programme: React.FC = () => {
         trainingDays,
         bodyweight: user.weight || 75,
         sex: user.sex === 'female' ? 'female' : 'male',
+        speTargets,
       };
 
       const { program, missingLifts } = createNewPowerliftingProgram(config);
@@ -449,6 +452,7 @@ export const Programme: React.FC = () => {
   };
 
   const calendar = generateCalendar();
+  const { hunterPanelClass } = useHunterMode();
 
   const formatNumber = (value: number | undefined | null): string => {
     if (value === undefined || value === null || isNaN(value)) {
@@ -462,8 +466,8 @@ export const Programme: React.FC = () => {
       <div className="mx-auto max-w-7xl space-y-4 md:space-y-8 relative z-10 page-transition stagger-animation">
         
         {/* Header Principal - VitalForce DA */}
-        <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
-          <div className="absolute inset-0 gradient-primary opacity-80"></div>
+        <div className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${hunterPanelClass}`}>
+          <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
           {/* Effets de particules VitalForce */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-32 translate-x-32 animate-float"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full translate-y-24 -translate-x-24 animate-pulse-slow"></div>
@@ -472,10 +476,10 @@ export const Programme: React.FC = () => {
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="space-y-2 md:space-y-4">
-                <h1 className="text-xl md:text-5xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent truncate">
+                <h1 className="text-xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary/70 to-primary/70 bg-clip-text text-transparent truncate">
                   🏋️ Mon Programme
                 </h1>
-                <p className="text-xs md:text-xl text-blue-100 max-w-full md:max-w-2xl leading-relaxed">
+                <p className="text-xs md:text-xl text-white/85 max-w-full md:max-w-2xl leading-relaxed">
                   Programme personnalisé basé sur vos performances
                 </p>
                 <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
@@ -608,9 +612,9 @@ export const Programme: React.FC = () => {
 
         {/* Message d'information si les jours d'entraînement ont changé */}
         {programme && user?.trainingDays && programme.sessions.length > 0 && (
-          <Card className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-200 shadow-lg rounded-2xl">
+          <Card className="bg-gradient-to-r from-secondary/10 to-primary/10 border border-secondary/30 shadow-lg rounded-2xl">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-blue-300 flex items-center gap-2">
+              <CardTitle className="text-lg font-semibold text-secondary flex items-center gap-2">
                 <Target className="w-5 h-5" />
                 Jours d'Entraînement Configurés
               </CardTitle>
@@ -619,13 +623,13 @@ export const Programme: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {user.trainingDays.map(day => (
-                    <Badge key={day} className="bg-blue-500/15 border border-blue-500/25 text-blue-300 border-blue-300">
+                    <Badge key={day} className="bg-secondary/15 border border-secondary/25 text-secondary border-secondary">
                       {day}
                     </Badge>
                   ))}
                 </div>
-                <div className="bg-blue-500/15 border border-blue-500/25/50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-blue-300 text-sm">
+                <div className="bg-secondary/15 border border-secondary/25/50 border border-secondary/30 rounded-lg p-3">
+                  <p className="text-secondary text-sm">
                     <strong>💡 Astuce :</strong> Si vous avez modifié vos jours d'entraînement, 
                     cliquez sur "Générer Mon Programme" pour créer un nouveau programme adapté à vos nouveaux jours.
                   </p>
@@ -681,15 +685,15 @@ export const Programme: React.FC = () => {
             })()}
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
             <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
-              <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
+              <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <Calendar className="w-4 h-4" />
                 Aujourd'hui
               </TabsTrigger>
-              <TabsTrigger value="weekly" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
+              <TabsTrigger value="weekly" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <CalendarDays className="w-4 h-4" />
                 Hebdomadaire
               </TabsTrigger>
-              <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white rounded-lg transition-all duration-200">
+              <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
                 <List className="w-4 h-4" />
                 Planning
               </TabsTrigger>
@@ -700,7 +704,7 @@ export const Programme: React.FC = () => {
               <Card className="glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-xl rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
-                    <Calendar className="w-6 h-6 text-blue-500" />
+                    <Calendar className="w-6 h-6 text-secondary" />
                         Programme du Jour
                   </CardTitle>
                 </CardHeader>
@@ -715,7 +719,7 @@ export const Programme: React.FC = () => {
                             <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-300">
                               {todaySession.intensity}
                             </Badge>
-                            <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
+                            <Badge variant="secondary" className="bg-secondary/15 border border-secondary/25 text-secondary">
                               {todaySession.duration} min
                             </Badge>
                             <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-300">
@@ -725,8 +729,8 @@ export const Programme: React.FC = () => {
                   </div>
                   
                         {todaySession.notes && (
-                          <div className="p-3 bg-blue-500/10 rounded-lg mb-4">
-                            <p className="text-sm text-blue-300"><strong>Notes:</strong> {todaySession.notes}</p>
+                          <div className="p-3 bg-secondary/10 rounded-lg mb-4">
+                            <p className="text-sm text-secondary"><strong>Notes:</strong> {todaySession.notes}</p>
                     </div>
                         )}
 
@@ -783,8 +787,8 @@ export const Programme: React.FC = () => {
                 </div>
                       <h3 className="text-xl font-bold text-foreground mb-2">Jour de Repos</h3>
                       <p className="text-muted-foreground mb-6">Profitez de cette journée pour récupérer et vous détendre.</p>
-                      <div className="p-4 bg-blue-500/10 rounded-lg">
-                        <p className="text-sm text-blue-300">
+                      <div className="p-4 bg-secondary/10 rounded-lg">
+                        <p className="text-sm text-secondary">
                           💡 <strong>Conseil:</strong> La récupération est essentielle pour progresser.
                           Vous pouvez faire des étirements légers ou une marche.
                         </p>
@@ -927,7 +931,7 @@ export const Programme: React.FC = () => {
                 <div className="surface-accent rounded-xl md:rounded-2xl p-3 md:p-6 border border-white/10 shadow-lg">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3 md:mb-4">
                     <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-                      <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
+                      <div className="w-8 h-8 md:w-12 md:h-12 bg-gradient-to-br from-primary to-secondary rounded-xl md:rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
                         <Calendar className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -965,8 +969,8 @@ export const Programme: React.FC = () => {
                   <div className="grid grid-cols-3 gap-2 md:gap-4">
                     <div className="glass-card border-primary/20 rounded-lg md:rounded-2xl p-2 md:p-4 border border-white/10 shadow-sm">
                       <div className="flex flex-col md:flex-row items-center md:gap-3">
-                        <div className="w-6 h-6 md:w-10 md:h-10 bg-blue-500/15 border border-blue-500/25 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
-                          <Activity className="w-3 h-3 md:w-5 md:h-5 text-blue-400" />
+                        <div className="w-6 h-6 md:w-10 md:h-10 bg-secondary/15 border border-secondary/25 rounded-lg md:rounded-xl flex items-center justify-center mb-1 md:mb-0">
+                          <Activity className="w-3 h-3 md:w-5 md:h-5 text-secondary" />
                         </div>
                         <div className="text-center md:text-left">
                           <p className="text-base md:text-2xl font-bold text-foreground">{programme?.sessions.length || 0}</p>
@@ -1116,7 +1120,7 @@ export const Programme: React.FC = () => {
                   <Card className="glass-card border-primary/20 bg-white/10 backdrop-blur-md border border-white/30 shadow-2xl rounded-3xl overflow-hidden">
                     <CardContent className="p-16">
                       <div className="text-center">
-                        <div className="w-40 h-40 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                        <div className="w-40 h-40 bg-gradient-to-br from-primary via-secondary to-primary rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
                           <Calendar className="w-20 h-20 text-white" />
                         </div>
                         <h3 className="text-3xl font-bold text-foreground mb-4">Aucun Programme</h3>
@@ -1124,9 +1128,9 @@ export const Programme: React.FC = () => {
                           Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions organisées.
                         </p>
                         <Button
-                          onClick={handleGenerateProgramme}
+                          onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                           disabled={isGenerating}
-                          className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                          className="bg-gradient-to-r from-primary via-secondary to-primary hover:from-secondary hover:via-primary hover:to-secondary text-white px-10 py-4 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                         >
                           {isGenerating ? (
                             <>
@@ -1155,7 +1159,7 @@ export const Programme: React.FC = () => {
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
-                <Dumbbell className="w-6 h-6 text-blue-500" />
+                <Dumbbell className="w-6 h-6 text-secondary" />
                 {selectedSession?.nom}
               </DialogTitle>
             </DialogHeader>
@@ -1163,14 +1167,14 @@ export const Programme: React.FC = () => {
             {selectedSession && (
               <div className="space-y-6">
                 {/* Informations de la session */}
-                <div className="p-6 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-200/50">
+                <div className="p-6 bg-gradient-to-r from-secondary/10 to-primary/10 rounded-2xl border border-secondary/30">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-foreground">{selectedSession.nom}</h3>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-300">
                         {selectedSession.intensity}
                       </Badge>
-                      <Badge variant="secondary" className="bg-blue-500/15 border border-blue-500/25 text-blue-300">
+                      <Badge variant="secondary" className="bg-secondary/15 border border-secondary/25 text-secondary">
                         {selectedSession.duration} min
                       </Badge>
                       <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-300">
@@ -1180,8 +1184,8 @@ export const Programme: React.FC = () => {
                   </div>
 
                   {selectedSession.notes && (
-                    <div className="p-3 bg-blue-500/10 rounded-lg mb-4">
-                      <p className="text-sm text-blue-300"><strong>Notes:</strong> {selectedSession.notes}</p>
+                    <div className="p-3 bg-secondary/10 rounded-lg mb-4">
+                      <p className="text-sm text-secondary"><strong>Notes:</strong> {selectedSession.notes}</p>
                     </div>
                   )}
 

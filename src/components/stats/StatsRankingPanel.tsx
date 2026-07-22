@@ -99,7 +99,7 @@ export const StatsRankingPanel: React.FC<StatsRankingPanelProps> = ({
       <Card className="glass-card border-primary/20">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
             </div>
             Filtrer le classement
@@ -197,7 +197,7 @@ export const StatsRankingPanel: React.FC<StatsRankingPanelProps> = ({
                       <div className="flex items-center gap-2">
                         <span
                           className={`font-bold text-lg ${
-                            isCurrentUser ? 'text-blue-300' : 'text-foreground'
+                            isCurrentUser ? 'text-secondary' : 'text-foreground'
                           }`}
                         >
                           {athlete.name}
@@ -231,7 +231,7 @@ export const StatsRankingPanel: React.FC<StatsRankingPanelProps> = ({
                     <div className="text-right">
                       <div
                         className={`font-bold text-xl ${
-                          isCurrentUser ? 'text-blue-400' : 'text-foreground'
+                          isCurrentUser ? 'text-secondary' : 'text-foreground'
                         }`}
                       >
                         {athlete.globalScore}
@@ -320,7 +320,7 @@ export const StatsRankingPanel: React.FC<StatsRankingPanelProps> = ({
                     <div className="flex items-center gap-2">
                       <div className="w-20 bg-white/10 rounded-full h-2">
                         <div
-                          className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                          className="h-2 rounded-full gradient-primary"
                           style={{ width: `${percentage}%` }}
                         />
                       </div>

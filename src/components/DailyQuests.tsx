@@ -75,7 +75,7 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest, onComplete }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              isCompleted ? 'bg-green-500/15 border border-green-500/25 text-green-400' : 'bg-blue-500/15 border border-blue-500/25 text-blue-400'
+              isCompleted ? 'bg-green-500/15 border border-green-500/25 text-green-400' : 'bg-primary/15 border border-primary/25 text-primary'
             }`}>
               {getQuestIcon(quest.type)}
             </div>
@@ -198,7 +198,7 @@ export const DailyQuests: React.FC = () => {
       {/* Quêtes Quotidiennes */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-blue-500" />
+          <Calendar className="w-5 h-5 text-secondary" />
           <h3 className="text-xl font-semibold text-foreground">Quêtes du Jour</h3>
         </div>
         

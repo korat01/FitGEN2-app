@@ -15,7 +15,7 @@ const TABS: { value: ProgressionTab; label: string; icon: React.ElementType }[] 
 const tabClass =
   'flex flex-col items-center justify-center gap-1 min-h-[52px] md:min-h-[44px] md:flex-row md:gap-2 rounded-xl px-2 py-2 text-[11px] md:text-sm font-medium transition-all duration-200 ' +
   'text-muted-foreground hover:text-foreground hover:bg-white/5 ' +
-  'data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_rgba(107,42,255,0.35)]';
+  'data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]';
 
 export const ProgressionTabNav: React.FC = () => (
   <TabsList

@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '../contexts/AuthContext';
-import { 
+import { useHunterMode } from '../hooks/useHunterMode';
+import {
   Dumbbell, 
   Clock, 
   Target,
@@ -2136,13 +2137,15 @@ export const BlocsEntrainement: React.FC = () => {
     }
   };
 
+  const { hunterPanelClass } = useHunterMode();
+
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="space-y-8">
           {/* Header Principal - VitalForce DA */}
-          <div className="relative overflow-hidden rounded-3xl p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
-            <div className="absolute inset-0 gradient-primary opacity-80"></div>
+          <div className={`relative overflow-hidden rounded-3xl p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${hunterPanelClass}`}>
+            <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-32 translate-x-32 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full translate-y-24 -translate-x-24 animate-float"></div>
             

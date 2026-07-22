@@ -66,6 +66,24 @@ const AppContent: React.FC = () => {
   const { particles, spawnClickParticles } = useParticles();
   const { celebrations, removeCelebration } = useCelebration();
 
+  // "Mode Hunter" — identité Solo Leveling (voir .hunter-mode dans index.css), réservée aux hauts
+  // rangs (S/Nation/World), chacun avec sa propre identité : S (.hunter-s, rouge sombre/braise),
+  // Nation (.hunter-nation, violet dominant), World (.hunter-world, noir/gris/bleu glacé).
+  // Uniquement des classes sur <html> : rien d'autre à défaire si ça ne va pas.
+  useEffect(() => {
+    const isHunterRank = user?.rank === 'S' || user?.rank === 'Nation' || user?.rank === 'World';
+    const isSRank = user?.rank === 'S';
+    const isWorldRank = user?.rank === 'World';
+    const isNationRank = user?.rank === 'Nation';
+    document.documentElement.classList.toggle('hunter-mode', isHunterRank);
+    document.documentElement.classList.toggle('hunter-s', isSRank);
+    document.documentElement.classList.toggle('hunter-world', isWorldRank);
+    document.documentElement.classList.toggle('hunter-nation', isNationRank);
+    return () => {
+      document.documentElement.classList.remove('hunter-mode', 'hunter-s', 'hunter-world', 'hunter-nation');
+    };
+  }, [user?.rank]);
+
   // Effet de clic global sur les éléments interactifs
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {

@@ -18,12 +18,10 @@ function generateByType(config: PowerliftingProgramConfig, maxes: UserMaxes, sta
       return generateClassique531(config, maxes, startWeek);
     case 'apprentissage':
       return generateApprentissage(config, maxes, startWeek);
-    case 'specialisation-bench':
-      return generateSpecialisation(config, maxes, 'bench', startWeek);
-    case 'specialisation-squat':
-      return generateSpecialisation(config, maxes, 'squat', startWeek);
-    case 'specialisation-deadlift':
-      return generateSpecialisation(config, maxes, 'deadlift', startWeek);
+    case 'spe': {
+      const targets: MainLift[] = config.speTargets && config.speTargets.length > 0 ? config.speTargets : ['squat'];
+      return generateSpecialisation(config, maxes, targets, startWeek);
+    }
     default: {
       const exhaustive: never = config.type;
       throw new Error(`Type de programme inconnu: ${exhaustive}`);

@@ -29,6 +29,7 @@ import { MealPhotoModal } from '@/components/nutrition/MealPhotoModal';
 import { useNutritionFavorites } from '@/hooks/useNutritionFavorites';
 import { useScannedAliments } from '@/hooks/useScannedAliments';
 import { useMealPhotoLog } from '@/hooks/useMealPhotoLog';
+import { useHunterMode } from '@/hooks/useHunterMode';
 import { RECETTES, calculerMacrosRecette } from '@/utils/nutritionData';
 
 // Chargé à la demande : embarque la lib ZXing (décodage code-barres), assez lourde pour ne pas
@@ -1557,13 +1558,15 @@ const Nutrition: React.FC = () => {
     }
   };
 
+  const { hunterPanelClass } = useHunterMode();
+
   return (
     <div className="relative">
       <div className="container mx-auto space-y-4 md:space-y-6 p-4 md:p-6 relative z-10 page-transition">
         <div className="stagger-animation">
       {/* Header VitalForce DA */}
-      <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
-        <div className="absolute inset-0 gradient-primary opacity-80"></div>
+      <div className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${hunterPanelClass}`}>
+        <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
         <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-24 translate-x-24 animate-pulse-slow"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -1717,7 +1720,7 @@ const Nutrition: React.FC = () => {
                   </div>
                   <CardTitle className="text-foreground text-xl">{aliment.nom}</CardTitle>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="border-blue-300 text-blue-300 bg-blue-500/10">
+                    <Badge variant="outline" className="border-secondary text-secondary bg-secondary/10">
                       {aliment.categorie}
                       </Badge>
                     {isScanned ? (
@@ -1774,7 +1777,7 @@ const Nutrition: React.FC = () => {
                         </div>
                     )}
 
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
+                    <Button className="w-full gradient-primary text-white font-semibold">
                       <Plus className="h-4 w-4 mr-2" />
                       Ajouter à un repas
                         </Button>
@@ -1860,7 +1863,7 @@ const Nutrition: React.FC = () => {
                         </div>
                       )}
 
-                      <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold">
+                      <Button className="w-full gradient-primary text-white font-semibold">
                         <ChefHat className="h-4 w-4 mr-2" />
                         Voir la recette
                       </Button>

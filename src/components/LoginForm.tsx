@@ -83,7 +83,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="Votre nom"
             required
             disabled={isLoading}
@@ -103,7 +103,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="pl-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="votre@email.com"
             required
             disabled={isLoading}
@@ -123,7 +123,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="pl-10 pr-10 h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+            className="pl-10 pr-10 h-12 border-white/10 focus:border-primary focus:ring-primary"
             placeholder="Votre mot de passe"
             required
             disabled={isLoading}
@@ -154,7 +154,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
               type="number"
               value={formData.weight}
               onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-primary focus:ring-primary"
               placeholder="75"
               min="30"
               max="200"
@@ -173,7 +173,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
               type="number"
               value={formData.age}
               onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
-              className="h-12 border-white/10 focus:border-blue-500 focus:ring-blue-500"
+              className="h-12 border-white/10 focus:border-primary focus:ring-primary"
               placeholder="28"
               min="16"
               max="100"
@@ -214,7 +214,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
           <select
             value={formData.sportClass}
             onChange={(e) => setFormData({ ...formData, sportClass: e.target.value })}
-            className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-blue-500 focus:ring-blue-500"
+            className="w-full h-12 px-4 border border-white/10 rounded-lg focus:border-primary focus:ring-primary"
             disabled={isLoading}
           >
             <option value="classique">Classique</option>
@@ -230,7 +230,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onCancel }) => 
       <div className="flex gap-3">
         <Button
           type="submit"
-          className="flex-1 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold"
+          className="flex-1 h-12 gradient-primary text-white font-semibold"
           disabled={isLoading}
         >
           {isLoading ? (

@@ -57,18 +57,18 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       <Button
         variant="ghost"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative overflow-hidden flex items-center gap-3 text-black hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 px-4 py-2 rounded-lg transition-all duration-300 group"
+        className="relative overflow-hidden flex items-center gap-3 text-black hover:bg-gradient-to-r hover:from-primary/10 hover:to-secondary/10 px-4 py-2 rounded-lg transition-all duration-300 group"
       >
         {/* Avatar avec gradient */}
         <div className="relative">
-          <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center group-hover:animate-pulse">
+          <div className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center group-hover:animate-pulse">
             <User className="w-4 h-4 text-white" />
           </div>
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-ping"></div>
         </div>
-        
+
         {/* Nom avec gradient */}
-        <span className="font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent group-hover:animate-pulse">
+        <span className="font-semibold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent group-hover:animate-pulse">
           {userName}
         </span>
         

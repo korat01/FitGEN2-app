@@ -1,6 +1,6 @@
-// Programmes de "Spécialisation" (Bench / Squat / Deadlift) — fréquence plus élevée sur le
-// mouvement choisi (2 à 4x/semaine selon le nombre de jours disponibles, avec des variantes
-// heavy/volume/technique/vitesse), les 2 autres mouvements passant en simple entretien 1x/semaine.
+// Programme "Spé" — spécialisation OPTIONNELLE : on choisit 1 ou 2 mouvements à spécialiser (plus
+// de fréquence, variantes lourd/volume/technique/vitesse), le(s) mouvement(s) restant(s) passe(nt)
+// en simple entretien allégé (1x/semaine minimum, peut monter si des jours restent disponibles).
 // Schéma largement documenté dans la communauté powerlifting (Stronger by Science, Smolov,
 // Smolov Jr, Coan/Phillipi) même s'il n'existe pas de protocole unique canonique — cf. recherche.
 import { buildWarmupSets, buildMainLiftSets, roundToPlates, pctOf, assignExerciseIds } from '../../programmeGenerator';
@@ -10,7 +10,6 @@ import type {
   GeneratedSession,
   MainLift,
   PowerliftingProgramConfig,
-  ProgramType,
   UserMaxes,
 } from '../types';
 
@@ -22,13 +21,26 @@ const MAIN_LIFT_NOM: Record<MainLift, string> = {
 
 const REPOS_LOURD: Record<MainLift, string> = { squat: '3-4 min', bench: '3 min', deadlift: '3-4 min' };
 
-// Combien de fois par semaine le mouvement spécialisé revient, selon le nombre total de jours
-// choisis — toute la marge supplémentaire va sur le mouvement ciblé, jamais sur l'entretien.
-function targetFrequency(totalDays: number): number {
-  if (totalDays <= 3) return 2;
-  if (totalDays === 4) return 2;
-  if (totalDays === 5) return 3;
-  return 4; // 6 jours
+const ALL_LIFTS: MainLift[] = ['squat', 'bench', 'deadlift'];
+
+// Répartit les jours disponibles : 1 jour minimum garanti par mouvement (ciblé OU entretien), tout
+// le reste part en fréquence supplémentaire sur les mouvements CIBLÉS uniquement (jamais sur
+// l'entretien — c'est tout l'intérêt d'un bloc de spécialisation), en alternance si 2 cibles.
+function planFrequencies(totalDays: number, targets: MainLift[]): { targetDays: Record<MainLift, number>; maintenanceLifts: MainLift[] } {
+  const maintenanceLifts = ALL_LIFTS.filter((l) => !targets.includes(l));
+  const targetDays: Partial<Record<MainLift, number>> = {};
+  targets.forEach((t) => { targetDays[t] = 1; });
+
+  let remaining = totalDays - targets.length - maintenanceLifts.length;
+  let i = 0;
+  while (remaining > 0) {
+    const t = targets[i % targets.length];
+    targetDays[t] = (targetDays[t] || 0) + 1;
+    remaining--;
+    i++;
+  }
+
+  return { targetDays: targetDays as Record<MainLift, number>, maintenanceLifts };
 }
 
 type Flavor = 'heavy' | 'volume' | 'technique' | 'vitesse';
@@ -96,63 +108,66 @@ const MAINTENANCE_CYCLE_INCREMENT: Record<MainLift, number> = { squat: 2.5, benc
 export function generateSpecialisation(
   config: PowerliftingProgramConfig,
   maxes: UserMaxes,
-  target: MainLift,
+  targets: MainLift[],
   startWeek: number = 1
 ): GeneratedPowerliftingProgram {
   const days = config.trainingDays;
   const totalDays = days.length;
-  const freq = Math.min(targetFrequency(totalDays), totalDays - (totalDays > 3 ? 2 : 1));
-  const others = (['squat', 'bench', 'deadlift'] as MainLift[]).filter((l) => l !== target);
+  const { targetDays, maintenanceLifts } = planFrequencies(totalDays, targets);
   const nbCycles = 2;
 
   const sessions: GeneratedSession[] = [];
-  let flavorCursor = 0;
+  const flavorCursor: Record<string, number> = {};
+  targets.forEach((t) => { flavorCursor[t] = 0; });
 
   for (let cycle = 1; cycle <= nbCycles; cycle++) {
-    const targetWorkingMax = roundToPlates(maxes[target] + CYCLE_INCREMENT[target] * (cycle - 1));
-    const maintenanceMax: Record<MainLift, number> = {
-      squat: maxes.squat, bench: maxes.bench, deadlift: maxes.deadlift,
-    };
-    others.forEach((l) => { maintenanceMax[l] = roundToPlates(maxes[l] + MAINTENANCE_CYCLE_INCREMENT[l] * (cycle - 1)); });
+    const targetWorkingMax: Partial<Record<MainLift, number>> = {};
+    targets.forEach((t) => { targetWorkingMax[t] = roundToPlates(maxes[t] + CYCLE_INCREMENT[t] * (cycle - 1)); });
+    const maintenanceMax: Partial<Record<MainLift, number>> = {};
+    maintenanceLifts.forEach((l) => { maintenanceMax[l] = roundToPlates(maxes[l] + MAINTENANCE_CYCLE_INCREMENT[l] * (cycle - 1)); });
 
     for (let semaineDansCycle = 1; semaineDansCycle <= 4; semaineDansCycle++) {
       const semaineAbsolue = startWeek + (cycle - 1) * 4 + (semaineDansCycle - 1);
       const isDeload = semaineDansCycle === 4;
       let jourIndex = 0;
 
-      for (let occurrence = 0; occurrence < freq; occurrence++, jourIndex++) {
-        const flavor = FLAVOR_CYCLE[flavorCursor % FLAVOR_CYCLE.length];
-        flavorCursor++;
-        const { exercises: raw, label } = buildTargetSession(flavor, target, targetWorkingMax, isDeload);
-        const exercises = assignExerciseIds(`spec-${semaineAbsolue}-${target}-${occurrence}`, raw);
-        sessions.push({
-          id: `spec-${semaineAbsolue}-${target}-${occurrence}`,
-          nom: `Semaine ${semaineAbsolue} - ${days[jourIndex]}`,
-          day: days[jourIndex],
-          phase: isDeload ? 'Deload' : 'Spécialisation',
-          intensity: isDeload ? 'Faible' : flavor === 'heavy' ? 'Maximale' : 'Élevée',
-          duration: exercises.length * 10,
-          exercises,
-          notes: isDeload
-            ? `Deload — ${MAIN_LIFT_NOM[target].toLowerCase()} (${label}), intensité réduite (Cycle ${cycle}).`
-            : `Spécialisation ${MAIN_LIFT_NOM[target]} — séance ${label} (Cycle ${cycle}).`,
-          equipment: ['Barre', 'Disques', 'Rack'],
-        });
-      }
+      targets.forEach((target) => {
+        const freq = targetDays[target];
+        for (let occurrence = 0; occurrence < freq; occurrence++, jourIndex++) {
+          if (!days[jourIndex]) return;
+          const flavor = FLAVOR_CYCLE[flavorCursor[target] % FLAVOR_CYCLE.length];
+          flavorCursor[target]++;
+          const { exercises: raw, label } = buildTargetSession(flavor, target, targetWorkingMax[target]!, isDeload);
+          const exercises = assignExerciseIds(`spe-${semaineAbsolue}-${target}-${occurrence}`, raw);
+          sessions.push({
+            id: `spe-${semaineAbsolue}-${target}-${occurrence}`,
+            nom: `Semaine ${semaineAbsolue} - ${days[jourIndex]}`,
+            day: days[jourIndex],
+            phase: isDeload ? 'Deload' : 'Spécialisation',
+            intensity: isDeload ? 'Faible' : flavor === 'heavy' ? 'Maximale' : 'Élevée',
+            duration: exercises.length * 10,
+            exercises,
+            notes: isDeload
+              ? `Deload — ${MAIN_LIFT_NOM[target].toLowerCase()} (${label}), intensité réduite (Cycle ${cycle}).`
+              : `Spécialisation ${MAIN_LIFT_NOM[target]} — séance ${label} (Cycle ${cycle}).`,
+            equipment: ['Barre', 'Disques', 'Rack'],
+          });
+        }
+      });
 
-      others.forEach((lift) => {
+      maintenanceLifts.forEach((lift) => {
         if (!days[jourIndex]) return;
-        const raw = buildMaintenanceSession(lift, maintenanceMax[lift], isDeload);
-        const exercises = assignExerciseIds(`spec-${semaineAbsolue}-${lift}-maint`, raw);
+        const raw = buildMaintenanceSession(lift, maintenanceMax[lift]!, isDeload);
+        const exercises = assignExerciseIds(`spe-${semaineAbsolue}-${lift}-maint`, raw);
         sessions.push({
-          id: `spec-${semaineAbsolue}-${lift}-maint`,
+          id: `spe-${semaineAbsolue}-${lift}-maint`,
           nom: `Semaine ${semaineAbsolue} - ${days[jourIndex]}`,
           day: days[jourIndex],
           phase: isDeload ? 'Deload' : 'Entretien',
           intensity: 'Modérée',
           duration: exercises.length * 10,
           exercises,
-          notes: `Entretien ${MAIN_LIFT_NOM[lift].toLowerCase()} — 1x/semaine pour ne pas perdre le mouvement pendant le bloc de spécialisation ${MAIN_LIFT_NOM[target].toLowerCase()} (Cycle ${cycle}).`,
+          notes: `Entretien ${MAIN_LIFT_NOM[lift].toLowerCase()} — charge allégée pour ne pas régresser pendant le bloc de spécialisation ${targets.map((t) => MAIN_LIFT_NOM[t].toLowerCase()).join(' et ')} (Cycle ${cycle}).`,
           equipment: ['Barre', 'Disques', 'Rack'],
         });
         jourIndex++;
@@ -160,13 +175,15 @@ export function generateSpecialisation(
     }
   }
 
-  const label = MAIN_LIFT_NOM[target];
+  const targetLabel = targets.map((t) => MAIN_LIFT_NOM[t]).join(' + ');
+  const freqLabel = targets.map((t) => `${MAIN_LIFT_NOM[t].toLowerCase()} ${targetDays[t]}x/semaine`).join(', ');
+
   return {
-    id: `specialisation-${target}-${Date.now()}`,
-    nom: `Spécialisation — ${label}`,
-    description: `Bloc de spécialisation ${label.toLowerCase()} : ${freq}x/semaine sur ce mouvement (alternance lourd/volume/technique/vitesse), ${others.map((l) => MAIN_LIFT_NOM[l].toLowerCase()).join(' et ')} maintenus 1x/semaine chacun pour ne pas régresser pendant le bloc.`,
+    id: `spe-${Date.now()}`,
+    nom: `Spé — ${targetLabel}`,
+    description: `Bloc de spécialisation optionnelle : ${freqLabel} (alternance lourd/volume/technique/vitesse), ${maintenanceLifts.map((l) => MAIN_LIFT_NOM[l].toLowerCase()).join(' et ')} maintenu${maintenanceLifts.length > 1 ? 's' : ''} en charge allégée pour ne pas régresser pendant le bloc.`,
     duree: startWeek - 1 + nbCycles * 4,
     sessions,
-    type: `specialisation-${target}` as ProgramType,
+    type: 'spe',
   };
 }

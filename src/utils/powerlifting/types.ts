@@ -2,14 +2,15 @@ import type { MainLift, PowerliftingLevel } from '../programmeGenerator';
 
 export type { MainLift, PowerliftingLevel };
 
-// Les 5 types de programme demandés — un nouveau type ne demande qu'une entrée ici + un fichier
-// `programs/xxx.ts` de plus, le reste (config, orchestrateur, modal) n'a pas à changer.
+// Un nouveau type ne demande qu'une entrée ici + un fichier `programs/xxx.ts` de plus, le reste
+// (config, orchestrateur, modal) n'a pas à changer. "Spé" remplace les 3 anciens types rigides
+// specialisation-bench/squat/deadlift : la spécialisation devient optionnelle et on peut cibler 1
+// OU 2 mouvements à la fois (le(s) mouvement(s) non ciblé(s) reste(nt) en entretien allégé — voir
+// `speTargets` sur PowerliftingProgramConfig et programs/specialisation.ts).
 export type ProgramType =
   | 'classique'
   | 'apprentissage'
-  | 'specialisation-bench'
-  | 'specialisation-squat'
-  | 'specialisation-deadlift';
+  | 'spe';
 
 export interface UserMaxes {
   squat: number;
@@ -28,6 +29,8 @@ export interface PowerliftingProgramConfig {
   trainingDays: string[];
   bodyweight: number;
   sex: 'male' | 'female';
+  /** Uniquement pour type === 'spe' : 1 ou 2 mouvements à spécialiser (le(s) restant(s) passe(nt) en entretien). */
+  speTargets?: MainLift[];
 }
 
 export interface GeneratedExercise {
@@ -67,16 +70,12 @@ export interface GeneratedPowerliftingProgram {
 export const PROGRAM_TYPE_LABELS: Record<ProgramType, string> = {
   classique: 'Classique (5/3/1)',
   apprentissage: 'Apprentissage',
-  'specialisation-bench': 'Spécialisation — Bench Press',
-  'specialisation-squat': 'Spécialisation — Squat',
-  'specialisation-deadlift': 'Spécialisation — Deadlift',
+  spe: 'Spé (spécialisation optionnelle)',
 };
 
 // Nombre de jours d'entraînement autorisé par type de programme (2 à 6 selon la demande).
 export const PROGRAM_TYPE_DAY_RANGE: Record<ProgramType, { min: number; max: number }> = {
-  classique: { min: 3, max: 4 },
+  classique: { min: 3, max: 6 },
   apprentissage: { min: 2, max: 4 },
-  'specialisation-bench': { min: 3, max: 6 },
-  'specialisation-squat': { min: 3, max: 6 },
-  'specialisation-deadlift': { min: 3, max: 6 },
+  spe: { min: 3, max: 6 },
 };

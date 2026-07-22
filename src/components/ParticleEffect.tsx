@@ -10,7 +10,7 @@ interface ParticleEffectProps {
 const particleConfigs = {
   click: {
     count: 6,
-    colors: ['#6366f1', '#8b5cf6', '#a855f7'],
+    colors: ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--primary) / 0.7)'],
     emojis: [] as string[],
     size: 4,
     velocity: 3,

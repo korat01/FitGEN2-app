@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { SelectableTile } from '@/components/profile/SelectableTile';
 import { Target, GraduationCap, Dumbbell, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_DAY_RANGE, type ProgramType } from '@/utils/powerlifting';
+import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_DAY_RANGE, type ProgramType, type MainLift } from '@/utils/powerlifting';
 
 const DAYS_OF_WEEK = [
   { key: 'lundi', label: 'Lundi' },
@@ -15,37 +15,55 @@ const DAYS_OF_WEEK = [
   { key: 'dimanche', label: 'Dimanche' },
 ];
 
+const MAIN_LIFTS: Array<{ key: MainLift; label: string }> = [
+  { key: 'squat', label: 'Squat' },
+  { key: 'bench', label: 'Bench Press' },
+  { key: 'deadlift', label: 'Deadlift' },
+];
+
+const MAX_SPE_TARGETS = 2;
+
 // Descriptions courtes (une ligne) pour rester cohérent avec les autres SelectableTile de l'app
 // (cf. ProfileSummary) — celles-ci sont tronquées au-delà d'une ligne, donc pas de phrases longues.
 const TYPE_DESCRIPTIONS: Record<ProgramType, string> = {
   classique: 'Vagues progressives sur cycles de 4 semaines',
   apprentissage: 'Charge qui augmente à chaque séance',
-  'specialisation-bench': 'Fréquence élevée sur le bench',
-  'specialisation-squat': 'Fréquence élevée sur le squat',
-  'specialisation-deadlift': 'Fréquence élevée sur le deadlift',
+  spe: 'Choisis 1 ou 2 mouvements à spécialiser',
 };
+
+type Step = 'type' | 'targets' | 'classique-spe' | 'days';
 
 interface NewProgramModalProps {
   onClose: () => void;
-  onConfirm: (type: ProgramType, trainingDays: string[]) => void;
+  onConfirm: (type: ProgramType, trainingDays: string[], speTargets?: MainLift[]) => void;
 }
 
-// Wizard en 2 étapes : type de programme, puis jours d'entraînement (bornés selon le type choisi).
-// Header + footer restent fixes et seule la zone du milieu scroll — pense mobile : le bouton
-// d'action principal doit toujours rester visible sans avoir à scroller pour le trouver.
+// Wizard : type de programme, puis (si "Spé") mouvement(s) à spécialiser, puis jours d'entraînement
+// (bornés selon le type choisi). Header + footer restent fixes et seule la zone du milieu scroll —
+// pense mobile : le bouton d'action principal doit toujours rester visible sans avoir à scroller.
 // La génération réelle (vérif des perfs, semaine de test, dispatch vers le bon générateur) se fait
 // côté appelant (Programme.tsx) via src/utils/powerlifting — ce modal ne fait que collecter le choix.
 export const NewProgramModal: React.FC<NewProgramModalProps> = ({ onClose, onConfirm }) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<Step>('type');
   const [selectedType, setSelectedType] = useState<ProgramType | null>(null);
+  const [selectedTargets, setSelectedTargets] = useState<MainLift[]>([]);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
   const range = selectedType ? PROGRAM_TYPE_DAY_RANGE[selectedType] : null;
-  const canProceedToStep2 = !!selectedType;
+  const isSpe = selectedType === 'spe';
+  const isClassique = selectedType === 'classique';
+  const canProceedFromType = !!selectedType;
+  const canProceedFromTargets = selectedTargets.length >= 1 && selectedTargets.length <= MAX_SPE_TARGETS;
   const canConfirm = !!range && selectedDays.length >= range.min && selectedDays.length <= range.max;
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
+  };
+
+  const toggleTarget = (lift: MainLift) => {
+    setSelectedTargets((prev) =>
+      prev.includes(lift) ? prev.filter((l) => l !== lift) : prev.length < MAX_SPE_TARGETS ? [...prev, lift] : prev
+    );
   };
 
   const handleTypeSelect = (type: ProgramType) => {
@@ -54,7 +72,23 @@ export const NewProgramModal: React.FC<NewProgramModalProps> = ({ onClose, onCon
     // rentreraient plus dans la nouvelle fourchette max, pour éviter un choix devenu invalide.
     const newRange = PROGRAM_TYPE_DAY_RANGE[type];
     setSelectedDays((prev) => prev.slice(0, newRange.max));
+    if (type !== 'spe') setSelectedTargets([]);
   };
+
+  const goToDaysStep = () => setStep('days');
+  const goFromTypeStep = () => setStep(isSpe ? 'targets' : isClassique ? 'classique-spe' : 'days');
+  const goBackFromDays = () => setStep(isSpe ? 'targets' : isClassique ? 'classique-spe' : 'type');
+
+  const title =
+    step === 'type'
+      ? 'Nouveau programme'
+      : step === 'targets'
+      ? 'Spé — quels mouvements ?'
+      : step === 'classique-spe'
+      ? 'Spécialisation (optionnel)'
+      : selectedType
+      ? PROGRAM_TYPE_LABELS[selectedType]
+      : 'Nouveau programme';
 
   return (
     <Dialog open onOpenChange={(next) => { if (!next) onClose(); }}>
@@ -62,14 +96,12 @@ export const NewProgramModal: React.FC<NewProgramModalProps> = ({ onClose, onCon
         <DialogHeader className="p-4 pr-10 border-b border-white/10 shrink-0 space-y-0">
           <DialogTitle className="text-base md:text-lg font-bold text-foreground flex items-center gap-2 text-left">
             <Dumbbell className="w-5 h-5 text-primary shrink-0" />
-            <span className="truncate">
-              {step === 2 && selectedType ? PROGRAM_TYPE_LABELS[selectedType] : 'Nouveau programme'}
-            </span>
+            <span className="truncate">{title}</span>
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-0">
-          {step === 1 && (
+          {step === 'type' && (
             <>
               <p className="text-sm text-muted-foreground">Quel type de programme voulez-vous générer ?</p>
 
@@ -91,43 +123,69 @@ export const NewProgramModal: React.FC<NewProgramModalProps> = ({ onClose, onCon
                 onClick={() => handleTypeSelect('apprentissage')}
                 gradient="from-green-500 to-emerald-500"
               />
+              <SelectableTile
+                layout="horizontal"
+                icon={<Dumbbell className="w-5 h-5" />}
+                label={PROGRAM_TYPE_LABELS.spe}
+                description={TYPE_DESCRIPTIONS.spe}
+                selected={selectedType === 'spe'}
+                onClick={() => handleTypeSelect('spe')}
+                gradient="from-red-500 to-orange-500"
+              />
+            </>
+          )}
 
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 mt-4">Spécialisation</p>
-                <div className="space-y-2">
+          {step === 'targets' && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Choisis 1 ou 2 mouvements à spécialiser
+                <span className="ml-1 font-medium text-foreground">({selectedTargets.length}/{MAX_SPE_TARGETS})</span>
+                — le(s) reste(nt) en entretien allégé, pas d'inquiétude.
+              </p>
+
+              <div className="space-y-2">
+                {MAIN_LIFTS.map(({ key, label }) => (
                   <SelectableTile
+                    key={key}
                     layout="horizontal"
                     icon={<Dumbbell className="w-5 h-5" />}
-                    label="Bench Press"
-                    description={TYPE_DESCRIPTIONS['specialisation-bench']}
-                    selected={selectedType === 'specialisation-bench'}
-                    onClick={() => handleTypeSelect('specialisation-bench')}
-                    gradient="from-blue-500 to-cyan-500"
+                    label={label}
+                    selected={selectedTargets.includes(key)}
+                    onClick={() => toggleTarget(key)}
+                    disabled={!selectedTargets.includes(key) && selectedTargets.length >= MAX_SPE_TARGETS}
+                    gradient="from-red-500 to-orange-500"
                   />
-                  <SelectableTile
-                    layout="horizontal"
-                    icon={<Dumbbell className="w-5 h-5" />}
-                    label="Squat"
-                    description={TYPE_DESCRIPTIONS['specialisation-squat']}
-                    selected={selectedType === 'specialisation-squat'}
-                    onClick={() => handleTypeSelect('specialisation-squat')}
-                    gradient="from-red-500 to-pink-500"
-                  />
-                  <SelectableTile
-                    layout="horizontal"
-                    icon={<Dumbbell className="w-5 h-5" />}
-                    label="Deadlift"
-                    description={TYPE_DESCRIPTIONS['specialisation-deadlift']}
-                    selected={selectedType === 'specialisation-deadlift'}
-                    onClick={() => handleTypeSelect('specialisation-deadlift')}
-                    gradient="from-purple-500 to-violet-500"
-                  />
-                </div>
+                ))}
               </div>
             </>
           )}
 
-          {step === 2 && range && (
+          {step === 'classique-spe' && (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Optionnel : mets 1 ou 2 mouvements en priorité sur les jours au-delà des 3 jours de base
+                <span className="ml-1 font-medium text-foreground">({selectedTargets.length}/{MAX_SPE_TARGETS})</span>.
+                Sans choix, l'ordre par défaut (bench puis squat puis deadlift) est utilisé.
+              </p>
+
+              <div className="space-y-2">
+                {MAIN_LIFTS.map(({ key, label }) => (
+                  <SelectableTile
+                    key={key}
+                    layout="horizontal"
+                    icon={<Dumbbell className="w-5 h-5" />}
+                    label={label}
+                    selected={selectedTargets.includes(key)}
+                    onClick={() => toggleTarget(key)}
+                    disabled={!selectedTargets.includes(key) && selectedTargets.length >= MAX_SPE_TARGETS}
+                    gradient="from-primary to-secondary"
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {step === 'days' && range && (
             <>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="w-4 h-4 shrink-0" />
@@ -154,24 +212,55 @@ export const NewProgramModal: React.FC<NewProgramModalProps> = ({ onClose, onCon
         </div>
 
         <div className="flex gap-3 p-4 border-t border-white/10 shrink-0">
-          {step === 1 && (
+          {step === 'type' && (
             <Button
-              onClick={() => setStep(2)}
-              disabled={!canProceedToStep2}
+              onClick={goFromTypeStep}
+              disabled={!canProceedFromType}
               className="w-full bg-gradient-to-r from-primary to-secondary text-white"
             >
               Continuer
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           )}
-          {step === 2 && (
+          {step === 'targets' && (
             <>
-              <Button variant="outline" onClick={() => setStep(1)} className="border-2 border-white/15">
+              <Button variant="outline" onClick={() => setStep('type')} className="border-2 border-white/15">
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Retour
               </Button>
               <Button
-                onClick={() => selectedType && onConfirm(selectedType, selectedDays)}
+                onClick={goToDaysStep}
+                disabled={!canProceedFromTargets}
+                className="flex-1 bg-gradient-to-r from-primary to-secondary text-white"
+              >
+                Continuer
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </>
+          )}
+          {step === 'classique-spe' && (
+            <>
+              <Button variant="outline" onClick={() => setStep('type')} className="border-2 border-white/15">
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+              <Button
+                onClick={goToDaysStep}
+                className="flex-1 bg-gradient-to-r from-primary to-secondary text-white"
+              >
+                {selectedTargets.length > 0 ? 'Continuer' : 'Passer / Continuer'}
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            </>
+          )}
+          {step === 'days' && (
+            <>
+              <Button variant="outline" onClick={goBackFromDays} className="border-2 border-white/15">
+                <ChevronLeft className="w-4 h-4 mr-2" />
+                Retour
+              </Button>
+              <Button
+                onClick={() => selectedType && onConfirm(selectedType, selectedDays, (isSpe || isClassique) ? selectedTargets : undefined)}
                 disabled={!canConfirm}
                 className="flex-1 bg-gradient-to-r from-primary to-secondary text-white"
               >

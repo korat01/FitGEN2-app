@@ -1035,6 +1035,37 @@ export const applyProgression = (exercise: Exercise, phase: string, level: strin
   };
 };
 
+// Certains schémas (FSL, BBB, blocs "volume"/"vitesse" en spécialisation...) enchaînent plusieurs
+// sets IDENTIQUES (même mouvement, mêmes reps, même poids) en autant d'objets séparés — ExerciseCard
+// affiche une carte par objet, donc ça donnait "1x10 à 55kg" répété 5 fois au lieu d'une seule carte
+// "5x10 à 55kg". On fusionne ici les sets consécutifs identiques en sommant `series`, avant
+// d'assigner les ids : une carte = un vrai bloc de travail, une seule validation Réussi/Raté pour
+// tout le bloc (déjà le cas d'usage prévu par ExerciseCard, qui affiche `series` comme un nombre).
+// Ne fusionne jamais des exercices qui ont déjà un id explicite (séances déjà générées/stockées,
+// ré-affichées via les fonctions d'adaptation) pour ne pas perdre l'historique de validation existant.
+function mergeIdenticalConsecutiveSets(exercises: any[]): any[] {
+  const merged: any[] = [];
+  for (const ex of exercises) {
+    const prev = merged[merged.length - 1];
+    const canMerge =
+      prev &&
+      !prev.id &&
+      !ex.id &&
+      prev.nom === ex.nom &&
+      prev.type === ex.type &&
+      prev.reps === ex.reps &&
+      prev.poids === ex.poids &&
+      prev.pourcentage === ex.pourcentage &&
+      prev.repos === ex.repos;
+    if (canMerge) {
+      prev.series = (prev.series || 1) + (ex.series || 1);
+    } else {
+      merged.push({ ...ex });
+    }
+  }
+  return merged;
+}
+
 // Fonction principale de génération de programme - AMÉLIORÉE
 // Donne un id STABLE et UNIQUE à chaque exercice d'une séance (index dans la séance), au lieu de
 // retomber sur exercise.nom comme c'était le cas partout en aval (ExerciseContext/Programme.tsx font
@@ -1042,7 +1073,7 @@ export const applyProgression = (exercise: Exercise, phase: string, level: strin
 // TOUTES le même nom ("Squat" x3) donc le même id : valider "Raté" sur une seule série marquait les
 // 3 comme ratées d'un coup (même chose pour les paliers d'échauffement).
 export function assignExerciseIds(sessionId: string, exercises: any[]): any[] {
-  return exercises.map((ex, idx) => ({ ...ex, id: ex.id || `${sessionId}-ex${idx}` }));
+  return mergeIdenticalConsecutiveSets(exercises).map((ex, idx) => ({ ...ex, id: ex.id || `${sessionId}-ex${idx}` }));
 }
 
 // Appliqué une seule fois ici, sur le résultat final, pour couvrir tous les sports sans dupliquer

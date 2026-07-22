@@ -40,25 +40,49 @@ const WAVE_BY_WEEK: Record<number, WaveSet[]> = {
   4: [{ reps: 5, pct: 0.4 }, { reps: 5, pct: 0.5 }, { reps: 5, pct: 0.6 }], // deload
 };
 
-const ACCESSORY_POOL: Record<MainLift, Array<{ nom: string; ratio: number; series: number; reps: number; repos: string }>> = {
+// Plusieurs accessoires cohérents par mouvement (pas juste 2 fixes) — on en prend 2 par séance en
+// alternant selon la semaine, pour varier le stimulus sur le cycle plutôt que de répéter exactement
+// les 2 mêmes exercices 8 semaines de suite. Le poids est exprimé en ratio du Training Max du jour
+// (sauf mention contraire), cohérent avec le reste du module.
+interface AccessoryDef {
+  nom: string;
+  ratio: number;
+  series: number;
+  reps: number;
+  repos: string;
+}
+
+const ACCESSORY_POOL: Record<MainLift, AccessoryDef[]> = {
   squat: [
+    { nom: 'Presse à Jambes', ratio: 1.2, series: 3, reps: 12, repos: '90s' },
+    { nom: 'Fentes Bulgares', ratio: 0.25, series: 3, reps: 10, repos: '90s' },
     { nom: 'Fentes lestées', ratio: 0.15, series: 3, reps: 10, repos: '90s' },
     { nom: 'Extensions de Jambes', ratio: 0.35, series: 3, reps: 15, repos: '90s' },
   ],
   bench: [
     { nom: 'Développé Prise Serrée', ratio: 0.55, series: 3, reps: 10, repos: '90s' },
+    { nom: 'Dips Lestés', ratio: 0.2, series: 3, reps: 10, repos: '90s' },
+    { nom: 'Tractions Lestées', ratio: 0.15, series: 3, reps: 8, repos: '90s' },
     { nom: 'Extensions Triceps', ratio: 0.15, series: 3, reps: 15, repos: '60s' },
   ],
   deadlift: [
     { nom: 'Soulevé de Terre Roumain', ratio: 0.45, series: 3, reps: 10, repos: '90s' },
     { nom: 'Rowing Barre', ratio: 0.45, series: 3, reps: 10, repos: '90s' },
+    { nom: 'Fentes Bulgares', ratio: 0.25, series: 3, reps: 10, repos: '90s' },
+    { nom: 'Extensions Lombaires', ratio: 0, series: 3, reps: 15, repos: '60s' },
   ],
 };
 
-function buildAccessories(lift: MainLift, tm: number): GeneratedExercise[] {
-  return ACCESSORY_POOL[lift].map(({ nom, ratio, series, reps, repos }) => {
-    const poids = roundToPlates(tm * ratio);
-    return { nom, type: 'accessoire', series, reps, poids, pourcentage: pctOf(poids, tm), repos };
+// Alterne les 2 accessoires servis chaque semaine (semaines paires vs impaires) plutôt que de
+// toujours prendre les 2 premiers de la liste — la Presse à Jambes/RDL/Tractions reviennent chacun
+// leur tour, pas systématiquement les 4 chaque séance (durée de séance sinon trop longue).
+function buildAccessories(lift: MainLift, tm: number, semaineAbsolue: number): GeneratedExercise[] {
+  const pool = ACCESSORY_POOL[lift];
+  const offset = semaineAbsolue % 2 === 0 ? 2 : 0;
+  const picked = [pool[offset], pool[offset + 1]];
+  return picked.map(({ nom, ratio, series, reps, repos }) => {
+    const poids = ratio > 0 ? roundToPlates(tm * ratio) : 0;
+    return { nom, type: 'accessoire', series, reps, poids, pourcentage: poids > 0 ? pctOf(poids, tm) : 0, repos };
   });
 }
 
@@ -78,7 +102,7 @@ function createMainSession(
   lift: MainLift,
   tm: number,
   dayName: string,
-  isVolumeExtra: boolean
+  volumeExtraFor: MainLift | null
 ): GeneratedSession {
   const nomPrincipal = MAIN_LIFT_NOM[lift];
   const wave = WAVE_BY_WEEK[semaineDansCycle];
@@ -87,13 +111,15 @@ function createMainSession(
   let exercises: GeneratedExercise[];
   let notes: string;
 
-  if (isVolumeExtra) {
-    // 4e jour (4 séances/semaine) : volume supplémentaire façon BBB sur le bench, à intensité fixe
-    // et modérée — la fréquence en plus, pas une 2e montée en charge maximale dans la semaine.
+  if (volumeExtraFor) {
+    // Jour de volume supplémentaire (4e/5e/6e jour selon les jours choisis) façon BBB, à intensité
+    // fixe et modérée — la fréquence en plus sur ce mouvement, pas une 2e montée en charge maximale
+    // dans la semaine. Un seul mouvement ciblé par jour de volume (bench, puis squat, puis deadlift).
+    const nomVolume = MAIN_LIFT_NOM[volumeExtraFor];
     const poidsBBB = roundToPlates(tm * (isDeload ? 0.4 : 0.5));
-    const warmup = buildWarmupSets(nomPrincipal, poidsBBB, WENDLER_WARMUP) as GeneratedExercise[];
+    const warmup = buildWarmupSets(nomVolume, poidsBBB, WENDLER_WARMUP) as GeneratedExercise[];
     const bbb = Array.from({ length: 5 }, () => ({
-      nom: `${nomPrincipal} (volume)`,
+      nom: `${nomVolume} (volume)`,
       type: 'travail' as const,
       series: 1,
       reps: 10,
@@ -101,14 +127,14 @@ function createMainSession(
       pourcentage: pctOf(poidsBBB, tm),
       repos: '90s',
     }));
-    exercises = [...warmup, ...bbb, ...buildAccessories(lift, tm)];
-    notes = `Bloc Volume (Boring But Big) — ${nomPrincipal.toLowerCase()}, 5x10 à charge fixe (Cycle ${cycle}).`;
+    exercises = [...warmup, ...bbb, ...buildAccessories(volumeExtraFor, tm, semaineAbsolue)];
+    notes = `Bloc Volume (Boring But Big) — ${nomVolume.toLowerCase()}, 5x10 à charge fixe (Cycle ${cycle}).`;
   } else {
     const firstWorkingWeight = roundToPlates(tm * wave[0].pct);
     const warmup = buildWarmupSets(nomPrincipal, firstWorkingWeight, WENDLER_WARMUP) as GeneratedExercise[];
     const mainSets = buildMainLiftSets(nomPrincipal, tm, wave, REPOS_PRINCIPAL[lift]) as GeneratedExercise[];
     const fsl = isDeload ? [] : buildFSL(`${nomPrincipal} (FSL)`, tm, wave[0].pct);
-    exercises = [...warmup, ...mainSets, ...fsl, ...buildAccessories(lift, tm)];
+    exercises = [...warmup, ...mainSets, ...fsl, ...buildAccessories(lift, tm, semaineAbsolue)];
     const semaineLabel = isDeload ? 'Deload' : semaineDansCycle === 1 ? '5/5/5+' : semaineDansCycle === 2 ? '3/3/3+' : '5/3/1+';
     notes = isDeload
       ? 'Semaine de deload — intensité réduite, aucun AMRAP. Profitez-en pour récupérer avant le cycle suivant.'
@@ -116,16 +142,33 @@ function createMainSession(
   }
 
   return {
-    id: `531-${semaineAbsolue}-${lift}${isVolumeExtra ? '-vol' : ''}`,
+    id: `531-${semaineAbsolue}-${lift}${volumeExtraFor ? `-vol-${volumeExtraFor}` : ''}`,
     nom: `Semaine ${semaineAbsolue} - ${dayName}`,
     day: dayName,
     phase: isDeload ? 'Deload' : semaineDansCycle === 1 ? 'Adaptation' : semaineDansCycle === 2 ? 'Progression' : 'Spécialisation',
     intensity: isDeload ? 'Faible' : semaineDansCycle === 3 ? 'Maximale' : 'Élevée',
     duration: exercises.length * 10,
-    exercises: assignExerciseIds(`531-${semaineAbsolue}-${lift}`, exercises),
+    exercises: assignExerciseIds(`531-${semaineAbsolue}-${lift}${volumeExtraFor ? `-vol-${volumeExtraFor}` : ''}`, exercises),
     notes,
     equipment: ['Barre', 'Disques', 'Rack'],
   };
+}
+
+// Jours de volume supplémentaires au-delà des 3 jours principaux (squat/bench/deadlift) : bench en
+// 4e jour, squat en 5e, deadlift en 6e — dans cet ordre, pour rester cohérent avec l'ordre des 3
+// jours principaux et ne jamais faire travailler le même mouvement 2x en intensité max la semaine.
+const DEFAULT_EXTRA_DAY_LIFT: MainLift[] = ['bench', 'squat', 'deadlift'];
+
+// Spécialisation optionnelle DANS le Classique : si l'utilisateur a choisi 1 ou 2 mouvements à
+// spécialiser (même champ `speTargets` que le programme "Spé"), les jours en plus (au-delà des 3
+// jours de base) vont TOUS sur ce(s) mouvement(s) en alternance, au lieu de l'ordre par défaut
+// bench->squat->deadlift. Sans choix (optionnel, la plupart des utilisateurs skip cette étape dans
+// le modal), le comportement d'origine est inchangé.
+function resolveExtraDayLifts(nbExtraDays: number, speTargets?: MainLift[]): MainLift[] {
+  if (!speTargets || speTargets.length === 0) {
+    return DEFAULT_EXTRA_DAY_LIFT.slice(0, nbExtraDays);
+  }
+  return Array.from({ length: nbExtraDays }, (_, i) => speTargets[i % speTargets.length]);
 }
 
 // Génère le programme Classique (5/3/1) sur 2 cycles de 4 semaines (progression de TM visible sans
@@ -137,8 +180,9 @@ export function generateClassique531(
   startWeek: number = 1
 ): GeneratedPowerliftingProgram {
   const days = config.trainingDays;
-  const hasFourthDay = days.length >= 4;
   const liftForDay: MainLift[] = ['squat', 'bench', 'deadlift'];
+  const nbExtraDays = Math.max(0, Math.min(3, days.length - 3));
+  const extraDayLifts = resolveExtraDayLifts(nbExtraDays, config.speTargets);
 
   const sessions: GeneratedSession[] = [];
   const nbCycles = 2;
@@ -155,22 +199,29 @@ export function generateClassique531(
       liftForDay.forEach((lift, jourIndex) => {
         if (!days[jourIndex]) return;
         sessions.push(
-          createMainSession(semaineAbsolue, semaineDansCycle, cycle, lift, tmParCycle[lift], days[jourIndex], false)
+          createMainSession(semaineAbsolue, semaineDansCycle, cycle, lift, tmParCycle[lift], days[jourIndex], null)
         );
       });
 
-      if (hasFourthDay) {
+      for (let extra = 0; extra < nbExtraDays; extra++) {
+        const jourIndex = 3 + extra;
+        if (!days[jourIndex]) continue;
+        const targetLift = extraDayLifts[extra];
         sessions.push(
-          createMainSession(semaineAbsolue, semaineDansCycle, cycle, 'bench', tmParCycle.bench, days[3], true)
+          createMainSession(semaineAbsolue, semaineDansCycle, cycle, targetLift, tmParCycle[targetLift], days[jourIndex], targetLift)
         );
       }
     }
   }
 
+  const extraLabel = nbExtraDays > 0
+    ? ` + volume ${Array.from(new Set(extraDayLifts)).map((l) => MAIN_LIFT_NOM[l].toLowerCase()).join('/')}`
+    : '';
+
   return {
     id: `classique531-${Date.now()}`,
     nom: '5/3/1 — Programme Classique',
-    description: `Méthode 5/3/1 de Jim Wendler, basée sur vos Training Max (90% de vos 1RM réels : Squat ${maxes.squat}kg, Bench ${maxes.bench}kg, Deadlift ${maxes.deadlift}kg). Vague progressive sur 3 semaines (5/5/5+, 3/3/3+, 5/3/1+) suivie d'un deload, avec travail supplémentaire (FSL${hasFourthDay ? ' + volume bench' : ''}) et accessoires ciblés.`,
+    description: `Méthode 5/3/1 de Jim Wendler, basée sur vos Training Max (90% de vos 1RM réels : Squat ${maxes.squat}kg, Bench ${maxes.bench}kg, Deadlift ${maxes.deadlift}kg). Vague progressive sur 3 semaines (5/5/5+, 3/3/3+, 5/3/1+) suivie d'un deload, avec travail supplémentaire (FSL${extraLabel}) et accessoires ciblés et variés.`,
     duree: startWeek - 1 + nbCycles * 4,
     sessions,
     type: 'classique',

@@ -9,16 +9,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(107,42,255,0.3)] hover:shadow-[0_0_25px_rgba(107,42,255,0.5)] hover:scale-105",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--primary)/0.5)] hover:scale-105",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-[0_0_15px_rgba(239,68,68,0.3)] hover:shadow-[0_0_25px_rgba(239,68,68,0.5)]",
         outline:
           "border border-primary/30 bg-background/80 backdrop-blur-sm hover:bg-card hover:text-foreground hover:border-primary/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[0_0_15px_rgba(0,194,255,0.3)] hover:shadow-[0_0_25px_rgba(0,194,255,0.5)] hover:scale-105",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[0_0_15px_hsl(var(--secondary)/0.3)] hover:shadow-[0_0_25px_hsl(var(--secondary)/0.5)] hover:scale-105",
         ghost: "hover:bg-card/50 hover:text-foreground backdrop-blur-sm",
         link: "text-primary underline-offset-4 hover:underline hover:text-primary/80",
-        premium: "gradient-primary text-white shadow-[var(--shadow-glow-purple)] hover:shadow-[0_0_30px_rgba(107,42,255,0.8)] hover:scale-105",
+        premium: "gradient-primary text-white shadow-[var(--shadow-glow-purple)] hover:shadow-[0_0_30px_hsl(var(--primary)/0.8)] hover:scale-105",
         glass: "glass-card border-primary/30 text-foreground hover:bg-card/80 hover:border-primary/50",
       },
       size: {

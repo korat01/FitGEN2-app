@@ -35,7 +35,7 @@ const MobileNavigation: React.FC = () => {
                 }`}
               >
                 {active && (
-                  <div className="absolute inset-0 gradient-primary opacity-20 rounded-xl border border-[rgba(107,42,255,0.4)]" />
+                  <div className="absolute inset-0 gradient-primary opacity-20 rounded-xl border border-primary/40" />
                 )}
                 <div className={`relative transition-transform duration-300 ${
                   active ? 'scale-110' : ''
@@ -66,7 +66,7 @@ const MobileNavigation: React.FC = () => {
                   <Icon
                     className={`w-5 h-5 transition-all duration-300 ${
                       active
-                        ? 'stroke-[2.5] drop-shadow-[0_0_10px_rgba(0,194,255,0.8)]'
+                        ? 'stroke-[2.5] drop-shadow-[0_0_10px_hsl(var(--secondary)/0.8)]'
                         : 'stroke-2'
                     }`}
                   />

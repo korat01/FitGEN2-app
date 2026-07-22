@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { RankBadge } from '@/components/RankBadge';
 import { SelectableTile } from '@/components/profile/SelectableTile';
+import { useHunterMode } from '@/hooks/useHunterMode';
 
 interface MuscleGroup {
   name: string;
@@ -305,13 +306,14 @@ export const ProfileSummary: React.FC = () => {
   const imc = user.weight && user.height ? Math.round((user.weight / Math.pow(user.height / 100, 2)) * 10) / 10 : null;
 
   const sportFocusList = SPORT_FOCUS[user.sportClass || 'classique'] || [];
+  const { hunterPanelClass } = useHunterMode();
 
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Header Principal */}
-          <div className="relative overflow-hidden rounded-3xl gradient-primary p-6 md:p-8 text-white shadow-2xl">
+          <div className={`relative overflow-hidden rounded-3xl gradient-primary p-6 md:p-8 text-white shadow-2xl ${hunterPanelClass}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24" />
 

@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
-import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple, Feather, Crown } from 'lucide-react';
+import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple, Feather, Crown, Footprints } from 'lucide-react';
 import { getRankColors, type RankLevel } from '@/config/rankTheme';
 
 // Nouveaux composants pour le Dashboard
@@ -123,7 +123,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleur Total',
           value: `${bestTotal} kg`,
-          icon: '🏋️‍♂️',
+          icon: Dumbbell,
           description: `Squat: ${bestSquat}kg + Bench: ${bestBench}kg + Deadlift: ${bestDeadlift}kg`
         };
       case 'streetlifting':
@@ -141,7 +141,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleur Total Street',
           value: `${streetTotal} kg`,
-          icon: '💪',
+          icon: Weight,
           description: `+ ${bestStreetPullups} tractions max`
         };
       case 'sprint':
@@ -154,7 +154,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleur 100m',
           value: `${bestTime100m > 0 ? bestTime100m.toFixed(1) : '0'}s`,
-          icon: '⚡',
+          icon: Zap,
           description: `Vitesse max: ${maxSpeed} km/h`
         };
       case 'marathon':
@@ -170,14 +170,14 @@ export const Dashboard: React.FC = () => {
           return {
             label: 'Meilleur Marathon',
             value: `${hours}h${minutes.toString().padStart(2, '0')}`,
-            icon: '🏃‍♂️',
+            icon: Footprints,
             description: 'Temps record'
           };
         } else {
           return {
             label: 'Meilleure Distance',
             value: `${bestDistance30min.toFixed(1)} km`,
-            icon: '🏃‍♀️',
+            icon: Footprints,
             description: 'En 30 minutes'
           };
         }
@@ -188,7 +188,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleure Perf',
           value: `${bestCrossfitScore}`,
-          icon: '🔥',
+          icon: Flame,
           description: 'Meilleure performance'
         };
       case 'calisthenics':
@@ -200,15 +200,15 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleures Tractions',
           value: `${bestPullups} reps`,
-          icon: '🆙',
+          icon: TrendingUp,
           description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : 'En une série'
         };
       default:
         // Pour classique : score global
         return {
           label: 'Score Global',
-          value: `${userRank?.globalScore || 0} ${userRank?.scoreLabel || 'pts'}`,
-          icon: '⭐',
+          value: `${user?.globalScore ?? userRank?.globalScore ?? 0} ${user?.scoreLabel || userRank?.scoreLabel || 'pts'}`,
+          icon: Star,
           description: 'Performance générale'
         };
     }
@@ -240,18 +240,20 @@ export const Dashboard: React.FC = () => {
       </div>;
   }
 
-  const rankKey = (userRank?.rank || 'D') as RankLevel;
+  const rankKey = (user?.rank || userRank?.rank || 'D') as RankLevel;
   const rankColors = getRankColors(rankKey);
   const RankIcon = RANK_ICONS[rankKey] || Star;
+  const isHunterRank = rankKey === 'S' || rankKey === 'Nation' || rankKey === 'World';
 
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
       <div className="space-y-8 stagger-animation">
-          
-          {/* Header Principal - VitalForce DA */}
-          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
-            <div className="absolute inset-0 gradient-primary opacity-80"></div>
+
+          {/* Header Principal - VitalForce DA (recoloré en mode Hunter via .hunter-mode sur <html>,
+              voir App.tsx — les coins lumineux "fenêtre System" ne s'affichent qu'ici) */}
+          <div className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${isHunterRank ? 'hunter-panel' : ''}`}>
+            <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
             {/* Particules flottantes VitalForce */}
             <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24 animate-pulse-slow"></div>
@@ -286,7 +288,7 @@ export const Dashboard: React.FC = () => {
                   <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
                     <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
-                      <span className="text-lg md:text-xl">{mainStat.icon}</span>
+                      <mainStat.icon className="w-4 h-4 md:w-5 md:h-5" />
                       <span>{mainStat.label}: {mainStat.value}</span>
                     </div>
                     
@@ -303,11 +305,13 @@ export const Dashboard: React.FC = () => {
                     </div>
                 
                     <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      🔄 Recalculer
+                      <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+                      Recalculer
                     </Button>
-                    
+
                     <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      ➕ Performances
+                      <Plus className="w-3.5 h-3.5 mr-1.5" />
+                      Performances
                     </Button>
                 </div>
               </div>
@@ -364,9 +368,7 @@ export const Dashboard: React.FC = () => {
                     </p>
                   </div>
                   <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/15 border border-primary/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl md:text-3xl">
-                      {mainStat.icon}
-                    </span>
+                    <mainStat.icon className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                   </div>
                 </div>
               </CardContent>

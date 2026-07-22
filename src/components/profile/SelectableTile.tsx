@@ -52,7 +52,7 @@ export const SelectableTile: React.FC<SelectableTileProps> = ({
 
   const baseClass = `rounded-2xl border-2 transition-all duration-200 ${interactive ? 'cursor-pointer group' : ''} ${
     selected
-      ? `bg-white/[0.06] ${borderClass || 'border-primary/40'} shadow-[0_0_20px_rgba(107,42,255,0.12)]`
+      ? `bg-white/[0.06] ${borderClass || 'border-primary/40'} shadow-[0_0_20px_hsl(var(--primary)/0.12)]`
       : 'bg-white/[0.03] border-white/10 hover:border-white/20'
   }`;
 

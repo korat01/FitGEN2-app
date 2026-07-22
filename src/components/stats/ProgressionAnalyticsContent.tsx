@@ -43,9 +43,9 @@ export const ProgressionAnalyticsContent: React.FC<ProgressionAnalyticsContentPr
   if (isEmpty) {
     return (
       <StatsOverviewEmpty
-        rank={userRank?.rank || user?.rank || 'D'}
-        globalScore={userRank?.globalScore || user?.globalScore || 0}
-        scoreLabel={userRank?.scoreLabel || user?.scoreLabel || 'pts'}
+        rank={user?.rank || userRank?.rank || 'D'}
+        globalScore={user?.globalScore ?? userRank?.globalScore ?? 0}
+        scoreLabel={user?.scoreLabel || userRank?.scoreLabel || 'pts'}
         onAddPerformance={() => navigate('/stats')}
       />
     );

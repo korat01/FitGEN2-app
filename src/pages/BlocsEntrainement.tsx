@@ -2141,8 +2141,8 @@ export const BlocsEntrainement: React.FC = () => {
 
   return (
     <div className="relative">
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="space-y-8">
+      <div className="container mx-auto px-4 md:px-6 py-8 relative z-10 page-transition">
+        <div className="space-y-8 stagger-animation">
           {/* Header Principal - VitalForce DA */}
           <div className={`relative overflow-hidden rounded-3xl p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${hunterPanelClass}`}>
             <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
@@ -2152,15 +2152,15 @@ export const BlocsEntrainement: React.FC = () => {
             <div className="relative z-10">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
                 <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
-                      <Dumbbell className="w-8 h-8" />
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="p-3 md:p-4 bg-white/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
+                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8" />
                     </div>
-                    <div>
-                      <h1 className="text-4xl font-bold tracking-tight">
+                    <div className="min-w-0">
+                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
                         Exercices d'Entraînement
                       </h1>
-                      <p className="text-white/90 text-lg mt-2">Bibliothèque complète d'exercices</p>
+                      <p className="text-white/90 text-base md:text-lg mt-1 md:mt-2">Bibliothèque complète d'exercices</p>
                     </div>
         </div>
 

@@ -475,13 +475,20 @@ export const Programme: React.FC = () => {
           
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div className="space-y-2 md:space-y-4">
-                <h1 className="text-xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary/70 to-primary/70 bg-clip-text text-transparent truncate">
-                  🏋️ Mon Programme
+                <div className="space-y-3 md:space-y-4 min-w-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-11 h-11 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Dumbbell className="w-6 h-6 md:w-8 md:h-8" />
+                  </div>
+                  <div className="min-w-0">
+                <h1 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary/70 to-primary/70 bg-clip-text text-transparent truncate">
+                  Mon Programme
                 </h1>
                 <p className="text-xs md:text-xl text-white/85 max-w-full md:max-w-2xl leading-relaxed">
                   Programme personnalisé basé sur vos performances
                 </p>
+                  </div>
+                </div>
                 <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
                   <div className="flex items-center gap-1.5 md:gap-2 bg-white/20 backdrop-blur-sm px-2 md:px-4 py-1 md:py-2 rounded-full">
                     <Activity className="w-3 h-3 md:w-5 md:h-5" />
@@ -492,7 +499,7 @@ export const Programme: React.FC = () => {
                     <span className="font-semibold text-xs md:text-base truncate">5-3-1</span>
                   </div>
                 </div>
-              </div>
+                </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
                 {programme && (
                   <Button
@@ -521,7 +528,7 @@ export const Programme: React.FC = () => {
                 <Button
                   onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                   disabled={isGenerating}
-                  className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
+                  className="w-full sm:w-auto bg-white/20 hover:bg-white/30 text-white border-white/30 shadow-lg"
                 >
                   {isGenerating ? (
                     <>
@@ -586,13 +593,15 @@ export const Programme: React.FC = () => {
         {!programme && (
           <Card className="border-0 shadow-xl glass-card border-primary/20 backdrop-blur-md border border-white/20 rounded-2xl">
             <CardContent className="text-center py-12">
-              <div className="text-6xl mb-4">🏋️</div>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-primary flex items-center justify-center shadow-[var(--shadow-glow-purple)]">
+                <Dumbbell className="w-8 h-8 text-white" />
+              </div>
               <h3 className="text-xl font-semibold text-foreground/90 mb-2">Aucun Programme Généré</h3>
               <p className="text-muted-foreground mb-6">Générez votre programme personnalisé pour commencer votre entraînement !</p>
               <Button
                 onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                 disabled={isGenerating}
-                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
+                className="gradient-primary text-white shadow-lg"
               >
                 {isGenerating ? (
                   <>

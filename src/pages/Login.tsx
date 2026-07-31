@@ -156,7 +156,7 @@ export const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center p-4 relative bg-transparent">
       <VitalForceBackground intensity="high" />
       
-      <Card className="w-full max-w-md bg-card/90 border border-primary/30 shadow-[var(--shadow-glow-purple)] backdrop-blur-xl relative z-10">
+      <Card className="w-full max-w-md bg-card/90 border border-primary/30 shadow-[var(--shadow-glow-purple)] backdrop-blur-xl relative z-10 page-transition">
         <CardHeader className="text-center space-y-4 border-b border-primary/20">
           <div className="w-16 h-16 bg-card/80 rounded-2xl flex items-center justify-center mx-auto border border-primary/30 shadow-[var(--shadow-glow-blue)] animate-float">
             <Dumbbell className="w-8 h-8 text-primary" />
@@ -165,7 +165,7 @@ export const Login: React.FC = () => {
             Créer votre Profil
           </CardTitle>
           <p className="text-foreground/90">
-            Rejoignez l'aventure VitalForce
+            Commence ton ascension avec Ascend
           </p>
         </CardHeader>
         

@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.fitgen222.app',
-  appName: 'FitGEN',
+  appName: 'Ascend',
   webDir: 'dist',
   ios: {
     contentInset: 'always',

@@ -1,4 +1,4 @@
-// Données de nutrition pour l'application FitGEN2
+// Données de nutrition pour l'application Ascend
 export interface Aliment {
   id: string;
   nom: string;

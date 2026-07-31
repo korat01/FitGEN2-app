@@ -53,7 +53,7 @@ const RecetteDetail: React.FC = () => {
   const macros = calculerMacrosRecette(recette);
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
+    <div className="container mx-auto space-y-6 p-6 page-transition">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button onClick={() => navigate('/nutrition')} variant="outline" className="flex items-center gap-2">

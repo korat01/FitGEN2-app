@@ -15,7 +15,7 @@ import { DailyQuests } from '@/components/DailyQuests';
 import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
-import { DailyActivityWidget } from '@/components/DailyActivityWidget';
+import { HabitTracker } from '@/components/HabitTracker';
 import { OneRepMaxCalculator } from '@/components/OneRepMaxCalculator';
 import { HexagonBadgeRow } from '@/components/HexagonBadge';
 import { RankBadge } from '@/components/RankBadge';
@@ -268,7 +268,7 @@ export const Dashboard: React.FC = () => {
                     <RankBadge rank={rankKey} level={xpData?.level || 1} size="xl" animated className="shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
-                        VitalForce
+                        Ascend
                     </h1>
                       <div className="flex items-center gap-2 mt-2 max-w-xs">
                         <Progress
@@ -338,8 +338,8 @@ export const Dashboard: React.FC = () => {
         {/* Barre XP & Niveau */}
         <XPLevelBar />
 
-        {/* Activité du jour : pas, distance, calories */}
-        <DailyActivityWidget weightKg={user.weight} />
+        {/* Tracker d'habitudes : suivi quotidien + régularité sur les dernières semaines */}
+        <HabitTracker />
 
         {/* Calculateur de 1RM — réservé aux powerlifters */}
         {user.sportClass === 'power' && <OneRepMaxCalculator />}

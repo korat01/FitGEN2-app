@@ -53,7 +53,7 @@ const PWAInstallPrompt: React.FC = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
               <Download className="w-5 h-5 text-secondary" />
-              Installer FitGEN
+              Installer Ascend
             </CardTitle>
             <Button
               variant="ghost"
@@ -67,7 +67,7 @@ const PWAInstallPrompt: React.FC = () => {
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-4">
-            Installez FitGEN sur votre appareil pour un accès rapide et une expérience optimale.
+            Installez Ascend sur votre appareil pour un accès rapide et une expérience optimale.
           </p>
           <div className="flex gap-2">
             <Button

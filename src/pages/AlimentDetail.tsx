@@ -3016,7 +3016,7 @@ const AlimentDetail: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto space-y-6 p-6">
+    <div className="container mx-auto space-y-6 p-6 page-transition">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <Button

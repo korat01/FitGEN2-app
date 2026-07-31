@@ -1,51 +1,25 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Play, Apple, BarChart3, User } from 'lucide-react';
-import { VitalForceLogo } from './VitalForceLogo';
 
 const MobileNavigation: React.FC = () => {
   const location = useLocation();
-  const isActive = (path: string, isLogo?: boolean) =>
-    isLogo
-      ? location.pathname === '/dashboard' || location.pathname === '/'
-      : location.pathname === path;
-  
+  const isActive = (path: string) => location.pathname === path;
+
   const navItems = [
     { path: '/', icon: Home, label: 'Accueil' },
     { path: '/programme', icon: Play, label: 'Programme' },
-    { path: '/dashboard', icon: null, label: 'VitalForce', isLogo: true },
     { path: '/nutrition', icon: Apple, label: 'Nutrition' },
     { path: '/stats', icon: BarChart3, label: 'Stats' },
     { path: '/profile', icon: User, label: 'Profil' }
   ];
-  
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 gaming-nav">
-      <div className="safe-area-pb flex items-center justify-around h-16 px-2">
-        {navItems.map(({ path, icon: Icon, label, isLogo }) => {
-          const active = isActive(path, isLogo);
-          
-          if (isLogo) {
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={`relative flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all duration-300 active:scale-95 ${
-                  active ? 'text-secondary' : 'text-muted-foreground'
-                }`}
-              >
-                {active && (
-                  <div className="absolute inset-0 gradient-primary opacity-20 rounded-xl border border-primary/40" />
-                )}
-                <div className={`relative transition-transform duration-300 ${
-                  active ? 'scale-110' : ''
-                }`}>
-                  <VitalForceLogo size={28} glow={active} />
-                </div>
-              </Link>
-            );
-          }
-          
+    <nav className="fixed bottom-0 left-0 right-0 z-50 gaming-nav">
+      <div className="safe-area-pb flex items-center justify-around h-16 px-2 max-w-xl md:mx-auto">
+        {navItems.map(({ path, icon: Icon, label }) => {
+          const active = isActive(path);
+
           return (
             <Link
               key={path}

@@ -10,7 +10,8 @@ import {
   Target, Activity, Heart, Dumbbell,
   Star, TrendingUp, Flame,
   Zap as Lightning,
-  Timer, Wind, Gauge, Sparkles
+  Timer, Wind, Gauge, Sparkles,
+  Crown, LogOut, Settings
 } from 'lucide-react';
 import { RankBadge } from '@/components/RankBadge';
 import { SelectableTile } from '@/components/profile/SelectableTile';
@@ -120,7 +121,7 @@ const TIME_OPTIONS = [
 ];
 
 export const ProfileSummary: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -310,8 +311,8 @@ export const ProfileSummary: React.FC = () => {
 
   return (
     <div className="relative">
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-6">
+      <div className="container mx-auto px-4 md:px-6 py-8 page-transition">
+        <div className="space-y-6 stagger-animation">
           {/* Header Principal */}
           <div className={`relative overflow-hidden rounded-3xl gradient-primary p-6 md:p-8 text-white shadow-2xl ${hunterPanelClass}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32" />
@@ -704,6 +705,37 @@ export const ProfileSummary: React.FC = () => {
                     <div className="text-2xl font-bold text-primary">{user?.trainingMonths || 3} mois</div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Compte — reprend ce qui vivait dans le menu utilisateur de l'ancienne barre du haut
+                (supprimée : plus d'accès à la déconnexion ailleurs dans l'app). */}
+            <Card className="glass-card border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
+                  <div className="w-9 h-9 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-secondary" />
+                  </div>
+                  Compte
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => window.location.href = '/pro'}
+                  className="w-full justify-start h-12 px-4 rounded-lg text-foreground/90 hover:bg-white/10"
+                >
+                  <Crown className="w-5 h-5 mr-3 text-yellow-500" />
+                  <span className="font-medium">Devenir Pro</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={logout}
+                  className="w-full justify-start h-12 px-4 rounded-lg text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                >
+                  <LogOut className="w-5 h-5 mr-3" />
+                  <span className="font-medium">Déconnexion</span>
+                </Button>
               </CardContent>
             </Card>
           </div>

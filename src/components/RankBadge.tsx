@@ -37,7 +37,7 @@ const bubbleClasses = {
   xl: 'w-11 h-11 text-base -mt-5 border-2',
 };
 
-const RANK_LABELS: Record<RankLevel, string> = {
+export const RANK_LABELS: Record<RankLevel, string> = {
   E: 'Rang E',
   D: 'Rang D',
   C: 'Rang C',

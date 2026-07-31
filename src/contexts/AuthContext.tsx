@@ -14,7 +14,10 @@ export interface User {
   globalScore?: number;
   /** Nom de l'unité de globalScore (ex: "IPF GL Points" vs "Score") — l'échelle diffère selon la méthode de calcul. */
   scoreLabel?: string;
-  
+  /** Bascule la DA teintée par rang (fond, boutons, glows — voir App.tsx). Par défaut activée : si
+      absent (utilisateurs existants avant cette option), on considère true, pas false. */
+  showRankTheme?: boolean;
+
   // Optional fields
   focus_trapezes?: any;
   focus_avant_bras?: any;

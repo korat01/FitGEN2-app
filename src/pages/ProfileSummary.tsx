@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useAuth } from '../contexts/AuthContext';
 import { scoringEngine } from '../utils/scoring';
 import {
@@ -11,7 +12,7 @@ import {
   Star, TrendingUp, Flame,
   Zap as Lightning,
   Timer, Wind, Gauge, Sparkles,
-  Crown, LogOut, Settings
+  Crown, LogOut, Settings, Palette
 } from 'lucide-react';
 import { RankBadge } from '@/components/RankBadge';
 import { SelectableTile } from '@/components/profile/SelectableTile';
@@ -720,6 +721,17 @@ export const ProfileSummary: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
+                <div className="flex items-center justify-between gap-3 h-12 px-4 rounded-lg">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Palette className="w-5 h-5 text-secondary shrink-0" />
+                    <span className="font-medium text-foreground/90 truncate">Couleur du rang dans l&apos;app</span>
+                  </div>
+                  <Switch
+                    checked={user?.showRankTheme !== false}
+                    onCheckedChange={(checked) => updateUser({ showRankTheme: checked })}
+                    aria-label="Afficher la couleur du rang dans l'app"
+                  />
+                </div>
                 <Button
                   variant="ghost"
                   onClick={() => window.location.href = '/pro'}

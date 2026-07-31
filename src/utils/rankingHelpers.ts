@@ -1,21 +1,29 @@
+// Calé sur les couleurs réelles des illustrations de badge (src/assets/ranks/*.png) et sur
+// RANK_COLORS (src/config/rankTheme.ts) — avant, ce mapping était complètement déconnecté de
+// l'art (S en violet alors que son dragon est rouge, A en rouge alors que ses éclairs sont bleus,
+// C en vert alors que sa médaille est bleutée, Nation/World absents et retombant sur du gris).
 export const getRangColor = (rang: string) => {
   switch (rang) {
-    case 'S': return 'from-purple-600 to-purple-800';
-    case 'A': return 'from-red-500 to-red-700';
-    case 'B': return 'from-blue-500 to-blue-700';
-    case 'C': return 'from-green-500 to-green-700';
-    case 'D': return 'from-yellow-500 to-yellow-700';
+    case 'D': return 'from-amber-700 to-orange-600';
+    case 'C': return 'from-blue-400 to-blue-600';
+    case 'B': return 'from-yellow-300 to-amber-500';
+    case 'A': return 'from-blue-600 to-cyan-400';
+    case 'S': return 'from-red-600 to-red-800';
+    case 'Nation': return 'from-purple-600 to-purple-400';
+    case 'World': return 'from-slate-900 to-sky-300';
     default: return 'from-gray-500 to-gray-700';
   }
 };
 
 export const getRangIcon = (rang: string) => {
   switch (rang) {
-    case 'S': return '👑';
-    case 'A': return '🏆';
-    case 'B': return '🥇';
-    case 'C': return '🥈';
     case 'D': return '🥉';
+    case 'C': return '🥈';
+    case 'B': return '🥇';
+    case 'A': return '⚡';
+    case 'S': return '🐉';
+    case 'Nation': return '👑';
+    case 'World': return '🌌';
     default: return '⭐';
   }
 };

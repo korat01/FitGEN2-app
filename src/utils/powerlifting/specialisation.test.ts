@@ -53,4 +53,24 @@ describe('generateSpecialisation (programme "Spé")', () => {
     expect(semaine1.some((s) => s.exercises.some((e) => e.nom.startsWith('Soulevé de Terre')))).toBe(true);
     expect(semaine1.some((s) => s.exercises.some((e) => e.nom.startsWith('Développé Couché')))).toBe(true);
   });
+
+  it('le pourcentage affiché est bien "% du vrai 1RM", y compris sur l\'échauffement et l\'entretien', () => {
+    // Régression : buildWarmupSets/buildMainLiftSets calculent pourcentage par rapport à
+    // workingMax/firstWeight (des valeurs internes qui dérivent d'un cycle à l'autre), pas au 1RM
+    // d'origine — l'UI affiche pourtant "{pourcentage}% du max".
+    const days = ['lundi', 'mardi', 'mercredi', 'jeudi'];
+    const program = generateSpecialisation(config(days), maxes, ['squat'], 1);
+    const semaine1 = program.sessions.filter((s) => s.nom.startsWith('Semaine 1 -'));
+
+    const squatSession = semaine1.find((s) => s.phase === 'Spécialisation')!;
+    squatSession.exercises.filter((ex) => ex.poids > 0).forEach((ex) => {
+      expect(ex.pourcentage).toBe(Math.round((ex.poids / maxes.squat) * 100));
+    });
+
+    const maintenanceSession = semaine1.find((s) => s.phase === 'Entretien')!;
+    const maintLift = maintenanceSession.exercises.some((e) => e.nom.startsWith('Développé Couché')) ? maxes.bench : maxes.deadlift;
+    maintenanceSession.exercises.filter((ex) => ex.poids > 0).forEach((ex) => {
+      expect(ex.pourcentage).toBe(Math.round((ex.poids / maintLift) * 100));
+    });
+  });
 });

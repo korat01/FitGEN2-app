@@ -137,7 +137,11 @@ export function generateSpecialisation(
           if (!days[jourIndex]) return;
           const flavor = FLAVOR_CYCLE[flavorCursor[target] % FLAVOR_CYCLE.length];
           flavorCursor[target]++;
-          const { exercises: raw, label } = buildTargetSession(flavor, target, targetWorkingMax[target]!, isDeload);
+          const { exercises: rawBuilt, label } = buildTargetSession(flavor, target, targetWorkingMax[target]!, isDeload);
+          // `pourcentage` doit rester lisible comme "% du vrai 1RM" (l'UI affiche "{pourcentage}%
+          // du max") — buildWarmupSets/buildMainLiftSets le calculent par rapport à workingMax/
+          // firstWeight (des valeurs internes qui dérivent d'un cycle à l'autre), pas au 1RM d'origine.
+          const raw = rawBuilt.map((ex) => ({ ...ex, pourcentage: ex.poids > 0 ? pctOf(ex.poids, maxes[target]) : 0 }));
           const exercises = assignExerciseIds(`spe-${semaineAbsolue}-${target}-${occurrence}`, raw);
           sessions.push({
             id: `spe-${semaineAbsolue}-${target}-${occurrence}`,
@@ -157,7 +161,8 @@ export function generateSpecialisation(
 
       maintenanceLifts.forEach((lift) => {
         if (!days[jourIndex]) return;
-        const raw = buildMaintenanceSession(lift, maintenanceMax[lift]!, isDeload);
+        const rawBuilt = buildMaintenanceSession(lift, maintenanceMax[lift]!, isDeload);
+        const raw = rawBuilt.map((ex) => ({ ...ex, pourcentage: ex.poids > 0 ? pctOf(ex.poids, maxes[lift]) : 0 }));
         const exercises = assignExerciseIds(`spe-${semaineAbsolue}-${lift}-maint`, raw);
         sessions.push({
           id: `spe-${semaineAbsolue}-${lift}-maint`,

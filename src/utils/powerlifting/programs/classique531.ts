@@ -101,6 +101,7 @@ function createMainSession(
   cycle: number,
   lift: MainLift,
   tm: number,
+  oneRM: number,
   dayName: string,
   volumeExtraFor: MainLift | null
 ): GeneratedSession {
@@ -140,6 +141,17 @@ function createMainSession(
       ? 'Semaine de deload — intensité réduite, aucun AMRAP. Profitez-en pour récupérer avant le cycle suivant.'
       : `5/3/1 — semaine ${semaineLabel} sur ${nomPrincipal.toLowerCase()} (Training Max ${tm}kg, Cycle ${cycle}). Le dernier set est un AMRAP : allez chercher un maximum de répétitions propres.`;
   }
+
+  // `pourcentage` doit être lisible par l'utilisateur comme "% de VOTRE 1RM" (c'est ce que l'UI
+  // affiche littéralement : "{pourcentage}% du max") — buildWarmupSets/buildMainLiftSets calculent
+  // ce champ par rapport à leur propre référence interne (firstWorkingWeight, Training Max...), pas
+  // le vrai 1RM. Sans ce remap, un échauffement à 40% du "premier set de travail" (lui-même ~65-95%
+  // du TM, lui-même 90% du 1RM) s'affichait comme "40% du max", ce qui ne correspondait à rien de
+  // réel une fois rapporté au vrai 1RM.
+  exercises = exercises.map((ex) => ({
+    ...ex,
+    pourcentage: ex.poids > 0 ? pctOf(ex.poids, oneRM) : 0,
+  }));
 
   return {
     id: `531-${semaineAbsolue}-${lift}${volumeExtraFor ? `-vol-${volumeExtraFor}` : ''}`,
@@ -199,7 +211,7 @@ export function generateClassique531(
       liftForDay.forEach((lift, jourIndex) => {
         if (!days[jourIndex]) return;
         sessions.push(
-          createMainSession(semaineAbsolue, semaineDansCycle, cycle, lift, tmParCycle[lift], days[jourIndex], null)
+          createMainSession(semaineAbsolue, semaineDansCycle, cycle, lift, tmParCycle[lift], maxes[lift], days[jourIndex], null)
         );
       });
 
@@ -208,7 +220,7 @@ export function generateClassique531(
         if (!days[jourIndex]) continue;
         const targetLift = extraDayLifts[extra];
         sessions.push(
-          createMainSession(semaineAbsolue, semaineDansCycle, cycle, targetLift, tmParCycle[targetLift], days[jourIndex], targetLift)
+          createMainSession(semaineAbsolue, semaineDansCycle, cycle, targetLift, tmParCycle[targetLift], maxes[targetLift], days[jourIndex], targetLift)
         );
       }
     }

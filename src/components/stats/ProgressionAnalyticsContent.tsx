@@ -9,6 +9,7 @@ import { StatsRecordsPanel } from '@/components/stats/StatsRecordsPanel';
 import { StatsProgressPanel } from '@/components/stats/StatsProgressPanel';
 import { StatsGoalsPanel } from '@/components/stats/StatsGoalsPanel';
 import { StatsRankingPanel } from '@/components/stats/StatsRankingPanel';
+import { WeightSleepTrends } from '@/components/stats/WeightSleepTrends';
 import { ProgressionTab } from '@/components/stats/ProgressionTabNav';
 import { MainStats, Achievement, GlobalStats } from '@/types/stats';
 
@@ -39,6 +40,23 @@ export const ProgressionAnalyticsContent: React.FC<ProgressionAnalyticsContentPr
 }) => {
   const navigate = useNavigate();
   const isEmpty = performances.length === 0 || !mainStats;
+
+  // Le suivi poids/sommeil est indépendant des performances de force — ne doit pas rester
+  // caché derrière l'état vide "aucune performance", donc évalué avant ce garde-fou.
+  if (activeTab === 'progress') {
+    return (
+      <div className="space-y-6">
+        <StatsSection title="Poids & Sommeil" description="Suivi quotidien, moyenne glissante sur 10 entrées">
+          <WeightSleepTrends />
+        </StatsSection>
+        {!isEmpty && (
+          <StatsSection title="Évolution des performances" description="Suivez votre progression dans le temps">
+            <StatsProgressPanel performances={performances} />
+          </StatsSection>
+        )}
+      </div>
+    );
+  }
 
   if (isEmpty) {
     return (
@@ -79,14 +97,6 @@ export const ProgressionAnalyticsContent: React.FC<ProgressionAnalyticsContentPr
           </StatsSection>
         )}
       </div>
-    );
-  }
-
-  if (activeTab === 'progress') {
-    return (
-      <StatsSection title="Évolution" description="Suivez votre progression dans le temps">
-        <StatsProgressPanel performances={performances} />
-      </StatsSection>
     );
   }
 

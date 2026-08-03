@@ -33,38 +33,27 @@ import { NewProgramModal } from '../components/programme/NewProgramModal';
 import {
   createNewPowerliftingProgram,
   continueAfterTestWeek,
+  regenerateWithMaxes,
+  getLoggedMaxes,
+  hasAllMaxes,
   type ProgramType,
   type PowerliftingProgramConfig,
   type GeneratedPowerliftingProgram,
   type MainLift,
+  type UserMaxes,
 } from '../utils/powerlifting';
 
-// Fonction pour récupérer les 1RM réels de l'utilisateur (le programme travaille directement
-// par rapport à ces maxs, il n'y a plus de "Training Max" intermédiaire)
-const getUserMaxes = () => {
-  const userPerformances = localStorage.getItem('userPerformances');
-  if (!userPerformances) return null;
-
-  try {
-    const performances = JSON.parse(userPerformances);
-
-    const getBestPerformance = (discipline: string) => {
-      const perf = performances.filter((p: any) => p.discipline === discipline);
-      return perf.length > 0 ? Math.max(...perf.map((p: any) => p.value)) : null;
-    };
-
-    const maxSquat = getBestPerformance('squat');
-    const maxBench = getBestPerformance('bench');
-    const maxDeadlift = getBestPerformance('deadlift');
-
-    if (!maxSquat || !maxBench || !maxDeadlift) return null;
-
-    return { maxSquat, maxBench, maxDeadlift };
-  } catch (error) {
-    console.error('Erreur lors du calcul des maxs:', error);
-    return null;
-  }
+// Numéro de semaine le plus bas présent dans le programme stocké — sert de `startWeek` pour
+// recalculer les charges sans perdre la progression dans le cycle (cf. handleRecalculateMaxes).
+const getStoredStartWeek = (programme: any): number => {
+  const weeks = (programme?.sessions || [])
+    .map((s: any) => parseInt(s.nom?.match(/Semaine (\d+)/)?.[1], 10))
+    .filter((n: number) => Number.isFinite(n));
+  return weeks.length > 0 ? Math.min(...weeks) : 1;
 };
+
+const maxesEqual = (a?: UserMaxes, b?: UserMaxes): boolean =>
+  !!a && !!b && a.squat === b.squat && a.bench === b.bench && a.deadlift === b.deadlift;
 
 export const Programme: React.FC = () => {
   const { user } = useAuth();
@@ -188,10 +177,13 @@ export const Programme: React.FC = () => {
 
   // Adapte un GeneratedPowerliftingProgram (nouveau système modulaire) au format déjà utilisé par
   // cette page (mêmes clés que l'ancien generateProgramme) — pour ne rien casser côté affichage.
+  // `generatedWithMaxes` retient le 1RM utilisé pour ce calcul : permet de détecter plus tard qu'il
+  // a changé (nouvelle perf loggée) et de proposer un recalcul des charges, cf. handleRecalculateMaxes.
   const toStoredProgramme = (
     generated: GeneratedPowerliftingProgram,
     config: PowerliftingProgramConfig,
-    existingDateDebut?: string
+    existingDateDebut?: string,
+    generatedWithMaxes?: UserMaxes
   ) => ({
     id: generated.id,
     nom: generated.nom,
@@ -199,6 +191,7 @@ export const Programme: React.FC = () => {
     sessions: generated.sessions,
     isTestWeek: !!generated.isTestWeek,
     powerliftingConfig: config,
+    generatedWithMaxes,
     userProfile: {
       sportClass: 'power',
       trainingDays: config.trainingDays,
@@ -222,7 +215,8 @@ export const Programme: React.FC = () => {
       };
 
       const { program, missingLifts } = createNewPowerliftingProgram(config);
-      const stored = toStoredProgramme(program, config);
+      const logged = getLoggedMaxes();
+      const stored = toStoredProgramme(program, config, undefined, hasAllMaxes(logged) ? logged : undefined);
 
       localStorage.setItem('userProgramme', JSON.stringify(stored));
       setProgramme(stored);
@@ -263,10 +257,27 @@ export const Programme: React.FC = () => {
       return;
     }
 
-    const stored = toStoredProgramme(result, programme.powerliftingConfig, programme.dateDebut);
+    const logged = getLoggedMaxes();
+    const stored = toStoredProgramme(result, programme.powerliftingConfig, programme.dateDebut, hasAllMaxes(logged) ? logged : undefined);
     localStorage.setItem('userProgramme', JSON.stringify(stored));
     setProgramme(stored);
     alert('🎉 Votre programme complet est prêt, à partir de la Semaine 2 !');
+  };
+
+  // Le 1RM loggé a changé depuis la génération de ce programme (nouvelle perf saisie dans Stats) —
+  // recalcule les charges du reste du programme SANS repartir de la semaine 1 : même startWeek,
+  // donc mêmes ids de séance/exercice (déterministes), donc les validations déjà faites restent liées.
+  const handleRecalculateMaxes = () => {
+    if (!programme?.powerliftingConfig) return;
+    const logged = getLoggedMaxes();
+    if (!hasAllMaxes(logged)) return;
+
+    const startWeek = getStoredStartWeek(programme);
+    const regenerated = regenerateWithMaxes(programme.powerliftingConfig, logged, startWeek);
+    const stored = toStoredProgramme(regenerated, programme.powerliftingConfig, programme.dateDebut, logged);
+    localStorage.setItem('userProgramme', JSON.stringify(stored));
+    setProgramme(stored);
+    alert('✅ Charges recalculées avec votre 1RM à jour !');
   };
 
   // Un programme généré avant l'ajout des types d'exercice (échauffement/travail/accessoire)
@@ -653,8 +664,13 @@ export const Programme: React.FC = () => {
           <>
             {/* Informations 1RM */}
             {(() => {
-              const maxes = getUserMaxes();
-              return maxes ? (
+              const maxes = getLoggedMaxes();
+              if (!hasAllMaxes(maxes)) return null;
+
+              const usesTrainingMax = programme.powerliftingConfig?.type === 'classique';
+              const maxesChanged = programme.generatedWithMaxes && !maxesEqual(maxes, programme.generatedWithMaxes);
+
+              return (
                 <Card className="glass-card border-primary/20 rounded-2xl mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-3 mb-4">
@@ -667,30 +683,44 @@ export const Programme: React.FC = () => {
                       <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Squat</p>
-                          <p className="text-lg font-bold text-foreground">{maxes.maxSquat}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.squat}kg</p>
                         </div>
                       </div>
                       <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Bench</p>
-                          <p className="text-lg font-bold text-foreground">{maxes.maxBench}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.bench}kg</p>
                         </div>
                       </div>
                       <div className="surface-panel rounded-lg p-4">
                         <div className="text-center">
                           <p className="text-sm text-muted-foreground mb-1">Deadlift</p>
-                          <p className="text-lg font-bold text-foreground">{maxes.maxDeadlift}kg</p>
+                          <p className="text-lg font-bold text-foreground">{maxes.deadlift}kg</p>
                         </div>
                       </div>
                     </div>
                     <div className="mt-4 p-3 rounded-lg surface-accent">
                       <p className="text-sm text-foreground/90">
-                        <strong className="text-secondary">💡 Note :</strong> tous les pourcentages du programme sont calculés directement sur ces maxs (pas de Training Max intermédiaire), avec une petite progression à chaque nouveau cycle.
+                        <strong className="text-secondary">💡 Note :</strong>{' '}
+                        {usesTrainingMax
+                          ? 'les pourcentages du programme sont calculés sur votre Training Max (90% de ces 1RM), avec une petite progression à chaque nouveau cycle.'
+                          : 'tous les pourcentages du programme sont calculés directement sur ces 1RM.'}
                       </p>
                     </div>
+                    {maxesChanged && (
+                      <div className="mt-3 p-3 rounded-lg border border-secondary/30 bg-secondary/10 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                        <p className="text-sm text-foreground/90">
+                          <strong className="text-secondary">⚡ 1RM mis à jour :</strong> ce programme a été généré avec Squat {programme.generatedWithMaxes.squat}kg / Bench {programme.generatedWithMaxes.bench}kg / Deadlift {programme.generatedWithMaxes.deadlift}kg — les charges affichées ne suivent pas encore vos derniers 1RM.
+                        </p>
+                        <Button onClick={handleRecalculateMaxes} size="sm" className="gradient-primary text-white shrink-0">
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Recalculer les charges
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
-              ) : null;
+              );
             })()}
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
             <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>

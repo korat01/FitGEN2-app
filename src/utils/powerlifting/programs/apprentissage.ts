@@ -121,12 +121,18 @@ export function generateApprentissage(
       const isSessionA = globalSessionIndex % 2 === 0;
       const secondLift: MainLift = isSessionA ? 'bench' : 'deadlift';
 
-      const squatBlock = createLiftBlock('squat', currentWeight.squat, globalSessionIndex).map((ex) =>
-        ex.type === 'travail' ? { ...ex, pourcentage: pctOf(ex.poids, maxes.squat) } : ex
-      );
-      const secondBlock = createLiftBlock(secondLift, currentWeight[secondLift], globalSessionIndex).map((ex) =>
-        ex.type === 'travail' ? { ...ex, pourcentage: pctOf(ex.poids, maxes[secondLift]) } : ex
-      );
+      // Remappé sur TOUS les types d'exercice (pas seulement "travail") : buildWarmupSets/
+      // buildAccessory calculent leur %  par rapport au poids du jour (déjà réduit), pas au vrai
+      // 1RM — l'UI affiche pourtant littéralement "{pourcentage}% du max", donc ce champ doit être
+      // relatif au vrai 1RM partout, sous peine d'afficher des pourcentages qui ne veulent rien dire.
+      const squatBlock = createLiftBlock('squat', currentWeight.squat, globalSessionIndex).map((ex) => ({
+        ...ex,
+        pourcentage: ex.poids > 0 ? pctOf(ex.poids, maxes.squat) : 0,
+      }));
+      const secondBlock = createLiftBlock(secondLift, currentWeight[secondLift], globalSessionIndex).map((ex) => ({
+        ...ex,
+        pourcentage: ex.poids > 0 ? pctOf(ex.poids, maxes[secondLift]) : 0,
+      }));
 
       const exercises = assignExerciseIds(`appr-${semaineAbsolue}-${jour}`, [...squatBlock, ...secondBlock]);
 

@@ -22,6 +22,23 @@ describe('generateClassique531', () => {
     }
   });
 
+  it('le pourcentage affiché est bien "% du vrai 1RM" (pas de la réf interne échauffement/TM)', () => {
+    // Régression : buildWarmupSets calcule pourcentage par rapport à sa propre référence interne
+    // (le 1er set de travail, lui-même déjà réduit par le Training Max) — l'UI affiche pourtant
+    // littéralement "{pourcentage}% du max", donc ce champ doit être recalculé sur maxes[lift].
+    const config: PowerliftingProgramConfig = { type: 'classique', trainingDays: ['lundi', 'mardi', 'mercredi'], bodyweight: 80, sex: 'male' };
+    const program = generateClassique531(config, maxes, 1);
+    const semaine1 = program.sessions.filter((s) => s.nom.startsWith('Semaine 1 -'));
+
+    const benchSession = semaine1.find((s) => s.day === 'mardi')!;
+    benchSession.exercises
+      .filter((ex) => ex.poids > 0)
+      .forEach((ex) => {
+        const expectedPct = Math.round((ex.poids / maxes.bench) * 100);
+        expect(ex.pourcentage).toBe(expectedPct);
+      });
+  });
+
   it("n'assigne jamais un poids qui n'existe pas en salle (multiple de 2.5kg, ou 0 pour du poids de corps)", () => {
     const trainingDays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
     const config: PowerliftingProgramConfig = { type: 'classique', trainingDays, bodyweight: 80, sex: 'male' };

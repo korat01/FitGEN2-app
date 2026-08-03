@@ -49,6 +49,19 @@ export function createNewPowerliftingProgram(config: PowerliftingProgramConfig):
   return { program: generateByType(config, maxes, 1), missingLifts: [] };
 }
 
+// Recalcule le programme avec des maxes à jour (nouveau 1RM loggé en cours de route), EN GARDANT
+// le même point de départ (startWeek) — donc la même numérotation de semaine/cycle, le même id de
+// séance (déterministe, cf. assignExerciseIds) et donc les mêmes validations/notes déjà associées.
+// Seuls les poids/pourcentages changent. Sans ça le programme restait figé sur le 1RM du jour de
+// génération jusqu'à une régénération complète (qui repart de la semaine 1).
+export function regenerateWithMaxes(
+  config: PowerliftingProgramConfig,
+  maxes: UserMaxes,
+  startWeek: number
+): GeneratedPowerliftingProgram {
+  return generateByType(config, maxes, startWeek);
+}
+
 // Après une semaine de test : si les 3 perfs sont maintenant connues (l'utilisateur les a saisies
 // dans Stats), génère le vrai programme et le concatène à la suite de la semaine de test — la
 // numérotation continue donc à "Semaine 2" comme demandé, sans perdre l'historique de la semaine 1.

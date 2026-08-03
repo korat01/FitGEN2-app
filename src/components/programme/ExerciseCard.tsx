@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Flame, Dumbbell, Sparkles, Check, X } from 'lucide-react';
+import { Flame, Dumbbell, Sparkles, Check, X, Info } from 'lucide-react';
 import { useSounds } from '@/utils/sounds';
+import { ExerciseInfoModal } from './ExerciseInfoModal';
 
 type ExerciseType = 'echauffement' | 'travail' | 'accessoire';
 
@@ -53,6 +54,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
   const isWarmup = type === 'echauffement';
   const isMainLift = type === 'travail';
   const { playSuccess, playError } = useSounds();
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
 
   const sets = exercise.progression?.sets ?? exercise.series;
   const reps = exercise.progression?.reps ?? exercise.reps;
@@ -99,10 +101,18 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
               )}
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <h4 className={`truncate font-semibold ${isWarmup ? 'text-sm text-muted-foreground' : 'text-base text-foreground'}`}>
                     {nomAffiche}
                   </h4>
+                  <button
+                    type="button"
+                    onClick={() => setIsInfoOpen(true)}
+                    aria-label={`Voir les infos de ${nomAffiche}`}
+                    className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-muted-foreground/70 hover:text-secondary hover:bg-secondary/10 transition-colors"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                  </button>
                 </div>
                 {meta && !isWarmup && (
                   <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{meta.label}</span>
@@ -190,6 +200,7 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, isComplete
           </CardContent>
         </div>
       </div>
+      <ExerciseInfoModal nom={nomAffiche} open={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
     </Card>
   );
 };

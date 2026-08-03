@@ -8,26 +8,39 @@ export type HabitIconKey =
   | 'sun'
   | 'heart'
   | 'brain'
-  | 'coffee';
+  | 'coffee'
+  | 'scale';
+
+export type HabitKind = 'check' | 'metric';
 
 export interface HabitDefinition {
   id: string;
   label: string;
   icon: HabitIconKey;
+  /** 'check' (par défaut si absent, habitudes existantes avant cette option) = case à cocher.
+      'metric' = valeur numérique quotidienne (poids, sommeil...) avec courbe + moyenne glissante. */
+  kind?: HabitKind;
+  /** Unité affichée pour les habitudes 'metric' (ex: 'kg', 'h'). */
+  unit?: string;
 }
 
 export const ICON_KEYS: HabitIconKey[] = [
   'dumbbell', 'droplet', 'moon', 'salad', 'wind', 'book', 'sun', 'heart', 'brain', 'coffee',
 ];
 
+export const isMetricHabit = (habit: HabitDefinition): boolean => habit.kind === 'metric';
+export const isCheckHabit = (habit: HabitDefinition): boolean => !isMetricHabit(habit);
+
 // Habitudes par défaut, utilisées pour amorcer la liste au tout premier lancement — ensuite
-// la liste vit dans le localStorage et l'utilisateur peut l'éditer (ajout/suppression).
+// la liste vit dans le localStorage et l'utilisateur peut l'éditer (ajout/suppression). Poids et
+// Sommeil sont 'metric' (courbe + moyenne glissante sur 10 entrées) plutôt qu'une simple coche.
 const DEFAULT_HABITS: HabitDefinition[] = [
   { id: 'training', label: 'Entraînement', icon: 'dumbbell' },
   { id: 'hydration', label: 'Hydratation', icon: 'droplet' },
-  { id: 'sleep', label: 'Sommeil', icon: 'moon' },
+  { id: 'sleep', label: 'Sommeil', icon: 'moon', kind: 'metric', unit: 'h' },
   { id: 'nutrition', label: 'Nutrition', icon: 'salad' },
   { id: 'mobility', label: 'Étirements', icon: 'wind' },
+  { id: 'weight', label: 'Poids', icon: 'scale', kind: 'metric', unit: 'kg' },
 ];
 
 export type HabitLog = Record<string, string[]>;
@@ -35,10 +48,22 @@ export type HabitLog = Record<string, string[]>;
 const DEFS_STORAGE_KEY = 'habitTrackerDefinitions';
 const LOG_STORAGE_KEY = 'habitTrackerLog';
 
+// Fait passer 'sleep' en 'metric' et ajoute 'weight' aux listes déjà sauvegardées avant l'ajout
+// du suivi de métriques, sans toucher aux habitudes personnalisées de l'utilisateur.
+const migrateDefinitions = (defs: HabitDefinition[]): HabitDefinition[] => {
+  let next = defs.map((h) =>
+    h.id === 'sleep' && h.kind !== 'metric' ? { ...h, kind: 'metric' as const, unit: 'h' } : h
+  );
+  if (!next.some((h) => h.id === 'weight')) {
+    next = [...next, { id: 'weight', label: 'Poids', icon: 'scale', kind: 'metric', unit: 'kg' }];
+  }
+  return next;
+};
+
 export const loadHabitDefinitions = (): HabitDefinition[] => {
   try {
     const saved = JSON.parse(localStorage.getItem(DEFS_STORAGE_KEY) || 'null');
-    if (Array.isArray(saved) && saved.length > 0) return saved;
+    if (Array.isArray(saved) && saved.length > 0) return migrateDefinitions(saved);
   } catch {
     // ignore
   }
@@ -227,4 +252,163 @@ export const computeWeekCompletionRate = (
   if (elapsedDays.length === 0) return 0;
   const totalDone = elapsedDays.reduce((sum, d) => sum + (log[toDateKey(d)]?.length || 0), 0);
   return totalDone / (elapsedDays.length * totalHabits);
+};
+
+// ---------------------------------------------------------------------------------------------
+// Habitudes "metric" (poids, sommeil...) : une valeur numérique par jour au lieu d'une coche,
+// stockées séparément du HabitLog booléen (formes différentes : nombre vs liste d'ids).
+// ---------------------------------------------------------------------------------------------
+
+export type MetricLog = Record<string /* dateKey */, Record<string /* habitId */, number>>;
+
+const METRIC_STORAGE_KEY = 'habitTrackerMetricLog';
+
+export const loadMetricLog = (): MetricLog => {
+  try {
+    return JSON.parse(localStorage.getItem(METRIC_STORAGE_KEY) || '{}');
+  } catch {
+    return {};
+  }
+};
+
+export const saveMetricLog = (log: MetricLog): void => {
+  localStorage.setItem(METRIC_STORAGE_KEY, JSON.stringify(log));
+};
+
+export const getMetricValue = (log: MetricLog, dateKey: string, habitId: string): number | undefined =>
+  log[dateKey]?.[habitId];
+
+export const setMetricValue = (
+  log: MetricLog,
+  dateKey: string,
+  habitId: string,
+  value: number
+): MetricLog => ({
+  ...log,
+  [dateKey]: { ...(log[dateKey] || {}), [habitId]: value },
+});
+
+export const clearMetricValue = (log: MetricLog, dateKey: string, habitId: string): MetricLog => {
+  if (!log[dateKey] || !(habitId in log[dateKey])) return log;
+  const { [habitId]: _removed, ...restOfDay } = log[dateKey];
+  const next = { ...log };
+  if (Object.keys(restOfDay).length === 0) {
+    delete next[dateKey];
+  } else {
+    next[dateKey] = restOfDay;
+  }
+  return next;
+};
+
+export interface MetricEntry {
+  dateKey: string;
+  value: number;
+}
+
+// Historique trié chronologiquement (plus ancien -> plus récent) pour une habitude 'metric'.
+export const getMetricHistory = (log: MetricLog, habitId: string): MetricEntry[] =>
+  Object.entries(log)
+    .filter(([, day]) => typeof day[habitId] === 'number')
+    .map(([dateKey, day]) => ({ dateKey, value: day[habitId] }))
+    .sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+
+// Moyenne glissante sur les `windowSize` DERNIÈRES ENTRÉES SAISIES (pas les derniers jours civils
+// — si on ne pèse pas tous les jours, moyenner sur des jours civils inclurait des trous).
+export const computeRollingAverage = (
+  history: MetricEntry[],
+  windowSize: number = 10
+): number | undefined => {
+  if (history.length === 0) return undefined;
+  const window = history.slice(-windowSize);
+  return window.reduce((sum, e) => sum + e.value, 0) / window.length;
+};
+
+// Note de qualité du sommeil sur 10, basée sur l'écart aux ~8h recommandées (8h = 10/10, chaque
+// heure d'écart -2 points). Heuristique simple, pas une recommandation médicale.
+export const computeSleepScore = (hours: number): number => {
+  const raw = 10 - Math.abs(hours - 8) * 2;
+  return Math.max(0, Math.min(10, Math.round(raw * 10) / 10));
+};
+
+// Le sommeil se saisit en heures + minutes (7h30, pas "7.5") ; converti en heures décimales pour
+// le stockage/les moyennes/le score, reconverti pour l'affichage.
+export const hmToHours = (hours: number, minutes: number): number =>
+  Math.round((hours + minutes / 60) * 100) / 100;
+
+export const hoursToHM = (decimalHours: number): { hours: number; minutes: number } => {
+  const hours = Math.floor(decimalHours);
+  const minutes = Math.round((decimalHours - hours) * 60);
+  return minutes === 60 ? { hours: hours + 1, minutes: 0 } : { hours, minutes };
+};
+
+// Formatage d'affichage selon l'unité : "7h30" pour le sommeil (pas de décimale peu parlante),
+// un nombre à décimales pour le poids (jusqu'au gramme, sans zéros superflus — 82.4 pas 82.400).
+export const formatMetricValue = (value: number, unit?: string): string => {
+  if (unit === 'h') {
+    const { hours, minutes } = hoursToHM(value);
+    return minutes > 0 ? `${hours}h${String(minutes).padStart(2, '0')}` : `${hours}h`;
+  }
+  const rounded = Math.round(value * 1000) / 1000;
+  return `${parseFloat(rounded.toFixed(3))}${unit ? ` ${unit}` : ''}`;
+};
+
+export type ChartGranularity = 'day' | 'week' | 'month';
+
+export interface ChartPoint {
+  label: string;
+  value: number;
+}
+
+const parseDateKey = (dateKey: string): Date => {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
+const MONTH_LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+const formatDayLabel = (dateKey: string): string => {
+  const d = parseDateKey(dateKey);
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+};
+
+const weekBucketKey = (dateKey: string): string => toDateKey(getWeekDates(parseDateKey(dateKey))[0]);
+
+const formatWeekLabel = (bucketKey: string): string => {
+  const d = parseDateKey(bucketKey);
+  return `${d.getDate()}/${d.getMonth() + 1}`;
+};
+
+const monthBucketKey = (dateKey: string): string => dateKey.slice(0, 7); // "YYYY-MM"
+
+const formatMonthLabel = (bucketKey: string): string => {
+  const [, m] = bucketKey.split('-').map(Number);
+  return MONTH_LABELS[m - 1];
+};
+
+// Regroupe l'historique brut (une entrée par jour saisi) par jour/semaine/mois pour l'affichage
+// du graphique — semaine/mois moyennent les valeurs du groupe plutôt que de n'en garder qu'une.
+export const aggregateMetricHistory = (
+  history: MetricEntry[],
+  granularity: ChartGranularity
+): ChartPoint[] => {
+  if (granularity === 'day') {
+    return history.map((h) => ({ label: formatDayLabel(h.dateKey), value: h.value }));
+  }
+
+  const bucketKeyFor = granularity === 'week' ? weekBucketKey : monthBucketKey;
+  const formatLabel = granularity === 'week' ? formatWeekLabel : formatMonthLabel;
+
+  const buckets = new Map<string, number[]>();
+  history.forEach((h) => {
+    const key = bucketKeyFor(h.dateKey);
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key)!.push(h.value);
+  });
+
+  return Array.from(buckets.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, values]) => ({
+      label: formatLabel(key),
+      value: values.reduce((sum, v) => sum + v, 0) / values.length,
+    }));
 };

@@ -5,7 +5,6 @@ import {
   calculateMainStats,
   generateAchievements,
   calculateGlobalStats,
-  toPerformanceRecords,
 } from '@/utils/statsCalculator';
 import { MainStats, Achievement, GlobalStats } from '@/types/stats';
 
@@ -18,8 +17,6 @@ export function usePerformanceStats() {
   const [globalStats, setGlobalStats] = useState<GlobalStats | null>(null);
   const syncedUserIdRef = useRef<string | null>(null);
   const lastRankRef = useRef<{ rank?: string; globalScore?: number }>({});
-  const lastRawRef = useRef<string | null>(null);
-  const performancesRef = useRef<any[]>([]);
 
   const syncDerivedStats = useCallback(
     (performancesList: any[]) => {
@@ -37,11 +34,20 @@ export function usePerformanceStats() {
           rank: realRank.rank,
           globalScore: realRank.globalScore,
         };
-        updateUser({ rank: realRank.rank, globalScore: realRank.globalScore, scoreLabel: realRank.scoreLabel });
+        updateUser({ rank: realRank.rank, globalScore: realRank.globalScore });
       }
 
       try {
-        const formattedPerformances = toPerformanceRecords(performancesList, user.id);
+        const formattedPerformances = performancesList.map((p: any) => ({
+          id: p.id || Math.random().toString(),
+          userId: user.id,
+          discipline: { id: p.discipline, name: p.discipline },
+          value: parseFloat(p.value) || 0,
+          units: 'kg',
+          date: new Date(p.date),
+          context: 'raw',
+          verified: true,
+        }));
 
         setMainStats(calculateMainStats(user as any, formattedPerformances));
         setAchievements(generateAchievements(user as any, formattedPerformances));
@@ -65,22 +71,13 @@ export function usePerformanceStats() {
 
     const saved = localStorage.getItem('userPerformances');
     const list = saved ? JSON.parse(saved) : [];
-    lastRawRef.current = saved;
-    performancesRef.current = list;
     setPerformances(list);
     syncDerivedStats(list);
   }, [user, syncDerivedStats]);
 
   const refreshFromStorage = useCallback(() => {
     const saved = localStorage.getItem('userPerformances');
-    // Rien n'a changé côté stockage : on évite de recréer des refs et de
-    // faire re-render toute la chaîne (cartes, graphique...) pour rien.
-    if (saved === lastRawRef.current) {
-      return performancesRef.current;
-    }
-    lastRawRef.current = saved;
     const list = saved ? JSON.parse(saved) : [];
-    performancesRef.current = list;
     setPerformances(list);
     syncDerivedStats(list);
     return list;

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useAuth } from '../contexts/AuthContext';
 import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
-import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple, Feather, Crown, Footprints } from 'lucide-react';
-import { getRankColors, type RankLevel } from '@/config/rankTheme';
+import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple } from 'lucide-react';
 
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
@@ -15,8 +14,7 @@ import { DailyQuests } from '@/components/DailyQuests';
 import { QuestWidget } from '@/components/QuestWidget';
 import { StreakDisplay } from '@/components/StreakDisplay';
 import { WeeklyProgressChart } from '@/components/WeeklyProgressChart';
-import { HabitTracker } from '@/components/HabitTracker';
-import { OneRepMaxCalculator } from '@/components/OneRepMaxCalculator';
+import { DailyActivityWidget } from '@/components/DailyActivityWidget';
 import { HexagonBadgeRow } from '@/components/HexagonBadge';
 import { RankBadge } from '@/components/RankBadge';
 import { ProgressionPreviewCard } from '@/components/stats/ProgressionPreviewCard';
@@ -24,22 +22,8 @@ import { usePerformanceStats } from '@/hooks/usePerformanceStats';
 import { getWeekKey } from '@/utils/weeklyProgress';
 
 // Utilitaires pour les calculs
-import { calculateXPData, generateDailyQuests, calculateStreakData, toPerformanceRecords } from '@/utils/statsCalculator';
+import { calculateXPData, generateDailyQuests, calculateStreakData } from '@/utils/statsCalculator';
 import { XPData, DailyQuest, StreakData } from '@/types/stats';
-
-// Icône par rang — reflète la même escalade visuelle que les effets d'aura du RankBadge
-// (dust/embers/shine/flame/lightning/energy/shadow-flame), pour rester cohérent d'un composant à l'autre.
-const RANK_ICONS: Record<RankLevel, React.ComponentType<{ className?: string }>> = {
-  E: Feather,
-  D: Flame,
-  C: Sparkles,
-  B: Zap,
-  A: Zap,
-  S: Flame,
-  Nation: Sparkles,
-  World: Crown,
-};
-
 export const Dashboard: React.FC = () => {
   const {
     user,
@@ -55,6 +39,7 @@ export const Dashboard: React.FC = () => {
     refreshFromStorage,
   } = usePerformanceStats();
   const [weekKey, setWeekKey] = useState(getWeekKey());
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   // NOUVEAUX ÉTATS POUR LES COMPOSANTS DASHBOARD
   const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([]);
@@ -64,14 +49,31 @@ export const Dashboard: React.FC = () => {
     if (user) {
       const list = refreshFromStorage();
       const realRank = scoringEngine.calculateUserRank(user, list);
-      alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore} ${realRank.scoreLabel})`);
+      setDebugInfo({
+        userWeight: user.weight,
+        userSex: user.sex,
+        userSportClass: user.sportClass,
+        performancesCount: list.length,
+        performances: list,
+        calculatedRank: realRank,
+      });
+      alert(`Rang recalculé : ${realRank.rank} (${realRank.globalScore}/1000)`);
     }
   };
 
   // Calculer quêtes et streak quand les performances changent
   useEffect(() => {
     if (user) {
-      const formattedPerformances = toPerformanceRecords(performances, user.id);
+      const formattedPerformances = performances.map((p: any) => ({
+        id: p.id || Math.random().toString(),
+        userId: user.id,
+        discipline: { id: p.discipline, name: p.discipline },
+        value: parseFloat(p.value) || 0,
+        units: 'kg',
+        date: new Date(p.date),
+        context: 'raw',
+        verified: true,
+      }));
 
       try {
         const calculatedStreakData = calculateStreakData(user as any, formattedPerformances);
@@ -80,6 +82,17 @@ export const Dashboard: React.FC = () => {
         setStreakData(calculatedStreakData);
       } catch (error) {
         console.error('Erreur calcul dashboard:', error);
+      }
+
+      if (userRank) {
+        setDebugInfo({
+          userWeight: user.weight,
+          userSex: user.sex,
+          userSportClass: user.sportClass,
+          performancesCount: performances.length,
+          performances,
+          calculatedRank: userRank,
+        });
       }
     }
   }, [user, performances, userRank, validations]);
@@ -101,6 +114,50 @@ export const Dashboard: React.FC = () => {
     };
   }, [weekKey, refreshFromStorage]);
 
+  // Fonction pour obtenir la couleur du rang
+  const getRangColor = (rang: string) => {
+    switch (rang) {
+      case 'World':
+        return 'from-yellow-400 to-yellow-600';
+      case 'Nation':
+        return 'from-purple-500 to-purple-700';
+      case 'S':
+        return 'from-purple-600 to-purple-800';
+      case 'A':
+        return 'from-red-500 to-red-700';
+      case 'B':
+        return 'from-blue-500 to-blue-700';
+      case 'C':
+        return 'from-green-500 to-green-700';
+      case 'D':
+        return 'from-yellow-500 to-yellow-700';
+      default:
+        return 'from-gray-500 to-gray-700';
+    }
+  };
+
+  // Fonction pour obtenir l'icône du rang
+  const getRangIcon = (rang: string) => {
+    switch (rang) {
+      case 'World':
+        return '🏆';
+      case 'Nation':
+        return '🏆';
+      case 'S':
+        return '🥇';
+      case 'A':
+        return '🥈';
+      case 'B':
+        return '🥉';
+      case 'C':
+        return '⭐';
+      case 'D':
+        return '🔰';
+      default:
+        return '⭐';
+    }
+  };
+
   // Fonction pour obtenir la statistique principale selon la classe de sport
   const getMainStatForSportClass = (sportClass: string, performances: any[]) => {
     switch (sportClass?.toLowerCase()) {
@@ -120,10 +177,34 @@ export const Dashboard: React.FC = () => {
         const bestDeadlift = deadliftPerformances.length > 0 ? Math.max(...deadliftPerformances.map(p => p.value || 0)) : 0;
         const bestTotal = bestSquat + bestBench + bestDeadlift;
 
+        // DEBUG: Afficher les performances pour comprendre le calcul
+        console.log('🏋️ DEBUG POWERLIFTING:', {
+          squatPerformances: squatPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
+          benchPerformances: benchPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
+          deadliftPerformances: deadliftPerformances.map(p => ({
+            value: p.value,
+            date: p.date
+          })),
+          bestSquat,
+          bestBench,
+          bestDeadlift,
+          bestTotal,
+          allPerformances: performances.map(p => ({
+            discipline: p.discipline,
+            value: p.value,
+            date: p.date
+          }))
+        });
         return {
           label: 'Meilleur Total',
           value: `${bestTotal} kg`,
-          icon: Dumbbell,
+          icon: '🏋️‍♂️',
           description: `Squat: ${bestSquat}kg + Bench: ${bestBench}kg + Deadlift: ${bestDeadlift}kg`
         };
       case 'streetlifting':
@@ -141,7 +222,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleur Total Street',
           value: `${streetTotal} kg`,
-          icon: Weight,
+          icon: '💪',
           description: `+ ${bestStreetPullups} tractions max`
         };
       case 'sprint':
@@ -154,7 +235,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleur 100m',
           value: `${bestTime100m > 0 ? bestTime100m.toFixed(1) : '0'}s`,
-          icon: Zap,
+          icon: '⚡',
           description: `Vitesse max: ${maxSpeed} km/h`
         };
       case 'marathon':
@@ -170,14 +251,14 @@ export const Dashboard: React.FC = () => {
           return {
             label: 'Meilleur Marathon',
             value: `${hours}h${minutes.toString().padStart(2, '0')}`,
-            icon: Footprints,
+            icon: '🏃‍♂️',
             description: 'Temps record'
           };
         } else {
           return {
             label: 'Meilleure Distance',
             value: `${bestDistance30min.toFixed(1)} km`,
-            icon: Footprints,
+            icon: '🏃‍♀️',
             description: 'En 30 minutes'
           };
         }
@@ -188,7 +269,7 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleure Perf',
           value: `${bestCrossfitScore}`,
-          icon: Flame,
+          icon: '🔥',
           description: 'Meilleure performance'
         };
       case 'calisthenics':
@@ -200,20 +281,72 @@ export const Dashboard: React.FC = () => {
         return {
           label: 'Meilleures Tractions',
           value: `${bestPullups} reps`,
-          icon: TrendingUp,
+          icon: '🆙',
           description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : 'En une série'
         };
       default:
         // Pour classique : score global
         return {
           label: 'Score Global',
-          value: `${user?.globalScore ?? userRank?.globalScore ?? 0} ${user?.scoreLabel || userRank?.scoreLabel || 'pts'}`,
-          icon: Star,
+          value: `${userRank?.globalScore || 0}/1000`,
+          icon: '⭐',
           description: 'Performance générale'
         };
     }
   };
 
+  // Fonction pour calculer la progression vers le rang supérieur
+  const getRankProgression = (currentRank: string, currentScore: number) => {
+    const rankThresholds = {
+      'D': {
+        min: 0,
+        max: 200
+      },
+      'C': {
+        min: 200,
+        max: 400
+      },
+      'B': {
+        min: 400,
+        max: 600
+      },
+      'A': {
+        min: 600,
+        max: 800
+      },
+      'S': {
+        min: 800,
+        max: 900
+      },
+      'Nation': {
+        min: 900,
+        max: 950
+      },
+      'World': {
+        min: 950,
+        max: 1000
+      }
+    };
+    const threshold = rankThresholds[currentRank as keyof typeof rankThresholds];
+    if (!threshold) return {
+      percentage: 100,
+      nextRank: 'World'
+    };
+
+    // Calculer le pourcentage dans le rang actuel
+    const range = threshold.max - threshold.min;
+    const progress = currentScore - threshold.min;
+    const percentage = Math.min(Math.max(progress / range * 100, 0), 100);
+
+    // Déterminer le rang suivant
+    const ranks = ['D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
+    const currentIndex = ranks.indexOf(currentRank);
+    const nextRank = currentIndex < ranks.length - 1 ? ranks[currentIndex + 1] : 'World';
+    return {
+      percentage,
+      nextRank
+    };
+  };
 
   // Fonctions pour gérer les interactions Dashboard
   const handleQuestComplete = (questId: string) => {
@@ -223,14 +356,6 @@ export const Dashboard: React.FC = () => {
       progress: quest.maxProgress
     } : quest));
   };
-
-  // Mémorisé : évite de recalculer 5x par rendu (filtres/max sur performances)
-  // (le cas "classique" lit aussi userRank.globalScore, doit être dans les deps)
-  const mainStat = useMemo(
-    () => getMainStatForSportClass(user?.sportClass || 'classique', performances),
-    [user?.sportClass, performances, userRank]
-  );
-
   if (!user) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -239,36 +364,29 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>;
   }
-
-  const rankKey = (user?.rank || userRank?.rank || 'D') as RankLevel;
-  const rankColors = getRankColors(rankKey);
-  const RankIcon = RANK_ICONS[rankKey] || Star;
-  const isHunterRank = rankKey === 'S' || rankKey === 'Nation' || rankKey === 'World';
-
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
       <div className="space-y-8 stagger-animation">
-
-          {/* Header Principal - VitalForce DA (recoloré en mode Hunter via .hunter-mode sur <html>,
-              voir App.tsx — les coins lumineux "fenêtre System" ne s'affichent qu'ici) */}
-          <div className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${isHunterRank ? 'hunter-panel' : ''}`}>
-            <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
+          
+          {/* Header Principal - VitalForce DA */}
+          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
+            <div className="absolute inset-0 gradient-primary opacity-80"></div>
             {/* Particules flottantes VitalForce */}
             <div className="absolute top-0 right-0 w-32 h-32 md:w-64 md:h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full -translate-y-16 translate-x-16 md:-translate-y-32 md:translate-x-32 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-secondary/20 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 md:w-48 md:h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-12 -translate-x-12 md:translate-y-24 md:-translate-x-24"></div>
-
+            
           <div className="relative z-10">
               <div className="flex flex-col lg:flex-row gap-6">
                 {/* Left: User Info */}
                 <div className="flex-1 space-y-4 md:space-y-6">
                   <div className="flex items-start gap-3 md:gap-4">
                     {/* Identité : badge de rang + niveau en petite bulle */}
-                    <RankBadge rank={rankKey} level={xpData?.level || 1} size="xl" animated className="shrink-0" />
+                    <RankBadge rank={userRank?.rank || 'D'} level={xpData?.level || 1} size="lg" animated className="shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate text-white">
-                        Ascend
+                        VitalForce
                     </h1>
                       <div className="flex items-center gap-2 mt-2 max-w-xs">
                         <Progress
@@ -287,48 +405,47 @@ export const Dashboard: React.FC = () => {
                   
                   <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
-                    <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
-                      <mainStat.icon className="w-4 h-4 md:w-5 md:h-5" />
-                      <span>{mainStat.label}: {mainStat.value}</span>
-                    </div>
+                    {(() => {
+                    const mainStat = getMainStatForSportClass(user.sportClass, performances);
+                    return <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
+                          <span className="text-lg md:text-xl">{mainStat.icon}</span>
+                          <span>{mainStat.label}: {mainStat.value}</span>
+                        </div>;
+                  })()}
                     
-                    {/* RANG CALCULÉ AVEC LES PERFORMANCES — teinté dynamiquement selon le rang atteint */}
-                    <div
-                      className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full text-white font-semibold text-sm md:text-base"
-                      style={{
-                        background: `linear-gradient(135deg, ${rankColors.primary} 0%, ${rankColors.secondary} 100%)`,
-                        boxShadow: `0 0 18px ${rankColors.secondary}66`,
-                      }}
-                    >
-                      <RankIcon className="w-4 h-4 md:w-5 md:h-5" />
-                      <span>Rang {rankKey}</span>
+                    {/* RANG CALCULÉ AVEC LES PERFORMANCES */}
+                    <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-purple)] text-sm md:text-base">
+                      <span>Rang {userRank?.rank || 'D'}</span>
                     </div>
                 
                     <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                      Recalculer
+                      🔄 Recalculer
                     </Button>
-
+                    
                     <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
-                      <Plus className="w-3.5 h-3.5 mr-1.5" />
-                      Performances
+                      ➕ Performances
                     </Button>
                 </div>
               </div>
 
                 <div className="space-y-3 md:space-y-4 mt-4">
-                  <div className="text-foreground/90 font-medium text-sm md:text-base">
-                    Progression vers le rang {userRank?.nextRank || 'C'}
-                  </div>
-                  <div className="w-full max-w-md">
-                    <Progress value={userRank?.rankProgressPercent || 0} size="md" variant="subtle" />
-                  </div>
-                  <div className="text-xs md:text-sm">
-                    <span className="text-foreground font-bold text-lg md:text-xl">
-                      {Math.round(userRank?.rankProgressPercent || 0)}%
-                    </span>
-                    <span className="text-foreground/80"> vers le rang {userRank?.nextRank || 'C'}</span>
-                  </div>
+                  {(() => {
+                  const progression = getRankProgression(userRank?.rank || 'D', userRank?.globalScore || 0);
+                  return <>
+                        <div className="text-foreground/90 font-medium text-sm md:text-base">
+                          Progression vers le rang {progression.nextRank}
+                        </div>
+                        <div className="w-full max-w-md">
+                          <Progress value={progression.percentage} size="md" variant="subtle" />
+                        </div>
+                        <div className="text-xs md:text-sm">
+                          <span className="text-foreground font-bold text-lg md:text-xl">
+                            {Math.round(progression.percentage)}%
+                          </span> 
+                          <span className="text-foreground/80"> vers le rang {progression.nextRank}</span>
+                        </div>
+                      </>;
+                })()}
                 </div>
             </div>
           </div>
@@ -338,17 +455,31 @@ export const Dashboard: React.FC = () => {
         {/* Barre XP & Niveau */}
         <XPLevelBar />
 
-        {/* Tracker d'habitudes : suivi quotidien + régularité sur les dernières semaines */}
-        <HabitTracker />
-
-        {/* Calculateur de 1RM — réservé aux powerlifters */}
-        {user.sportClass === 'power' && <OneRepMaxCalculator />}
+        {/* Activité du jour : pas, distance, calories */}
+        <DailyActivityWidget weightKg={user.weight} />
 
         {/* Widget Quêtes */}
         <QuestWidget />
 
         {/* Streak & Régularité */}
         {streakData && <StreakDisplay streakData={streakData} />}
+
+          {/* DEBUG INFO - Masqué par défaut */}
+          {false && <div className="bg-yellow-500/15 border border-yellow-500/25 border border-yellow-400 rounded-lg p-4 mb-6">
+              <h3 className="text-lg font-bold text-yellow-800 mb-2">🐛 DEBUG INFO</h3>
+              <div className="text-sm text-yellow-700 space-y-1">
+                <p><strong>Utilisateur:</strong></p>
+                <p>Poids: {user?.weight || 75}kg</p>
+                <p>Sexe: {user?.sex || 'male'}</p>
+                <p>Sport: {user?.sportClass || 'classique'}</p>
+                <p>Âge: {user?.age || 25} ans</p>
+                <p><strong>Performances:</strong></p>
+                <p>Nombre: {performances.length}</p>
+                <p><strong>Détail:</strong> {JSON.stringify(performances, null, 2)}</p>
+                <p><strong>Rang calculé:</strong></p>
+                <p>{JSON.stringify(userRank, null, 2)}</p>
+                </div>
+                </div>}
 
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
@@ -358,17 +489,19 @@ export const Dashboard: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs md:text-sm text-secondary mb-1 font-semibold truncate">
-                      {mainStat.label}
+                      {getMainStatForSportClass(user.sportClass, performances).label}
                     </p>
                     <p className="text-xl md:text-3xl font-bold text-foreground truncate">
-                      {mainStat.value}
+                      {getMainStatForSportClass(user.sportClass, performances).value}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {mainStat.description}
+                      {getMainStatForSportClass(user.sportClass, performances).description}
                     </p>
                   </div>
                   <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/15 border border-primary/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <mainStat.icon className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                    <span className="text-2xl md:text-3xl">
+                      {getMainStatForSportClass(user.sportClass, performances).icon}
+                    </span>
                   </div>
                 </div>
               </CardContent>

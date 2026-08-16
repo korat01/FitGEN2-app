@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,8 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '../contexts/AuthContext';
-import { useHunterMode } from '../hooks/useHunterMode';
-import {
+import { 
   Dumbbell, 
   Clock, 
   Target,
@@ -2137,30 +2136,28 @@ export const BlocsEntrainement: React.FC = () => {
     }
   };
 
-  const { hunterPanelClass } = useHunterMode();
-
   return (
     <div className="relative">
-      <div className="container mx-auto px-4 md:px-6 py-8 relative z-10 page-transition">
-        <div className="space-y-8 stagger-animation">
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <div className="space-y-8">
           {/* Header Principal - VitalForce DA */}
-          <div className={`relative overflow-hidden rounded-3xl p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${hunterPanelClass}`}>
-            <div className="absolute inset-0 gradient-primary opacity-[var(--hero-overlay-opacity)]"></div>
+          <div className="relative overflow-hidden rounded-3xl p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30">
+            <div className="absolute inset-0 gradient-primary opacity-80"></div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-secondary/20 to-transparent rounded-full -translate-y-32 translate-x-32 animate-pulse-slow"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-accent/20 to-transparent rounded-full translate-y-24 -translate-x-24 animate-float"></div>
             
             <div className="relative z-10">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
                 <div className="space-y-6">
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="p-3 md:p-4 bg-white/20 rounded-xl md:rounded-2xl backdrop-blur-sm flex-shrink-0">
-                      <Dumbbell className="w-6 h-6 md:w-8 md:h-8" />
+                  <div className="flex items-center gap-4">
+                    <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm">
+                      <Dumbbell className="w-8 h-8" />
                     </div>
-                    <div className="min-w-0">
-                      <h1 className="text-2xl md:text-4xl font-bold tracking-tight truncate">
+                    <div>
+                      <h1 className="text-4xl font-bold tracking-tight">
                         Exercices d'Entraînement
                       </h1>
-                      <p className="text-white/90 text-base md:text-lg mt-1 md:mt-2">Bibliothèque complète d'exercices</p>
+                      <p className="text-white/90 text-lg mt-2">Bibliothèque complète d'exercices</p>
                     </div>
         </div>
 

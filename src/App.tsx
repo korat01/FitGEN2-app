@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -12,12 +12,8 @@ import PageLayout from './components/PageLayout';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { ParticleContainer } from './components/ParticleContainer';
 import { CelebrationContainer } from './components/CelebrationContainer';
-import { RankUpScreen } from './components/RankUpScreen';
-import type { RankLevel } from './components/RankBadge';
 import { useParticles } from './hooks/useParticles';
 import { useCelebration } from './hooks/useCelebration';
-
-const RANK_ORDER: RankLevel[] = ['E', 'D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
 
 // Lazy loading des pages
 const Login = lazy(() => import('./pages/Login'));
@@ -67,63 +63,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Composant principal de l'application
 const AppContent: React.FC = () => {
   const { user } = useAuth();
-  const { particles, spawnClickParticles, spawnLevelUpParticles } = useParticles();
+  const { particles, spawnClickParticles } = useParticles();
   const { celebrations, removeCelebration } = useCelebration();
-
-  // Écran plein écran de changement de rang — se déclenche uniquement quand le rang MONTE par
-  // rapport au dernier rang connu, jamais sur la toute première synchronisation après connexion
-  // (previousRankRef reste null tant qu'aucun rang n'a été vu, donc pas de "rang up" surprise
-  // juste après un login). Réinitialisé à la déconnexion pour ne pas fausser la prochaine session.
-  const previousRankRef = useRef<string | null>(null);
-  const [rankUpTarget, setRankUpTarget] = useState<RankLevel | null>(null);
-
-  useEffect(() => {
-    if (!user) {
-      previousRankRef.current = null;
-      return;
-    }
-    const currentRank = user.rank || 'D';
-    const prev = previousRankRef.current;
-    if (prev && prev !== currentRank && RANK_ORDER.indexOf(currentRank as RankLevel) > RANK_ORDER.indexOf(prev as RankLevel)) {
-      setRankUpTarget(currentRank as RankLevel);
-    }
-    previousRankRef.current = currentRank;
-  }, [user?.rank, user?.id]);
-
-  // "Mode Hunter" — identité Solo Leveling (voir .hunter-mode dans index.css), réservée aux hauts
-  // rangs (S/Nation/World), chacun avec sa propre identité : S (.hunter-s, rouge sombre/braise),
-  // Nation (.hunter-nation, violet dominant), World (.hunter-world, noir/gris/bleu glacé).
-  // Rangs D/C/B/A : même mécanique indépendante du Mode Hunter (classe sur <html>, retail de
-  // --primary/--secondary/fond), sans les décors "fenêtre System" des rangs élite — D en bronze/
-  // braise (.rank-d), C en bleu/argent (.rank-c), B en or (.rank-gold), A en platine/éclairs
-  // bleus (.rank-a).
-  // Uniquement des classes sur <html> : rien d'autre à défaire si ça ne va pas.
-  // showRankTheme (réglage utilisateur, voir Stats.tsx) : si désactivé, aucune classe de rang
-  // n'est posée -> l'app reste sur le thème violet/cyan par défaut quel que soit le rang.
-  const showRankTheme = user?.showRankTheme !== false;
-  useEffect(() => {
-    const isHunterRank = showRankTheme && (user?.rank === 'S' || user?.rank === 'Nation' || user?.rank === 'World');
-    const isSRank = showRankTheme && user?.rank === 'S';
-    const isWorldRank = showRankTheme && user?.rank === 'World';
-    const isNationRank = showRankTheme && user?.rank === 'Nation';
-    const isDRank = showRankTheme && user?.rank === 'D';
-    const isBRank = showRankTheme && user?.rank === 'B';
-    const isCRank = showRankTheme && user?.rank === 'C';
-    const isARank = showRankTheme && user?.rank === 'A';
-    document.documentElement.classList.toggle('hunter-mode', isHunterRank);
-    document.documentElement.classList.toggle('hunter-s', isSRank);
-    document.documentElement.classList.toggle('hunter-world', isWorldRank);
-    document.documentElement.classList.toggle('hunter-nation', isNationRank);
-    document.documentElement.classList.toggle('rank-d', isDRank);
-    document.documentElement.classList.toggle('rank-gold', isBRank);
-    document.documentElement.classList.toggle('rank-c', isCRank);
-    document.documentElement.classList.toggle('rank-a', isARank);
-    return () => {
-      document.documentElement.classList.remove(
-        'hunter-mode', 'hunter-s', 'hunter-world', 'hunter-nation', 'rank-d', 'rank-gold', 'rank-c', 'rank-a'
-      );
-    };
-  }, [user?.rank, showRankTheme]);
 
   // Effet de clic global sur les éléments interactifs
   useEffect(() => {
@@ -149,16 +90,9 @@ const AppContent: React.FC = () => {
   
   return (
       <>
-      {rankUpTarget && (
-        <RankUpScreen
-          rank={rankUpTarget}
-          onDismiss={() => setRankUpTarget(null)}
-          onReveal={spawnLevelUpParticles}
-        />
-      )}
       <ParticleContainer particles={particles} />
-      <CelebrationContainer
-        celebrations={celebrations}
+      <CelebrationContainer 
+        celebrations={celebrations} 
         onCelebrationComplete={removeCelebration}
       />
       <Router>

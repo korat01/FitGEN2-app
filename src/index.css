@@ -98,12 +98,6 @@ All colors MUST be HSL.
     
     /* Bordures gaming */
     --border-glow: 1px solid rgba(0, 194, 255, 0.3);
-
-    /* Opacité du voile "gradient-primary" des headers de page (Dashboard, Programme, Nutrition,
-       Exercices, Stats). En Mode Hunter, primary/secondary partagent souvent la même famille de
-       teinte (ex: rouge sombre + rouge électrique) : à 80% d'opacité ça noie les boutons dedans.
-       Baissée uniquement sous .hunter-mode, via une variable plutôt qu'en réécrivant chaque page. */
-    --hero-overlay-opacity: 0.8;
   }
 
   .dark {
@@ -129,290 +123,6 @@ All colors MUST be HSL.
     --border: 220 30% 20%;
     --input: 220 30% 15%;
     --ring: 261 100% 59%;
-  }
-
-  /* ============================================================
-     HUNTER MODE — identité Solo Leveling, réservée aux rangs
-     S / Nation / World (voir App.tsx : classe posée sur <html>).
-     Palette fixe et travaillée à la main (pas de couleur générée
-     par rang comme les tentatives précédentes) : noir profond,
-     violet électrique "Shadow Monarch", bleu "System window".
-     Ranks E→A ne sont jamais concernés, rien ne change pour eux.
-     ============================================================ */
-  .hunter-mode {
-    /* Voile de header bien plus discret : laisse le fond sombre transparaître pour que les
-       boutons (primary/secondary pleins) se détachent au lieu de se fondre dans un bloc uni. */
-    --hero-overlay-opacity: 0.35;
-    --background: 258 45% 3%;
-    --card: 258 35% 7%;
-    --card-foreground: 0 0% 100%;
-    --popover: 258 35% 7%;
-    --primary: 271 76% 53%;           /* #8A2BE2 — violet électrique */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 195 100% 50%;        /* #00BFFF — bleu "System" */
-    --secondary-foreground: 0 0% 100%;
-    --accent: 195 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --muted: 258 25% 12%;
-    --muted-foreground: 258 15% 72%;
-    --border: 271 45% 22%;
-    --input: 258 30% 10%;
-    --ring: 195 100% 50%;
-
-    --vitalforce-purple: #8A2BE2;
-    --vitalforce-cyan: #00BFFF;
-
-    --gradient-primary: linear-gradient(135deg, #8A2BE2 0%, #00BFFF 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #8A2BE2 0%, #00BFFF 100%);
-    --gradient-secondary: linear-gradient(135deg, #00BFFF 0%, #8A2BE2 100%);
-    --gradient-progress: linear-gradient(90deg, #8A2BE2 0%, #00BFFF 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(138, 43, 226, 0.6);
-    --shadow-glow-blue: 0 0 25px rgba(0, 191, 255, 0.6);
-    --shadow-glow-cyan: 0 0 30px rgba(0, 191, 255, 0.7);
-  }
-
-  /* Rang World — identité froide et unique (noir/gris/bleu glacé), distincte du violet/bleu
-     électrique partagé par S et Nation : le badge World est noir, pas violet. Sélecteur composé
-     (.hunter-mode.hunter-world) pour ne jamais dépendre de l'ordre des règles dans ce fichier. */
-  .hunter-mode.hunter-world {
-    --background: 220 25% 2%;
-    --card: 220 18% 6%;
-    --card-foreground: 0 0% 100%;
-    --popover: 220 18% 6%;
-    --primary: 220 20% 10%;            /* quasi noir */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 195 90% 78%;          /* bleu glacé, #8FE9FF */
-    --secondary-foreground: 222 47% 8%; /* fond clair -> texte sombre */
-    --accent: 210 12% 55%;             /* gris froid */
-    --accent-foreground: 0 0% 100%;
-    --muted: 220 15% 12%;
-    --muted-foreground: 210 12% 68%;
-    --border: 195 35% 28%;
-    --input: 220 15% 9%;
-    --ring: 195 90% 78%;
-
-    --vitalforce-purple: #14161c;
-    --vitalforce-cyan: #8FE9FF;
-
-    --gradient-primary: linear-gradient(135deg, #14161c 0%, #8FE9FF 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #14161c 0%, #8FE9FF 100%);
-    --gradient-secondary: linear-gradient(135deg, #8FE9FF 0%, #14161c 100%);
-    --gradient-progress: linear-gradient(90deg, #14161c 0%, #8FE9FF 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(143, 233, 255, 0.35);
-    --shadow-glow-blue: 0 0 25px rgba(143, 233, 255, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(143, 233, 255, 0.6);
-  }
-
-  /* Rang Nation — identité violet dominant, distincte du violet+bleu électrique de S : ici le
-     bleu disparaît quasiment, tout tourne autour de deux violets (profond + clair) au lieu d'un
-     duo violet/bleu. Même principe que .hunter-world : sélecteur composé, ne change que la teinte. */
-  .hunter-mode.hunter-nation {
-    --background: 265 55% 3%;
-    --card: 265 42% 7%;
-    --card-foreground: 0 0% 100%;
-    --popover: 265 42% 7%;
-    --primary: 266 100% 55%;           /* #6B2AFF — violet profond */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 271 91% 75%;          /* #C084FC — violet clair/lavande */
-    --secondary-foreground: 265 60% 10%; /* fond clair -> texte sombre */
-    --accent: 271 91% 75%;
-    --accent-foreground: 265 60% 10%;
-    --muted: 265 28% 12%;
-    --muted-foreground: 265 15% 74%;
-    --border: 266 55% 30%;
-    --input: 265 32% 10%;
-    --ring: 271 91% 75%;
-
-    --vitalforce-purple: #6B2AFF;
-    --vitalforce-cyan: #C084FC;
-
-    --gradient-primary: linear-gradient(135deg, #6B2AFF 0%, #C084FC 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #6B2AFF 0%, #C084FC 100%);
-    --gradient-secondary: linear-gradient(135deg, #C084FC 0%, #6B2AFF 100%);
-    --gradient-progress: linear-gradient(90deg, #6B2AFF 0%, #C084FC 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(107, 42, 255, 0.55);
-    --shadow-glow-blue: 0 0 25px rgba(192, 132, 252, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(192, 132, 252, 0.6);
-  }
-
-  /* Rang S — identité rouge/noir pure, pas d'ambre/jaune : rouge sombre + rouge électrique sur
-     fond quasi noir. Même principe que Nation/World : sélecteur composé, ne change que la teinte. */
-  .hunter-mode.hunter-s {
-    --background: 0 0% 2%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 5%;
-    --primary: 0 100% 27%;             /* #8B0000 — rouge sombre */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 100% 50%;           /* #FF0000 — rouge électrique */
-    --secondary-foreground: 0 0% 100%;
-    --accent: 0 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 65%;
-    --border: 0 60% 20%;
-    --input: 0 0% 6%;
-    --ring: 0 100% 50%;
-
-    --vitalforce-purple: #8B0000;
-    --vitalforce-cyan: #FF0000;
-
-    --gradient-primary: linear-gradient(135deg, #8B0000 0%, #FF0000 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #8B0000 0%, #FF0000 100%);
-    --gradient-secondary: linear-gradient(135deg, #FF0000 0%, #8B0000 100%);
-    --gradient-progress: linear-gradient(90deg, #8B0000 0%, #FF0000 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(139, 0, 0, 0.5);
-    --shadow-glow-blue: 0 0 25px rgba(255, 0, 0, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(255, 0, 0, 0.6);
-  }
-
-  /* Rang B — identité or. En dehors du "Mode Hunter" (réservé aux rangs S/Nation/World) : simple
-     retail de teinte sur --primary/--secondary, sans les décors "fenêtre System". Avant ce bloc,
-     seul le halo isolé du badge (RANK_COLORS.B) était doré — le fond des pages restait le violet/
-     cyan par défaut, d'où l'incohérence. Mêmes valeurs que RANK_COLORS.B pour rester aligné.
-     Or "vrai" et non brun : une teinte pleinement saturée mais avec une luminosité < 50% (comme
-     l'ancien #E08E00) se perçoit comme marron à l'œil, pas comme doré — donc primary reste ≥ 50%
-     de luminosité (métal doré riche) et secondary est l'or vif classique. */
-  .rank-gold {
-    /* primary/secondary sont tous les deux dans la famille or (5° d'écart de teinte) : même
-       raison que .hunter-mode, sans le voile allégé les boutons du header se fondraient dans un
-       bloc uni au lieu de s'en détacher. */
-    --hero-overlay-opacity: 0.35;
-    /* --background/--card par défaut ont une teinte 220° (bleu) même à faible saturation — sans
-       cette override, .glass-card (basé sur hsl(var(--card))) resterait bleu-froid même avec un
-       header doré au-dessus. Teinte chaude à faible saturation, pas un marron plein. */
-    --background: 38 30% 4%;
-    --card: 38 22% 9%;
-    --card-foreground: 0 0% 100%;
-    --popover: 38 22% 9%;
-    --primary: 46 65% 52%;               /* #D4AF37 — or métallique */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 51 100% 50%;            /* #FFD700 — or vif classique */
-    --secondary-foreground: 38 60% 12%;  /* fond clair -> texte sombre */
-    --muted: 38 15% 15%;
-    --muted-foreground: 38 10% 68%;
-    --accent: 46 65% 52%;
-    --accent-foreground: 0 0% 100%;
-    --border: 42 45% 22%;
-    --input: 38 20% 11%;
-    --ring: 51 100% 50%;
-
-    --vitalforce-purple: #D4AF37;
-    --vitalforce-cyan: #FFD700;
-
-    --gradient-primary: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #D4AF37 0%, #FFD700 100%);
-    --gradient-secondary: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
-    --gradient-progress: linear-gradient(90deg, #D4AF37 0%, #FFD700 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(212, 175, 55, 0.5);
-    --shadow-glow-blue: 0 0 25px rgba(255, 215, 0, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(255, 215, 0, 0.6);
-  }
-
-  /* Rang C — identité bleu/argent (médaille argent + liseré néon bleu, voir c.png). Même
-     mécanique que .rank-gold : override --primary/--secondary/fond, pas de décor "fenêtre
-     System". Mêmes valeurs que RANK_COLORS.C. */
-  .rank-c {
-    --hero-overlay-opacity: 0.35;
-    --background: 210 30% 4%;
-    --card: 210 22% 9%;
-    --card-foreground: 0 0% 100%;
-    --popover: 210 22% 9%;
-    --primary: 206 51% 53%;              /* #4A90C4 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 196 64% 69%;            /* #7EC8E3 */
-    --secondary-foreground: 210 60% 12%;
-    --muted: 210 15% 15%;
-    --muted-foreground: 210 10% 68%;
-    --accent: 206 51% 53%;
-    --accent-foreground: 0 0% 100%;
-    --border: 208 40% 22%;
-    --input: 210 20% 11%;
-    --ring: 196 64% 69%;
-
-    --vitalforce-purple: #4A90C4;
-    --vitalforce-cyan: #7EC8E3;
-
-    --gradient-primary: linear-gradient(135deg, #4A90C4 0%, #7EC8E3 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #4A90C4 0%, #7EC8E3 100%);
-    --gradient-secondary: linear-gradient(135deg, #7EC8E3 0%, #4A90C4 100%);
-    --gradient-progress: linear-gradient(90deg, #4A90C4 0%, #7EC8E3 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(74, 144, 196, 0.5);
-    --shadow-glow-blue: 0 0 25px rgba(126, 200, 227, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(126, 200, 227, 0.6);
-  }
-
-  /* Rang A — identité platine/éclairs bleu électrique vif (voir a.png : guerrier + foudre, pas
-     un simple bleu-blanc délavé). Mêmes valeurs que RANK_COLORS.A. */
-  .rank-a {
-    --hero-overlay-opacity: 0.35;
-    --background: 218 32% 4%;
-    --card: 218 24% 9%;
-    --card-foreground: 0 0% 100%;
-    --popover: 218 24% 9%;
-    --primary: 222 100% 55%;             /* #1B5FFF — bleu électrique, pleinement saturé */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 187 100% 50%;           /* #00E1FF — cyan électrique vif */
-    --secondary-foreground: 218 60% 10%;
-    --muted: 218 15% 15%;
-    --muted-foreground: 218 10% 68%;
-    --accent: 222 100% 55%;
-    --accent-foreground: 0 0% 100%;
-    --border: 220 60% 26%;
-    --input: 218 20% 11%;
-    --ring: 187 100% 50%;
-
-    --vitalforce-purple: #1B5FFF;
-    --vitalforce-cyan: #00E1FF;
-
-    --gradient-primary: linear-gradient(135deg, #1B5FFF 0%, #00E1FF 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #1B5FFF 0%, #00E1FF 100%);
-    --gradient-secondary: linear-gradient(135deg, #00E1FF 0%, #1B5FFF 100%);
-    --gradient-progress: linear-gradient(90deg, #1B5FFF 0%, #00E1FF 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(27, 95, 255, 0.55);
-    --shadow-glow-blue: 0 0 25px rgba(0, 225, 255, 0.55);
-    --shadow-glow-cyan: 0 0 30px rgba(0, 225, 255, 0.65);
-  }
-
-  /* Rang D — identité bronze/braise (bouclier bronze + fissures orange qui couvent, voir d.png).
-     Mêmes valeurs que RANK_COLORS.D. Le bronze est intrinsèquement brun-métallique (contrairement
-     au piège "or perçu comme marron" de B) donc pas de contrainte de luminosité ≥ 50% ici. */
-  .rank-d {
-    --hero-overlay-opacity: 0.35;
-    --background: 25 25% 3%;
-    --card: 25 20% 8%;
-    --card-foreground: 0 0% 100%;
-    --popover: 25 20% 8%;
-    --primary: 29 57% 46%;               /* #B87333 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 24 100% 63%;            /* #FF8C42 */
-    --secondary-foreground: 25 60% 12%;
-    --muted: 25 15% 14%;
-    --muted-foreground: 25 10% 68%;
-    --accent: 29 57% 46%;
-    --accent-foreground: 0 0% 100%;
-    --border: 27 40% 20%;
-    --input: 25 20% 10%;
-    --ring: 24 100% 63%;
-
-    --vitalforce-purple: #B87333;
-    --vitalforce-cyan: #FF8C42;
-
-    --gradient-primary: linear-gradient(135deg, #B87333 0%, #FF8C42 100%);
-    --gradient-primary-horizontal: linear-gradient(90deg, #B87333 0%, #FF8C42 100%);
-    --gradient-secondary: linear-gradient(135deg, #FF8C42 0%, #B87333 100%);
-    --gradient-progress: linear-gradient(90deg, #B87333 0%, #FF8C42 100%);
-
-    --shadow-glow-purple: 0 0 25px rgba(184, 115, 51, 0.5);
-    --shadow-glow-blue: 0 0 25px rgba(255, 140, 66, 0.5);
-    --shadow-glow-cyan: 0 0 30px rgba(255, 140, 66, 0.6);
   }
 }
 
@@ -458,37 +168,22 @@ All colors MUST be HSL.
     background: linear-gradient(135deg, rgba(21, 25, 40, 0.9) 0%, rgba(11, 13, 26, 0.95) 100%);
     border-color: rgba(0, 194, 255, 0.15);
   }
-
-  /* Glassmorphism premium - style VitalForce. Fond/bordure/glow suivent --card/--primary/
-     --secondary (pas de rgba figé) pour se reteinter sous Mode Hunter et .rank-gold — avant,
-     ces valeurs étaient codées en dur et le fond des cartes restait bleu-violet quel que soit
-     le rang affiché (seuls les accents isolés type bg-primary/15 suivaient le thème). */
+  
+  /* Glassmorphism premium - style VitalForce */
   .glass-card {
     @apply rounded-xl backdrop-blur-xl;
-    background: hsl(var(--card) / 0.6);
-    border: 1px solid hsl(var(--primary) / 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    background: rgba(30, 35, 53, 0.6);
+    border: 1px solid rgba(107, 42, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 0 1px hsl(var(--secondary) / 0.1);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.3s ease, box-shadow 0.3s ease;
+                0 0 0 1px rgba(0, 194, 255, 0.1);
   }
-
+  
   .glass-card:hover {
-    transform: translateY(-3px);
-    border-color: hsl(var(--primary) / 0.4);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5),
+    border-color: rgba(107, 42, 255, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 
                 inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                0 0 30px hsl(var(--primary) / 0.2);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .glass-card {
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .glass-card:hover {
-      transform: none;
-    }
+                0 0 30px rgba(107, 42, 255, 0.2);
   }
   
   .gaming-card {
@@ -515,30 +210,30 @@ All colors MUST be HSL.
     background: rgba(107, 42, 255, 0.15);
     border-color: rgba(107, 42, 255, 0.3);
   }
-
+  
   .gradient-primary {
     background: var(--gradient-primary);
   }
-
+  
   .gradient-secondary {
     background: var(--gradient-secondary);
   }
-
+  
   .gradient-success {
     background: var(--gradient-success);
   }
-
+  
   .gradient-cyan-purple {
     background: var(--gradient-cyan-purple);
   }
-
+  
   /* Barres de progression — lisibles, contrastées, sans surcharge visuelle */
   .vitalforce-progress {
     @apply rounded-full overflow-hidden relative w-full;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.14);
   }
-
+  
   .vitalforce-progress-bar {
     @apply h-full rounded-full transition-all duration-700 ease-out relative;
     background: var(--gradient-progress);
@@ -551,7 +246,7 @@ All colors MUST be HSL.
   }
 
   .vitalforce-progress-subtle .vitalforce-progress-bar {
-    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+    background: linear-gradient(90deg, #6B2AFF 0%, #00C2FF 100%);
     box-shadow: none;
   }
 
@@ -777,481 +472,6 @@ All colors MUST be HSL.
     background: radial-gradient(ellipse 75% 65% at 50% 40%, transparent 30%, rgba(3, 5, 12, 0.75) 100%);
   }
 
-  /* Fond atmosphérique en mode Hunter — noir profond + glows violet/bleu électrique au lieu du
-     violet/cyan VitalForce. Ne redéfinit QUE ce que .hunter-mode ajoute sur <html> ; sans cette
-     classe (rangs E→A), .vf-bg-* garde exactement son rendu VitalForce d'origine. */
-  .hunter-mode .vf-bg-base {
-    background: #000000;
-  }
-
-  .hunter-mode .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(138, 43, 226, 0.28) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(0, 191, 255, 0.2) 0%, transparent 50%),
-      linear-gradient(180deg, #050208 0%, #000000 45%, #000000 100%);
-  }
-
-  .hunter-mode .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(138, 43, 226, 0.5) 0%, transparent 70%);
-  }
-
-  .hunter-mode .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(0, 191, 255, 0.35) 0%, transparent 70%);
-  }
-
-  .hunter-mode .vf-bg-dust {
-    background: #00BFFF;
-    box-shadow: 0 0 6px rgba(0, 191, 255, 0.8);
-  }
-
-  .hunter-mode .vf-bg-dust:nth-child(odd) {
-    background: #8A2BE2;
-    box-shadow: 0 0 6px rgba(138, 43, 226, 0.8);
-  }
-
-  .hunter-mode .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(0, 191, 255, 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 191, 255, 0.5) 1px, transparent 1px);
-  }
-
-  /* Panneau "fenêtre System" — coins en équerre lumineux, réservé au header du Dashboard en
-     mode Hunter (pas appliqué à toutes les .glass-card pour ne pas surcharger l'app entière). */
-  .hunter-panel {
-    position: relative;
-  }
-
-  .hunter-panel::before,
-  .hunter-panel::after {
-    content: '';
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    pointer-events: none;
-    z-index: 20;
-    opacity: 0.9;
-  }
-
-  .hunter-panel::before {
-    top: 10px;
-    left: 10px;
-    border-top: 2px solid #00BFFF;
-    border-left: 2px solid #00BFFF;
-    filter: drop-shadow(0 0 4px rgba(0, 191, 255, 0.8));
-  }
-
-  .hunter-panel::after {
-    bottom: 10px;
-    right: 10px;
-    border-bottom: 2px solid #00BFFF;
-    border-right: 2px solid #00BFFF;
-    filter: drop-shadow(0 0 4px rgba(0, 191, 255, 0.8));
-  }
-
-  /* Rang World — même fond atmosphérique et mêmes coins "System", mais en froid (noir/gris/bleu
-     glacé) au lieu du violet/bleu électrique de S et Nation. */
-  .hunter-mode.hunter-world .vf-bg-base {
-    background: #000000;
-  }
-
-  .hunter-mode.hunter-world .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(143, 233, 255, 0.16) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(140, 150, 160, 0.1) 0%, transparent 50%),
-      linear-gradient(180deg, #020203 0%, #000000 45%, #000000 100%);
-  }
-
-  .hunter-mode.hunter-world .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(143, 233, 255, 0.28) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-world .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(130, 140, 150, 0.22) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-world .vf-bg-dust {
-    background: #8FE9FF;
-    box-shadow: 0 0 6px rgba(143, 233, 255, 0.7);
-  }
-
-  .hunter-mode.hunter-world .vf-bg-dust:nth-child(odd) {
-    background: #6b7280;
-    box-shadow: 0 0 6px rgba(107, 114, 128, 0.55);
-  }
-
-  .hunter-mode.hunter-world .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(143, 233, 255, 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(143, 233, 255, 0.3) 1px, transparent 1px);
-  }
-
-  .hunter-mode.hunter-world .hunter-panel::before {
-    border-top-color: #8FE9FF;
-    border-left-color: #8FE9FF;
-    filter: drop-shadow(0 0 4px rgba(143, 233, 255, 0.7));
-  }
-
-  .hunter-mode.hunter-world .hunter-panel::after {
-    border-bottom-color: #8FE9FF;
-    border-right-color: #8FE9FF;
-    filter: drop-shadow(0 0 4px rgba(143, 233, 255, 0.7));
-  }
-
-  /* Rang Nation — même fond atmosphérique et mêmes coins "System", mais en violet dominant
-     (deux violets, quasiment plus de bleu) au lieu du violet/bleu électrique de S. */
-  .hunter-mode.hunter-nation .vf-bg-base {
-    background: #050214;
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(107, 42, 255, 0.32) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(192, 132, 252, 0.2) 0%, transparent 50%),
-      linear-gradient(180deg, #0a0518 0%, #050214 45%, #030110 100%);
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(107, 42, 255, 0.5) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(192, 132, 252, 0.32) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-dust {
-    background: #C084FC;
-    box-shadow: 0 0 6px rgba(192, 132, 252, 0.7);
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-dust:nth-child(odd) {
-    background: #6B2AFF;
-    box-shadow: 0 0 6px rgba(107, 42, 255, 0.7);
-  }
-
-  .hunter-mode.hunter-nation .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(192, 132, 252, 0.35) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(192, 132, 252, 0.35) 1px, transparent 1px);
-  }
-
-  .hunter-mode.hunter-nation .hunter-panel::before {
-    border-top-color: #C084FC;
-    border-left-color: #C084FC;
-    filter: drop-shadow(0 0 4px rgba(192, 132, 252, 0.7));
-  }
-
-  .hunter-mode.hunter-nation .hunter-panel::after {
-    border-bottom-color: #C084FC;
-    border-right-color: #C084FC;
-    filter: drop-shadow(0 0 4px rgba(192, 132, 252, 0.7));
-  }
-
-  /* Rang S — même fond atmosphérique et mêmes coins "System", mais en rouge/noir pur (rouge
-     sombre + rouge électrique), sans ambre/jaune, au lieu du violet/bleu par défaut de .hunter-mode. */
-  .hunter-mode.hunter-s .vf-bg-base {
-    background: #000000;
-  }
-
-  .hunter-mode.hunter-s .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(139, 0, 0, 0.3) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(255, 0, 0, 0.16) 0%, transparent 50%),
-      linear-gradient(180deg, #0a0000 0%, #000000 45%, #000000 100%);
-  }
-
-  .hunter-mode.hunter-s .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(139, 0, 0, 0.45) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-s .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(255, 0, 0, 0.28) 0%, transparent 70%);
-  }
-
-  .hunter-mode.hunter-s .vf-bg-dust {
-    background: #FF0000;
-    box-shadow: 0 0 6px rgba(255, 0, 0, 0.65);
-  }
-
-  .hunter-mode.hunter-s .vf-bg-dust:nth-child(odd) {
-    background: #8B0000;
-    box-shadow: 0 0 6px rgba(139, 0, 0, 0.65);
-  }
-
-  .hunter-mode.hunter-s .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(255, 0, 0, 0.25) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 0, 0, 0.25) 1px, transparent 1px);
-  }
-
-  .hunter-mode.hunter-s .hunter-panel::before {
-    border-top-color: #FF0000;
-    border-left-color: #FF0000;
-    filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.65));
-  }
-
-  .hunter-mode.hunter-s .hunter-panel::after {
-    border-bottom-color: #FF0000;
-    border-right-color: #FF0000;
-    filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.65));
-  }
-
-  /* Rang B — fond atmosphérique doré. C'est le vrai "fond de l'app" (grand calque derrière tout
-     le contenu, rendu par VitalForceBackground) : sans ces overrides, .vf-bg-* garde son violet/
-     cyan par défaut même une fois le header et les cartes reteintés, d'où le bleu qui persistait. */
-  .rank-gold .vf-bg-base {
-    background: #0d0a03;
-  }
-
-  .rank-gold .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(212, 175, 55, 0.28) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(255, 215, 0, 0.16) 0%, transparent 50%),
-      linear-gradient(180deg, #14100a 0%, #0d0a03 45%, #0a0700 100%);
-  }
-
-  .rank-gold .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
-  }
-
-  .rank-gold .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, transparent 70%);
-  }
-
-  /* vf-bg-glow-bl / vf-bg-aurora / vf-bg-orb-* n'étaient encore recolorés par AUCUN rang (même
-     pas en Mode Hunter) — restés bleu/cyan/violet par défaut, ça passait inaperçu sur un thème
-     déjà froid mais ça détonne clairement sur un thème or. */
-  .rank-gold .vf-bg-glow-bl {
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.18) 0%, transparent 70%);
-  }
-
-  .rank-gold .vf-bg-aurora {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 215, 0, 0.1) 20%,
-      rgba(212, 175, 55, 0.22) 50%,
-      rgba(255, 215, 0, 0.08) 75%,
-      transparent 100%
-    );
-  }
-
-  .rank-gold .vf-bg-orb-a {
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.32) 0%, transparent 70%);
-  }
-
-  .rank-gold .vf-bg-orb-b {
-    background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, transparent 70%);
-  }
-
-  .rank-gold .vf-bg-orb-c {
-    background: radial-gradient(circle, rgba(255, 193, 7, 0.2) 0%, transparent 70%);
-  }
-
-  .rank-gold .vf-bg-dust {
-    background: #FFD700;
-    box-shadow: 0 0 6px rgba(255, 215, 0, 0.65);
-  }
-
-  .rank-gold .vf-bg-dust:nth-child(odd) {
-    background: #D4AF37;
-    box-shadow: 0 0 6px rgba(212, 175, 55, 0.65);
-  }
-
-  .rank-gold .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(255, 215, 0, 0.25) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 215, 0, 0.25) 1px, transparent 1px);
-  }
-
-  /* Rang C — fond atmosphérique bleu/argent. */
-  .rank-c .vf-bg-base {
-    background: #060d14;
-  }
-
-  .rank-c .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(74, 144, 196, 0.28) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(126, 200, 227, 0.16) 0%, transparent 50%),
-      linear-gradient(180deg, #0a141c 0%, #060d14 45%, #04090f 100%);
-  }
-
-  .rank-c .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(74, 144, 196, 0.4) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(126, 200, 227, 0.28) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-glow-bl {
-    background: radial-gradient(circle, rgba(74, 144, 196, 0.18) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-aurora {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(126, 200, 227, 0.1) 20%,
-      rgba(74, 144, 196, 0.22) 50%,
-      rgba(126, 200, 227, 0.08) 75%,
-      transparent 100%
-    );
-  }
-
-  .rank-c .vf-bg-orb-a {
-    background: radial-gradient(circle, rgba(74, 144, 196, 0.32) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-orb-b {
-    background: radial-gradient(circle, rgba(126, 200, 227, 0.25) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-orb-c {
-    background: radial-gradient(circle, rgba(100, 180, 220, 0.2) 0%, transparent 70%);
-  }
-
-  .rank-c .vf-bg-dust {
-    background: #7EC8E3;
-    box-shadow: 0 0 6px rgba(126, 200, 227, 0.65);
-  }
-
-  .rank-c .vf-bg-dust:nth-child(odd) {
-    background: #4A90C4;
-    box-shadow: 0 0 6px rgba(74, 144, 196, 0.65);
-  }
-
-  .rank-c .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(126, 200, 227, 0.25) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(126, 200, 227, 0.25) 1px, transparent 1px);
-  }
-
-  /* Rang A — fond atmosphérique bleu électrique vif (pleinement saturé, pas un platine délavé). */
-  .rank-a .vf-bg-base {
-    background: #05070f;
-  }
-
-  .rank-a .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(27, 95, 255, 0.32) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(0, 225, 255, 0.2) 0%, transparent 50%),
-      linear-gradient(180deg, #080c1a 0%, #05070f 45%, #04050c 100%);
-  }
-
-  .rank-a .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(27, 95, 255, 0.48) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(0, 225, 255, 0.34) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-glow-bl {
-    background: radial-gradient(circle, rgba(27, 95, 255, 0.2) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-aurora {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(0, 225, 255, 0.14) 20%,
-      rgba(27, 95, 255, 0.28) 50%,
-      rgba(0, 225, 255, 0.12) 75%,
-      transparent 100%
-    );
-  }
-
-  .rank-a .vf-bg-orb-a {
-    background: radial-gradient(circle, rgba(27, 95, 255, 0.38) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-orb-b {
-    background: radial-gradient(circle, rgba(0, 225, 255, 0.32) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-orb-c {
-    background: radial-gradient(circle, rgba(0, 160, 255, 0.26) 0%, transparent 70%);
-  }
-
-  .rank-a .vf-bg-dust {
-    background: #00E1FF;
-    box-shadow: 0 0 6px rgba(0, 225, 255, 0.8);
-  }
-
-  .rank-a .vf-bg-dust:nth-child(odd) {
-    background: #1B5FFF;
-    box-shadow: 0 0 6px rgba(27, 95, 255, 0.75);
-  }
-
-  .rank-a .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(0, 225, 255, 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 225, 255, 0.3) 1px, transparent 1px);
-  }
-
-  /* Rang D — fond atmosphérique bronze/braise. */
-  .rank-d .vf-bg-base {
-    background: #0d0904;
-  }
-
-  .rank-d .vf-bg-mesh {
-    background:
-      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(184, 115, 51, 0.28) 0%, transparent 55%),
-      radial-gradient(ellipse 90% 70% at 100% 100%, rgba(255, 140, 66, 0.18) 0%, transparent 50%),
-      linear-gradient(180deg, #140f08 0%, #0d0904 45%, #0a0603 100%);
-  }
-
-  .rank-d .vf-bg-glow-top {
-    background: radial-gradient(circle, rgba(184, 115, 51, 0.4) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-glow-br {
-    background: radial-gradient(circle, rgba(255, 140, 66, 0.28) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-glow-bl {
-    background: radial-gradient(circle, rgba(184, 115, 51, 0.18) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-aurora {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 140, 66, 0.1) 20%,
-      rgba(184, 115, 51, 0.22) 50%,
-      rgba(255, 140, 66, 0.08) 75%,
-      transparent 100%
-    );
-  }
-
-  .rank-d .vf-bg-orb-a {
-    background: radial-gradient(circle, rgba(184, 115, 51, 0.32) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-orb-b {
-    background: radial-gradient(circle, rgba(255, 140, 66, 0.25) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-orb-c {
-    background: radial-gradient(circle, rgba(220, 130, 60, 0.2) 0%, transparent 70%);
-  }
-
-  .rank-d .vf-bg-dust {
-    background: #FF8C42;
-    box-shadow: 0 0 6px rgba(255, 140, 66, 0.65);
-  }
-
-  .rank-d .vf-bg-dust:nth-child(odd) {
-    background: #B87333;
-    box-shadow: 0 0 6px rgba(184, 115, 51, 0.65);
-  }
-
-  .rank-d .vf-bg-grid {
-    background-image:
-      linear-gradient(rgba(255, 140, 66, 0.25) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 140, 66, 0.25) 1px, transparent 1px);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .vf-particle,
     .vf-confetti,
@@ -1298,7 +518,7 @@ All colors MUST be HSL.
   }
   
   .animate-slide-in-up {
-    animation: slide-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: slide-in-up 0.5s ease-out;
   }
   
   .animate-slide-in-right {
@@ -1395,17 +615,15 @@ All colors MUST be HSL.
   }
   
   /* Navigation bottom style gaming */
-  /* Fond basé sur --card/--background (pas un rgba figé) pour se reteinter avec le rang, comme
-     .glass-card — sinon la barre du bas reste navy-bleu même en Mode Hunter/.rank-gold. */
   .gaming-nav {
-    background: linear-gradient(180deg, hsl(var(--card) / 0.98) 0%, hsl(var(--background)) 100%);
-    border-top: 1px solid hsl(var(--secondary) / 0.2);
+    background: linear-gradient(180deg, rgba(21, 25, 40, 0.98) 0%, rgba(11, 13, 26, 1) 100%);
+    border-top: 1px solid rgba(0, 194, 255, 0.2);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
   }
-
+  
   .gaming-nav-item-active {
     @apply text-secondary;
-    filter: drop-shadow(0 0 8px hsl(var(--secondary) / 0.8));
+    filter: drop-shadow(0 0 8px rgba(0, 194, 255, 0.8));
   }
 }
 
@@ -1469,117 +687,6 @@ All colors MUST be HSL.
   animation: badge-breathe 3.5s ease-in-out infinite;
 }
 
-/* Uniquement l'opacité, pas de scale ici : un filtre blur() animé EN MÊME TEMPS qu'un transform
-   force le navigateur à re-rasteriser le flou à chaque frame (au lieu de juste recomposer un
-   calque) — combiné au scale du badge lui-même juste au-dessus, certains appareils finissent par
-   décrocher l'animation et la geler en plein milieu. L'opacité seule reste sur le compositeur,
-   sans jamais re-dessiner le flou. */
-@keyframes badge-glow-pulse {
-  0%, 100% {
-    opacity: 0.55;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-badge-glow-pulse {
-  animation: badge-glow-pulse 3.5s ease-in-out infinite;
-}
-
-/* ---- Effets d'aura par rang (RankBadge) ---- */
-
-@keyframes rank-particle-float {
-  0% {
-    transform: translateY(0) scale(0.6);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(-160%) scale(0.3);
-    opacity: 0;
-  }
-}
-
-@keyframes rank-spark-flicker {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  6% {
-    opacity: 1;
-    transform: scale(1.3);
-  }
-  10% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  48% {
-    opacity: 0;
-  }
-  54% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
-  58% {
-    opacity: 0;
-  }
-}
-
-@keyframes rank-flame-lick {
-  0%, 100% {
-    transform: scaleY(1) scaleX(1) translateY(0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scaleY(1.3) scaleX(0.85) translateY(-8%);
-    opacity: 0.9;
-  }
-}
-
-/* Le trait traverse en continu sur TOUTE la durée (pas juste les premiers 45% puis un plateau
-   immobile jusqu'à 100%) — un palier figé à valeur constante pendant plus de la moitié du cycle
-   se voyait comme un arrêt net de l'animation, même si techniquement elle continuait de tourner
-   (le trait étant juste sorti du cercle, invisible). */
-@keyframes rank-shine-sweep {
-  0% {
-    transform: translateX(-120%) rotate(20deg);
-  }
-  100% {
-    transform: translateX(220%) rotate(20deg);
-  }
-}
-
-@keyframes rank-energy-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rank-smoke-drift {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.35;
-  }
-  50% {
-    transform: translate(4%, -10%) scale(1.15);
-    opacity: 0.6;
-  }
-}
-
-.animate-rank-shine-sweep {
-  animation: rank-shine-sweep 3.2s ease-in-out infinite;
-}
-
-.animate-rank-energy-spin {
-  animation: rank-energy-spin 6s linear infinite;
-}
-
 @keyframes glow-pulse {
   0%, 100% {
     box-shadow: 0 0 20px rgba(107, 42, 255, 0.4);
@@ -1592,7 +699,7 @@ All colors MUST be HSL.
 @keyframes slide-in-up {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -1666,45 +773,56 @@ All colors MUST be HSL.
   }
 }
 
-/* Scrollbar masquée — sensation d'app native, le scroll (souris/molette/tactile) reste actif */
-html {
-  scrollbar-width: none;
+/* Scrollbar personnalisé */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
+::-webkit-scrollbar-track {
+  @apply bg-muted/30;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Améliorations des scrollbars */
 ::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gradient-to-b from-blue-400 to-purple-500 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply from-blue-500 to-purple-600;
 }
 
 /* Effets de focus améliorés */
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-background;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background;
 }
 
-/* Animations d'entrée — cascade sur toute la page, pas seulement les 4 premiers blocs */
+/* Animations d'entrée */
 .stagger-animation > * {
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
 }
 
-.stagger-animation > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger-animation > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger-animation > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger-animation > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger-animation > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger-animation > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger-animation > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger-animation > *:nth-child(8) { animation-delay: 0.4s; }
-.stagger-animation > *:nth-child(9) { animation-delay: 0.45s; }
-.stagger-animation > *:nth-child(n+10) { animation-delay: 0.5s; }
-
-@media (prefers-reduced-motion: reduce) {
-  .stagger-animation > * {
-    animation: none;
-    opacity: 1;
-  }
-}
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
   from {

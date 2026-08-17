@@ -13,6 +13,8 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { ParticleContainer } from './components/ParticleContainer';
 import { CelebrationContainer } from './components/CelebrationContainer';
 import { RankUpScreen } from './components/RankUpScreen';
+import { VitalForceBackground } from './components/VitalForceBackground';
+import MobileNavigation from './components/MobileNavigation';
 import type { RankLevel } from './components/RankBadge';
 import { useParticles } from './hooks/useParticles';
 import { useCelebration } from './hooks/useCelebration';
@@ -20,18 +22,33 @@ import { Smartphone } from 'lucide-react';
 
 const RANK_ORDER: RankLevel[] = ['E', 'D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
 
-// Lazy loading des pages
-const Login = lazy(() => import('./pages/Login'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Stats = lazy(() => import('./pages/Stats'));
-const ProfileSummary = lazy(() => import('./pages/ProfileSummary'));
-const Programme = lazy(() => import('./pages/Programme'));
-const BlocsEntrainement = lazy(() => import('./pages/BlocsEntrainement'));
+// Lazy loading des pages — fonctions d'import nommées séparément (pas juste inline dans lazy())
+// pour pouvoir les rappeler nous-mêmes ensuite et précharger les paquets en tâche de fond une fois
+// l'app au repos (voir le useEffect de préchargement plus bas) : sans ça, CHAQUE page affichait un
+// petit flash de chargement à sa toute première visite, même une fois le découpage des paquets par
+// page corrigé — inévitable avec du lazy-loading pur tant que le paquet n'est pas déjà en cache.
+const loginImport = () => import('./pages/Login');
+const dashboardImport = () => import('./pages/Dashboard');
+const statsImport = () => import('./pages/Stats');
+const profileImport = () => import('./pages/ProfileSummary');
+const programmeImport = () => import('./pages/Programme');
+const blocsImport = () => import('./pages/BlocsEntrainement');
+const nutritionImport = () => import('./pages/Nutrition');
+const alimentImport = () => import('./pages/AlimentDetail');
+const recetteImport = () => import('./pages/RecetteDetail');
+const dailyQuestsImport = () => import('./components/DailyQuests');
+
+const Login = lazy(loginImport);
+const Dashboard = lazy(dashboardImport);
+const Stats = lazy(statsImport);
+const ProfileSummary = lazy(profileImport);
+const Programme = lazy(programmeImport);
+const BlocsEntrainement = lazy(blocsImport);
 const NotFound = lazy(() => import('./pages/NotFound'));
-const Nutrition = lazy(() => import('./pages/Nutrition'));
-const AlimentDetail = lazy(() => import('./pages/AlimentDetail'));
-const RecetteDetail = lazy(() => import('./pages/RecetteDetail'));
-const DailyQuests = lazy(() => import('./components/DailyQuests'));
+const Nutrition = lazy(nutritionImport);
+const AlimentDetail = lazy(alimentImport);
+const RecetteDetail = lazy(recetteImport);
+const DailyQuests = lazy(dailyQuestsImport);
 
 // Composant de chargement
 const LoadingSpinner = () => (
@@ -70,6 +87,34 @@ const AppContent: React.FC = () => {
   const { user } = useAuth();
   const { particles, spawnClickParticles, spawnLevelUpParticles } = useParticles();
   const { celebrations, removeCelebration } = useCelebration();
+
+  // Précharge les paquets des autres pages une fois connecté, en tâche de fond une fois l'app au
+  // repos — sans ça, même avec un paquet dédié par page (déjà corrigé), la TOUTE PREMIÈRE visite de
+  // chaque page affiche un flash de chargement le temps de télécharger son paquet. requestIdleCallback
+  // n'existe pas sur Safari iOS (jamais implémenté) : setTimeout est le vrai chemin utilisé sur iPhone,
+  // pas juste un filet de secours.
+  useEffect(() => {
+    if (!user) return;
+    const schedule =
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback
+        : (cb: () => void) => window.setTimeout(cb, 1500);
+
+    const handle = schedule(() => {
+      [
+        dashboardImport, statsImport, profileImport, programmeImport,
+        blocsImport, nutritionImport, alimentImport, recetteImport, dailyQuestsImport,
+      ].forEach((importFn) => importFn().catch(() => {}));
+    });
+
+    return () => {
+      if (typeof window.cancelIdleCallback === 'function' && typeof handle === 'number') {
+        window.cancelIdleCallback(handle);
+      } else {
+        window.clearTimeout(handle as unknown as number);
+      }
+    };
+  }, [user]);
 
   // Écran plein écran de changement de rang — se déclenche uniquement quand le rang MONTE par
   // rapport au dernier rang connu, jamais sur la toute première synchronisation après connexion
@@ -170,7 +215,10 @@ const AppContent: React.FC = () => {
         onCelebrationComplete={removeCelebration}
       />
       <Router>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        {/* Rendu une seule fois pour toute la session (pas par page — voir PageLayout.tsx) : le
+            fond animé et la nav du bas sont des éléments d'app globaux, pas du contenu de page. */}
+        {user && <VitalForceBackground intensity="medium" />}
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
           {/* Route publique - Redirige vers dashboard si déjà connecté */}
@@ -264,7 +312,8 @@ const AppContent: React.FC = () => {
           <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-        
+
+          {user && <MobileNavigation />}
           <Toaster />
           <PWAInstallPrompt />
         </div>

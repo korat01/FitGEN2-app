@@ -57,29 +57,18 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
+        // Uniquement les librairies tierces ici (partagées entre pages, bon candidat au cache
+        // long terme). Les pages elles-mêmes NE DOIVENT PAS être ici : App.tsx les charge déjà en
+        // lazy (React.lazy + import()) une par une — les regrouper de force dans un seul chunk
+        // "pages" (comme avant) annule ce découpage et oblige à télécharger TOUTES les pages
+        // (dont Nutrition, la plus grosse avec sa base d'aliments) dès la première page visitée,
+        // d'où le chargement/lag remonté sur Nutrition alors que le vrai coût était partagé par 7 pages.
         manualChunks: {
-          // Vendor chunks
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs', '@radix-ui/react-toast'],
           'chart-vendor': ['recharts'],
           'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
           'utils-vendor': ['date-fns', 'clsx', 'tailwind-merge'],
-          
-          // App chunks
-          'pages': [
-            './src/pages/Login',
-            './src/pages/Dashboard', 
-            './src/pages/Stats',
-            './src/pages/ProfileSummary',
-            './src/pages/Programme',
-            './src/pages/BlocsEntrainement',
-            './src/pages/Nutrition'
-          ],
-          'utils': [
-            './src/utils/programmeGenerator',
-            './src/utils/scoring',
-            './src/utils/blocsExercices'
-          ]
         }
       }
     },

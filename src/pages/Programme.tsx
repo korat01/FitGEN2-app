@@ -763,25 +763,25 @@ export const Programme: React.FC = () => {
                       <div className="p-4 md:p-6 surface-accent rounded-2xl border border-primary/20">
                         <div className="flex flex-col gap-3 mb-4">
                           <h3 className="text-lg md:text-xl font-bold text-foreground">{todaySession.nom}</h3>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="outline" className="bg-primary/15 border-primary/30 text-primary">
-                              {todaySession.intensity}
-                            </Badge>
-                            <Badge variant="secondary" className="bg-secondary/15 border border-secondary/25 text-secondary">
-                              {todaySession.duration} min
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className={
-                                { Progression: 'bg-secondary/15 text-secondary border-secondary/30',
-                                  Deload: 'bg-white/10 text-muted-foreground border-white/15',
-                                  Adaptation: 'bg-green-500/15 text-green-400 border-green-500/30',
-                                  'Spécialisation': 'bg-accent/15 text-accent border-accent/30',
-                                }[todaySession.phase] || 'bg-primary/15 text-primary border-primary/30'
-                              }
-                            >
-                              {todaySession.phase}
-                            </Badge>
+                          {/* Icône + libellé + valeur plutôt que des badges colorés sur fond coloré
+                              (bg-primary/15 + text-primary) : contraste trop faible pour rester
+                              lisible, surtout sur mobile en plein soleil. */}
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+                            <div className="flex items-center gap-1.5">
+                              <Zap className="w-4 h-4 text-secondary shrink-0" />
+                              <span className="text-muted-foreground">Intensité</span>
+                              <span className="font-semibold text-foreground">{todaySession.intensity}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Timer className="w-4 h-4 text-secondary shrink-0" />
+                              <span className="text-muted-foreground">Durée</span>
+                              <span className="font-semibold text-foreground">{todaySession.duration} min</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Activity className="w-4 h-4 text-secondary shrink-0" />
+                              <span className="text-muted-foreground">Phase</span>
+                              <span className="font-semibold text-foreground">{todaySession.phase}</span>
+                            </div>
                     </div>
                   </div>
 

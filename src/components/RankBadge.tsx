@@ -71,16 +71,17 @@ export const RankBadge: React.FC<RankBadgeProps> = React.memo(({ rank, level, si
     <div className={cn('relative inline-flex flex-col items-center', className)}>
       <div
         className={cn('relative flex items-center justify-center', sizeClasses[size], animated && 'animate-badge-breathe')}
-        style={{ filter: `drop-shadow(0 0 12px ${secondary}99)` }}
+        style={{ filter: `drop-shadow(0 0 14px ${secondary}) drop-shadow(0 0 26px ${secondary}aa)` }}
         title={label}
       >
         {/* Halo ambiant teinté par rang — donne au badge une vraie identité de couleur, même
-            avant de regarder les particules (utile en un coup d'œil sur des petites tailles). */}
+            avant de regarder les particules (utile en un coup d'œil sur des petites tailles).
+            Alpha remontée : trop discret sur écran iOS en usage réel. */}
         <div
           className={cn('absolute rounded-full blur-xl', animated && 'animate-badge-glow-pulse')}
           style={{
             inset: '-18%',
-            background: `radial-gradient(circle, ${secondary}66 0%, ${primary}40 45%, transparent 75%)`,
+            background: `radial-gradient(circle, ${secondary}88 0%, ${primary}55 45%, transparent 75%)`,
             zIndex: 0,
           }}
         />

@@ -16,7 +16,14 @@ const MobileNavigation: React.FC = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 gaming-nav">
-      <div className="safe-area-pb flex items-center justify-around h-16 px-2 max-w-xl md:mx-auto">
+      {/* Pas de hauteur fixe : avec .safe-area-pb (padding-bottom) sur une boîte à hauteur figée,
+          l'espace pour l'icône + le texte se retrouvait écrasé sur les iPhone à encoche/barre home
+          (padding de sécurité ~34px grignotant une boîte de 64px), d'où les icônes qui débordaient.
+          Ici le padding de sécurité s'AJOUTE à un padding normal, la hauteur suit le contenu. */}
+      <div
+        className="flex items-center justify-around px-2 pt-2 max-w-xl md:mx-auto"
+        style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
+      >
         {navItems.map(({ path, icon: Icon, label }) => {
           const active = isActive(path);
 
@@ -24,29 +31,32 @@ const MobileNavigation: React.FC = () => {
             <Link
               key={path}
               to={path}
-              className={`relative flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all duration-300 active:scale-95 ${
-                active 
-                  ? 'text-secondary' 
+              className={`relative flex flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-300 active:scale-95 ${
+                active
+                  ? 'text-secondary'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {active && (
-                <div className="absolute inset-0 bg-secondary/10 rounded-xl border border-secondary/30" />
+                <div
+                  className="absolute inset-0 bg-secondary/15 rounded-xl border border-secondary/40"
+                  style={{ boxShadow: '0 0 18px hsl(var(--secondary) / 0.35)' }}
+                />
               )}
               <div className={`relative transition-transform duration-300 ${
                 active ? 'scale-110' : ''
               }`}>
                 {Icon && (
                   <Icon
-                    className={`w-5 h-5 transition-all duration-300 ${
+                    className={`w-6 h-6 transition-all duration-300 ${
                       active
-                        ? 'stroke-[2.5] drop-shadow-[0_0_10px_hsl(var(--secondary)/0.8)]'
-                        : 'stroke-2'
+                        ? 'stroke-[2.5] drop-shadow-[0_0_14px_hsl(var(--secondary)/0.95)]'
+                        : 'stroke-[2.25]'
                     }`}
                   />
                 )}
               </div>
-              <span className={`text-[10px] font-medium ${
+              <span className={`text-[11px] font-medium leading-none ${
                 active ? 'font-semibold text-secondary' : ''
               }`}>
                 {label}

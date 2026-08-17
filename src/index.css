@@ -1706,6 +1706,20 @@ html {
   }
 }
 
+/* Verrou paysage — iOS ne permet pas de bloquer la rotation d'une PWA installée depuis Safari
+   (contrairement à une vraie app native via Xcode) : cet écran est le contournement web standard.
+   max-height cible le format téléphone en paysage (~390-430px de haut) sans se déclencher sur
+   tablette/desktop en paysage, qui restent bien plus hauts. */
+.landscape-lock {
+  display: none;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-lock {
+    display: flex;
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

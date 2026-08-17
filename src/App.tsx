@@ -16,6 +16,7 @@ import { RankUpScreen } from './components/RankUpScreen';
 import type { RankLevel } from './components/RankBadge';
 import { useParticles } from './hooks/useParticles';
 import { useCelebration } from './hooks/useCelebration';
+import { Smartphone } from 'lucide-react';
 
 const RANK_ORDER: RankLevel[] = ['E', 'D', 'C', 'B', 'A', 'S', 'Nation', 'World'];
 
@@ -149,6 +150,13 @@ const AppContent: React.FC = () => {
   
   return (
       <>
+      {/* Toujours dans le DOM, visible uniquement en paysage téléphone via CSS (.landscape-lock,
+          voir index.css) — pas de JS d'orientation nécessaire, marche même avant hydratation. */}
+      <div className="landscape-lock fixed inset-0 z-[200] flex-col items-center justify-center gap-4 bg-background text-center p-8">
+        <Smartphone className="w-12 h-12 text-secondary animate-pulse" />
+        <p className="text-lg font-semibold text-foreground">Tourne ton téléphone</p>
+        <p className="text-sm text-muted-foreground max-w-xs">Ascend est optimisé pour un usage en mode portrait.</p>
+      </div>
       {rankUpTarget && (
         <RankUpScreen
           rank={rankUpTarget}

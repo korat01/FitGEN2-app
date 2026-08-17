@@ -723,17 +723,26 @@ export const Programme: React.FC = () => {
               );
             })()}
           <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as any)} className="space-y-6">
-            <TabsList className={`grid w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-3'} glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-lg rounded-xl`}>
-              <TabsTrigger value="today" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
-                <Calendar className="w-4 h-4" />
+            <TabsList className="grid w-full grid-cols-3 gap-1.5 h-auto glass-card border-primary/20 backdrop-blur-md border border-white/20 shadow-lg rounded-2xl p-1.5">
+              <TabsTrigger
+                value="today"
+                className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
+              >
+                <Calendar className="w-5 h-5 md:w-4 md:h-4" />
                 Aujourd'hui
               </TabsTrigger>
-              <TabsTrigger value="weekly" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
-                <CalendarDays className="w-4 h-4" />
-                Hebdomadaire
+              <TabsTrigger
+                value="weekly"
+                className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
+              >
+                <CalendarDays className="w-5 h-5 md:w-4 md:h-4" />
+                Hebdo
               </TabsTrigger>
-              <TabsTrigger value="planning" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white rounded-lg transition-all duration-200">
-                <List className="w-4 h-4" />
+              <TabsTrigger
+                value="planning"
+                className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
+              >
+                <List className="w-5 h-5 md:w-4 md:h-4" />
                 Planning
               </TabsTrigger>
             </TabsList>
@@ -751,22 +760,31 @@ export const Programme: React.FC = () => {
                   {todaySession ? (
                     <div className="space-y-6">
                       {/* Informations de la session */}
-                      <div className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-200/50">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-xl font-bold text-foreground">{todaySession.nom}</h3>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800 border-green-300">
+                      <div className="p-4 md:p-6 surface-accent rounded-2xl border border-primary/20">
+                        <div className="flex flex-col gap-3 mb-4">
+                          <h3 className="text-lg md:text-xl font-bold text-foreground">{todaySession.nom}</h3>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/15 border-primary/30 text-primary">
                               {todaySession.intensity}
                             </Badge>
                             <Badge variant="secondary" className="bg-secondary/15 border border-secondary/25 text-secondary">
                               {todaySession.duration} min
                             </Badge>
-                            <Badge variant="outline" className="bg-purple-500/15 border border-purple-500/25 text-purple-800 border-purple-300">
+                            <Badge
+                              variant="outline"
+                              className={
+                                { Progression: 'bg-secondary/15 text-secondary border-secondary/30',
+                                  Deload: 'bg-white/10 text-muted-foreground border-white/15',
+                                  Adaptation: 'bg-green-500/15 text-green-400 border-green-500/30',
+                                  'Spécialisation': 'bg-accent/15 text-accent border-accent/30',
+                                }[todaySession.phase] || 'bg-primary/15 text-primary border-primary/30'
+                              }
+                            >
                               {todaySession.phase}
                             </Badge>
                     </div>
                   </div>
-                  
+
                         {todaySession.notes && (
                           <div className="p-3 bg-secondary/10 rounded-lg mb-4">
                             <p className="text-sm text-secondary"><strong>Notes:</strong> {todaySession.notes}</p>

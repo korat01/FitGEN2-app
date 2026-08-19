@@ -42,6 +42,7 @@ import {
   type MainLift,
   type UserMaxes,
 } from '../utils/powerlifting';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Numéro de semaine le plus bas présent dans le programme stocké — sert de `startWeek` pour
 // recalculer les charges sans perdre la progression dans le cycle (cf. handleRecalculateMaxes).
@@ -57,6 +58,7 @@ const maxesEqual = (a?: UserMaxes, b?: UserMaxes): boolean =>
 
 export const Programme: React.FC = () => {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
   const { isMobile } = useMobileDetection();
   const { addValidation, getExerciseStatus, getSessionStatus, getSessionXP, validations, sessionRatings, addSessionRating, getSessionRating } = useExerciseValidation();
   const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
@@ -107,7 +109,7 @@ export const Programme: React.FC = () => {
     console.log('📅 Jours d\'entraînement:', user?.trainingDays);
     
     if (!user) {
-      alert('❌ Vous devez être connecté');
+      alert(t('programme.alert.mustLogin'));
       return;
     }
     
@@ -159,17 +161,22 @@ export const Programme: React.FC = () => {
       console.log('✅ Programme généré et sauvegardé !');
       console.log('📊 Sessions créées:', adaptedProgramme.sessions.map(s => `${s.day}: ${s.nom}`));
       
-      alert(`🎉 Programme ${user.sportClass} généré avec succès !\n\n📅 ${adaptedProgramme.sessions.length} séances créées pour les jours :\n${user.trainingDays?.join(', ') || 'Non spécifiés'}\n\n✅ Vous pouvez maintenant voir vos entraînements dans les onglets "Hebdomadaire" et "Planning" !`);
+      alert(
+        t('programme.alert.generated')
+          .replace('{sport}', user.sportClass)
+          .replace('{count}', String(adaptedProgramme.sessions.length))
+          .replace('{days}', user.trainingDays?.join(', ') || t('programme.alert.notSpecified'))
+      );
     } catch (error) {
       console.error('❌ Erreur lors de la génération:', error);
       setIsGenerating(false);
-      alert('❌ Erreur lors de la génération du programme');
+      alert(t('programme.alert.genError'));
     }
   };
 
   // Fonction pour régénérer
   const handleRegenerateProgramme = () => {
-    const confirmRegenerate = confirm('🔄 Voulez-vous régénérer votre programme ?');
+    const confirmRegenerate = confirm(t('programme.alert.confirmRegenerate'));
     if (confirmRegenerate) {
       handleGenerateProgramme();
     }
@@ -223,16 +230,19 @@ export const Programme: React.FC = () => {
       setIsGenerating(false);
 
       if (missingLifts.length > 0) {
-        alert(
-          `📋 Aucune performance connue pour : ${missingLifts.join(', ')}.\n\nUne semaine de test a été générée pour estimer vos charges. Une fois vos résultats saisis dans "Stats", revenez ici et cliquez sur "Générer la suite du programme".`
-        );
+        alert(t('programme.alert.missingLifts').replace('{lifts}', missingLifts.join(', ')));
       } else {
-        alert(`🎉 Programme "${program.nom}" généré avec succès !\n\n📅 ${stored.sessions.length} séances sur ${trainingDays.length} jours/semaine.`);
+        alert(
+          t('programme.alert.plGenerated')
+            .replace('{name}', program.nom)
+            .replace('{count}', String(stored.sessions.length))
+            .replace('{days}', String(trainingDays.length))
+        );
       }
     } catch (error) {
       console.error('❌ Erreur lors de la génération du programme powerlifting:', error);
       setIsGenerating(false);
-      alert('❌ Erreur lors de la génération du programme');
+      alert(t('programme.alert.genError'));
     }
   };
 
@@ -253,7 +263,7 @@ export const Programme: React.FC = () => {
 
     const result = continueAfterTestWeek(programme.powerliftingConfig, testAsGenerated);
     if (!result) {
-      alert("⏳ Il manque encore au moins une performance (Squat, Bench ou Deadlift). Rendez-vous dans l'onglet Stats pour la renseigner, puis revenez ici.");
+      alert(t('programme.alert.missingPerf'));
       return;
     }
 
@@ -261,7 +271,7 @@ export const Programme: React.FC = () => {
     const stored = toStoredProgramme(result, programme.powerliftingConfig, programme.dateDebut, hasAllMaxes(logged) ? logged : undefined);
     localStorage.setItem('userProgramme', JSON.stringify(stored));
     setProgramme(stored);
-    alert('🎉 Votre programme complet est prêt, à partir de la Semaine 2 !');
+    alert(t('programme.alert.fullProgramReady'));
   };
 
   // Le 1RM loggé a changé depuis la génération de ce programme (nouvelle perf saisie dans Stats) —
@@ -277,7 +287,7 @@ export const Programme: React.FC = () => {
     const stored = toStoredProgramme(regenerated, programme.powerliftingConfig, programme.dateDebut, logged);
     localStorage.setItem('userProgramme', JSON.stringify(stored));
     setProgramme(stored);
-    alert('✅ Charges recalculées avec votre 1RM à jour !');
+    alert(t('programme.alert.recalculated'));
   };
 
   // Un programme généré avant l'ajout des types d'exercice (échauffement/travail/accessoire)
@@ -435,18 +445,18 @@ export const Programme: React.FC = () => {
   // Libellé court et lisible du contenu d'une séance (au lieu du nom "Semaine X - Jour" qui ne dit
   // rien sur le contenu réel) : le mouvement principal du jour, "PR" / "PR SBD" / "SBD", ou "Repos".
   const getSessionFocusLabel = (session: any): string => {
-    if (!session || session.isRestDay) return 'Repos';
+    if (!session || session.isRestDay) return t('programme.weekly.rest');
     if (session.notes?.includes('PR SBD')) return 'PR SBD 🏆';
     if (session.notes?.includes('Séance PR')) return 'PR 🏆';
     if (session.notes?.includes('SBD combinée')) return 'SBD';
     const mainExercise = session.exercises?.find((e: any) => e.type === 'travail');
     if (mainExercise) return mainExercise.nom;
-    return session.exercises?.[0]?.nom || session.phase || 'Séance';
+    return session.exercises?.[0]?.nom || session.phase || t('programme.today.exercises');
   };
 
   // Fonction pour obtenir le nom du mois
   const getMonthName = (date: Date) => {
-    return date.toLocaleDateString('fr-FR', { month: 'long' });
+    return date.toLocaleDateString(language === 'en' ? 'en-US' : 'fr-FR', { month: 'long' });
   };
 
   // Fonction pour valider un exercice
@@ -493,10 +503,10 @@ export const Programme: React.FC = () => {
                   </div>
                   <div className="min-w-0">
                 <h1 className="text-2xl md:text-5xl font-bold bg-gradient-to-r from-white via-secondary/70 to-primary/70 bg-clip-text text-transparent truncate">
-                  Mon Programme
+                  {t('programme.title')}
                 </h1>
                 <p className="text-xs md:text-xl text-white/85 max-w-full md:max-w-2xl leading-relaxed">
-                  Programme personnalisé basé sur vos performances
+                  {t('programme.subtitle')}
                 </p>
                   </div>
                 </div>
@@ -521,17 +531,17 @@ export const Programme: React.FC = () => {
                     {isGenerating ? (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                        Mise à jour...
+                        {t('programme.updating')}
                       </>
                     ) : isPowerlifting ? (
                       <>
                         <Dumbbell className="w-4 h-4 mr-2" />
-                        Nouveau programme
+                        {t('programme.newProgram')}
                       </>
                     ) : (
                       <>
                         <RefreshCw className="w-4 h-4 mr-2" />
-                        Mise à jour
+                        {t('programme.update')}
                       </>
                     )}
                   </Button>
@@ -544,12 +554,12 @@ export const Programme: React.FC = () => {
                   {isGenerating ? (
                     <>
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      Génération...
+                      {t('programme.generating')}
                     </>
                   ) : (
                     <>
                       <Play className="w-4 h-4 mr-2" />
-                      Générer Mon Programme
+                      {t('programme.generateMine')}
                     </>
                   )}
                 </Button>
@@ -563,8 +573,8 @@ export const Programme: React.FC = () => {
           <Card className="glass-card border-accent/30 bg-accent/5 rounded-2xl">
             <CardContent className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
               <div className="flex-1">
-                <p className="font-semibold text-foreground">Ton programme actuel date d'avant les dernières améliorations</p>
-                <p className="text-sm text-muted-foreground mt-1">Régénère-le pour avoir l'échauffement, tous les accessoires (renfos) et la séance SBD à jour.</p>
+                <p className="font-semibold text-foreground">{t('programme.stale.title')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('programme.stale.desc')}</p>
               </div>
               <Button
                 onClick={handleRegenerateProgramme}
@@ -572,7 +582,7 @@ export const Programme: React.FC = () => {
                 className="w-full md:w-auto gradient-primary text-white font-semibold shrink-0"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${isGenerating ? 'animate-spin' : ''}`} />
-                Régénérer maintenant
+                {t('programme.stale.button')}
               </Button>
             </CardContent>
           </Card>
@@ -583,10 +593,9 @@ export const Programme: React.FC = () => {
           <Card className="glass-card border-primary/30 bg-primary/5 rounded-2xl">
             <CardContent className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
               <div className="flex-1">
-                <p className="font-semibold text-foreground">📋 Semaine de test en cours</p>
+                <p className="font-semibold text-foreground">📋 {t('programme.testWeek.title')}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Complétez cette semaine puis enregistrez vos résultats (Squat, Développé Couché, Soulevé de Terre) dans l'onglet Stats.
-                  Votre programme complet se génère ensuite automatiquement à partir de la Semaine 2.
+                  {t('programme.testWeek.desc')}
                 </p>
               </div>
               <Button
@@ -594,7 +603,7 @@ export const Programme: React.FC = () => {
                 className="w-full md:w-auto gradient-primary text-white font-semibold shrink-0"
               >
                 <Play className="w-4 h-4 mr-2" />
-                Générer la suite du programme
+                {t('programme.testWeek.button')}
               </Button>
             </CardContent>
           </Card>
@@ -607,8 +616,8 @@ export const Programme: React.FC = () => {
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-primary flex items-center justify-center shadow-[var(--shadow-glow-purple)]">
                 <Dumbbell className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground/90 mb-2">Aucun Programme Généré</h3>
-              <p className="text-muted-foreground mb-6">Générez votre programme personnalisé pour commencer votre entraînement !</p>
+              <h3 className="text-xl font-semibold text-foreground/90 mb-2">{t('programme.none.title')}</h3>
+              <p className="text-muted-foreground mb-6">{t('programme.none.desc')}</p>
               <Button
                 onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
                 disabled={isGenerating}
@@ -617,12 +626,12 @@ export const Programme: React.FC = () => {
                 {isGenerating ? (
                   <>
                     <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Génération...
+                    {t('programme.generating')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    {isPowerlifting ? 'Nouveau programme' : 'Générer Mon Programme'}
+                    {isPowerlifting ? t('programme.newProgram') : t('programme.generateMine')}
                   </>
                 )}
               </Button>
@@ -636,7 +645,7 @@ export const Programme: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-lg font-semibold text-secondary flex items-center gap-2">
                 <Target className="w-5 h-5" />
-                Jours d'Entraînement Configurés
+                {t('programme.trainingDays.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -644,14 +653,13 @@ export const Programme: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   {user.trainingDays.map(day => (
                     <Badge key={day} className="bg-secondary/15 border border-secondary/25 text-secondary border-secondary">
-                      {day}
+                      {t(`profile.day.${day}`)}
                     </Badge>
                   ))}
                 </div>
                 <div className="bg-secondary/15 border border-secondary/25/50 border border-secondary/30 rounded-lg p-3">
                   <p className="text-secondary text-sm">
-                    <strong>💡 Astuce :</strong> Si vous avez modifié vos jours d'entraînement, 
-                    cliquez sur "Générer Mon Programme" pour créer un nouveau programme adapté à vos nouveaux jours.
+                    💡 {t('programme.trainingDays.tip')}
                   </p>
                 </div>
               </div>
@@ -677,7 +685,7 @@ export const Programme: React.FC = () => {
                       <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
                         <Target className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-foreground">Vos 1RM actuels</h3>
+                      <h3 className="text-lg font-bold text-foreground">{t('programme.maxes.title')}</h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="surface-panel rounded-lg p-4">
@@ -701,20 +709,24 @@ export const Programme: React.FC = () => {
                     </div>
                     <div className="mt-4 p-3 rounded-lg surface-accent">
                       <p className="text-sm text-foreground/90">
-                        <strong className="text-secondary">💡 Note :</strong>{' '}
+                        <strong className="text-secondary">💡 {t('programme.maxes.noteLabel')}</strong>{' '}
                         {usesTrainingMax
-                          ? 'les pourcentages du programme sont calculés sur votre Training Max (90% de ces 1RM), avec une petite progression à chaque nouveau cycle.'
-                          : 'tous les pourcentages du programme sont calculés directement sur ces 1RM.'}
+                          ? t('programme.maxes.note.tm')
+                          : t('programme.maxes.note.direct')}
                       </p>
                     </div>
                     {maxesChanged && (
                       <div className="mt-3 p-3 rounded-lg border border-secondary/30 bg-secondary/10 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
                         <p className="text-sm text-foreground/90">
-                          <strong className="text-secondary">⚡ 1RM mis à jour :</strong> ce programme a été généré avec Squat {programme.generatedWithMaxes.squat}kg / Bench {programme.generatedWithMaxes.bench}kg / Deadlift {programme.generatedWithMaxes.deadlift}kg — les charges affichées ne suivent pas encore vos derniers 1RM.
+                          <strong className="text-secondary">⚡ {t('programme.maxes.changed')}</strong>{' '}
+                          {t('programme.maxes.changedDesc')
+                            .replace('{squat}', String(programme.generatedWithMaxes.squat))
+                            .replace('{bench}', String(programme.generatedWithMaxes.bench))
+                            .replace('{deadlift}', String(programme.generatedWithMaxes.deadlift))}
                         </p>
                         <Button onClick={handleRecalculateMaxes} size="sm" className="gradient-primary text-white shrink-0">
                           <RefreshCw className="w-4 h-4 mr-2" />
-                          Recalculer les charges
+                          {t('programme.maxes.recalculate')}
                         </Button>
                       </div>
                     )}
@@ -729,21 +741,21 @@ export const Programme: React.FC = () => {
                 className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
               >
                 <Calendar className="w-5 h-5 md:w-4 md:h-4" />
-                Aujourd'hui
+                {t('programme.tab.today')}
               </TabsTrigger>
               <TabsTrigger
                 value="weekly"
                 className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
               >
                 <CalendarDays className="w-5 h-5 md:w-4 md:h-4" />
-                Hebdo
+                {t('programme.tab.weekly')}
               </TabsTrigger>
               <TabsTrigger
                 value="planning"
                 className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 min-h-[56px] md:min-h-0 py-2 text-xs md:text-sm font-medium rounded-xl transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-secondary data-[state=active]:text-white data-[state=active]:shadow-[0_0_16px_hsl(var(--primary)/0.35)]"
               >
                 <List className="w-5 h-5 md:w-4 md:h-4" />
-                Planning
+                {t('programme.tab.planning')}
               </TabsTrigger>
             </TabsList>
 
@@ -753,7 +765,7 @@ export const Programme: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-secondary" />
-                        Programme du Jour
+                        {t('programme.today.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -769,17 +781,17 @@ export const Programme: React.FC = () => {
                           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
                             <div className="flex items-center gap-1.5">
                               <Zap className="w-4 h-4 text-secondary shrink-0" />
-                              <span className="text-muted-foreground">Intensité</span>
+                              <span className="text-muted-foreground">{t('programme.today.intensity')}</span>
                               <span className="font-semibold text-foreground">{todaySession.intensity}</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Timer className="w-4 h-4 text-secondary shrink-0" />
-                              <span className="text-muted-foreground">Durée</span>
+                              <span className="text-muted-foreground">{t('programme.today.duration')}</span>
                               <span className="font-semibold text-foreground">{todaySession.duration} min</span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Activity className="w-4 h-4 text-secondary shrink-0" />
-                              <span className="text-muted-foreground">Phase</span>
+                              <span className="text-muted-foreground">{t('programme.today.phase')}</span>
                               <span className="font-semibold text-foreground">{todaySession.phase}</span>
                             </div>
                     </div>
@@ -787,13 +799,13 @@ export const Programme: React.FC = () => {
 
                         {todaySession.notes && (
                           <div className="p-3 bg-secondary/10 rounded-lg mb-4">
-                            <p className="text-sm text-secondary"><strong>Notes:</strong> {todaySession.notes}</p>
+                            <p className="text-sm text-secondary"><strong>{t('programme.today.notes')}</strong> {todaySession.notes}</p>
                     </div>
                         )}
 
                         {todaySession.equipment && todaySession.equipment.length > 0 && (
                           <div className="mb-4">
-                            <p className="text-sm font-medium text-foreground/90 mb-2">Équipement requis:</p>
+                            <p className="text-sm font-medium text-foreground/90 mb-2">{t('programme.today.equipment')}</p>
                             <div className="flex flex-wrap gap-2">
                               {todaySession.equipment.map((eq: string, index: number) => (
                                 <Badge key={index} variant="outline" className="text-muted-foreground">{eq}</Badge>
@@ -806,7 +818,7 @@ export const Programme: React.FC = () => {
                       {/* Exercices avec validation */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <h4 className="text-lg font-semibold text-foreground">Exercices ({todaySession.exercises.length})</h4>
+                          <h4 className="text-lg font-semibold text-foreground">{t('programme.today.exercises')} ({todaySession.exercises.length})</h4>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="bg-green-500/15 border border-green-500/25 text-green-800">
                               <Zap className="w-3 h-3 mr-1" />
@@ -842,12 +854,11 @@ export const Programme: React.FC = () => {
                       <div className="w-24 h-24 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <RefreshCw className="w-12 h-12 text-white" />
                 </div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">Jour de Repos</h3>
-                      <p className="text-muted-foreground mb-6">Profitez de cette journée pour récupérer et vous détendre.</p>
+                      <h3 className="text-xl font-bold text-foreground mb-2">{t('programme.today.restDay.title')}</h3>
+                      <p className="text-muted-foreground mb-6">{t('programme.today.restDay.desc')}</p>
                       <div className="p-4 bg-secondary/10 rounded-lg">
                         <p className="text-sm text-secondary">
-                          💡 <strong>Conseil:</strong> La récupération est essentielle pour progresser.
-                          Vous pouvez faire des étirements légers ou une marche.
+                          💡 {t('programme.today.restDay.tip')}
                         </p>
                 </div>
                     </div>
@@ -862,7 +873,7 @@ export const Programme: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-foreground flex items-center gap-3">
                     <CalendarDays className="w-6 h-6 text-green-500" />
-                    Planning Hebdomadaire
+                    {t('programme.weekly.title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -904,7 +915,7 @@ export const Programme: React.FC = () => {
                         >
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
-                              <CardTitle className="text-lg capitalize">{day}</CardTitle>
+                              <CardTitle className="text-lg capitalize">{t(`profile.day.${day}`)}</CardTitle>
                               {daySession && sessionStatus !== 'not-started' && (
                                 <div className="flex items-center gap-1">
                                   {sessionStatus === 'completed' && <CheckCircle className="w-4 h-4 text-green-500" />}
@@ -926,10 +937,10 @@ export const Programme: React.FC = () => {
                                   </Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                  <strong>{daySession.exercises?.length || 0}</strong> exercices
+                                  <strong>{daySession.exercises?.length || 0}</strong> {t('programme.weekly.exercises')}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                  <strong>Phase:</strong> {daySession.phase}
+                                  <strong>{t('programme.weekly.phase')}</strong> {daySession.phase}
                                 </p>
                                 {sessionStatus !== 'not-started' && (
                                   <div className="flex items-center justify-between">
@@ -943,9 +954,9 @@ export const Programme: React.FC = () => {
                                           : 'bg-yellow-500/15 border border-yellow-500/25 text-yellow-400'
                                       }
                                     >
-                                      {sessionStatus === 'completed' && 'Terminé'}
-                                      {sessionStatus === 'failed' && 'Échoué'}
-                                      {sessionStatus === 'partial' && 'En cours'}
+                                      {sessionStatus === 'completed' && t('programme.weekly.completed')}
+                                      {sessionStatus === 'failed' && t('programme.weekly.failed')}
+                                      {sessionStatus === 'partial' && t('programme.weekly.partial')}
                                     </Badge>
                                     <Badge variant="outline" className="bg-primary/15 border border-primary/25 text-primary">
                                       <Zap className="w-3 h-3 mr-1" />
@@ -961,15 +972,15 @@ export const Programme: React.FC = () => {
                                         <span className="text-secondary font-medium">({ex.pourcentage}% max)</span>
                                       )}
                                     </div>
-                                  )) || 'Aucun exercice'}
+                                  )) || t('programme.weekly.noExercise')}
                                   {daySession.exercises?.length > 2 && '...'}
                                 </div>
                               </div>
                             ) : (
                               <div className="text-center py-4">
                                 <RefreshCw className="w-8 h-8 text-muted-foreground/70 mx-auto mb-2" />
-                                <p className="text-sm text-muted-foreground font-medium">Repos</p>
-                                <p className="text-xs text-muted-foreground/70">Récupération</p>
+                                <p className="text-sm text-muted-foreground font-medium">{t('programme.weekly.rest')}</p>
+                                <p className="text-xs text-muted-foreground/70">{t('programme.weekly.recovery')}</p>
                               </div>
                             )}
                           </CardContent>
@@ -992,8 +1003,8 @@ export const Programme: React.FC = () => {
                         <Calendar className="w-4 h-4 md:w-6 md:h-6 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-base md:text-2xl font-bold text-foreground truncate">Planning Mensuel</h2>
-                        <p className="text-muted-foreground text-xs md:text-base truncate hidden sm:block">Calendrier d'entraînement</p>
+                        <h2 className="text-base md:text-2xl font-bold text-foreground truncate">{t('programme.planning.title')}</h2>
+                        <p className="text-muted-foreground text-xs md:text-base truncate hidden sm:block">{t('programme.planning.subtitle')}</p>
                       </div>
                     </div>
                     
@@ -1031,7 +1042,7 @@ export const Programme: React.FC = () => {
                         </div>
                         <div className="text-center md:text-left">
                           <p className="text-base md:text-2xl font-bold text-foreground">{programme?.sessions.length || 0}</p>
-                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Sessions</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">{t('programme.planning.sessions')}</p>
                         </div>
                       </div>
                     </div>
@@ -1045,7 +1056,7 @@ export const Programme: React.FC = () => {
                           <p className="text-base md:text-2xl font-bold text-foreground">
                             {programme ? Math.round(programme.sessions.reduce((acc: number, session: any) => acc + session.duration, 0) / programme.sessions.length) || 0 : 0}
                           </p>
-                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Min</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">{t('programme.planning.min')}</p>
                         </div>
                       </div>
                     </div>
@@ -1057,7 +1068,7 @@ export const Programme: React.FC = () => {
                         </div>
                         <div className="text-center md:text-left">
                           <p className="text-xs md:text-2xl font-bold text-foreground truncate">{programme?.userProfile?.sportClass || 'N/A'}</p>
-                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">Sport</p>
+                          <p className="text-[10px] md:text-sm text-muted-foreground truncate">{t('programme.planning.sport')}</p>
                         </div>
                       </div>
                     </div>
@@ -1069,10 +1080,13 @@ export const Programme: React.FC = () => {
                     <CardContent className="p-2 md:p-6">
                       {/* En-têtes des jours - Mobile Compact */}
                       <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-4">
-                        {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, i) => (
-                          <div key={day} className="text-center text-[10px] md:text-sm font-semibold text-foreground/90 p-1 md:p-2 bg-white/5 rounded md:rounded-lg border border-gray-100">
-                            <span className="hidden md:inline">{['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][i]}</span>
-                            <span className="md:hidden">{day}</span>
+                        {[
+                          t('programme.day.dim'), t('programme.day.lun'), t('programme.day.mar'),
+                          t('programme.day.mer'), t('programme.day.jeu'), t('programme.day.ven'), t('programme.day.sam'),
+                        ].map((dayLabel, i) => (
+                          <div key={i} className="text-center text-[10px] md:text-sm font-semibold text-foreground/90 p-1 md:p-2 bg-white/5 rounded md:rounded-lg border border-gray-100">
+                            <span className="hidden md:inline">{dayLabel}</span>
+                            <span className="md:hidden">{dayLabel.charAt(0)}</span>
                           </div>
                         ))}
                       </div>
@@ -1147,27 +1161,27 @@ export const Programme: React.FC = () => {
                         <div className="flex flex-wrap items-center justify-center gap-3">
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-secondary rounded"></div>
-                            <span className="text-sm font-medium text-foreground/90">Progression</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.progression')}</span>
                           </div>
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-white/30 rounded"></div>
-                            <span className="text-sm font-medium text-foreground/90">Deload</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.deload')}</span>
                           </div>
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-green-400 rounded"></div>
-                            <span className="text-sm font-medium text-foreground/90">Adaptation</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.adaptation')}</span>
                           </div>
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-accent rounded"></div>
-                            <span className="text-sm font-medium text-foreground/90">Spécialisation</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.specialisation')}</span>
                           </div>
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-white/10 rounded"></div>
-                            <span className="text-sm font-medium text-foreground/90">Repos</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.rest')}</span>
                           </div>
                           <div className="flex items-center gap-2 surface-panel-sm rounded-lg px-3 py-2">
                             <div className="w-3 h-3 bg-secondary rounded animate-pulse"></div>
-                            <span className="text-sm font-medium text-foreground/90">Aujourd'hui</span>
+                            <span className="text-sm font-medium text-foreground/90">{t('programme.planning.legend.today')}</span>
                           </div>
                         </div>
                       </div>
@@ -1180,9 +1194,9 @@ export const Programme: React.FC = () => {
                         <div className="w-40 h-40 bg-gradient-to-br from-primary via-secondary to-primary rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
                           <Calendar className="w-20 h-20 text-white" />
                         </div>
-                        <h3 className="text-3xl font-bold text-foreground mb-4">Aucun Programme</h3>
+                        <h3 className="text-3xl font-bold text-foreground mb-4">{t('programme.planning.none.title')}</h3>
                         <p className="text-muted-foreground mb-10 max-w-lg mx-auto text-lg leading-relaxed">
-                          Générez un programme personnalisé pour voir votre calendrier d'entraînement avec toutes vos sessions organisées.
+                          {t('programme.planning.none.desc')}
                         </p>
                         <Button
                           onClick={() => isPowerlifting ? setIsNewProgramModalOpen(true) : handleGenerateProgramme()}
@@ -1192,12 +1206,12 @@ export const Programme: React.FC = () => {
                           {isGenerating ? (
                             <>
                               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                              Génération...
+                              {t('programme.generating')}
                             </>
                           ) : (
                             <>
                               <Play className="w-6 h-6 mr-3" />
-                              Générer Programme
+                              {t('programme.planning.none.button')}
                             </>
                           )}
                         </Button>
@@ -1248,7 +1262,7 @@ export const Programme: React.FC = () => {
 
                   {selectedSession.equipment && selectedSession.equipment.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-sm font-medium text-foreground/90 mb-2">Équipement requis:</p>
+                      <p className="text-sm font-medium text-foreground/90 mb-2">{t('programme.modal.equipment')}</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedSession.equipment.map((eq: string, index: number) => (
                           <Badge key={index} variant="outline" className="text-muted-foreground">{eq}</Badge>
@@ -1260,7 +1274,7 @@ export const Programme: React.FC = () => {
 
                 {/* Exercices */}
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-foreground">Exercices ({selectedSession.exercises?.length || 0})</h4>
+                  <h4 className="text-lg font-semibold text-foreground">{t('programme.modal.exercises')} ({selectedSession.exercises?.length || 0})</h4>
                   {selectedSession.exercises?.map((exercise: any, index: number) => (
                     <ExerciseCard key={exercise.id || index} exercise={exercise} />
                   ))}
@@ -1277,12 +1291,12 @@ export const Programme: React.FC = () => {
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Zap className="w-5 h-5 text-secondary" />
-                Séance terminée — c'était comment ?
+                {t('programme.rpe.title')}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Notez la difficulté de <strong>{todaySession?.nom}</strong> : ça sert à ajuster la charge de votre prochaine séance sur ce mouvement.
+                {t('programme.rpe.desc').split('{session}')[0]}<strong>{todaySession?.nom}</strong>{t('programme.rpe.desc').split('{session}')[1]}
               </p>
 
               <div className="grid grid-cols-5 gap-2">
@@ -1302,8 +1316,8 @@ export const Programme: React.FC = () => {
                 ))}
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-                <span>1 · Très facile</span>
-                <span>10 · Hardcore</span>
+                <span>1 · {t('programme.rpe.easy')}</span>
+                <span>10 · {t('programme.rpe.hard')}</span>
               </div>
 
               <div className="flex gap-3 pt-2">
@@ -1311,10 +1325,10 @@ export const Programme: React.FC = () => {
                   onClick={handleSubmitDifficultyRating}
                   className="flex-1 bg-gradient-to-r from-primary to-secondary text-white"
                 >
-                  Valider ma note
+                  {t('programme.rpe.submit')}
                 </Button>
                 <Button variant="outline" onClick={handleDismissDifficultyRating} className="border-2 border-white/15">
-                  Passer
+                  {t('programme.rpe.skip')}
                 </Button>
               </div>
             </div>

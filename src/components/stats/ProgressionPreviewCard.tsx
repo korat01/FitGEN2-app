@@ -8,11 +8,15 @@ import { getRangColor, getRangIcon } from '@/utils/rankingHelpers';
 interface ProgressionPreviewCardProps {
   userRank: any;
   performancesCount: number;
+  /** Mode simplifié (voir ProfileSummary.tsx) : masque le rang/classement, ne garde que les
+      records et l'évolution des performances. */
+  simplified?: boolean;
 }
 
 export const ProgressionPreviewCard: React.FC<ProgressionPreviewCardProps> = ({
   userRank,
   performancesCount,
+  simplified = false,
 }) => (
   <Card className="glass-card border-primary/25 overflow-hidden">
     <CardContent className="p-5 md:p-6">
@@ -23,7 +27,9 @@ export const ProgressionPreviewCard: React.FC<ProgressionPreviewCardProps> = ({
             Ma progression
           </h3>
           <p className="text-sm text-muted-foreground max-w-md">
-            Records, graphiques d&apos;évolution, classement et objectifs — tout au même endroit.
+            {simplified
+              ? 'Records et graphiques d\'évolution de tes performances.'
+              : 'Records, graphiques d\'évolution, classement et objectifs — tout au même endroit.'}
           </p>
           <div className="flex flex-wrap gap-2 text-xs">
             <span className="surface-panel-sm px-2.5 py-1 rounded-full flex items-center gap-1 text-muted-foreground">
@@ -32,11 +38,13 @@ export const ProgressionPreviewCard: React.FC<ProgressionPreviewCardProps> = ({
             <span className="surface-panel-sm px-2.5 py-1 rounded-full flex items-center gap-1 text-muted-foreground">
               <TrendingUp className="w-3 h-3" /> Évolution
             </span>
-            <span className="surface-panel-sm px-2.5 py-1 rounded-full flex items-center gap-1 text-muted-foreground">
-              <Medal className="w-3 h-3" /> Classement
-            </span>
+            {!simplified && (
+              <span className="surface-panel-sm px-2.5 py-1 rounded-full flex items-center gap-1 text-muted-foreground">
+                <Medal className="w-3 h-3" /> Classement
+              </span>
+            )}
           </div>
-          {userRank && (
+          {!simplified && userRank && (
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${getRangColor(userRank.rank || 'D')} text-white text-sm font-semibold`}>
               <span>{getRangIcon(userRank.rank || 'D')}</span>
               <span>Rang {userRank.rank || 'D'}</span>
@@ -44,10 +52,15 @@ export const ProgressionPreviewCard: React.FC<ProgressionPreviewCardProps> = ({
               <span className="opacity-80">· {performancesCount} perf.</span>
             </div>
           )}
+          {simplified && (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/15 border border-primary/25 text-primary text-sm font-semibold">
+              <span>{performancesCount} performance{performancesCount > 1 ? 's' : ''} enregistrée{performancesCount > 1 ? 's' : ''}</span>
+            </div>
+          )}
         </div>
         <Button asChild className="gradient-primary text-white font-semibold shrink-0">
           <Link to="/progression">
-            Voir records &amp; classement
+            {simplified ? 'Voir mes records' : 'Voir records & classement'}
             <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </Button>

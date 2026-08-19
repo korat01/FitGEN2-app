@@ -22,6 +22,11 @@ export interface ClientProfile {
   };
 }
 
+/** Sports pour lesquels cet exercice est couramment utilisé — affiché en badges dans le
+    sélecteur d'exercices du coach (voir CoachProgramBuilder.tsx) pour identifier vite si un
+    exercice est plutôt "power", "marathon", musculation générale, etc. */
+export type SportTag = 'power' | 'musculation' | 'marathon' | 'sprint' | 'crossfit' | 'calisthenics' | 'streetlifting' | 'mobilite';
+
 export interface BlocExercice {
   nom: string;
   type: 'composé' | 'isolé' | 'cardio' | 'accessoire' | 'étirement' | 'gainage';
@@ -37,6 +42,7 @@ export interface BlocExercice {
   contraintes_médicales?: string[];
   pourcentage_rm?: number; // Nouveau champ pour les exercices de force
   exercice_rm?: 'developpe_couche' | 'squat' | 'souleve_de_terre' | 'developpe_militaire' | 'rowing';
+  sports?: SportTag[];
 }
 
 export interface SeanceJour {

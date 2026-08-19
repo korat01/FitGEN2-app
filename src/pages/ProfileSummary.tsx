@@ -12,11 +12,12 @@ import {
   Star, TrendingUp, Flame,
   Zap as Lightning,
   Timer, Wind, Gauge, Sparkles,
-  Crown, LogOut, Settings, Palette
+  Crown, LogOut, Settings, Palette, Languages, Minimize2
 } from 'lucide-react';
 import { RankBadge } from '@/components/RankBadge';
 import { SelectableTile } from '@/components/profile/SelectableTile';
 import { useHunterMode } from '@/hooks/useHunterMode';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MuscleGroup {
   name: string;
@@ -45,7 +46,7 @@ interface SportFocus {
   borderClass: string;
 }
 
-const SPORT_LABELS: Record<string, string> = {
+const SPORT_LABELS_FR: Record<string, string> = {
   power: 'Powerlifting',
   marathon: 'Marathon',
   crossfit: 'Crossfit',
@@ -53,6 +54,16 @@ const SPORT_LABELS: Record<string, string> = {
   streetlifting: 'Streetlifting',
   sprint: 'Sprint',
   classique: 'Classique',
+};
+
+const SPORT_LABELS_EN: Record<string, string> = {
+  power: 'Powerlifting',
+  marathon: 'Marathon',
+  crossfit: 'Crossfit',
+  calisthenics: 'Calisthenics',
+  streetlifting: 'Streetlifting',
+  sprint: 'Sprint',
+  classique: 'General fitness',
 };
 
 const SPORT_FOCUS: Record<string, SportFocus[]> = {
@@ -93,36 +104,21 @@ const SPORT_FOCUS: Record<string, SportFocus[]> = {
   ],
 };
 
-const LEVEL_OPTIONS = [
-  { value: 'Débutant', label: 'Débutant' },
-  { value: 'Intermédiaire', label: 'Intermédiaire' },
-  { value: 'Avancé', label: 'Avancé' },
-  { value: 'Expert', label: 'Expert' },
-];
-
-const DAYS_OF_WEEK = [
-  { key: 'lundi', label: 'Lundi' },
-  { key: 'mardi', label: 'Mardi' },
-  { key: 'mercredi', label: 'Mercredi' },
-  { key: 'jeudi', label: 'Jeudi' },
-  { key: 'vendredi', label: 'Vendredi' },
-  { key: 'samedi', label: 'Samedi' },
-  { key: 'dimanche', label: 'Dimanche' },
-];
-
-const TIME_OPTIONS = [
-  { value: 1, label: '1 mois' },
-  { value: 2, label: '2 mois' },
-  { value: 3, label: '3 mois' },
-  { value: 6, label: '6 mois' },
-  { value: 9, label: '9 mois' },
-  { value: 12, label: '12 mois' },
-  { value: 18, label: '18 mois' },
-  { value: 24, label: '24 mois' },
-];
+// Valeur stockée toujours en français (clé technique) — seul le libellé affiché change de langue.
+const LEVEL_VALUES = ['Débutant', 'Intermédiaire', 'Avancé', 'Expert'] as const;
+const DAY_KEYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as const;
+const TIME_VALUES = [1, 2, 3, 6, 9, 12, 18, 24];
 
 export const ProfileSummary: React.FC = () => {
   const { user, updateUser, logout } = useAuth();
+  const { t, language, setLanguage } = useLanguage();
+  const SPORT_LABELS = language === 'en' ? SPORT_LABELS_EN : SPORT_LABELS_FR;
+  const LEVEL_OPTIONS = LEVEL_VALUES.map((value) => ({
+    value,
+    label: t(`profile.level.${{ 'Débutant': 'beginner', 'Intermédiaire': 'intermediate', 'Avancé': 'advanced', 'Expert': 'expert' }[value]}`),
+  }));
+  const DAYS_OF_WEEK = DAY_KEYS.map((key) => ({ key, label: t(`profile.day.${key}`) }));
+  const TIME_OPTIONS = TIME_VALUES.map((value) => ({ value, label: `${value} ${t('common.months')}` }));
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [isEditingPhone, setIsEditingPhone] = useState(false);
@@ -288,8 +284,8 @@ export const ProfileSummary: React.FC = () => {
         <Card className="w-full max-w-md glass-card border-primary/20">
           <CardContent className="p-8 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground/50" />
-            <h2 className="text-xl font-semibold text-muted-foreground">Profil non trouvé</h2>
-            <p className="text-muted-foreground mt-2">Veuillez vous connecter pour accéder à votre profil.</p>
+            <h2 className="text-xl font-semibold text-muted-foreground">{t('profile.notFound.title')}</h2>
+            <p className="text-muted-foreground mt-2">{t('profile.notFound.message')}</p>
           </CardContent>
         </Card>
       </div>
@@ -309,12 +305,24 @@ export const ProfileSummary: React.FC = () => {
 
   const sportFocusList = SPORT_FOCUS[user.sportClass || 'classique'] || [];
   const { hunterPanelClass } = useHunterMode();
+  const simplifiedMode = user?.simplifiedMode === true;
 
   return (
     <div className="relative">
       <div className="container mx-auto px-4 md:px-6 py-8 page-transition">
         <div className="space-y-6 stagger-animation">
           {/* Header Principal */}
+          {simplifiedMode ? (
+            <div className="glass-card rounded-3xl p-6 md:p-8 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0">
+                <Users className="w-7 h-7 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">{user.name}</h1>
+                <p className="text-muted-foreground text-sm mt-1">{SPORT_LABELS[user.sportClass || 'classique']}</p>
+              </div>
+            </div>
+          ) : (
           <div className={`relative overflow-hidden rounded-3xl gradient-primary p-6 md:p-8 text-white shadow-2xl ${hunterPanelClass}`}>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/10 to-transparent rounded-full -translate-y-32 translate-x-32" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-white/10 to-transparent rounded-full translate-y-24 -translate-x-24" />
@@ -324,7 +332,7 @@ export const ProfileSummary: React.FC = () => {
                 <RankBadge rank={user.rank || 'D'} size="md" />
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{user.name}</h1>
-                  <p className="text-white/80 text-sm mt-1">Rang {user.rank || 'D'} · {SPORT_LABELS[user.sportClass || 'classique']}</p>
+                  <p className="text-white/80 text-sm mt-1">{t('profile.rank')} {user.rank || 'D'} · {SPORT_LABELS[user.sportClass || 'classique']}</p>
                 </div>
               </div>
 
@@ -337,6 +345,7 @@ export const ProfileSummary: React.FC = () => {
               </div>
             </div>
           </div>
+          )}
 
           {/* Focus unifié */}
           <Card className="glass-card border-primary/20 hover:shadow-2xl transition-all duration-300">
@@ -345,15 +354,15 @@ export const ProfileSummary: React.FC = () => {
                 <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                   <Target className="w-5 h-5 text-white" />
                 </div>
-                Mes Zones de Focus
+                {t('profile.focus.title')}
               </CardTitle>
-              <p className="text-muted-foreground text-sm mt-1">Sélectionnez les zones que vous voulez travailler en priorité</p>
+              <p className="text-muted-foreground text-sm mt-1">{t('profile.focus.subtitle')}</p>
             </CardHeader>
             <CardContent className="space-y-8">
               <div>
                 <h4 className="text-sm font-semibold text-foreground/80 mb-3 flex items-center gap-2 uppercase tracking-wide">
                   <Dumbbell className="w-4 h-4 text-primary" />
-                  Groupes musculaires
+                  {t('profile.focus.muscleGroups')}
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {MUSCLE_GROUPS.map((muscle) => (
@@ -373,7 +382,7 @@ export const ProfileSummary: React.FC = () => {
               <div>
                 <h4 className="text-sm font-semibold text-foreground/80 mb-3 flex items-center gap-2 uppercase tracking-wide">
                   <Star className="w-4 h-4 text-secondary" />
-                  Focus spécialisés — {SPORT_LABELS[user.sportClass || 'classique']}
+                  {t('profile.focus.specialized')} — {SPORT_LABELS[user.sportClass || 'classique']}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {sportFocusList.map((focus) => (
@@ -401,7 +410,7 @@ export const ProfileSummary: React.FC = () => {
                 <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                   <Trophy className="w-5 h-5 text-white" />
                 </div>
-                Niveau Général
+                {t('profile.level.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -418,7 +427,7 @@ export const ProfileSummary: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground mt-2">Ce niveau sera utilisé pour adapter vos programmes d'entraînement.</p>
+                <p className="text-xs text-muted-foreground mt-2">{t('profile.level.hint')}</p>
               </div>
             </CardContent>
           </Card>
@@ -431,13 +440,13 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  Jours d'entraînement
+                  {t('profile.trainingDays.title')}
                   <span className="text-sm font-normal text-muted-foreground">({(isEditingTrainingDays ? tempTrainingDays : user?.trainingDays)?.length || 0}/7)</span>
                 </CardTitle>
                 {!isEditingTrainingDays && (
                   <Button variant="outline" size="sm" onClick={() => setIsEditingTrainingDays(true)} className="border-2 border-white/15 hover:border-primary/50 hover:text-primary rounded-xl">
                     <Edit className="w-4 h-4 mr-2" />
-                    Modifier
+                    {t('common.edit')}
                   </Button>
                 )}
               </div>
@@ -462,11 +471,11 @@ export const ProfileSummary: React.FC = () => {
                 <div className="flex gap-3 mt-4">
                   <Button onClick={saveTrainingDays} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl">
                     <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder
+                    {t('common.save')}
                   </Button>
                   <Button variant="outline" onClick={cancelTrainingDays} className="border-2 border-white/15 hover:border-destructive/50 hover:text-destructive rounded-xl">
                     <X className="w-4 h-4 mr-2" />
-                    Annuler
+                    {t('common.cancel')}
                   </Button>
                 </div>
               )}
@@ -481,12 +490,12 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Timer className="w-5 h-5 text-white" />
                   </div>
-                  Durée d'entraînement
+                  {t('profile.trainingDuration.title')}
                 </CardTitle>
                 {!isEditingTrainingTime && (
                   <Button variant="outline" size="sm" onClick={() => setIsEditingTrainingTime(true)} className="border-2 border-white/15 hover:border-primary/50 hover:text-primary rounded-xl">
                     <Edit className="w-4 h-4 mr-2" />
-                    Modifier
+                    {t('common.edit')}
                   </Button>
                 )}
               </div>
@@ -511,11 +520,11 @@ export const ProfileSummary: React.FC = () => {
                 <div className="flex gap-3 mt-4">
                   <Button onClick={saveTrainingTime} className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl">
                     <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder
+                    {t('common.save')}
                   </Button>
                   <Button variant="outline" onClick={cancelTrainingTime} className="border-2 border-white/15 hover:border-destructive/50 hover:text-destructive rounded-xl">
                     <X className="w-4 h-4 mr-2" />
-                    Annuler
+                    {t('common.cancel')}
                   </Button>
                 </div>
               )}
@@ -523,10 +532,10 @@ export const ProfileSummary: React.FC = () => {
               <div className="mt-4 p-4 bg-secondary/10 rounded-2xl border border-secondary/30">
                 <div className="flex items-center gap-2 mb-1">
                   <Calendar className="w-4 h-4 text-secondary" />
-                  <span className="font-semibold text-secondary text-sm">Planification</span>
+                  <span className="font-semibold text-secondary text-sm">{t('profile.trainingDuration.planning')}</span>
                 </div>
                 <p className="text-sm text-secondary/90">
-                  Vous vous entraînerez pendant <strong>{user?.trainingMonths || 3} mois</strong> sur <strong>{user?.trainingDays?.length || 0} jours par semaine</strong>.
+                  {t('profile.trainingDuration.summary1')} <strong>{user?.trainingMonths || 3} {t('common.months')}</strong> {t('profile.trainingDuration.summary2')} <strong>{user?.trainingDays?.length || 0} {t('profile.trainingDuration.summary3')}</strong>.
                 </p>
               </div>
             </CardContent>
@@ -541,33 +550,33 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Users className="w-5 h-5 text-white" />
                   </div>
-                  Informations personnelles
+                  {t('profile.personalInfo.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {renderEditableField(
-                  'Nom complet', user.name || 'Non défini', isEditingName,
+                  t('profile.personalInfo.fullName'), user.name || t('common.notDefined'), isEditingName,
                   () => { setTempName(user.name || ''); setIsEditingName(true); },
                   () => { handleFieldChange('name', tempName); setIsEditingName(false); },
                   () => setIsEditingName(false),
                   tempName, setTempName, 'text', undefined, <Users className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Email', user.email || 'Non défini', isEditingEmail,
+                  t('profile.personalInfo.email'), user.email || t('common.notDefined'), isEditingEmail,
                   () => { setTempEmail(user.email || ''); setIsEditingEmail(true); },
                   () => { handleFieldChange('email', tempEmail); setIsEditingEmail(false); },
                   () => setIsEditingEmail(false),
                   tempEmail, setTempEmail, 'text', undefined, <Mail className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Téléphone', user.phone || 'Non défini', isEditingPhone,
+                  t('profile.personalInfo.phone'), user.phone || t('common.notDefined'), isEditingPhone,
                   () => { setTempPhone(user.phone || ''); setIsEditingPhone(true); },
                   () => { handleFieldChange('phone', tempPhone); setIsEditingPhone(false); },
                   () => setIsEditingPhone(false),
                   tempPhone, setTempPhone, 'text', undefined, <Phone className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Localisation', user.location || 'Non défini', isEditingLocation,
+                  t('profile.personalInfo.location'), user.location || t('common.notDefined'), isEditingLocation,
                   () => { setTempLocation(user.location || ''); setIsEditingLocation(true); },
                   () => { handleFieldChange('location', tempLocation); setIsEditingLocation(false); },
                   () => setIsEditingLocation(false),
@@ -583,38 +592,38 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Weight className="w-5 h-5 text-white" />
                   </div>
-                  Informations physiques
+                  {t('profile.physicalInfo.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {renderEditableField(
-                  'Poids', `${user.weight || 75} kg`, isEditingWeight,
+                  t('profile.physicalInfo.weight'), `${user.weight || 75} kg`, isEditingWeight,
                   () => { setTempWeight(user.weight || 75); setIsEditingWeight(true); },
                   () => { handleFieldChange('weight', tempWeight); setIsEditingWeight(false); },
                   () => setIsEditingWeight(false),
                   tempWeight, setTempWeight, 'number', undefined, <Weight className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Taille', `${user.height || 175} cm`, isEditingHeight,
+                  t('profile.physicalInfo.height'), `${user.height || 175} cm`, isEditingHeight,
                   () => { setTempHeight(user.height || 175); setIsEditingHeight(true); },
                   () => { handleFieldChange('height', tempHeight); setIsEditingHeight(false); },
                   () => setIsEditingHeight(false),
                   tempHeight, setTempHeight, 'number', undefined, <Activity className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Âge', `${user.age || 25} ans`, isEditingAge,
+                  t('profile.physicalInfo.age'), `${user.age || 25} ${t('common.years')}`, isEditingAge,
                   () => { setTempAge(user.age || 25); setIsEditingAge(true); },
                   () => { handleFieldChange('age', tempAge); setIsEditingAge(false); },
                   () => setIsEditingAge(false),
                   tempAge, setTempAge, 'number', undefined, <Calendar className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Sexe', user.sex === 'male' ? 'Homme' : 'Femme', isEditingSex,
+                  t('profile.physicalInfo.sex'), user.sex === 'male' ? t('common.male') : t('common.female'), isEditingSex,
                   () => { setTempSex(user.sex || 'male'); setIsEditingSex(true); },
                   () => { handleFieldChange('sex', tempSex); setIsEditingSex(false); },
                   () => setIsEditingSex(false),
                   tempSex, setTempSex, 'select',
-                  [{ value: 'male', label: 'Homme' }, { value: 'female', label: 'Femme' }],
+                  [{ value: 'male', label: t('common.male') }, { value: 'female', label: t('common.female') }],
                   <Users className="w-4 h-4" />
                 )}
               </CardContent>
@@ -627,12 +636,12 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
-                  Informations sportives
+                  {t('profile.sportInfo.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {renderEditableField(
-                  'Classe de sport', SPORT_LABELS[user.sportClass || 'classique'], isEditingSport,
+                  t('profile.sportInfo.sportClass'), SPORT_LABELS[user.sportClass || 'classique'], isEditingSport,
                   () => { setTempSport(user.sportClass || 'classique'); setIsEditingSport(true); },
                   () => { handleFieldChange('sportClass', tempSport); setIsEditingSport(false); },
                   () => setIsEditingSport(false),
@@ -641,21 +650,21 @@ export const ProfileSummary: React.FC = () => {
                   <Lightning className="w-4 h-4" />
                 )}
                 {renderEditableField(
-                  'Objectif principal',
-                  user.goal === 'performance' ? 'Performance' :
-                  user.goal === 'musculation' ? 'Musculation' :
-                  user.goal === 'endurance' ? 'Endurance' :
-                  user.goal === 'sante' ? 'Santé' : 'Performance',
+                  t('profile.sportInfo.mainGoal'),
+                  user.goal === 'performance' ? t('profile.goal.performance') :
+                  user.goal === 'musculation' ? t('profile.goal.musculation') :
+                  user.goal === 'endurance' ? t('profile.goal.endurance') :
+                  user.goal === 'sante' ? t('profile.goal.sante') : t('profile.goal.performance'),
                   isEditingGoal,
                   () => { setTempGoal(user.goal || 'performance'); setIsEditingGoal(true); },
                   () => { handleFieldChange('goal', tempGoal); setIsEditingGoal(false); },
                   () => setIsEditingGoal(false),
                   tempGoal, setTempGoal, 'select',
                   [
-                    { value: 'performance', label: 'Performance' },
-                    { value: 'musculation', label: 'Musculation' },
-                    { value: 'endurance', label: 'Endurance' },
-                    { value: 'sante', label: 'Santé' },
+                    { value: 'performance', label: t('profile.goal.performance') },
+                    { value: 'musculation', label: t('profile.goal.musculation') },
+                    { value: 'endurance', label: t('profile.goal.endurance') },
+                    { value: 'sante', label: t('profile.goal.sante') },
                   ],
                   <Target className="w-4 h-4" />
                 )}
@@ -669,7 +678,7 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 gradient-primary rounded-xl flex items-center justify-center">
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
-                  Statistiques
+                  {t('profile.stats.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -677,7 +686,7 @@ export const ProfileSummary: React.FC = () => {
                   <div className="p-4 bg-primary/10 rounded-xl border border-primary/30">
                     <div className="flex items-center gap-2 mb-1">
                       <Trophy className="w-4 h-4 text-primary" />
-                      <div className="text-xs font-medium text-primary uppercase tracking-wide">Performances</div>
+                      <div className="text-xs font-medium text-primary uppercase tracking-wide">{t('profile.stats.performances')}</div>
                     </div>
                     <div className="text-2xl font-bold text-primary">{performancesCount}</div>
                   </div>
@@ -693,7 +702,7 @@ export const ProfileSummary: React.FC = () => {
                   <div className="p-4 bg-secondary/10 rounded-xl border border-secondary/30">
                     <div className="flex items-center gap-2 mb-1">
                       <Calendar className="w-4 h-4 text-secondary" />
-                      <div className="text-xs font-medium text-secondary uppercase tracking-wide">Jours / semaine</div>
+                      <div className="text-xs font-medium text-secondary uppercase tracking-wide">{t('profile.stats.daysPerWeek')}</div>
                     </div>
                     <div className="text-2xl font-bold text-secondary">{user?.trainingDays?.length || 0}</div>
                   </div>
@@ -701,9 +710,9 @@ export const ProfileSummary: React.FC = () => {
                   <div className="p-4 surface-accent rounded-xl border border-primary/30">
                     <div className="flex items-center gap-2 mb-1">
                       <Timer className="w-4 h-4 text-primary" />
-                      <div className="text-xs font-medium text-primary uppercase tracking-wide">Programme</div>
+                      <div className="text-xs font-medium text-primary uppercase tracking-wide">{t('profile.stats.program')}</div>
                     </div>
-                    <div className="text-2xl font-bold text-primary">{user?.trainingMonths || 3} mois</div>
+                    <div className="text-2xl font-bold text-primary">{user?.trainingMonths || 3} {t('common.months')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -717,20 +726,64 @@ export const ProfileSummary: React.FC = () => {
                   <div className="w-9 h-9 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center">
                     <Settings className="w-5 h-5 text-secondary" />
                   </div>
-                  Compte
+                  {t('profile.account.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between gap-3 h-12 px-4 rounded-lg">
                   <div className="flex items-center gap-3 min-w-0">
                     <Palette className="w-5 h-5 text-secondary shrink-0" />
-                    <span className="font-medium text-foreground/90 truncate">Couleur du rang dans l&apos;app</span>
+                    <span className="font-medium text-foreground/90 truncate">{t('profile.account.rankColor')}</span>
                   </div>
                   <Switch
                     checked={user?.showRankTheme !== false}
                     onCheckedChange={(checked) => updateUser({ showRankTheme: checked })}
-                    aria-label="Afficher la couleur du rang dans l'app"
+                    aria-label={t('profile.account.rankColor')}
                   />
+                </div>
+                <div className="flex items-center justify-between gap-3 h-12 px-4 rounded-lg">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Minimize2 className="w-5 h-5 text-secondary shrink-0" />
+                    <span className="font-medium text-foreground/90 truncate">{t('profile.account.simplifiedMode')}</span>
+                  </div>
+                  <Switch
+                    checked={user?.simplifiedMode === true}
+                    onCheckedChange={(checked) => updateUser({ simplifiedMode: checked })}
+                    aria-label={t('profile.account.simplifiedMode')}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 h-12 px-4 rounded-lg">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Users className="w-5 h-5 text-secondary shrink-0" />
+                    <span className="font-medium text-foreground/90 truncate">{t('profile.account.coachMode')}</span>
+                  </div>
+                  <Switch
+                    checked={user?.isCoach === true}
+                    onCheckedChange={(checked) => updateUser({ isCoach: checked })}
+                    aria-label={t('profile.account.coachMode')}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 h-12 px-4 rounded-lg">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Languages className="w-5 h-5 text-secondary shrink-0" />
+                    <span className="font-medium text-foreground/90 truncate">{t('profile.account.language')}</span>
+                  </div>
+                  <div className="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setLanguage('fr')}
+                      className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${language === 'fr' ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      FR
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLanguage('en')}
+                      className={`px-3 py-1 rounded-md text-sm font-semibold transition-colors ${language === 'en' ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      EN
+                    </button>
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -738,7 +791,7 @@ export const ProfileSummary: React.FC = () => {
                   className="w-full justify-start h-12 px-4 rounded-lg text-foreground/90 hover:bg-white/10"
                 >
                   <Crown className="w-5 h-5 mr-3 text-yellow-500" />
-                  <span className="font-medium">Devenir Pro</span>
+                  <span className="font-medium">{t('profile.account.becomePro')}</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -746,7 +799,7 @@ export const ProfileSummary: React.FC = () => {
                   className="w-full justify-start h-12 px-4 rounded-lg text-red-500 hover:bg-red-500/10 hover:text-red-500"
                 >
                   <LogOut className="w-5 h-5 mr-3" />
-                  <span className="font-medium">Déconnexion</span>
+                  <span className="font-medium">{t('profile.account.logout')}</span>
                 </Button>
               </CardContent>
             </Card>

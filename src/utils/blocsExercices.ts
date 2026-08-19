@@ -14,7 +14,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["aucun"],
     description: "Position de planche, descendre la poitrine vers le sol et remonter",
-    contraintes_médicales: ["épaule_limitée"]
+    contraintes_médicales: ["épaule_limitée"],
+    sports: ["musculation", "calisthenics", "crossfit"]
   },
   {
     nom: "Pompes sur genoux",
@@ -26,7 +27,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 15,
     séries: 3,
     équipement: ["aucun", "tapis"],
-    description: "Version adaptée des pompes, genoux au sol"
+    description: "Version adaptée des pompes, genoux au sol",
+    sports: ["musculation", "calisthenics"]
   },
   {
     nom: "Développé haltères",
@@ -38,7 +40,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 10,
     séries: 4,
     équipement: ["haltères"],
-    description: "Allongé, pousser les haltères vers le haut"
+    description: "Allongé, pousser les haltères vers le haut",
+    sports: ["musculation", "crossfit"]
   },
   {
     nom: "Dips sur chaise",
@@ -50,7 +53,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 8,
     séries: 3,
     équipement: ["aucun"],
-    description: "Mains sur une chaise, corps suspendu, flexion/extension des bras"
+    description: "Mains sur une chaise, corps suspendu, flexion/extension des bras",
+    sports: ["musculation", "calisthenics"]
   },
 
   // Exercices haut du corps - Tirage
@@ -64,7 +68,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 6,
     séries: 3,
     équipement: ["barre"],
-    description: "Suspendre à une barre, tirer le corps vers le haut"
+    description: "Suspendre à une barre, tirer le corps vers le haut",
+    sports: ["musculation", "calisthenics", "streetlifting"]
   },
   {
     nom: "Rowing haltères",
@@ -76,7 +81,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 12,
     séries: 3,
     équipement: ["haltères"],
-    description: "Penché en avant, tirer les haltères vers la poitrine"
+    description: "Penché en avant, tirer les haltères vers la poitrine",
+    sports: ["musculation", "crossfit"]
   },
   {
     nom: "Rowing élastique",
@@ -88,7 +94,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 15,
     séries: 3,
     équipement: ["élastiques"],
-    description: "Tirer l'élastique vers soi, coudes le long du corps"
+    description: "Tirer l'élastique vers soi, coudes le long du corps",
+    sports: ["musculation"]
   },
 
   // Exercices bas du corps
@@ -103,7 +110,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["aucun"],
     description: "Pieds écartés, descendre en pliant les genoux",
-    contraintes_médicales: ["genou_fragile"]
+    contraintes_médicales: ["genou_fragile"],
+    sports: ["musculation", "crossfit", "marathon"]
   },
   {
     nom: "Fentes alternées",
@@ -116,7 +124,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["aucun"],
     description: "Pas en avant, plier le genou avant, alterner",
-    contraintes_médicales: ["genou_fragile"]
+    contraintes_médicales: ["genou_fragile"],
+    sports: ["musculation", "crossfit", "marathon"]
   },
   {
     nom: "Soulevé de terre haltères",
@@ -129,7 +138,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 4,
     équipement: ["haltères"],
     description: "Haltères au sol, soulever en gardant le dos droit",
-    contraintes_médicales: ["dos_sensible", "hernie_discale"]
+    contraintes_médicales: ["dos_sensible", "hernie_discale"],
+    sports: ["musculation", "power"]
   },
   {
     nom: "Squats gobelet",
@@ -141,7 +151,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 12,
     séries: 3,
     équipement: ["haltères", "kettlebell"],
-    description: "Tenir un poids contre la poitrine, effectuer un squat"
+    description: "Tenir un poids contre la poitrine, effectuer un squat",
+    sports: ["musculation", "crossfit"]
   },
 
   // Exercices de gainage
@@ -155,7 +166,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "30-60s",
     séries: 3,
     équipement: ["aucun", "tapis"],
-    description: "Position de pompe, maintenir la position"
+    description: "Position de pompe, maintenir la position",
+    sports: ["musculation", "calisthenics", "crossfit", "marathon"]
   },
   {
     nom: "Planche latérale",
@@ -167,7 +179,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "20-40s",
     séries: 2,
     équipement: ["aucun", "tapis"],
-    description: "Sur le côté, maintenir le corps aligné"
+    description: "Sur le côté, maintenir le corps aligné",
+    sports: ["musculation", "calisthenics"]
   },
   {
     nom: "Mountain climbers",
@@ -179,7 +192,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 20,
     séries: 3,
     équipement: ["aucun"],
-    description: "Position de planche, alterner genoux vers poitrine"
+    description: "Position de planche, alterner genoux vers poitrine",
+    sports: ["crossfit", "marathon", "sprint"]
   },
 
   // Exercices cardio
@@ -193,7 +207,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 30,
     séries: 3,
     équipement: ["aucun"],
-    description: "Sauts en écartant bras et jambes simultanément"
+    description: "Sauts en écartant bras et jambes simultanément",
+    sports: ["crossfit", "marathon"]
   },
   {
     nom: "Burpees",
@@ -205,7 +220,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 8,
     séries: 3,
     équipement: ["aucun"],
-    description: "Squat, position planche, pompe, saut vertical"
+    description: "Squat, position planche, pompe, saut vertical",
+    sports: ["crossfit"]
   },
   {
     nom: "Course sur place",
@@ -217,7 +233,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "45s",
     séries: 3,
     équipement: ["aucun"],
-    description: "Courir sur place en levant les genoux"
+    description: "Courir sur place en levant les genoux",
+    sports: ["marathon", "crossfit"]
   },
 
   // Exercices d'étirement
@@ -231,7 +248,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "30s",
     séries: 2,
     équipement: ["aucun", "tapis"],
-    description: "Jambe tendue, se pencher vers l'avant"
+    description: "Jambe tendue, se pencher vers l'avant",
+    sports: ["mobilite"]
   },
   {
     nom: "Étirement pectoraux",
@@ -243,7 +261,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "30s",
     séries: 2,
     équipement: ["aucun"],
-    description: "Bras contre un mur, rotation du corps"
+    description: "Bras contre un mur, rotation du corps",
+    sports: ["mobilite"]
   },
   {
     nom: "Cobra yoga",
@@ -256,7 +275,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["tapis"],
     description: "Allongé ventre, soulever le torse en s'appuyant sur les bras",
-    contraintes_médicales: ["dos_sensible"]
+    contraintes_médicales: ["dos_sensible"],
+    sports: ["mobilite"]
   },
 
   // Exercices avec équipement spécialisé
@@ -270,7 +290,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 15,
     séries: 3,
     équipement: ["kettlebell"],
-    description: "Balancer la kettlebell entre les jambes puis au niveau des épaules"
+    description: "Balancer la kettlebell entre les jambes puis au niveau des épaules",
+    sports: ["crossfit", "musculation"]
   },
   {
     nom: "Swiss ball crunch",
@@ -282,7 +303,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 15,
     séries: 3,
     équipement: ["swiss_ball"],
-    description: "Dos sur le ballon, effectuer des crunchs"
+    description: "Dos sur le ballon, effectuer des crunchs",
+    sports: ["musculation"]
   },
 
   // Exercices de force - Développé couché
@@ -298,7 +320,8 @@ export const tousBlocs: BlocExercice[] = [
     équipement: ["haltères"],
     description: "Allongé sur un banc, pousser les haltères vers le haut",
     pourcentage_rm: 75,
-    exercice_rm: "developpe_couche"
+    exercice_rm: "developpe_couche",
+    sports: ["power", "musculation"]
   },
   {
     nom: "Développé couché barre",
@@ -312,7 +335,8 @@ export const tousBlocs: BlocExercice[] = [
     équipement: ["barre", "machine_guidée"],
     description: "Allongé sur un banc, pousser la barre vers le haut",
     pourcentage_rm: 80,
-    exercice_rm: "developpe_couche"
+    exercice_rm: "developpe_couche",
+    sports: ["power", "musculation"]
   },
 
   // Exercices de force - Squat
@@ -329,7 +353,8 @@ export const tousBlocs: BlocExercice[] = [
     description: "Barre sur les épaules, descendre en pliant les genoux",
     pourcentage_rm: 80,
     exercice_rm: "squat",
-    contraintes_médicales: ["genou_fragile", "dos_sensible"]
+    contraintes_médicales: ["genou_fragile", "dos_sensible"],
+    sports: ["power", "musculation", "crossfit"]
   },
   {
     nom: "Squat haltères",
@@ -344,7 +369,8 @@ export const tousBlocs: BlocExercice[] = [
     description: "Haltères sur les épaules, effectuer un squat",
     pourcentage_rm: 75,
     exercice_rm: "squat",
-    contraintes_médicales: ["genou_fragile"]
+    contraintes_médicales: ["genou_fragile"],
+    sports: ["power", "musculation"]
   },
 
   // Exercices de force - Soulevé de terre
@@ -361,7 +387,8 @@ export const tousBlocs: BlocExercice[] = [
     description: "Barre au sol, soulever en gardant le dos droit",
     pourcentage_rm: 85,
     exercice_rm: "souleve_de_terre",
-    contraintes_médicales: ["dos_sensible", "hernie_discale"]
+    contraintes_médicales: ["dos_sensible", "hernie_discale"],
+    sports: ["power", "musculation", "crossfit"]
   },
 
   // Exercices de force - Développé militaire
@@ -378,7 +405,8 @@ export const tousBlocs: BlocExercice[] = [
     description: "Debout, pousser les haltères au-dessus de la tête",
     pourcentage_rm: 75,
     exercice_rm: "developpe_militaire",
-    contraintes_médicales: ["épaule_limitée"]
+    contraintes_médicales: ["épaule_limitée"],
+    sports: ["power", "musculation", "crossfit"]
   },
 
   // Exercices de force - Rowing
@@ -394,7 +422,8 @@ export const tousBlocs: BlocExercice[] = [
     équipement: ["barre"],
     description: "Penché en avant, tirer la barre vers la poitrine",
     pourcentage_rm: 75,
-    exercice_rm: "rowing"
+    exercice_rm: "rowing",
+    sports: ["power", "musculation"]
   },
 
   // Exercices cardio intensifs
@@ -408,7 +437,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "30s",
     séries: 6,
     équipement: ["aucun"],
-    description: "Course à vitesse maximale pendant 30 secondes"
+    description: "Course à vitesse maximale pendant 30 secondes",
+    sports: ["sprint", "crossfit"]
   },
   {
     nom: "Burpees avec pompe",
@@ -420,7 +450,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 10,
     séries: 4,
     équipement: ["aucun"],
-    description: "Squat, position planche, pompe, saut vertical"
+    description: "Squat, position planche, pompe, saut vertical",
+    sports: ["crossfit"]
   },
   {
     nom: "Mountain climbers rapides",
@@ -432,7 +463,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 30,
     séries: 4,
     équipement: ["aucun"],
-    description: "Position de planche, alterner genoux vers poitrine rapidement"
+    description: "Position de planche, alterner genoux vers poitrine rapidement",
+    sports: ["crossfit", "sprint"]
   },
 
   // Exercices d'endurance
@@ -446,7 +478,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "20min",
     séries: 1,
     équipement: ["aucun"],
-    description: "Course à rythme modéré pendant 20 minutes"
+    description: "Course à rythme modéré pendant 20 minutes",
+    sports: ["marathon"]
   },
   {
     nom: "Vélo stationnaire",
@@ -458,7 +491,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "25min",
     séries: 1,
     équipement: ["cardio"],
-    description: "Pédaler à rythme modéré pendant 25 minutes"
+    description: "Pédaler à rythme modéré pendant 25 minutes",
+    sports: ["marathon"]
   },
 
   // Exercices de remise en forme
@@ -472,7 +506,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "30min",
     séries: 1,
     équipement: ["aucun"],
-    description: "Marche à rythme soutenu pendant 30 minutes"
+    description: "Marche à rythme soutenu pendant 30 minutes",
+    sports: ["marathon", "mobilite"]
   },
   {
     nom: "Yoga flow",
@@ -484,7 +519,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: "45min",
     séries: 1,
     équipement: ["tapis"],
-    description: "Séquence de postures de yoga enchaînées"
+    description: "Séquence de postures de yoga enchaînées",
+    sports: ["mobilite"]
   },
 
   // Exercices pour femmes - Focus bas du corps
@@ -498,7 +534,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 15,
     séries: 3,
     équipement: ["haltères"],
-    description: "Allongé dos au sol, haltère sur le bassin, lever les hanches"
+    description: "Allongé dos au sol, haltère sur le bassin, lever les hanches",
+    sports: ["musculation"]
   },
   {
     nom: "Fentes bulgares",
@@ -511,7 +548,8 @@ export const tousBlocs: BlocExercice[] = [
     séries: 3,
     équipement: ["haltères"],
     description: "Pied arrière surélevé, effectuer des fentes",
-    contraintes_médicales: ["genou_fragile"]
+    contraintes_médicales: ["genou_fragile"],
+    sports: ["musculation"]
   },
   {
     nom: "Donkey kicks",
@@ -523,7 +561,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 20,
     séries: 3,
     équipement: ["aucun"],
-    description: "Position à 4 pattes, lever la jambe vers l'arrière"
+    description: "Position à 4 pattes, lever la jambe vers l'arrière",
+    sports: ["musculation"]
   },
 
   // Exercices pour hommes - Focus force
@@ -537,7 +576,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 6,
     séries: 4,
     équipement: ["barre"],
-    description: "Suspendu à une barre, tirer le corps vers le haut"
+    description: "Suspendu à une barre, tirer le corps vers le haut",
+    sports: ["calisthenics", "streetlifting", "musculation"]
   },
   {
     nom: "Dips barres parallèles",
@@ -549,7 +589,8 @@ export const tousBlocs: BlocExercice[] = [
     répétitions: 8,
     séries: 4,
     équipement: ["barre"],
-    description: "Mains sur les barres parallèles, flexion/extension des bras"
+    description: "Mains sur les barres parallèles, flexion/extension des bras",
+    sports: ["calisthenics", "streetlifting", "musculation"]
   }
 ];
 

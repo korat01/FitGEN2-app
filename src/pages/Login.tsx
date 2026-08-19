@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
-import { Dumbbell, Eye, EyeOff, User, Lock, Mail, Weight, Calendar, Activity } from 'lucide-react';
+import { Dumbbell, Eye, EyeOff, User, Lock, Mail, Weight, Calendar, Activity, Ruler } from 'lucide-react';
 import { VitalForceBackground } from '@/components/VitalForceBackground';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Login: React.FC = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,6 +20,7 @@ export const Login: React.FC = () => {
     email: '',
     password: '',
     weight: 75,
+    height: 175,
     age: 28,
     sex: 'male' as 'male' | 'female',
     sportClass: 'classique'
@@ -51,6 +54,7 @@ export const Login: React.FC = () => {
         name: formData.name,
         email: formData.email,
         weight: formData.weight,
+        height: formData.height,
         age: formData.age,
         sex: formData.sex,
         sportClass: formData.sportClass,
@@ -162,19 +166,19 @@ export const Login: React.FC = () => {
             <Dumbbell className="w-8 h-8 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-            Créer votre Profil
+            {t('login.title')}
           </CardTitle>
           <p className="text-foreground/90">
-            Commence ton ascension avec Ascend
+            {t('login.subtitle')}
           </p>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nom */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-semibold text-primary">
-                Nom complet *
+                {t('login.name')}
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
@@ -184,7 +188,7 @@ export const Login: React.FC = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
-                  placeholder="Votre nom"
+                  placeholder={t('login.namePlaceholder')}
                   required
                   disabled={isLoading}
                 />
@@ -194,7 +198,7 @@ export const Login: React.FC = () => {
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-semibold text-primary">
-                Email *
+                {t('login.email')}
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
@@ -214,7 +218,7 @@ export const Login: React.FC = () => {
             {/* Mot de passe */}
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-semibold text-primary">
-                Mot de passe *
+                {t('login.password')}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
@@ -224,7 +228,7 @@ export const Login: React.FC = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="pl-10 pr-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
-                  placeholder="Votre mot de passe"
+                  placeholder={t('login.passwordPlaceholder')}
                   required
                   disabled={isLoading}
                 />
@@ -241,13 +245,14 @@ export const Login: React.FC = () => {
 
             {/* Informations personnelles */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground">Informations personnelles</h3>
-              
+              <h3 className="text-lg font-semibold text-foreground">{t('login.personalInfo')}</h3>
+              <p className="text-xs text-muted-foreground -mt-2">{t('login.personalInfoHint')}</p>
+
               <div className="grid grid-cols-2 gap-4">
                 {/* Poids */}
                 <div className="space-y-2">
                   <Label htmlFor="weight" className="text-sm font-semibold text-primary">
-                    Poids (kg)
+                    {t('login.weight')}
                   </Label>
                   <div className="relative">
                     <Weight className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
@@ -266,10 +271,32 @@ export const Login: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Taille */}
+                <div className="space-y-2">
+                  <Label htmlFor="height" className="text-sm font-semibold text-primary">
+                    {t('login.height')}
+                  </Label>
+                  <div className="relative">
+                    <Ruler className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
+                    <Input
+                      id="height"
+                      type="number"
+                      value={formData.height}
+                      onChange={(e) => setFormData({ ...formData, height: Number(e.target.value) })}
+                      className="pl-10 h-12 bg-background/80 border-primary/30 text-foreground focus:border-primary"
+                      placeholder="175"
+                      min="120"
+                      max="230"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
                 {/* Âge */}
                 <div className="space-y-2">
                   <Label htmlFor="age" className="text-sm font-semibold text-primary">
-                    Âge
+                    {t('login.age')}
                   </Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4" />
@@ -291,7 +318,7 @@ export const Login: React.FC = () => {
 
               {/* Sexe */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-primary">Sexe</Label>
+                <Label className="text-sm font-semibold text-primary">{t('login.sex')}</Label>
                 <div className="flex gap-3">
                   <Button
                     type="button"
@@ -300,7 +327,7 @@ export const Login: React.FC = () => {
                     className={`flex-1 h-12 ${formData.sex === 'male' ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-[var(--shadow-glow-purple)]' : 'bg-background/80 border-primary/30 text-foreground hover:bg-primary/10'}`}
                     disabled={isLoading}
                   >
-                    Homme
+                    {t('common.male')}
                   </Button>
                   <Button
                     type="button"
@@ -309,14 +336,14 @@ export const Login: React.FC = () => {
                     className={`flex-1 h-12 ${formData.sex === 'female' ? 'bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-[var(--shadow-glow-purple)]' : 'bg-background/80 border-primary/30 text-foreground hover:bg-primary/10'}`}
                     disabled={isLoading}
                   >
-                    Femme
+                    {t('common.female')}
                   </Button>
                 </div>
               </div>
 
               {/* Classe de sport */}
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-primary">Type de sport</Label>
+                <Label className="text-sm font-semibold text-primary">{t('login.sportType')}</Label>
                 <div className="relative">
                   <Activity className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-4 h-4 pointer-events-none" />
                   <select
@@ -325,13 +352,13 @@ export const Login: React.FC = () => {
                     className="w-full h-12 pl-10 pr-4 bg-background/80 border border-primary/30 text-foreground rounded-lg focus:border-primary focus:ring-1 focus:ring-primary appearance-none"
                     disabled={isLoading}
                   >
-                    <option value="classique">Classique</option>
-                    <option value="crossfit">CrossFit</option>
-                    <option value="power">Powerlifting</option>
-                    <option value="marathon">Marathon</option>
-                    <option value="calisthenics">Calisthenics</option>
-                    <option value="sprint">Sprint</option>
-                    <option value="streetlifting">Streetlifting</option>
+                    <option value="classique">{t('login.sport.classique')}</option>
+                    <option value="crossfit">{t('login.sport.crossfit')}</option>
+                    <option value="power">{t('login.sport.power')}</option>
+                    <option value="marathon">{t('login.sport.marathon')}</option>
+                    <option value="calisthenics">{t('login.sport.calisthenics')}</option>
+                    <option value="sprint">{t('login.sport.sprint')}</option>
+                    <option value="streetlifting">{t('login.sport.streetlifting')}</option>
                   </select>
                 </div>
               </div>
@@ -346,12 +373,12 @@ export const Login: React.FC = () => {
               {isLoading ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-background"></div>
-                  <span>Création en cours...</span>
+                  <span>{t('login.submitting')}</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Dumbbell className="w-5 h-5" />
-                  <span>Créer mon Profil</span>
+                  <span>{t('login.submit')}</span>
                 </div>
               )}
             </Button>

@@ -10,9 +10,11 @@ import { useCelebration } from '@/hooks/useCelebration';
 import { getRangColor, getRangIcon } from '@/utils/rankingHelpers';
 import { Achievement } from '@/types/stats';
 import { Target, ArrowLeft } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Progression: React.FC = () => {
   const { celebrate } = useCelebration();
+  const { t } = useLanguage();
   const {
     user,
     performances,
@@ -45,16 +47,17 @@ export const Progression: React.FC = () => {
             rankColorClass={getRangColor(user?.rank || userRank?.rank || 'D')}
             globalScore={user?.globalScore ?? userRank?.globalScore ?? 0}
             onRefresh={refreshFromStorage}
+            simplified={user?.simplifiedMode === true}
           />
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Records, graphiques, classement et objectifs — consultation uniquement.
+              {t('progression.intro')}
             </p>
             <Button asChild size="sm" variant="outline" className="shrink-0 border-primary/25">
               <Link to="/stats">
                 <Target className="w-4 h-4 mr-2" />
-                Saisir une performance
+                {t('progression.enterPerf')}
               </Link>
             </Button>
           </div>
@@ -83,7 +86,7 @@ export const Progression: React.FC = () => {
             <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
               <Link to="/dashboard">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour à l&apos;accueil
+                {t('stats.backHome')}
               </Link>
             </Button>
           </div>

@@ -6,6 +6,7 @@ import { StatsPageHeader } from '@/components/stats/StatsPageHeader';
 import { PerformanceManager } from '@/components/stats/PerformanceManager';
 import { usePerformanceStats } from '@/hooks/usePerformanceStats';
 import { getRangColor, getRangIcon } from '@/utils/rankingHelpers';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Stats: React.FC = () => {
   const {
@@ -16,6 +17,7 @@ export const Stats: React.FC = () => {
     syncDerivedStats,
     refreshFromStorage,
   } = usePerformanceStats();
+  const { t } = useLanguage();
 
   const handleAdd = (form: { discipline: string; value: string; date: string }) => {
     if (!user) return;
@@ -52,16 +54,17 @@ export const Stats: React.FC = () => {
             scoreLabel={user?.scoreLabel || userRank?.scoreLabel || 'Score'}
             rankProgressPercent={userRank?.rankProgressPercent || 0}
             onRefresh={refreshFromStorage}
+            simplified={user?.simplifiedMode === true}
           />
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Saisissez et gérez vos performances ici. Records, graphiques et classement sont sur l&apos;accueil.
+              {t('stats.intro')}
             </p>
             <Button asChild variant="outline" size="sm" className="shrink-0 border-primary/25">
               <Link to="/dashboard">
                 <LayoutGrid className="w-4 h-4 mr-2" />
-                Voir mes statistiques
+                {t('stats.viewStats')}
               </Link>
             </Button>
           </div>
@@ -77,7 +80,7 @@ export const Stats: React.FC = () => {
             <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
               <Link to="/dashboard">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour à l&apos;accueil
+                {t('stats.backHome')}
               </Link>
             </Button>
           </div>

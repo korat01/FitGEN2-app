@@ -1,7 +1,7 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LanguageProvider } from './contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { ExerciseProvider } from './contexts/ExerciseContext';
 import { QuestProvider } from './contexts/QuestContext';
 import { ThemeProvider } from './lib/theme-provider';
@@ -30,6 +30,7 @@ const RANK_ORDER: RankLevel[] = ['E', 'D', 'C', 'B', 'A', 'S', 'Nation', 'World'
 const loginImport = () => import('./pages/Login');
 const dashboardImport = () => import('./pages/Dashboard');
 const statsImport = () => import('./pages/Stats');
+const progressionImport = () => import('./pages/Progression');
 const profileImport = () => import('./pages/ProfileSummary');
 const programmeImport = () => import('./pages/Programme');
 const blocsImport = () => import('./pages/BlocsEntrainement');
@@ -37,10 +38,15 @@ const nutritionImport = () => import('./pages/Nutrition');
 const alimentImport = () => import('./pages/AlimentDetail');
 const recetteImport = () => import('./pages/RecetteDetail');
 const dailyQuestsImport = () => import('./components/DailyQuests');
+const coachingImport = () => import('./pages/Coaching');
+const coachClientImport = () => import('./pages/CoachClientDetail');
+const coachProgramImport = () => import('./pages/CoachProgramBuilder');
+const mealPlanImport = () => import('./pages/MealPlanGenerator');
 
 const Login = lazy(loginImport);
 const Dashboard = lazy(dashboardImport);
 const Stats = lazy(statsImport);
+const Progression = lazy(progressionImport);
 const ProfileSummary = lazy(profileImport);
 const Programme = lazy(programmeImport);
 const BlocsEntrainement = lazy(blocsImport);
@@ -49,6 +55,10 @@ const Nutrition = lazy(nutritionImport);
 const AlimentDetail = lazy(alimentImport);
 const RecetteDetail = lazy(recetteImport);
 const DailyQuests = lazy(dailyQuestsImport);
+const Coaching = lazy(coachingImport);
+const CoachClientDetail = lazy(coachClientImport);
+const CoachProgramBuilder = lazy(coachProgramImport);
+const MealPlanGenerator = lazy(mealPlanImport);
 
 // Composant de chargement
 const LoadingSpinner = () => (
@@ -85,8 +95,24 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Composant principal de l'application
 const AppContent: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { particles, spawnClickParticles, spawnLevelUpParticles } = useParticles();
   const { celebrations, removeCelebration } = useCelebration();
+
+  // Verrouillage actif de l'orientation (Android/Chrome en PWA installée) — l'API Screen Orientation
+  // n'existe que dans un contexte plein écran/standalone, d'où le retry sur 'visibilitychange' (au
+  // premier lancement l'app peut ne pas encore être fullscreen). Sur iOS Safari, screen.orientation.lock
+  // n'existe pas du tout (jamais implémenté par WebKit) : le catch silencieux laisse alors le relais total
+  // à l'écran de blocage CSS (.landscape-lock, voir index.css) qui reste le seul recours possible.
+  useEffect(() => {
+    const tryLock = () => {
+      const orientation = (screen as unknown as { orientation?: { lock?: (o: string) => Promise<void> } }).orientation;
+      orientation?.lock?.('portrait').catch(() => {});
+    };
+    tryLock();
+    document.addEventListener('visibilitychange', tryLock);
+    return () => document.removeEventListener('visibilitychange', tryLock);
+  }, []);
 
   // Précharge les paquets des autres pages une fois connecté, en tâche de fond une fois l'app au
   // repos — sans ça, même avec un paquet dédié par page (déjà corrigé), la TOUTE PREMIÈRE visite de
@@ -102,8 +128,9 @@ const AppContent: React.FC = () => {
 
     const handle = schedule(() => {
       [
-        dashboardImport, statsImport, profileImport, programmeImport,
+        dashboardImport, statsImport, progressionImport, profileImport, programmeImport,
         blocsImport, nutritionImport, alimentImport, recetteImport, dailyQuestsImport,
+        coachingImport, coachClientImport, coachProgramImport, mealPlanImport,
       ].forEach((importFn) => importFn().catch(() => {}));
     });
 
@@ -116,15 +143,25 @@ const AppContent: React.FC = () => {
     };
   }, [user]);
 
+  // Mode simplifié (voir ProfileSummary.tsx) — DA épurée façon Réglages/App Store, sans rang ni
+  // niveau : coupe le thème de rang, le fond animé VitalForce et l'écran de changement de rang,
+  // et pose .simple-mode sur <html> (palette plate bleu système, voir index.css).
+  const simplifiedMode = user?.simplifiedMode === true;
+  useEffect(() => {
+    document.documentElement.classList.toggle('simple-mode', simplifiedMode);
+    return () => document.documentElement.classList.remove('simple-mode');
+  }, [simplifiedMode]);
+
   // Écran plein écran de changement de rang — se déclenche uniquement quand le rang MONTE par
   // rapport au dernier rang connu, jamais sur la toute première synchronisation après connexion
   // (previousRankRef reste null tant qu'aucun rang n'a été vu, donc pas de "rang up" surprise
   // juste après un login). Réinitialisé à la déconnexion pour ne pas fausser la prochaine session.
+  // Jamais déclenché en mode simplifié : pas de système de rang, pas de célébration de rang.
   const previousRankRef = useRef<string | null>(null);
   const [rankUpTarget, setRankUpTarget] = useState<RankLevel | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || simplifiedMode) {
       previousRankRef.current = null;
       return;
     }
@@ -134,7 +171,7 @@ const AppContent: React.FC = () => {
       setRankUpTarget(currentRank as RankLevel);
     }
     previousRankRef.current = currentRank;
-  }, [user?.rank, user?.id]);
+  }, [user?.rank, user?.id, simplifiedMode]);
 
   // "Mode Hunter" — identité Solo Leveling (voir .hunter-mode dans index.css), réservée aux hauts
   // rangs (S/Nation/World), chacun avec sa propre identité : S (.hunter-s, rouge sombre/braise),
@@ -144,9 +181,10 @@ const AppContent: React.FC = () => {
   // braise (.rank-d), C en bleu/argent (.rank-c), B en or (.rank-gold), A en platine/éclairs
   // bleus (.rank-a).
   // Uniquement des classes sur <html> : rien d'autre à défaire si ça ne va pas.
-  // showRankTheme (réglage utilisateur, voir Stats.tsx) : si désactivé, aucune classe de rang
-  // n'est posée -> l'app reste sur le thème violet/cyan par défaut quel que soit le rang.
-  const showRankTheme = user?.showRankTheme !== false;
+  // showRankTheme (réglage utilisateur, voir ProfileSummary.tsx) : si désactivé, aucune classe de
+  // rang n'est posée -> l'app reste sur le thème violet/cyan par défaut quel que soit le rang.
+  // Mode simplifié : même chose, jamais de classe de rang (indépendamment de showRankTheme).
+  const showRankTheme = user?.showRankTheme !== false && !simplifiedMode;
   useEffect(() => {
     const isHunterRank = showRankTheme && (user?.rank === 'S' || user?.rank === 'Nation' || user?.rank === 'World');
     const isSRank = showRankTheme && user?.rank === 'S';
@@ -199,8 +237,8 @@ const AppContent: React.FC = () => {
           voir index.css) — pas de JS d'orientation nécessaire, marche même avant hydratation. */}
       <div className="landscape-lock fixed inset-0 z-[200] flex-col items-center justify-center gap-4 bg-background text-center p-8">
         <Smartphone className="w-12 h-12 text-secondary animate-pulse" />
-        <p className="text-lg font-semibold text-foreground">Tourne ton téléphone</p>
-        <p className="text-sm text-muted-foreground max-w-xs">Ascend est optimisé pour un usage en mode portrait.</p>
+        <p className="text-lg font-semibold text-foreground">{t('landscape.title')}</p>
+        <p className="text-sm text-muted-foreground max-w-xs">{t('landscape.subtitle')}</p>
       </div>
       {rankUpTarget && (
         <RankUpScreen
@@ -218,7 +256,7 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen bg-background relative">
         {/* Rendu une seule fois pour toute la session (pas par page — voir PageLayout.tsx) : le
             fond animé et la nav du bas sont des éléments d'app globaux, pas du contenu de page. */}
-        {user && <VitalForceBackground intensity="medium" />}
+        {user && <VitalForceBackground intensity={simplifiedMode ? 'none' : 'medium'} />}
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
           {/* Route publique - Redirige vers dashboard si déjà connecté */}
@@ -248,7 +286,15 @@ const AppContent: React.FC = () => {
               </PageLayout>
             </ProtectedRoute>
           } />
-          
+
+          <Route path="/progression" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Progression />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
           <Route path="/profile" element={
             <ProtectedRoute>
               <PageLayout>
@@ -301,6 +347,49 @@ const AppContent: React.FC = () => {
             <ProtectedRoute>
               <PageLayout>
                 <DailyQuests />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Mode Coach — prototype sans backend, voir src/utils/coachingData.ts */}
+          <Route path="/coaching" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <Coaching />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/coaching/:id" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <CoachClientDetail />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/coaching/:id/programme" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <CoachProgramBuilder />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          {/* Programme "libre", sans coaché rattaché — pour un client qui n'a pas de compte dans
+              l'app (export PDF seulement, voir CoachProgramBuilder.tsx). */}
+          <Route path="/coaching/programme" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <CoachProgramBuilder />
+              </PageLayout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/nutrition/plan" element={
+            <ProtectedRoute>
+              <PageLayout>
+                <MealPlanGenerator />
               </PageLayout>
             </ProtectedRoute>
           } />

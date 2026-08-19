@@ -1567,16 +1567,16 @@ const AlimentDetail: React.FC = () => {
       classe: 'Récupération',
       tags: ['Vegan', 'Sans gluten'],
       emoji: '🍚',
-      description: 'Riz basmati, une variété de riz à grain long originaire d\'Inde, réputé pour son arôme délicat et sa texture légère.',
+      description: 'Riz brun complet, moins raffiné que le riz blanc, il conserve son enveloppe riche en fibres et minéraux.',
       avantages: [
-        'Source d\'énergie durable',
-        'Facile à digérer',
-        'Riche en glucides complexes',
-        'Faible en gras'
+        'Fibres et son conservés',
+        'Index glycémique plus bas que le riz blanc',
+        'Riche en manganèse et sélénium',
+        'Énergie durable'
       ],
       conseils: [
         'Rincer le riz avant la cuisson',
-        'Cuire dans un volume d\'eau 1,5 fois supérieur',
+        'Temps de cuisson plus long que le riz blanc',
         'Laisser reposer 5 minutes après cuisson',
         'Conserver dans un endroit sec et frais'
       ]
@@ -2627,18 +2627,18 @@ const AlimentDetail: React.FC = () => {
       classe: 'Récupération',
       tags: ['Vegan', 'Sans gluten'],
       emoji: '🌾',
-      description: 'Céréale riche en minéraux et vitamine C, idéale pour la santé.',
+      description: 'Pseudo-céréale ancienne riche en lysine, un acide aminé souvent limitant dans les céréales classiques.',
       avantages: [
-        'Vitamine C pour la santé des os',
-        'Potassium pour la santé cardiaque',
-        'Folates pour la santé nerveuse',
-        'Faible en calories'
+        'Riche en lysine (acide aminé rare dans les céréales)',
+        'Magnésium pour les muscles',
+        'Fer pour la formation des globules rouges',
+        'Sans gluten naturellement'
       ],
       conseils: [
-        'Manger cru ou légèrement cuit',
-        'Associer avec des légumes',
-        'Conserver au réfrigérateur',
-        'Manger rapidement'
+        'Rincer avant cuisson',
+        'Cuire dans l\'eau bouillante',
+        'Laisser gonfler 15 minutes',
+        'Utiliser comme base de salades ou porridge'
       ]
     },
     '95': {
@@ -2850,18 +2850,18 @@ const AlimentDetail: React.FC = () => {
       classe: 'Sèche',
       tags: [],
       emoji: '🥩',
-      description: 'Viande de chevre riche en protéines et sélénium, idéale pour la santé.',
+      description: 'Viande d\'agneau riche en protéines et en fer, plus grasse que le bœuf mais tout aussi riche en nutriments.',
       avantages: [
         'Protéines complètes',
-        'Faible en graisses',
-        'Sélénium antioxydant',
+        'Fer pour la formation des globules rouges',
+        'Zinc pour l\'immunité',
         'Vitamines B pour l\'énergie'
       ],
       conseils: [
-        'Choisir du chevre bio',
-        'Cuire à la vapeur ou grillé',
+        'Choisir de l\'agneau élevé en plein air',
+        'Cuire à feu moyen pour garder le moelleux',
         'Éviter la surcuisson',
-        'Consommer 3-4 fois par semaine'
+        'Consommer avec modération (viande plus grasse)'
       ]
     },
     '103': {

@@ -17,6 +17,12 @@ export interface User {
   /** Bascule la DA teintée par rang (fond, boutons, glows — voir App.tsx). Par défaut activée : si
       absent (utilisateurs existants avant cette option), on considère true, pas false. */
   showRankTheme?: boolean;
+  /** Mode simplifié : DA épurée façon Apple/iOS, masque rang/niveau/XP/quêtes/streaks partout dans
+      l'app (voir .simple-mode dans index.css et App.tsx). Par défaut désactivé. */
+  simplifiedMode?: boolean;
+  /** Mode Coach : remplace l'onglet Programme par Coaching dans la nav (voir MobileNavigation.tsx
+      et App.tsx). Prototype sans backend — voir src/utils/coachingData.ts. */
+  isCoach?: boolean;
 
   // Optional fields
   focus_trapezes?: any;

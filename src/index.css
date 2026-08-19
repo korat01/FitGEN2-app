@@ -414,6 +414,43 @@ All colors MUST be HSL.
     --shadow-glow-blue: 0 0 25px rgba(255, 140, 66, 0.5);
     --shadow-glow-cyan: 0 0 30px rgba(255, 140, 66, 0.6);
   }
+
+  /* Mode simplifié — DA épurée façon Réglages/App Store en mode sombre : pas de dégradés, pas de
+     glow, pas de teinte par rang (voir App.tsx, où ce mode force showRankTheme à false). Un seul
+     bleu système (#0A84FF, le bleu iOS en mode sombre) sert d'accent partout ; les "gradient-*"
+     restent définis (beaucoup de composants s'appuient dessus) mais avec les deux arrêts de couleur
+     identiques, ce qui les rend visuellement plats sans avoir à toucher à chaque composant. */
+  .simple-mode {
+    --hero-overlay-opacity: 0.08;
+    --background: 0 0% 0%;
+    --card: 240 3% 11%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 3% 11%;
+    --primary: 211 100% 52%;             /* #0A84FF — bleu système iOS (dark) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 211 100% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 2% 18%;
+    --muted-foreground: 240 2% 58%;
+    --accent: 211 100% 52%;
+    --accent-foreground: 0 0% 100%;
+    --border: 240 2% 22%;
+    --input: 240 2% 16%;
+    --ring: 211 100% 52%;
+
+    --vitalforce-purple: #0A84FF;
+    --vitalforce-cyan: #0A84FF;
+
+    --gradient-primary: linear-gradient(135deg, #0A84FF 0%, #0A84FF 100%);
+    --gradient-primary-horizontal: linear-gradient(90deg, #0A84FF 0%, #0A84FF 100%);
+    --gradient-secondary: linear-gradient(135deg, #0A84FF 0%, #0A84FF 100%);
+    --gradient-progress: linear-gradient(90deg, #0A84FF 0%, #0A84FF 100%);
+
+    --shadow-glow-purple: none;
+    --shadow-glow-blue: none;
+    --shadow-glow-cyan: none;
+    --shadow-glow-pink: none;
+  }
 }
 
 @layer base {
@@ -482,6 +519,19 @@ All colors MUST be HSL.
                 0 0 30px hsl(var(--primary) / 0.2);
   }
 
+  /* Mode simplifié : cartes plates, opaques, sans glow ni halo — look "liste groupée" iOS. */
+  .simple-mode .glass-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: none;
+  }
+
+  .simple-mode .glass-card:hover {
+    transform: none;
+    border-color: hsl(var(--border));
+    box-shadow: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .glass-card {
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -510,11 +560,33 @@ All colors MUST be HSL.
     border-color: hsl(var(--primary) / 0.25);
   }
 
+  .simple-mode .surface-accent {
+    background: hsl(var(--muted));
+    border-color: hsl(var(--border));
+  }
+
   .icon-badge {
     @apply rounded-xl flex items-center justify-center border;
     background: rgba(107, 42, 255, 0.15);
     border-color: rgba(107, 42, 255, 0.3);
   }
+
+  .simple-mode .icon-badge {
+    background: hsl(var(--primary) / 0.15);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  /* Badges "sport" du sélecteur d'exercices coach (CoachProgramBuilder.tsx) — une teinte distincte
+     par sport pour repérer vite un exercice, y compris en mode simplifié (couleur fonctionnelle,
+     pas décorative, donc pas neutralisée par .simple-mode contrairement au reste du thème). */
+  .sport-tag-power { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+  .sport-tag-musculation { background: hsl(var(--primary) / 0.15); color: hsl(var(--primary)); border-color: hsl(var(--primary) / 0.3); }
+  .sport-tag-marathon { background: rgba(34, 197, 94, 0.15); color: #4ade80; border-color: rgba(34, 197, 94, 0.3); }
+  .sport-tag-sprint { background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.3); }
+  .sport-tag-crossfit { background: rgba(168, 85, 247, 0.15); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+  .sport-tag-calisthenics { background: hsl(var(--secondary) / 0.15); color: hsl(var(--secondary)); border-color: hsl(var(--secondary) / 0.3); }
+  .sport-tag-streetlifting { background: rgba(236, 72, 153, 0.15); color: #f472b6; border-color: rgba(236, 72, 153, 0.3); }
+  .sport-tag-mobilite { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3); }
 
   .gradient-primary {
     background: var(--gradient-primary);
@@ -1403,9 +1475,19 @@ All colors MUST be HSL.
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
   }
 
+  .simple-mode .gaming-nav {
+    background: hsl(var(--card));
+    border-top: 1px solid hsl(var(--border));
+    box-shadow: none;
+  }
+
   .gaming-nav-item-active {
     @apply text-secondary;
     filter: drop-shadow(0 0 8px hsl(var(--secondary) / 0.8));
+  }
+
+  .simple-mode .gaming-nav-item-active {
+    filter: none;
   }
 }
 
@@ -1729,4 +1811,66 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Mode simplifié — neutralise l'arc-en-ciel de couleurs Tailwind codées en dur (bg-green-500/15,
+   text-purple-400, from-red-500 to-pink-500...) qui traîne dans plein de pages (icônes de stats,
+   badges de statut, dégradés de cartes...) et qui n'est piloté par AUCUNE variable CSS — sans ça
+   .simple-mode réussissait à aplatir le thème général mais laissait toutes ces touches de couleur
+   éparpillées, d'où le rendu "arc-en-ciel sur fond noir" jugé moche.
+   IMPORTANT : sélecteurs de classe EXACTS (échappés, ex: .bg-green-500\/15), PAS de sélecteur
+   d'attribut par sous-chaîne ([class*="..."]) — ce dernier plante la compilation Tailwind
+   ("Unexpected '/'" dans postcss-selector-parser) dès que le projet contient par ailleurs une
+   route avec paramètre (ex: "/aliment/:id") quelque part dans le code scanné. Vérifié en isolant
+   le bug avec `npx tailwindcss` : les sélecteurs de classe exacts échappés n'ont pas ce problème,
+   contrairement aux sélecteurs d'attribut, y compris hors de tout @layer. Liste construite à partir
+   d'un audit des classes réellement utilisées (Dashboard/Programme/Nutrition/Stats/Profil/etc.). */
+.simple-mode .bg-green-500\/15, .simple-mode .bg-green-500\/5, .simple-mode .bg-green-500,
+.simple-mode .bg-green-400, .simple-mode .bg-green-600,
+.simple-mode .bg-purple-500\/15,
+.simple-mode .bg-orange-500\/15, .simple-mode .bg-orange-500,
+.simple-mode .bg-yellow-500\/15, .simple-mode .bg-yellow-500\/5,
+.simple-mode .bg-red-500\/15, .simple-mode .bg-red-500\/10,
+.simple-mode .bg-blue-500\/15 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.simple-mode .text-green-300, .simple-mode .text-green-400, .simple-mode .text-green-500, .simple-mode .text-green-800,
+.simple-mode .text-purple-300, .simple-mode .text-purple-400, .simple-mode .text-purple-500, .simple-mode .text-purple-800,
+.simple-mode .text-orange-300, .simple-mode .text-orange-400, .simple-mode .text-orange-500,
+.simple-mode .text-yellow-300, .simple-mode .text-yellow-400, .simple-mode .text-yellow-500, .simple-mode .text-yellow-600,
+.simple-mode .text-red-300, .simple-mode .text-red-400, .simple-mode .text-red-500,
+.simple-mode .text-blue-300, .simple-mode .text-blue-400, .simple-mode .text-cyan-400 {
+  color: hsl(var(--secondary)) !important;
+}
+
+.simple-mode .border-green-500\/25, .simple-mode .border-green-500\/30, .simple-mode .border-green-500\/40, .simple-mode .border-green-300,
+.simple-mode .border-purple-500\/25, .simple-mode .border-purple-500\/40, .simple-mode .border-purple-300, .simple-mode .border-indigo-500\/40,
+.simple-mode .border-orange-500\/25, .simple-mode .border-orange-500\/30, .simple-mode .border-orange-500\/40,
+.simple-mode .border-yellow-500\/25, .simple-mode .border-yellow-500\/30, .simple-mode .border-yellow-500\/40,
+.simple-mode .border-red-500\/25, .simple-mode .border-red-500\/30, .simple-mode .border-red-500\/40,
+.simple-mode .border-blue-500\/25, .simple-mode .border-blue-500\/30, .simple-mode .border-blue-500\/40,
+.simple-mode .border-pink-500\/40 {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Dégradés : from-* et to-* fixent chacun un arrêt de couleur (variable interne Tailwind) —
+   en forçant TOUS les from-* au même bleu et TOUS les to-* au même bleu (quelle que soit la
+   paire d'origine), le dégradé devient un aplat uni sans avoir à connaître chaque paire exacte. */
+.simple-mode .from-green-500, .simple-mode .from-purple-500, .simple-mode .from-purple-600,
+.simple-mode .from-indigo-500, .simple-mode .from-orange-500, .simple-mode .from-orange-500\/10,
+.simple-mode .from-yellow-500, .simple-mode .from-yellow-400, .simple-mode .from-red-500,
+.simple-mode .from-red-500\/10, .simple-mode .from-blue-500, .simple-mode .from-blue-500\/10,
+.simple-mode .from-pink-500 {
+  --tw-gradient-from: hsl(var(--primary)) var(--tw-gradient-from-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.simple-mode .to-emerald-500, .simple-mode .to-emerald-500\/10, .simple-mode .to-violet-500,
+.simple-mode .to-blue-500, .simple-mode .to-pink-600, .simple-mode .to-orange-500,
+.simple-mode .to-orange-500\/10, .simple-mode .to-orange-500\/15, .simple-mode .to-rose-500,
+.simple-mode .to-indigo-500\/10, .simple-mode .to-cyan-500, .simple-mode .to-pink-500,
+.simple-mode .to-pink-500\/10, .simple-mode .to-green-500\/15 {
+  --tw-gradient-to: hsl(var(--secondary)) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }

@@ -20,7 +20,10 @@ import {
   ImagePlus,
   Scale,
   X,
-  Loader2
+  Loader2,
+  Sparkles,
+  ChevronRight,
+  ThumbsDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MacroStatsGrid } from '@/components/nutrition/MacroStatsGrid';
@@ -36,9 +39,11 @@ import { RECETTES, calculerMacrosRecette } from '@/utils/nutritionData';
 // vouloir l'inclure dans le chunk partagé des pages tant que l'utilisateur n'a pas cliqué "Scanner".
 const BarcodeScannerModal = lazy(() => import('@/components/nutrition/BarcodeScannerModal'));
 import { fetchProductByBarcode, ProductNotFoundError } from '@/utils/openFoodFacts';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Nutrition: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('aliments');
   const [searchTerm, setSearchTerm] = useState('');
   // Filtre séparé par onglet : partager un seul état entre onglets faisait qu'une sélection sur un
@@ -68,8 +73,8 @@ const Nutrition: React.FC = () => {
       setScanStatus('error');
       setScanError(
         error instanceof ProductNotFoundError
-          ? 'Produit non reconnu — il n\'est pas encore référencé dans la base Open Food Facts.'
-          : 'Erreur réseau pendant la recherche du produit. Réessayez.'
+          ? t('nutrition.scanNotFound')
+          : t('nutrition.scanNetworkError')
       );
     }
   };
@@ -769,21 +774,6 @@ const Nutrition: React.FC = () => {
       emoji: '🥥'
     },
     {
-      id: '50',
-      nom: 'Myrtilles',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 57,
-      proteines: 0.7,
-      glucides: 14,
-      lipides: 0.3,
-      fibres: 2.4,
-      micronutriments: ['Antioxydants', 'Vitamine C', 'Manganèse'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫐'
-    },
-    {
       id: '53',
       nom: 'Thon',
       categorie: 'Protéines',
@@ -814,96 +804,6 @@ const Nutrition: React.FC = () => {
       emoji: '🍚'
     },
     {
-      id: '57',
-      nom: 'Mangue',
-      categorie: 'Micronutriments',
-      ig: 'Modéré',
-      calories: 60,
-      proteines: 0.8,
-      glucides: 15,
-      lipides: 0.4,
-      fibres: 1.6,
-      micronutriments: ['Vitamine C', 'Vitamine A', 'Folates'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥭'
-    },
-    {
-      id: '58',
-      nom: 'Graines de chia',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 486,
-      proteines: 17,
-      glucides: 42,
-      lipides: 31,
-      fibres: 34,
-      micronutriments: ['Oméga-3', 'Calcium', 'Fer'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🌱'
-    },
-    {
-      id: '59',
-      nom: 'Pomme',
-      categorie: 'Micronutriments',
-      ig: 'Modéré',
-      calories: 52,
-      proteines: 0.3,
-      glucides: 14,
-      lipides: 0.2,
-      fibres: 2.4,
-      micronutriments: ['Vitamine C', 'Fibres', 'Antioxydants'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🍎'
-    },
-    {
-      id: '60',
-      nom: 'Lentilles',
-      categorie: 'Protéines',
-      ig: 'Bas',
-      calories: 116,
-      proteines: 9,
-      glucides: 20,
-      lipides: 0.4,
-      fibres: 8,
-      micronutriments: ['Fer', 'Folates', 'Magnésium'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫘'
-    },
-    {
-      id: '62',
-      nom: 'Noix',
-      categorie: 'Lipides',
-      ig: 'Bas',
-      calories: 654,
-      proteines: 15,
-      glucides: 14,
-      lipides: 65,
-      fibres: 6.7,
-      micronutriments: ['Oméga-3', 'Vitamine E', 'Manganèse'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥜'
-    },
-    {
-      id: '63',
-      nom: 'Pommes de terre',
-      categorie: 'Glucides',
-      ig: 'Modéré',
-      calories: 77,
-      proteines: 2,
-      glucides: 17,
-      lipides: 0.1,
-      fibres: 2.2,
-      micronutriments: ['Potassium', 'Vitamine C', 'B6'],
-      classe: 'Récupération',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥔'
-    },
-    {
       id: '65',
       nom: 'Champignons',
       categorie: 'Micronutriments',
@@ -917,36 +817,6 @@ const Nutrition: React.FC = () => {
       classe: 'Anti-inflammatoire',
       tags: ['Vegan', 'Sans gluten'],
       emoji: '🍄'
-    },
-    {
-      id: '66',
-      nom: 'Gingembre',
-      categorie: 'Micronutriments',
-      ig: 'Bas',
-      calories: 80,
-      proteines: 1.8,
-      glucides: 18,
-      lipides: 0.8,
-      fibres: 2,
-      micronutriments: ['Gingérol', 'Potassium', 'Magnésium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🫚'
-    },
-    {
-      id: '67',
-      nom: 'Kiwi',
-      categorie: 'Micronutriments',
-      ig: 'Modéré',
-      calories: 61,
-      proteines: 1.1,
-      glucides: 15,
-      lipides: 0.5,
-      fibres: 3,
-      micronutriments: ['Vitamine C', 'Vitamine K', 'Potassium'],
-      classe: 'Anti-inflammatoire',
-      tags: ['Vegan', 'Sans gluten'],
-      emoji: '🥝'
     },
     {
       id: '68',
@@ -1490,34 +1360,34 @@ const Nutrition: React.FC = () => {
     }
   ];
 
-  // Filtres pour aliments
+  // Filtres pour aliments (value reste en français : matche aliment.categorie, qui reste non traduit)
   const alimentFilters = [
-    { value: 'all', label: 'Tous', icon: Apple },
-    { value: 'protéines', label: 'Protéines', icon: Target },
-    { value: 'glucides', label: 'Glucides', icon: Zap },
-    { value: 'lipides', label: 'Lipides', icon: Droplet },
-    { value: 'micronutriments', label: 'Micronutriments', icon: Star }
+    { value: 'all', label: t('nutrition.filter.all'), icon: Apple },
+    { value: 'protéines', label: t('nutrition.filter.proteins'), icon: Target },
+    { value: 'glucides', label: t('nutrition.filter.carbs'), icon: Zap },
+    { value: 'lipides', label: t('nutrition.filter.fats'), icon: Droplet },
+    { value: 'micronutriments', label: t('nutrition.filter.micronutrients'), icon: Star }
   ];
 
   // Filtres pour recettes (par objectif nutritionnel)
   const recetteFilters = [
-    { value: 'all', label: 'Toutes', icon: ChefHat },
-    { value: 'prise de masse', label: 'Prise de masse', icon: Target },
-    { value: 'sèche', label: 'Sèche', icon: Zap },
-    { value: 'récupération', label: 'Récupération', icon: Heart },
-    { value: 'anti-inflammatoire', label: 'Anti-inflammatoire', icon: Star },
-    { value: 'équilibre', label: 'Équilibre', icon: Scale }
+    { value: 'all', label: t('nutrition.filter.allRecipes'), icon: ChefHat },
+    { value: 'prise de masse', label: t('nutrition.filter.massGain'), icon: Target },
+    { value: 'sèche', label: t('nutrition.filter.cut'), icon: Zap },
+    { value: 'récupération', label: t('nutrition.filter.recovery'), icon: Heart },
+    { value: 'anti-inflammatoire', label: t('nutrition.filter.antiInflammatory'), icon: Star },
+    { value: 'équilibre', label: t('nutrition.filter.balance'), icon: Scale }
   ];
 
   // Filtres par moment de la journée (tags) — ce que l'onglet "Repas" offrait avant sa fusion avec
   // les recettes, pour ne pas perdre la possibilité de parcourir par petit-déj/déjeuner/dîner/collation.
   const momentFilters = [
-    { value: 'all', label: 'Tous les moments', icon: Clock },
-    { value: 'petit-déjeuner', label: 'Petit-déjeuner', icon: Clock },
-    { value: 'déjeuner', label: 'Déjeuner', icon: ChefHat },
-    { value: 'dîner', label: 'Dîner', icon: ChefHat },
-    { value: 'collation', label: 'Collation', icon: Apple },
-    { value: 'post-training', label: 'Post-training', icon: Zap }
+    { value: 'all', label: t('nutrition.filter.allMoments'), icon: Clock },
+    { value: 'petit-déjeuner', label: t('nutrition.filter.breakfast'), icon: Clock },
+    { value: 'déjeuner', label: t('nutrition.filter.lunch'), icon: ChefHat },
+    { value: 'dîner', label: t('nutrition.filter.dinner'), icon: ChefHat },
+    { value: 'collation', label: t('nutrition.filter.snack'), icon: Apple },
+    { value: 'post-training', label: t('nutrition.filter.postTraining'), icon: Zap }
   ];
 
   // Filtrer les aliments (base + ceux ajoutés via le scanner de code-barres)
@@ -1575,81 +1445,101 @@ const Nutrition: React.FC = () => {
               <Apple className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl md:text-4xl font-bold truncate">Nutrition</h1>
-              <p className="text-white/80 truncate">Gérez votre alimentation</p>
+              <h1 className="text-2xl md:text-4xl font-bold truncate">{t('nutrition.title')}</h1>
+              <p className="text-white/80 truncate">{t('nutrition.subtitle')}</p>
             </div>
           </div>
           <Button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold border border-white/30">
             <Plus className="h-4 w-4 mr-2" />
-            Créer un repas
+            {t('nutrition.createMeal')}
           </Button>
         </div>
       </div>
 
-      {/* Recherche */}
+      {/* Plan alimentaire — une seule carte : le corps lance la génération, le bouton "pouce
+          baissé" (préférences/exclusions) est une action secondaire greffée dessus plutôt qu'une
+          deuxième carte pleine largeur juste en dessous. */}
       <Card className="glass-card border-primary/20 border-0 shadow-lg">
-        <CardContent className="p-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground/70 h-5 w-5" />
-                <Input
-                placeholder="Rechercher un aliment ou un repas..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-12 text-lg border-2 border-white/10 focus:border-primary glass-card border-primary/20"
-              />
+        <CardContent className="p-4 flex items-center gap-3">
+          <button
+            onClick={() => navigate('/nutrition/plan')}
+            className="flex-1 min-w-0 flex items-center gap-3 text-left"
+          >
+            <div className="w-11 h-11 gradient-primary rounded-xl flex items-center justify-center shrink-0">
+              <Sparkles className="h-5 w-5 text-white" />
             </div>
-          </CardContent>
-        </Card>
-
-      {/* Journal photo — aide-mémoire visuel, pas d'estimation automatique (voir MealPhotoModal) */}
-      <Card className="glass-card border-primary/20 border-0 shadow-lg">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Camera className="h-5 w-5 text-secondary" />
-              Journal photo des repas
-            </CardTitle>
-            <Button onClick={() => setIsPhotoModalOpen(true)} variant="outline" size="sm">
-              <ImagePlus className="h-4 w-4 mr-2" />
-              Ajouter une photo
-            </Button>
-          </div>
-        </CardHeader>
-        {photoEntries.length > 0 && (
-          <CardContent>
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {photoEntries.map((entry) => (
-                <div key={entry.id} className="relative shrink-0 w-32">
-                  <img src={entry.imageDataUrl} alt={entry.nom} className="w-32 h-32 object-cover rounded-xl" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removePhotoEntry(entry.id)}
-                    className="absolute top-1 right-1 p-1 h-7 w-7 bg-black/50 text-white hover:bg-black/70"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                  <p className="text-xs font-medium text-foreground truncate mt-1">{entry.nom}</p>
-                  {entry.calories != null && (
-                    <p className="text-[10px] text-muted-foreground">{entry.calories} kcal</p>
-                  )}
-                </div>
-              ))}
+            <div className="min-w-0">
+              <h3 className="font-bold text-foreground text-sm">Générer mon plan alimentaire</h3>
+              <p className="text-xs text-muted-foreground truncate">Calories, macros et repas sur mesure</p>
             </div>
-          </CardContent>
-        )}
+          </button>
+          <button
+            onClick={() => navigate('/nutrition/plan', { state: { standalone: true } })}
+            title="Aliments & repas que je n'aime pas"
+            aria-label="Aliments & repas que je n'aime pas"
+            className="w-11 h-11 rounded-xl bg-secondary/15 border border-secondary/25 flex items-center justify-center shrink-0 hover:bg-secondary/25 transition-colors"
+          >
+            <ThumbsDown className="h-4 w-4 text-secondary" />
+          </button>
+        </CardContent>
       </Card>
+
+      {/* Recherche + accès rapide au journal photo — regroupés sur une ligne pour ne pas empiler
+          une carte pleine largeur de plus. */}
+      <div className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 h-5 w-5" />
+          <Input
+            placeholder={t('nutrition.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-12 border-2 border-white/10 focus:border-primary glass-card border-primary/20"
+          />
+        </div>
+        <Button
+          onClick={() => setIsPhotoModalOpen(true)}
+          variant="outline"
+          className="h-12 px-4 border-primary/20 shrink-0 relative"
+          title={t('nutrition.photoLog')}
+        >
+          <Camera className="h-5 w-5" />
+          {photoEntries.length > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 min-w-[18px] px-1 rounded-full bg-secondary text-secondary-foreground text-[10px] font-bold flex items-center justify-center">
+              {photoEntries.length}
+            </span>
+          )}
+        </Button>
+      </div>
+
+      {photoEntries.length > 0 && (
+        <div className="flex gap-3 overflow-x-auto pb-1">
+          {photoEntries.map((entry) => (
+            <div key={entry.id} className="relative shrink-0 w-24">
+              <img src={entry.imageDataUrl} alt={entry.nom} className="w-24 h-24 object-cover rounded-xl" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removePhotoEntry(entry.id)}
+                className="absolute top-1 right-1 p-1 h-6 w-6 bg-black/50 text-white hover:bg-black/70"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+              <p className="text-[10px] font-medium text-foreground truncate mt-1">{entry.nom}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Onglets */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="aliments" className="flex items-center gap-2">
             <Apple className="h-4 w-4" />
-            Aliments ({filteredAliments.length})
+            {t('nutrition.tab.foods')} ({filteredAliments.length})
             </TabsTrigger>
           <TabsTrigger value="recettes" className="flex items-center gap-2">
             <ChefHat className="h-4 w-4" />
-            Recettes ({filteredRecettes.length})
+            {t('nutrition.tab.recipes')} ({filteredRecettes.length})
           </TabsTrigger>
           </TabsList>
 
@@ -1667,7 +1557,7 @@ const Nutrition: React.FC = () => {
               ) : (
                 <ScanLine className="h-4 w-4 mr-2" />
               )}
-              Scanner un aliment
+              {t('nutrition.scanFood')}
             </Button>
           </div>
 
@@ -1726,7 +1616,7 @@ const Nutrition: React.FC = () => {
                     {isScanned ? (
                       <Badge variant="outline" className="text-xs text-muted-foreground">
                         <ScanLine className="h-3 w-3 mr-1" />
-                        Scanné
+                        {t('nutrition.scanned')}
                       </Badge>
                     ) : (
                       <Badge className={getIGColor(aliment.ig)}>
@@ -1746,7 +1636,7 @@ const Nutrition: React.FC = () => {
 
                     {/* Classe nutritionnelle */}
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Classe</span>
+                      <span className="text-muted-foreground">{t('nutrition.class')}</span>
                       <Badge className={getClasseColor(aliment.classe)}>
                         {aliment.classe}
                         </Badge>
@@ -1766,7 +1656,7 @@ const Nutrition: React.FC = () => {
                     {/* Micronutriments */}
                     {aliment.micronutriments.length > 0 && (
                       <div>
-                        <p className="text-sm font-medium text-foreground/90 mb-1">Micronutriments :</p>
+                        <p className="text-sm font-medium text-foreground/90 mb-1">{t('nutrition.micronutrients')}</p>
                         <div className="flex flex-wrap gap-1">
                           {aliment.micronutriments.map((nutrient, index) => (
                             <Badge key={index} variant="secondary" className="text-xs">
@@ -1779,7 +1669,7 @@ const Nutrition: React.FC = () => {
 
                     <Button className="w-full gradient-primary text-white font-semibold">
                       <Plus className="h-4 w-4 mr-2" />
-                      Ajouter à un repas
+                      {t('nutrition.addToMeal')}
                         </Button>
                       </div>
                     </CardContent>
@@ -1842,7 +1732,7 @@ const Nutrition: React.FC = () => {
                       />
 
                       <div>
-                        <p className="text-sm font-medium text-foreground/90 mb-2">Ingrédients :</p>
+                        <p className="text-sm font-medium text-foreground/90 mb-2">{t('nutrition.ingredients')}</p>
                         <div className="space-y-1">
                           {recette.ingredients.map((ing, index) => (
                             <div key={index} className="flex justify-between text-sm">
@@ -1865,7 +1755,7 @@ const Nutrition: React.FC = () => {
 
                       <Button className="w-full gradient-primary text-white font-semibold">
                         <ChefHat className="h-4 w-4 mr-2" />
-                        Voir la recette
+                        {t('nutrition.viewRecipe')}
                       </Button>
                     </div>
                   </CardContent>

@@ -3,6 +3,7 @@ import { BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useHunterMode } from '@/hooks/useHunterMode';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface StatsPageHeaderProps {
   userName?: string;
@@ -13,6 +14,9 @@ interface StatsPageHeaderProps {
   scoreLabel?: string;
   rankProgressPercent?: number;
   onRefresh: () => void;
+  /** Mode simplifié (voir ProfileSummary.tsx) : masque la case "Rang", ne garde que score et
+      progression. */
+  simplified?: boolean;
 }
 
 export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
@@ -21,12 +25,14 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
   rankIcon,
   rankColorClass,
   globalScore,
-  scoreLabel = 'Score',
+  scoreLabel,
   rankProgressPercent = 0,
   onRefresh,
+  simplified = false,
 }) => {
   const progress = Math.min(Math.max(rankProgressPercent, 0), 100);
   const { hunterPanelClass } = useHunterMode();
+  const { t } = useLanguage();
 
   return (
     <div className={`glass-card border border-primary/25 overflow-hidden rounded-2xl md:rounded-3xl ${hunterPanelClass}`}>
@@ -41,9 +47,9 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
                 <BarChart3 className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
               <div className="min-w-0">
-                <p className="text-white/70 text-xs md:text-sm uppercase tracking-wide">Performances</p>
+                <p className="text-white/70 text-xs md:text-sm uppercase tracking-wide">{t('stats.header.performances')}</p>
                 <h1 className="text-lg md:text-2xl font-bold text-white truncate">
-                  {userName || 'Champion'}
+                  {userName || t('stats.header.champion')}
                 </h1>
               </div>
             </div>
@@ -54,25 +60,27 @@ export const StatsPageHeader: React.FC<StatsPageHeaderProps> = ({
               className="shrink-0 h-10 px-3 text-white/90 hover:text-white hover:bg-white/15 border border-white/20"
             >
               <RefreshCw className="w-4 h-4 mr-1.5" />
-              <span className="hidden sm:inline text-xs">Actualiser</span>
+              <span className="hidden sm:inline text-xs">{t('stats.header.refresh')}</span>
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 md:gap-4">
+          <div className={`grid gap-2 md:gap-4 ${simplified ? 'grid-cols-2' : 'grid-cols-3'}`}>
+            {!simplified && (
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-1">Rang</p>
+              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-1">{t('stats.header.rank')}</p>
               <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r ${rankColorClass} text-white text-sm font-semibold`}>
                 <span>{rankIcon}</span>
                 <span>{rank}</span>
               </div>
             </div>
+            )}
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 md:p-4 text-center">
-              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-1">Score</p>
+              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-1">{t('stats.header.score')}</p>
               <p className="text-xl md:text-2xl font-bold text-white tabular-nums">{globalScore}</p>
-              <p className="text-[10px] text-white/50 truncate">{scoreLabel}</p>
+              <p className="text-[10px] text-white/50 truncate">{scoreLabel || t('stats.header.score')}</p>
             </div>
             <div className="rounded-xl bg-black/20 border border-white/10 p-3 md:p-4">
-              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-2 text-center">Progression</p>
+              <p className="text-[10px] md:text-xs text-white/60 uppercase tracking-wide mb-2 text-center">{t('stats.header.progression')}</p>
               <Progress value={progress} size="sm" variant="subtle" className="mb-1.5" />
               <p className="text-center text-xs font-semibold text-white tabular-nums">{Math.round(progress)}%</p>
             </div>

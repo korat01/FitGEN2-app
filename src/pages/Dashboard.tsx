@@ -8,6 +8,7 @@ import { useExerciseValidation } from '../contexts/ExerciseContext';
 import { scoringEngine } from '../utils/scoring';
 import { Dumbbell, Target, TrendingUp, Zap, Clock, Weight, Gauge, Activity, BarChart3, Star, Award, Flame, Sparkles, Heart, CheckCircle, Play, Pause, RotateCcw, Plus, Calendar, Timer, Users, Settings, Bell, Search, Apple, Feather, Crown, Footprints } from 'lucide-react';
 import { getRankColors, type RankLevel } from '@/config/rankTheme';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Nouveaux composants pour le Dashboard
 import { XPLevelBar } from '@/components/XPLevelBar';
@@ -54,6 +55,7 @@ export const Dashboard: React.FC = () => {
     userRank,
     refreshFromStorage,
   } = usePerformanceStats();
+  const { t } = useLanguage();
   const [weekKey, setWeekKey] = useState(getWeekKey());
 
   // NOUVEAUX ÉTATS POUR LES COMPOSANTS DASHBOARD
@@ -121,7 +123,7 @@ export const Dashboard: React.FC = () => {
         const bestTotal = bestSquat + bestBench + bestDeadlift;
 
         return {
-          label: 'Meilleur Total',
+          label: t('dashboard.mainStat.bestTotal'),
           value: `${bestTotal} kg`,
           icon: Dumbbell,
           description: `Squat: ${bestSquat}kg + Bench: ${bestBench}kg + Deadlift: ${bestDeadlift}kg`
@@ -139,7 +141,7 @@ export const Dashboard: React.FC = () => {
         const bestStreetPullups = streetPullups.length > 0 ? Math.max(...streetPullups) : 0;
         const streetTotal = bestStreetSquat + bestStreetBench + bestStreetDeadlift;
         return {
-          label: 'Meilleur Total Street',
+          label: t('dashboard.mainStat.bestTotalStreet'),
           value: `${streetTotal} kg`,
           icon: Weight,
           description: `+ ${bestStreetPullups} tractions max`
@@ -152,7 +154,7 @@ export const Dashboard: React.FC = () => {
         const bestTime200m = sprint200m.length > 0 ? Math.min(...sprint200m) : 0;
         const maxSpeed = bestTime100m > 0 ? (100 / bestTime100m * 3.6).toFixed(1) : '0';
         return {
-          label: 'Meilleur 100m',
+          label: t('dashboard.mainStat.best100m'),
           value: `${bestTime100m > 0 ? bestTime100m.toFixed(1) : '0'}s`,
           icon: Zap,
           description: `Vitesse max: ${maxSpeed} km/h`
@@ -168,17 +170,17 @@ export const Dashboard: React.FC = () => {
           const hours = Math.floor(bestMarathonTime / 60);
           const minutes = bestMarathonTime % 60;
           return {
-            label: 'Meilleur Marathon',
+            label: t('dashboard.mainStat.bestMarathon'),
             value: `${hours}h${minutes.toString().padStart(2, '0')}`,
             icon: Footprints,
-            description: 'Temps record'
+            description: t('dashboard.mainStat.recordTime')
           };
         } else {
           return {
-            label: 'Meilleure Distance',
+            label: t('dashboard.mainStat.bestDistance'),
             value: `${bestDistance30min.toFixed(1)} km`,
             icon: Footprints,
-            description: 'En 30 minutes'
+            description: t('dashboard.mainStat.in30min')
           };
         }
       case 'crossfit':
@@ -186,10 +188,10 @@ export const Dashboard: React.FC = () => {
         const crossfitPerformances = performances.filter(p => ['burpees', 'pullups', 'squat', 'bench', 'bench_press'].includes(p.discipline));
         const bestCrossfitScore = crossfitPerformances.length > 0 ? Math.max(...crossfitPerformances.map(p => p.value || 0)) : 0;
         return {
-          label: 'Meilleure Perf',
+          label: t('dashboard.mainStat.bestPerf'),
           value: `${bestCrossfitScore}`,
           icon: Flame,
-          description: 'Meilleure performance'
+          description: t('dashboard.mainStat.bestPerf')
         };
       case 'calisthenics':
         // Pour le calisthenics : MEILLEURES performances
@@ -198,18 +200,18 @@ export const Dashboard: React.FC = () => {
         const bestPullups = pullupsPerformances.length > 0 ? Math.max(...pullupsPerformances) : 0;
         const bestMuscleUps = muscleUpsPerformances.length > 0 ? Math.max(...muscleUpsPerformances) : 0;
         return {
-          label: 'Meilleures Tractions',
+          label: t('dashboard.mainStat.bestPullups'),
           value: `${bestPullups} reps`,
           icon: TrendingUp,
-          description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : 'En une série'
+          description: bestMuscleUps > 0 ? `+ ${bestMuscleUps} muscle-ups` : t('dashboard.mainStat.oneSet')
         };
       default:
         // Pour classique : score global
         return {
-          label: 'Score Global',
+          label: t('dashboard.mainStat.globalScore'),
           value: `${user?.globalScore ?? userRank?.globalScore ?? 0} ${user?.scoreLabel || userRank?.scoreLabel || 'pts'}`,
           icon: Star,
-          description: 'Performance générale'
+          description: t('dashboard.mainStat.generalPerf')
         };
     }
   };
@@ -228,14 +230,14 @@ export const Dashboard: React.FC = () => {
   // (le cas "classique" lit aussi userRank.globalScore, doit être dans les deps)
   const mainStat = useMemo(
     () => getMainStatForSportClass(user?.sportClass || 'classique', performances),
-    [user?.sportClass, performances, userRank]
+    [user?.sportClass, performances, userRank, t]
   );
 
   if (!user) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-lg text-muted-foreground">Chargement...</p>
+          <p className="text-lg text-muted-foreground">{t('dashboard.loading')}</p>
         </div>
       </div>;
   }
@@ -244,12 +246,33 @@ export const Dashboard: React.FC = () => {
   const rankColors = getRankColors(rankKey);
   const RankIcon = RANK_ICONS[rankKey] || Star;
   const isHunterRank = rankKey === 'S' || rankKey === 'Nation' || rankKey === 'World';
+  // Mode simplifié (voir ProfileSummary.tsx) : DA épurée sans rang/niveau/XP/quêtes/streaks —
+  // seuls la donnée réelle (poids, programme, nutrition, historique) reste affichée.
+  const simplifiedMode = user?.simplifiedMode === true;
 
   return (
     <div className="relative">
       <div className="container mx-auto px-4 py-8 relative z-10 page-transition">
       <div className="space-y-8 stagger-animation">
 
+          {simplifiedMode ? (
+            /* Header simplifié — juste une salutation et l'accès rapide aux performances, sans
+               rang/XP/niveau. Reste dans .glass-card (aplatie par .simple-mode, voir index.css)
+               pour garder la cohérence visuelle avec le reste de l'app. */
+            <div className="glass-card rounded-2xl md:rounded-3xl p-5 md:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+                  {t('dashboard.greeting')}{user.name ? `, ${user.name.split(' ')[0]}` : ''}
+                </h1>
+                <p className="text-muted-foreground mt-1">{mainStat.label} · {mainStat.value}</p>
+              </div>
+              <Button onClick={() => window.location.href = '/stats'} className="shrink-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                <Plus className="w-4 h-4 mr-1.5" />
+                {t('dashboard.performances')}
+              </Button>
+            </div>
+          ) : (
+          <>
           {/* Header Principal - VitalForce DA (recoloré en mode Hunter via .hunter-mode sur <html>,
               voir App.tsx — les coins lumineux "fenêtre System" ne s'affichent qu'ici) */}
           <div className={`relative overflow-hidden rounded-2xl md:rounded-3xl p-4 md:p-8 text-white shadow-[var(--shadow-glow-purple)] glass-card border border-primary/30 ${isHunterRank ? 'hunter-panel' : ''}`}>
@@ -284,14 +307,14 @@ export const Dashboard: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3">
                     {/* STATISTIQUE PRINCIPALE SELON LA CLASSE DE SPORT */}
                     <div className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full bg-gradient-to-r from-secondary to-secondary/80 text-primary-foreground font-semibold shadow-[var(--shadow-glow-blue)] text-sm md:text-base">
                       <mainStat.icon className="w-4 h-4 md:w-5 md:h-5" />
                       <span>{mainStat.label}: {mainStat.value}</span>
                     </div>
-                    
+
                     {/* RANG CALCULÉ AVEC LES PERFORMANCES — teinté dynamiquement selon le rang atteint */}
                     <div
                       className="inline-flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full text-white font-semibold text-sm md:text-base"
@@ -301,24 +324,24 @@ export const Dashboard: React.FC = () => {
                       }}
                     >
                       <RankIcon className="w-4 h-4 md:w-5 md:h-5" />
-                      <span>Rang {rankKey}</span>
+                      <span>{t('profile.rank')} {rankKey}</span>
                     </div>
-                
+
                     <Button onClick={recalculateRank} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
                       <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                      Recalculer
+                      {t('dashboard.recalculate')}
                     </Button>
 
                     <Button onClick={() => window.location.href = '/stats'} size="sm" className="bg-card/30 hover:bg-card/50 text-foreground border-primary/30 backdrop-blur-sm text-xs md:text-sm">
                       <Plus className="w-3.5 h-3.5 mr-1.5" />
-                      Performances
+                      {t('dashboard.performances')}
                     </Button>
                 </div>
               </div>
 
                 <div className="space-y-3 md:space-y-4 mt-4">
                   <div className="text-foreground/90 font-medium text-sm md:text-base">
-                    Progression vers le rang {userRank?.nextRank || 'C'}
+                    {t('dashboard.progressTo')} {userRank?.nextRank || 'C'}
                   </div>
                   <div className="w-full max-w-md">
                     <Progress value={userRank?.rankProgressPercent || 0} size="md" variant="subtle" />
@@ -327,28 +350,39 @@ export const Dashboard: React.FC = () => {
                     <span className="text-foreground font-bold text-lg md:text-xl">
                       {Math.round(userRank?.rankProgressPercent || 0)}%
                     </span>
-                    <span className="text-foreground/80"> vers le rang {userRank?.nextRank || 'C'}</span>
+                    <span className="text-foreground/80"> {t('dashboard.towardRank')} {userRank?.nextRank || 'C'}</span>
                   </div>
                 </div>
             </div>
           </div>
-        </div>
+          </div>
+          </>
+          )}
 
-        {/* NOUVEAUX COMPOSANTS DASHBOARD */}
+        {/* NOUVEAUX COMPOSANTS DASHBOARD — masqués en mode simplifié (gamification) */}
+        {!simplifiedMode && (
+          <>
         {/* Barre XP & Niveau */}
         <XPLevelBar />
+          </>
+        )}
 
-        {/* Tracker d'habitudes : suivi quotidien + régularité sur les dernières semaines */}
+        {/* Tracker d'habitudes : suivi quotidien + régularité sur les dernières semaines — reste
+            visible en mode simplifié, c'est du suivi factuel, pas de la gamification. */}
         <HabitTracker />
 
         {/* Calculateur de 1RM — réservé aux powerlifters */}
         {user.sportClass === 'power' && <OneRepMaxCalculator />}
 
+        {!simplifiedMode && (
+          <>
         {/* Widget Quêtes */}
         <QuestWidget />
 
         {/* Streak & Régularité */}
         {streakData && <StreakDisplay streakData={streakData} />}
+          </>
+        )}
 
           {/* Statistiques rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
@@ -378,7 +412,7 @@ export const Dashboard: React.FC = () => {
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Poids</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">{t('dashboard.weight')}</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.weight} kg</p>
                   </div>
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -392,7 +426,7 @@ export const Dashboard: React.FC = () => {
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Âge</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">{t('dashboard.age')}</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{user.age} ans</p>
                   </div>
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-accent/15 border border-accent/25 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -406,7 +440,7 @@ export const Dashboard: React.FC = () => {
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Sport</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">{t('dashboard.sport')}</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground capitalize truncate">{user.sportClass}</p>
                       </div>
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/15 border border-primary/25 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -420,7 +454,7 @@ export const Dashboard: React.FC = () => {
               <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">Performances</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mb-1 truncate">{t('dashboard.performances')}</p>
                     <p className="text-lg md:text-2xl font-bold text-foreground truncate">{performances.length}</p>
                   </div>
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-secondary/15 border border-secondary/25 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -431,38 +465,40 @@ export const Dashboard: React.FC = () => {
             </Card>
           </div>
 
-          {/* Achievements Badges Row */}
+          {/* Achievements Badges Row — masqué en mode simplifié */}
+          {!simplifiedMode && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
                 <Award className="w-5 h-5 text-secondary" />
-                Achievements
+                {t('dashboard.achievements')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <HexagonBadgeRow 
+              <HexagonBadgeRow
                 badges={[
-                  { level: 1, title: 'Débutant', variant: 'bronze', unlocked: true },
-                  { level: 5, title: 'Régulier', variant: 'primary', unlocked: (xpData?.level || 1) >= 5 },
-                  { level: 10, title: 'Confirmé', variant: 'platinum', unlocked: (xpData?.level || 1) >= 10 },
-                  { level: 25, title: 'Expert', variant: 'gold', unlocked: (xpData?.level || 1) >= 25 },
-                  { level: 50, title: 'Légende', variant: 'diamond', unlocked: (xpData?.level || 1) >= 50 },
+                  { level: 1, title: t('dashboard.badge.beginner'), variant: 'bronze', unlocked: true },
+                  { level: 5, title: t('dashboard.badge.regular'), variant: 'primary', unlocked: (xpData?.level || 1) >= 5 },
+                  { level: 10, title: t('dashboard.badge.confirmed'), variant: 'platinum', unlocked: (xpData?.level || 1) >= 10 },
+                  { level: 25, title: t('dashboard.badge.expert'), variant: 'gold', unlocked: (xpData?.level || 1) >= 25 },
+                  { level: 50, title: t('dashboard.badge.legend'), variant: 'diamond', unlocked: (xpData?.level || 1) >= 50 },
                 ]}
                 size="sm"
               />
             </CardContent>
           </Card>
+          )}
 
           {/* Progression hebdomadaire (données réelles, reset lundi) */}
           <WeeklyProgressChart
             key={weekKey}
-            title="Progression hebdomadaire"
+            title={t('dashboard.weeklyProgress')}
             performances={performances}
             validations={validations}
           />
 
           {/* Accès rapide : records, graphiques, classement */}
-          <ProgressionPreviewCard userRank={userRank} performancesCount={performances.length} />
+          <ProgressionPreviewCard userRank={userRank} performancesCount={performances.length} simplified={simplifiedMode} />
 
           {/* Actions rapides */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -471,8 +507,8 @@ export const Dashboard: React.FC = () => {
                 <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Ma progression</h3>
-                <p className="text-muted-foreground">Records, graphiques et classement</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{t('dashboard.quickActions.progress.title')}</h3>
+                <p className="text-muted-foreground">{t('dashboard.quickActions.progress.desc')}</p>
               </CardContent>
             </Card>
 
@@ -481,8 +517,8 @@ export const Dashboard: React.FC = () => {
                 <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Dumbbell className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Mon Programme</h3>
-                <p className="text-muted-foreground">Gérer mes entraînements</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{t('dashboard.quickActions.programme.title')}</h3>
+                <p className="text-muted-foreground">{t('dashboard.quickActions.programme.desc')}</p>
               </CardContent>
             </Card>
 
@@ -491,8 +527,8 @@ export const Dashboard: React.FC = () => {
                 <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Apple className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Nutrition</h3>
-                <p className="text-muted-foreground">Aliments, repas et objectifs</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{t('dashboard.quickActions.nutrition.title')}</h3>
+                <p className="text-muted-foreground">{t('dashboard.quickActions.nutrition.desc')}</p>
               </CardContent>
             </Card>
 
@@ -501,8 +537,8 @@ export const Dashboard: React.FC = () => {
                 <div className="w-16 h-16 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
               </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Mon Profil</h3>
-                <p className="text-muted-foreground">Modifier mes informations</p>
+                <h3 className="text-xl font-bold text-foreground mb-2">{t('dashboard.quickActions.profile.title')}</h3>
+                <p className="text-muted-foreground">{t('dashboard.quickActions.profile.desc')}</p>
             </CardContent>
           </Card>
           </div>

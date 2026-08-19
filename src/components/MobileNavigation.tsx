@@ -1,17 +1,25 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Play, Apple, BarChart3, User } from 'lucide-react';
+import { Home, Play, Apple, BarChart3, User, Users } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MobileNavigation: React.FC = () => {
   const location = useLocation();
-  const isActive = (path: string) => location.pathname === path;
+  const { t } = useLanguage();
+  const { user } = useAuth();
+  const simplified = user?.simplifiedMode === true;
+  const isCoach = user?.isCoach === true;
+  const isActive = (path: string) => location.pathname === path || (path === '/coaching' && location.pathname.startsWith('/coaching'));
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Accueil' },
-    { path: '/programme', icon: Play, label: 'Programme' },
-    { path: '/nutrition', icon: Apple, label: 'Nutrition' },
-    { path: '/stats', icon: BarChart3, label: 'Stats' },
-    { path: '/profile', icon: User, label: 'Profil' }
+    { path: '/', icon: Home, label: t('nav.home') },
+    isCoach
+      ? { path: '/coaching', icon: Users, label: t('nav.coaching') }
+      : { path: '/programme', icon: Play, label: t('nav.programme') },
+    { path: '/nutrition', icon: Apple, label: t('nav.nutrition') },
+    { path: '/stats', icon: BarChart3, label: t('nav.stats') },
+    { path: '/profile', icon: User, label: t('nav.profile') }
   ];
 
   return (
@@ -40,17 +48,17 @@ const MobileNavigation: React.FC = () => {
               {active && (
                 <div
                   className="absolute inset-0 bg-secondary/15 rounded-xl border border-secondary/40"
-                  style={{ boxShadow: '0 0 18px hsl(var(--secondary) / 0.35)' }}
+                  style={simplified ? undefined : { boxShadow: '0 0 18px hsl(var(--secondary) / 0.35)' }}
                 />
               )}
               <div className={`relative transition-transform duration-300 ${
-                active ? 'scale-110' : ''
+                active && !simplified ? 'scale-110' : ''
               }`}>
                 {Icon && (
                   <Icon
                     className={`w-6 h-6 transition-all duration-300 ${
                       active
-                        ? 'stroke-[2.5] drop-shadow-[0_0_14px_hsl(var(--secondary)/0.95)]'
+                        ? `stroke-[2.5] ${simplified ? '' : 'drop-shadow-[0_0_14px_hsl(var(--secondary)/0.95)]'}`
                         : 'stroke-[2.25]'
                     }`}
                   />
